@@ -9,7 +9,7 @@ LASY manipulates laser pulses, and operates on the laser envelope. The definitio
 .. math::
 
    1+1=2
-   E_x (x,y,t) = \Re ( \mathcal{E} e^{-i\omega_0t}p_x)
+
  
 Style conventions
 -----------------
