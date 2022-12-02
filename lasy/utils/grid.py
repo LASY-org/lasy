@@ -23,6 +23,6 @@ class Grid:
         self.ncomps = ncomps
         if array_in is not None:
             assert(box.npoints == array_in.shape)
-            self.field = array_in
+            self.field = array_in.astype('complex128')
         else:
-            self.field = np.zeros(box.npoints)
+            self.field = np.zeros(box.npoints, dtype='complex128')
