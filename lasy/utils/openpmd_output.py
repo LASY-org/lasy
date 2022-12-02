@@ -23,7 +23,7 @@ def write_to_openpmd_file(file_prefix, file_format, box, dim, array_in, pol):
         The array should contain the complex envelope of the electric field.
 
     pol: list of 2 complex numbers
-        Polarization vector that multiplies array_in to get the Ex and Ey fields.
+        Polarization vector that multiplies array_in to get the Ex and Ey array_ins.
     """
     # Create file
     series = io.Series(
@@ -31,34 +31,41 @@ def write_to_openpmd_file(file_prefix, file_format, box, dim, array_in, pol):
         io.Access.create)
     i = series.iterations[0]
 
-    # Define the field metadata
-    E = i.meshes["E"]
-    E.grid_spacing = [ (hi-lo)/npoints for hi, lo, npoints in \
-                           zip( box.hi, box.lo, box.npoints ) ]
-    E.grid_global_offset = box.lo
-    E.axis_labels = ['x', 'y', 't']
-    E.unit_dimension = {
-        io.Unit_Dimension.M:  1,
-        io.Unit_Dimension.L:  1,
-        io.Unit_Dimension.I: -1,
-        io.Unit_Dimension.T: -3
-    }
-    if dim == 'xyz':
-        E.geometry = io.Geometry.cartesian
-    elif dim == 'rz':
-        E.geometry = io.Geometry.thetaMode
+    # Define Ex_real, Ex_imag, Ey_real, Ey_imag as scalar records
+    for comp_name in ['Ex_real', 'Ex_imag', 'Ey_real', 'Ey_imag']:
 
-    # Define the data sets
-    dataset = io.Dataset(field.dtype, field.shape)
+        # Define the mesh
+        m = i.meshes[comp_name]
+        m.grid_spacing = [ (hi-lo)/npoints for hi, lo, npoints in \
+                               zip( box.hi, box.lo, box.npoints ) ]
+        m.grid_global_offset = box.lo
+        m.axis_labels = ['x', 'y', 't']
+        m.unit_dimension = {
+            io.Unit_Dimension.M:  1,
+            io.Unit_Dimension.L:  1,
+            io.Unit_Dimension.I: -1,
+            io.Unit_Dimension.T: -3
+        }
+        if dim == 'xyz':
+            m.geometry = io.Geometry.cartesian
+        elif dim == 'rz':
+            m.geometry = io.Geometry.thetaMode
 
-    Ex = E["x"]
-    Ex.position = [0]*len(dim)
-    Ex.reset_dataset(dataset)
-    Ex.store_chunk( field*pol[0] )
+        # Define the dataset
+        dataset = io.Dataset(array_in.real.dtype, array_in.real.shape)
+        E = m[io.Mesh_Record_Component.SCALAR]
+        E.position = [0]*len(dim)
+        E.reset_dataset(dataset)
 
-    Ey = E["y"]
-    Ey.position = [0]*len(dim)
-    Ey.reset_dataset(dataset)
-    Ey.store_chunk( field*pol[1] )
+        # Pick the correct field
+        if comp_name == 'Ex_real':
+            data = (array_in*pol[0]).real.copy()
+        elif comp_name == 'Ex_imag':
+            data = (array_in*pol[0]).imag.copy()
+        elif comp_name == 'Ey_real':
+            data = (array_in*pol[1]).real.copy()
+        elif comp_name == 'Ey_imag':
+            data = (array_in*pol[1]).imag.copy()
+        E.store_chunk( data )
 
     series.flush()
