@@ -3,7 +3,7 @@ import scipy.constants as scc
 
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
-
+from lasy.utils.openpmd_output import write_to_openpmd_file
 
 class Laser:
     """
@@ -78,7 +78,7 @@ class Laser:
         # This mimics a laser pulse propagating rigidly.
         # TODO: actual propagation.
 
-    def write_to_file(self, file_prefix="laser", file_format='hdf5'):
+    def write_to_file(self, file_prefix="laser", file_format='h5'):
         """
         Write the laser profile + metadata to file.
 
@@ -88,12 +88,8 @@ class Laser:
             The file name will start with this prefix.
 
         file_format: string
-            Format to be used for the output file. Options are "hdf5" and "bp".
+            Format to be used for the output file. Options are "h5" and "bp".
         """
-
-        # As Angel suggested, I would recommend putting the openPMD implementation
-        # in a separate file, and not importing openPMD-api here.
-        # That should clean up the import and allow for more flexibility
-        # TODO: actual dumping to file.
-        print("lo = ", self.field.box.lo)
-        print("The laser was dumped. Check the recycle bin.")
+        write_to_openpmd_file( file_prefix, file_format,
+                               self.field.box, self.dim, self.field.field,
+                               self.lambda0, self.pol )
