@@ -1,6 +1,7 @@
 import openpmd_api as io
 
-def write_to_openpmd_file(file_prefix, file_format, box, dim, array_in, pol):
+def write_to_openpmd_file(file_prefix, file_format, box,
+                          dim, array_in, wavelength, pol):
     """
     Write the laser field into an openPMD file
 
@@ -22,6 +23,9 @@ def write_to_openpmd_file(file_prefix, file_format, box, dim, array_in, pol):
         n-dimensional (n=2 for dim='rz', n=3 for dim='xyz') array with laser field
         The array should contain the complex envelope of the electric field.
 
+    wavelength: scalar
+        Central wavelength for which the laser pulse envelope is defined.
+
     pol: list of 2 complex numbers
         Polarization vector that multiplies array_in to get the Ex and Ey array_ins.
     """
@@ -31,8 +35,12 @@ def write_to_openpmd_file(file_prefix, file_format, box, dim, array_in, pol):
         io.Access.create)
     i = series.iterations[0]
 
-    # Define Ex_real, Ex_imag, Ey_real, Ey_imag as scalar records
-    for comp_name in ['Ex_real', 'Ex_imag', 'Ey_real', 'Ey_imag']:
+    # Store metadata needed to reconstruct the field
+    i.set_attribute("wavelength", wavelength)
+    i.set_attribute("pol", pol)
+
+    # Define E_real, E_imag as scalar records
+    for comp_name in ['E_real', 'E_imag']:
 
         # Define the mesh
         m = i.meshes[comp_name]
@@ -58,14 +66,10 @@ def write_to_openpmd_file(file_prefix, file_format, box, dim, array_in, pol):
         E.reset_dataset(dataset)
 
         # Pick the correct field
-        if comp_name == 'Ex_real':
-            data = (array_in*pol[0]).real.copy()
-        elif comp_name == 'Ex_imag':
-            data = (array_in*pol[0]).imag.copy()
-        elif comp_name == 'Ey_real':
-            data = (array_in*pol[1]).real.copy()
-        elif comp_name == 'Ey_imag':
-            data = (array_in*pol[1]).imag.copy()
+        if comp_name == 'E_real':
+            data = (array_in).real.copy()
+        elif comp_name == 'E_imag':
+            data = (array_in).imag.copy()
         E.store_chunk( data )
 
     series.flush()

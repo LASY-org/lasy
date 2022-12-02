@@ -91,5 +91,5 @@ class Laser:
             Format to be used for the output file. Options are "h5" and "bp".
         """
         write_to_openpmd_file( file_prefix, file_format,
-                               self.field.box, self.dim,
-                               self.field.field, self.pol )
+                               self.field.box, self.dim, self.field.field,
+                               self.lambda0, self.pol )
