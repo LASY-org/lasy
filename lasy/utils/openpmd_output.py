@@ -17,10 +17,10 @@ def write_to_openpmd_file(file_prefix, file_format, box,
         Defines the grid over which the laser is dumped
 
     dim: string
-        Dimension of the array, 'rz' or 'xyz'
+        Dimension of the array, 'rt' or 'xyt'
 
     array_in: numpy complex array
-        n-dimensional (n=2 for dim='rz', n=3 for dim='xyz') array with laser field
+        n-dimensional (n=2 for dim='rt', n=3 for dim='xyt') array with laser field
         The array should contain the complex envelope of the electric field.
 
     wavelength: scalar
@@ -54,9 +54,9 @@ def write_to_openpmd_file(file_prefix, file_format, box,
             io.Unit_Dimension.I: -1,
             io.Unit_Dimension.T: -3
         }
-        if dim == 'xyz':
+        if dim == 'xyt':
             m.geometry = io.Geometry.cartesian
-        elif dim == 'rz':
+        elif dim == 'rt':
             m.geometry = io.Geometry.thetaMode
 
         # Define the dataset

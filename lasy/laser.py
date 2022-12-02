@@ -18,7 +18,11 @@ class Laser:
         Parameters
         ----------
         dim: string
-            Dimension of the array, 'rz' or 'xyz'
+            Dimensionality of the array. Options are:
+            - 'xyt': The laser pulse is represented on a 3D grid:
+                     Cartesian (x,y) transversely, and temporal (t) longitudinally.
+            - 'rt' : The laser pulse is represented on a 2D grid:
+                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
         lo: list of scalars
             Lower end of the physical domain where the laser array is defined
@@ -27,7 +31,7 @@ class Laser:
             Higher end of the physical domain where the laser array is defined
 
         array_in: numpy complex array
-            n-dimensional (n=2 for dim='rz', n=3 for dim='xyz') array with laser field
+            n-dimensional (n=2 for dim='rt', n=3 for dim='xyt') array with laser field
             The array should contain the complex envelope of the electric field.
             The magnetic field is assumed orthogonal to the electric field, with the same profile
             and a magnitude c times lower.
@@ -47,9 +51,9 @@ class Laser:
             The polarization vector is normalized to have a unitary magnitude.
         """
 
-        self.ndims = 2 if dim == 'rz' else 3
+        self.ndims = 2 if dim == 'rt' else 3
 
-        assert(dim in ['rz', 'xyz'])
+        assert(dim in ['rt', 'xyt'])
         assert(len(lo) == self.ndims)
         assert(len(hi) == self.ndims)
         assert(array_in.ndim == self.ndims)

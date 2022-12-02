@@ -13,20 +13,24 @@ class Box:
 
         Parameters
         ----------
-        dim : string
-            Dimensionality of the box, 'xyz' or 'rz'
+        dim: string
+            Dimensionality of the array. Options are:
+            - 'xyt': The laser pulse is represented on a 3D grid:
+                     Cartesian (x,y) transversely, and temporal (t) longitudinally.
+            - 'rt' : The laser pulse is represented on a 2D grid:
+                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
         lo, hi : list of scalars
             Lower and higher end of the physical domain of the box.
-            One element per direction (2 for dim='rz', 3 for dim='xyz')
+            One element per direction (2 for dim='rt', 3 for dim='xyt')
 
         npoints : tuple of int
             Number of points in each direction.
-            One element per direction (2 for dim='rz', 3 for dim='xyz')
-            For the moment, the lower end is assumed to be (0,0) in rz and (0,0,0) in xyz
+            One element per direction (2 for dim='rt', 3 for dim='xyt')
+            For the moment, the lower end is assumed to be (0,0) in rt and (0,0,0) in xyt
         """
         self.dim = dim
-        self.ndims = 2 if dim == 'rz' else 3
+        self.ndims = 2 if dim == 'rt' else 3
         self.lo = list(lo)
         self.hi = list(hi)
         self.npoints = npoints
