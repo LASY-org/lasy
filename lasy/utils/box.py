@@ -31,6 +31,10 @@ class Box:
         """
         self.dim = dim
         self.ndims = 2 if dim == 'rt' else 3
+        assert(dim in ['rt', 'xyt'])
+        assert(len(lo) == self.ndims)
+        assert(len(hi) == self.ndims)
+
         self.lo = list(lo)
         self.hi = list(hi)
         self.npoints = npoints

@@ -1,15 +1,21 @@
 import numpy as np
-from lasy.laser import Laser
+from lasy.utils.box import Box
+from lasy.gaussian_laser import GaussianLaser
 
-lo = (1,2,3)
-hi = (4,6,8)
 dim = 'xyt'
-npoints=(2,3,2)
+lo = (-10e-6, -10e-6, -60e-15)
+hi = (+10e-6, +10e-6, +60e-15)
+npoints=(20,20,20)
+box = Box( dim, lo, hi, npoints)
 
-array_in = np.random.rand(*npoints) + 1.j*np.random.rand(*npoints)
 wavelength=.8e-6
 pol = (1,0)
-laser = Laser(dim, lo, hi, array_in, wavelength, pol)
+laser_energy = 1. # J
+t_peak = 0.e-15 # s
+tau = 30.e-15 # s
+w0 = 5.e-6 # m
+
+laser = GaussianLaser(box, wavelength, pol, laser_energy, w0, tau, t_peak)
 laser.write_to_file()
 laser.propagate(1)
 laser.write_to_file()
