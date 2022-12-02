@@ -3,7 +3,7 @@ import scipy.constants as scc
 
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
-
+from lasy.utils.openpmd_output import write_to_openpmd_file
 
 class Laser:
     """
@@ -93,43 +93,3 @@ class Laser:
         write_to_openpmd_file( file_prefix, file_format,
                                self.field.box, self.dim,
                                self.field.field, self.pol )
-
-def write_to_openpmd_file(file_prefix, file_format, box, dim, field, pol):
-    import openpmd_api as io
-    # Create file
-    series = io.Series(
-        "{}_%05T.{}".format(file_prefix, file_format),
-        io.Access.create)
-    i = series.iterations[0]
-
-    # Define the field metadata
-    E = i.meshes["E"]
-    E.grid_spacing = [ (hi-lo)/npoints for hi, lo, npoints in \
-                           zip( box.hi, box.lo, box.npoints ) ]
-    E.grid_global_offset = box.lo
-    E.axis_labels = ['x', 'y', 't']
-    E.unit_dimension = {
-        io.Unit_Dimension.M:  1,
-        io.Unit_Dimension.L:  1,
-        io.Unit_Dimension.I: -1,
-        io.Unit_Dimension.T: -3
-    }
-    if dim == 'xyz':
-        E.geometry = io.Geometry.cartesian
-    elif dim == 'rz':
-        E.geometry = io.Geometry.thetaMode
-
-    # Define the data sets
-    dataset = io.Dataset(field.dtype, field.shape)
-
-    Ex = E["x"]
-    Ex.position = [0]*len(dim)
-    Ex.reset_dataset(dataset)
-    Ex.store_chunk( field*pol[0] )
-
-    Ey = E["y"]
-    Ey.position = [0]*len(dim)
-    Ey.reset_dataset(dataset)
-    Ey.store_chunk( field*pol[1] )
-
-    series.flush()
