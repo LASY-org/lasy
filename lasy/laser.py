@@ -97,10 +97,50 @@ class Laser:
         # TODO: actual dumping to file.
         print("lo = ", self.field.box.lo)
         import openpmd_api as io
+
+        box = self.field.box
+        dim = self.dim
+        field = self.field.field
+        pol = self.pol
+
+        # Create file
         series = io.Series(
             "{}_%05T.{}".format(file_prefix, file_format),
             io.Access.create)
         i = series.iterations[0]
+
+        # Define the field metadata
+        E = i.meshes["E"]
+        E.grid_spacing = [ (hi-lo)/npoints for hi, lo, npoints in \
+                               zip( box.hi, box.lo, box.npoints ) ]
+        E.grid_global_offset = box.lo
+        E.axis_labels = ['x', 'y', 't']
+        E.unit_dimension = {
+            io.Unit_Dimension.M:  1,
+            io.Unit_Dimension.L:  1,
+            io.Unit_Dimension.I: -1,
+            io.Unit_Dimension.T: -3
+        }
+        if dim == 'xyz':
+            E.geometry = io.Geometry.cartesian
+        elif dim == 'rz':
+            E.geometry = io.Geometry.thetaMode
+
+        # Define the data sets
+        dataset = io.Dataset(
+            self.field.field.dtype,
+            self.field.field.shape)
+
+        Ex = E["x"]
+        Ex.position = [0]*len(dim)
+        Ex.reset_dataset(dataset)
+        Ex.store_chunk( field*pol[0] )
+
+        Ey = E["y"]
+        Ey.position = [0]*len(dim)
+        Ey.reset_dataset(dataset)
+        Ey.store_chunk( field*pol[1] )
+
         series.flush()
         print(self.field.field)
         print("The laser was dumped. Check the recycle bin.")
