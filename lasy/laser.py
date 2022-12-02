@@ -77,8 +77,8 @@ class Laser:
             Distance by which the laser pulse should be propagated
         """
 
-        self.field.box.lo[-1] += distance
-        self.field.box.hi[-1] += distance
+        self.field.box.lo[-1] += distance/scc.c
+        self.field.box.hi[-1] += distance/scc.c
         # This mimics a laser pulse propagating rigidly.
         # TODO: actual propagation.
 
