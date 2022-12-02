@@ -3,7 +3,7 @@ from lasy.laser import Laser
 
 lo = (1,2,3)
 hi = (4,6,8)
-dim = 'xyz'
+dim = 'xyt'
 npoints=(2,3,2)
 
 array_in = np.zeros(npoints)
