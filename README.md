@@ -10,8 +10,8 @@ LASY manipulates laser pulses, and operates on the laser envelope. The definitio
    E_y(x,y,t) = \Re ( \mathcal{E}(x,y,t) e^{-i\omega_0t}p_y)\end{aligned}
 ```
 
-where $$E_x$$ (resp. $$E_y$$) is the laser electric field in the x (resp. y) direction, $$\mathcal{E}$$ is the complex laser envelope stored and used in lasy, $$\omega_0 = 2\pi c/\lambda_0$$ is the angular frequenc\
-y defined from the laser wavelength $$\lambda_0$$ and $$(p_x,p_y)$$ is the (complex and normalized) polarization vector.
+where $E_x$ (resp. $E_y$) is the laser electric field in the x (resp. y) direction, $\mathcal{E}$ is the complex laser envelope stored and used in lasy, $\omega_0 = 2\pi c/\lambda_0$ is the angular frequenc\
+y defined from the laser wavelength $\lambda_0$ and $(p_x,p_y)$ is the (complex and normalized) polarization vector.
  
 ## Style conventions
 
