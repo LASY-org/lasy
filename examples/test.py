@@ -6,7 +6,7 @@ hi = (4,6,8)
 dim = 'xyz'
 npoints=(2,3,2)
 
-array_in = np.zeros(npoints)
+array_in = np.random.rand(*npoints)
 wavelength=.8e-6
 pol = (1,0)
 laser = Laser(dim, lo, hi, array_in, wavelength, pol)

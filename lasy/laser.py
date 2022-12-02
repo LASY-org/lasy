@@ -78,7 +78,7 @@ class Laser:
         # This mimics a laser pulse propagating rigidly.
         # TODO: actual propagation.
 
-    def write_to_file(self, file_prefix="laser", file_format='hdf5'):
+    def write_to_file(self, file_prefix="laser", file_format='h5'):
         """
         Write the laser profile + metadata to file.
 
@@ -88,7 +88,7 @@ class Laser:
             The file name will start with this prefix.
 
         file_format: string
-            Format to be used for the output file. Options are "hdf5" and "bp".
+            Format to be used for the output file. Options are "h5" and "bp".
         """
 
         # As Angel suggested, I would recommend putting the openPMD implementation
@@ -96,4 +96,11 @@ class Laser:
         # That should clean up the import and allow for more flexibility
         # TODO: actual dumping to file.
         print("lo = ", self.field.box.lo)
+        import openpmd_api as io
+        series = io.Series(
+            "{}_%05T.{}".format(file_prefix, file_format),
+            io.Access.create)
+        i = series.iterations[0]
+        series.flush()
+        print(self.field.field)
         print("The laser was dumped. Check the recycle bin.")
