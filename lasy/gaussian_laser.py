@@ -1,4 +1,4 @@
-from .laser import laser
+from .laser import Laser
 
 class GaussianLaser(Laser):
     """
