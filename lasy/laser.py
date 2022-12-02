@@ -90,57 +90,46 @@ class Laser:
         file_format: string
             Format to be used for the output file. Options are "h5" and "bp".
         """
+        write_to_openpmd_file( file_prefix, file_format,
+                               self.field.box, self.dim,
+                               self.field.field, self.pol )
 
-        # As Angel suggested, I would recommend putting the openPMD implementation
-        # in a separate file, and not importing openPMD-api here.
-        # That should clean up the import and allow for more flexibility
-        # TODO: actual dumping to file.
-        print("lo = ", self.field.box.lo)
-        import openpmd_api as io
+def write_to_openpmd_file(file_prefix, file_format, box, dim, field, pol):
+    import openpmd_api as io
+    # Create file
+    series = io.Series(
+        "{}_%05T.{}".format(file_prefix, file_format),
+        io.Access.create)
+    i = series.iterations[0]
 
-        box = self.field.box
-        dim = self.dim
-        field = self.field.field
-        pol = self.pol
+    # Define the field metadata
+    E = i.meshes["E"]
+    E.grid_spacing = [ (hi-lo)/npoints for hi, lo, npoints in \
+                           zip( box.hi, box.lo, box.npoints ) ]
+    E.grid_global_offset = box.lo
+    E.axis_labels = ['x', 'y', 't']
+    E.unit_dimension = {
+        io.Unit_Dimension.M:  1,
+        io.Unit_Dimension.L:  1,
+        io.Unit_Dimension.I: -1,
+        io.Unit_Dimension.T: -3
+    }
+    if dim == 'xyz':
+        E.geometry = io.Geometry.cartesian
+    elif dim == 'rz':
+        E.geometry = io.Geometry.thetaMode
 
-        # Create file
-        series = io.Series(
-            "{}_%05T.{}".format(file_prefix, file_format),
-            io.Access.create)
-        i = series.iterations[0]
+    # Define the data sets
+    dataset = io.Dataset(field.dtype, field.shape)
 
-        # Define the field metadata
-        E = i.meshes["E"]
-        E.grid_spacing = [ (hi-lo)/npoints for hi, lo, npoints in \
-                               zip( box.hi, box.lo, box.npoints ) ]
-        E.grid_global_offset = box.lo
-        E.axis_labels = ['x', 'y', 't']
-        E.unit_dimension = {
-            io.Unit_Dimension.M:  1,
-            io.Unit_Dimension.L:  1,
-            io.Unit_Dimension.I: -1,
-            io.Unit_Dimension.T: -3
-        }
-        if dim == 'xyz':
-            E.geometry = io.Geometry.cartesian
-        elif dim == 'rz':
-            E.geometry = io.Geometry.thetaMode
+    Ex = E["x"]
+    Ex.position = [0]*len(dim)
+    Ex.reset_dataset(dataset)
+    Ex.store_chunk( field*pol[0] )
 
-        # Define the data sets
-        dataset = io.Dataset(
-            self.field.field.dtype,
-            self.field.field.shape)
+    Ey = E["y"]
+    Ey.position = [0]*len(dim)
+    Ey.reset_dataset(dataset)
+    Ey.store_chunk( field*pol[1] )
 
-        Ex = E["x"]
-        Ex.position = [0]*len(dim)
-        Ex.reset_dataset(dataset)
-        Ex.store_chunk( field*pol[0] )
-
-        Ey = E["y"]
-        Ey.position = [0]*len(dim)
-        Ey.reset_dataset(dataset)
-        Ey.store_chunk( field*pol[1] )
-
-        series.flush()
-        print(self.field.field)
-        print("The laser was dumped. Check the recycle bin.")
+    series.flush()
