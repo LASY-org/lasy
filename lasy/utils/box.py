@@ -37,5 +37,6 @@ class Box:
         self.axes = []
         self.dx = []
         for i in range(self.ndims):
-            self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
-            self.dx.append(self.axes[i][1] - self.axes[i][0])
+            self.dx.append( (hi[i] - lo[i])/npoints[i] )
+            # Define laser field at cell centers
+            self.axes.append(lo[i] + self.dx[i]*(0.5 + np.arange(npoints[i])))

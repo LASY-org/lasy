@@ -44,8 +44,7 @@ def write_to_openpmd_file(file_prefix, file_format, box,
 
         # Define the mesh
         m = i.meshes[comp_name]
-        m.grid_spacing = [ (hi-lo)/npoints for hi, lo, npoints in \
-                               zip( box.hi, box.lo, box.npoints ) ]
+        m.grid_spacing = box.dx
         m.grid_global_offset = box.lo
         m.axis_labels = ['x', 'y', 't']
         m.unit_dimension = {
@@ -62,7 +61,7 @@ def write_to_openpmd_file(file_prefix, file_format, box,
         # Define the dataset
         dataset = io.Dataset(array_in.real.dtype, array_in.real.shape)
         E = m[io.Mesh_Record_Component.SCALAR]
-        E.position = [0]*len(dim)
+        E.position = [0.5]*len(dim) # Laser field is defined at cell centers
         E.reset_dataset(dataset)
 
         # Pick the correct field
