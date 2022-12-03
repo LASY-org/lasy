@@ -20,7 +20,7 @@ In cylindrical coordinates, the envelope is decomposed in $N_m$ azimuthal modes 
    E_y (r,\theta,t) = \operatorname{Re}\left( \sum_{-N_m+1}^{N_m-1}\mathcal{E}_m(r,t) e^{-im\theta}e^{-i\omega_0t}p_y\right).\end{aligned}
 ```
 
-At the moment LASY only support axisymmetric envelope profiles ($N_m=1$).
+At the moment LASY only support axisymmetric envelope profiles: $N_m=1$.
  
 ## Style conventions
 
