@@ -16,18 +16,8 @@ class Laser:
 
         Parameters
         ----------
-        dim: string
-            Dimensionality of the array. Options are:
-            - 'xyt': The laser pulse is represented on a 3D grid:
-                     Cartesian (x,y) transversely, and temporal (t) longitudinally.
-            - 'rt' : The laser pulse is represented on a 2D grid:
-                     Cylindrical (r) transversely, and temporal (t) longitudinally.
-
-        lo: list of scalars
-            Lower end of the physical domain where the laser array is defined
-
-        hi: list of scalars
-            Higher end of the physical domain where the laser array is defined
+        box: an object of type lasy.utils.box.Box
+            Defines the grid over which the laser will be computed
 
         wavelength: scalar
             Central wavelength for which the laser pulse envelope is defined.
