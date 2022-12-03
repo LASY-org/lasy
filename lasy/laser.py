@@ -110,7 +110,8 @@ class Laser:
             # 1D array that computes the volume of radial cells
             dV = np.pi*( (r+0.5*dr)**2 - (r-0.5*dr)**2 ) * dz
             energy = (dV[:,np.newaxis] * scc.epsilon_0 * 0.5 * \
-                    abs(self.field.field)**2).sum()
+                    abs(self.field.field[0,:,:])**2).sum()
             # TODO: generalize for higher-order modes
+            assert self.field.field.shape[0] == 1
 
         return energy

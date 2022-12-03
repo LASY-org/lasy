@@ -21,4 +21,9 @@ class Grid:
         """
         self.box = box
         self.ncomps = ncomps
-        self.field = np.zeros(box.npoints, dtype='complex128')
+        if self.box.dim == 'xyt':
+            self.field = np.zeros(box.npoints, dtype='complex128')
+        elif self.box.dim == 'rt':
+            # Supports only 1 azimuthal mode for now
+            self.field = np.zeros((1, box.npoints[0], box.npoints[1]),
+                                    dtype='complex128')

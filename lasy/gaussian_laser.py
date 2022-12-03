@@ -35,10 +35,11 @@ class GaussianLaser(Laser):
                             -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/w0**2 )
             self.field.field[...] = transverse_profile[:,:,np.newaxis] * \
                                       long_profile[np.newaxis, np.newaxis, :]
-        elif self.dim == 'rz':
+        elif self.dim == 'rt':
             r = box.axes[0]
             transverse_profile = np.exp( -r**2/w0**2 )
-            self.field.field[...] = transverse_profile[:,np.newaxis] * \
+            # Store field purely in mode 0
+            self.field.field[0,:,:] = transverse_profile[:,np.newaxis] * \
                                       long_profile[np.newaxis, :]
 
         # Normalize to the correct energy
