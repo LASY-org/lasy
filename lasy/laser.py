@@ -82,3 +82,35 @@ class Laser:
         write_to_openpmd_file( file_prefix, file_format,
                                self.field.box, self.dim, self.field.field,
                                self.lambda0, self.pol )
+
+    def _compute_laser_energy(self):
+        """
+        Computes the total laser energy that corresponds to the current
+        envelope data. This is used mainly for normalization purposes.
+
+        Returns:
+        --------
+        energy: float (in Joules)
+        """
+        # This uses the following volume integral:
+        # $E_{laser} = \int dV \;\frac{\epsilon_0}{2} | E_{env} |^2$
+        # which assumes that we can average over the oscilations at the
+        # specified laser wavelength.
+        # This probably needs to be generalized for few-cycle laser pulses.
+        box = self.field.box
+        dz = box.dx[-1] * scc.c # (Last dimension is time)
+
+        if self.dim == 'xyt':
+            dV = box.dx[0] * box.dx[1] * dz
+            energy = ((dV * scc.epsilon_0 * 0.5) * \
+                    abs(self.field.field)**2).sum()
+        elif self.dim == 'rt':
+            r = box.axes[0]
+            dr = box.dx[0]
+            # 1D array that computes the volume of radial cells
+            dV = np.pi*( (r+0.5*dr)**2 - (r-0.5*dr)**2 ) * dz
+            energy = (dV[:,np.newaxis] * scc.epsilon_0 * 0.5 * \
+                    abs(self.field.field)**2).sum()
+            # TODO: generalize for higher-order modes
+
+        return energy

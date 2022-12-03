@@ -41,4 +41,7 @@ class GaussianLaser(Laser):
             self.field.field[...] = transverse_profile[:,np.newaxis] * \
                                       long_profile[np.newaxis, :]
 
-        # TODO: normalize to correct energy
+        # Normalize to the correct energy
+        current_energy = self._compute_laser_energy()
+        norm_factor = (laser_energy/current_energy)**.5
+        self.field.field *= norm_factor
