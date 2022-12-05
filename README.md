@@ -25,7 +25,7 @@ At the moment LASY only support axisymmetric envelope profiles: $N_m=1$.
 ## Style conventions
 
 - Docstrings are written using the Numpy style.
-- For each significant contribution, using pull requests is encouraged: the description helps to explain the code and open dicussion.
+- A PR should be open for any contribution: the description helps to explain the code and open dicussion.
 
 ## Test
 
