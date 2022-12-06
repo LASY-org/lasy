@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.constants as scc
 
-from lasy.utils.box import Box
 from lasy.utils.grid import Grid
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
@@ -11,30 +10,14 @@ class Laser:
     The laser pulse is assumed to propagate in the z direction.
     """
 
-    def __init__(self, dim, lo, hi, array_in, wavelength, pol):
+    def __init__(self, box, wavelength, pol):
         """
         Construct Laser class from specified arrays
 
         Parameters
         ----------
-        dim: string
-            Dimensionality of the array. Options are:
-            - 'xyt': The laser pulse is represented on a 3D grid:
-                     Cartesian (x,y) transversely, and temporal (t) longitudinally.
-            - 'rt' : The laser pulse is represented on a 2D grid:
-                     Cylindrical (r) transversely, and temporal (t) longitudinally.
-
-        lo: list of scalars
-            Lower end of the physical domain where the laser array is defined
-
-        hi: list of scalars
-            Higher end of the physical domain where the laser array is defined
-
-        array_in: numpy complex array
-            n-dimensional (n=2 for dim='rt', n=3 for dim='xyt') array with laser field
-            The array should contain the complex envelope of the electric field.
-            The magnetic field is assumed orthogonal to the electric field, with the same profile
-            and a magnitude c times lower.
+        box: an object of type lasy.utils.box.Box
+            Defines the grid over which the laser will be computed
 
         wavelength: scalar
             Central wavelength for which the laser pulse envelope is defined.
@@ -50,22 +33,14 @@ class Laser:
             - Circular polarization: pol = (1,j)/sqrt(2) (j is the imaginary number)
             The polarization vector is normalized to have a unitary magnitude.
         """
-
-        self.ndims = 2 if dim == 'rt' else 3
-
-        assert(dim in ['rt', 'xyt'])
-        assert(len(lo) == self.ndims)
-        assert(len(hi) == self.ndims)
-        assert(array_in.ndim == self.ndims)
         assert(len(pol) == 2)
 
-        self.dim = dim
+        self.dim = box.dim
         norm_pol = np.sqrt(np.abs(pol[0])**2 + np.abs(pol[1])**2)
         self.pol = np.array([pol[0]/norm_pol, pol[1]/norm_pol])
         self.lambda0 = wavelength
         self.omega0 = 2*scc.pi*scc.c/self.lambda0
-        box = Box(dim, lo, hi, array_in.shape)
-        self.field = Grid(box, array_in=array_in)
+        self.field = Grid(box)
 
     def propagate(self, distance):
         """
@@ -97,3 +72,36 @@ class Laser:
         write_to_openpmd_file( file_prefix, file_format,
                                self.field.box, self.dim, self.field.field,
                                self.lambda0, self.pol )
+
+    def _compute_laser_energy(self):
+        """
+        Computes the total laser energy that corresponds to the current
+        envelope data. This is used mainly for normalization purposes.
+
+        Returns:
+        --------
+        energy: float (in Joules)
+        """
+        # This uses the following volume integral:
+        # $E_{laser} = \int dV \;\frac{\epsilon_0}{2} | E_{env} |^2$
+        # which assumes that we can average over the oscilations at the
+        # specified laser wavelength.
+        # This probably needs to be generalized for few-cycle laser pulses.
+        box = self.field.box
+        dz = box.dx[-1] * scc.c # (Last dimension is time)
+
+        if self.dim == 'xyt':
+            dV = box.dx[0] * box.dx[1] * dz
+            energy = ((dV * scc.epsilon_0 * 0.5) * \
+                    abs(self.field.field)**2).sum()
+        elif self.dim == 'rt':
+            r = box.axes[0]
+            dr = box.dx[0]
+            # 1D array that computes the volume of radial cells
+            dV = np.pi*( (r+0.5*dr)**2 - (r-0.5*dr)**2 ) * dz
+            energy = (dV[:,np.newaxis] * scc.epsilon_0 * 0.5 * \
+                    abs(self.field.field[0,:,:])**2).sum()
+            # TODO: generalize for higher-order modes
+            assert self.field.field.shape[0] == 1
+
+        return energy

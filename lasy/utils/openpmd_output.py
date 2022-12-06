@@ -47,7 +47,6 @@ def write_to_openpmd_file(file_prefix, file_format, box,
         m.grid_spacing = [ (hi-lo)/npoints for hi, lo, npoints in \
                                zip( box.hi, box.lo, box.npoints ) ]
         m.grid_global_offset = box.lo
-        m.axis_labels = ['x', 'y', 't']
         m.unit_dimension = {
             io.Unit_Dimension.M:  1,
             io.Unit_Dimension.L:  1,
@@ -56,8 +55,10 @@ def write_to_openpmd_file(file_prefix, file_format, box,
         }
         if dim == 'xyt':
             m.geometry = io.Geometry.cartesian
+            m.axis_labels = ['x', 'y', 't']
         elif dim == 'rt':
             m.geometry = io.Geometry.thetaMode
+            m.axis_labels = ['r', 't']
 
         # Define the dataset
         dataset = io.Dataset(array_in.real.dtype, array_in.real.shape)
