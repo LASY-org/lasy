@@ -4,7 +4,7 @@ from lasy.utils.box import Box
 from lasy.utils.grid import Grid
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
-class Lasy:
+class Laser:
     """
     Top-level class that can evaluate a laser profile on a grid,
     propagate it, and write it to a file.
@@ -12,7 +12,7 @@ class Lasy:
 
     def __init__(self, dim, lo, hi, npoints, profile):
         """
-        Construct a lasy object
+        Construct a laser object
 
         Parameters
         ----------
