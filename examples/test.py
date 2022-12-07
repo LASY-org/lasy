@@ -13,11 +13,12 @@ profile = GaussianLaser(wavelength, pol, laser_energy, w0, tau, t_peak)
 # 3D Cartesian case
 
 dim = 'xyt'
-lo = (-10e-6, -10e-6, -60e-15)
-hi = (+10e-6, +10e-6, +60e-15)
+xlim = (-10e-6, 10e-6)
+ylim = (-10e-6, 10e-6)
+tlim = (-60e-15, 60e-15)
 npoints=(100,100,100)
 
-laser = Laser(dim, lo, hi, npoints, profile)
+laser = Laser(dim, npoints, profile, tlim, xlim=xlim, ylim=ylim)
 laser.write_to_file('laser3d')
 laser.propagate(1)
 laser.write_to_file('laser3d')
@@ -25,11 +26,11 @@ laser.write_to_file('laser3d')
 # Cylindrical case
 
 dim = 'rt'
-lo = (0e-6, -60e-15)
-hi = (10e-6, +60e-15)
+rlim = (0, 10e-6)
+tlim = (-60e-15, 60e-15)
 npoints=(50,100)
 
-laser = Laser(dim, lo, hi, npoints, profile)
+laser = Laser(dim, npoints, profile, tlim=tlim, rlim=rlim)
 laser.write_to_file('laserRZ')
 laser.propagate(1)
 laser.write_to_file('laserRZ')

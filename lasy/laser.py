@@ -10,7 +10,7 @@ class Laser:
     propagate it, and write it to a file.
     """
 
-    def __init__(self, dim, lo, hi, npoints, profile):
+    def __init__(self, dim, npoints, profile, tlim, xlim=None, ylim=None, rlim=None):
         """
         Construct a laser object
 
@@ -23,10 +23,6 @@ class Laser:
             - 'rt' : The laser pulse is represented on a 2D grid:
                      Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-        lo, hi : list of scalars
-            Lower and higher end of the physical domain of the box.
-            One element per direction (2 for dim='rt', 3 for dim='xyt')
-
         npoints : tuple of int
             Number of points in each direction.
             One element per direction (2 for dim='rt', 3 for dim='xyt')
@@ -34,7 +30,34 @@ class Laser:
 
         profile: an object of type lasy.laser_profiles.laser_profile.LaserProfile
             Defines how to evaluate the envelope field
+
+        tlim : list of 2 scalars
+            Lower and higher end of the physical box in the temporal direction.
+
+        xlim : list of 2 scalars
+            Lower and higher end of the physical box in the x direction.
+            Required for dim='xyt'.
+
+        ylim : list of 2 scalars
+            Lower and higher end of the physical box in the x direction.
+            Required for dim='xyt'.
+
+        rlim : list of 2 scalars
+            Lower and higher end of the physical box in the radial.
+            Required for dim='rt'.
         """
+
+        assert dim in ['rt', 'xyt']
+
+        if dim == 'rt':
+            assert(rlim is not None)
+            lo = (rlim[0], tlim[0])
+            hi = (rlim[1], tlim[1])
+        else dim == 'xyt':
+            assert(xlim is not None and ylim is not None)            
+            lo = (xlim[0], ylim[0], tlim[0])
+            hi = (xlim[1], ylim[1], tlim[1])
+            
         self.box = Box(dim, lo, hi, npoints)
         self.field = Grid(self.box)
         self.dim = self.box.dim
