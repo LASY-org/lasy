@@ -1,12 +1,13 @@
-from .laser import Laser
+from ..utils.laser_energy import compute_laser_energy
+from .laser_profile import LaserProfile
 import numpy as np
 
-class GaussianLaser(Laser):
+class GaussianLaser(LaserProfile):
     """
     Derived class for the analytic profile of a Gaussian laser pulse.
     """
 
-    def __init__(self, box, wavelength, pol,
+    def __init__(self, wavelength, pol,
                 laser_energy, w0, tau, t_peak, cep_phase=0):
         """
         Defines a Gaussian laser pulse.
@@ -28,9 +29,6 @@ class GaussianLaser(Laser):
 
         Parameters:
         -----------
-        box: an object of type lasy.utils.box.Box
-            Defines the grid over which the laser will be computed
-
         wavelength: float (in meter)
             The main laser wavelength :math:`\lambda_0` of the laser, which
             defines :math:`\omega_0` in the above formula, according to
@@ -65,27 +63,44 @@ class GaussianLaser(Laser):
             in the above formula (i.e. the phase of the laser
             oscillation, at the time where the laser envelope is maximum)
         """
-        super().__init__(box, wavelength, pol)
+        super().__init__(wavelength, pol)
+        self.laser_energy = laser_energy
+        self.w0 = w0
+        self.tau = tau
+        self.t_peak = t_peak
+        self.cep_phase = cep_phase
 
+    def evaluate( self, envelope, box ):
+        """
+        Fills the envelope field of the laser
+
+        Parameters
+        -----------
+        envelope: ndarrays (V/m)
+            Contains the values of the envelope field, to be filled
+
+        box: an object of type lasy.utils.Box
+            Defines the points at which evaluate the laser
+        """
         t = box.axes[-1]
-        long_profile = np.exp( -(t-t_peak)**2/tau**2 \
-                               + 1.j*(cep_phase + self.omega0*t_peak) )
+        long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
+                              + 1.j*(self.cep_phase + self.omega0*self.t_peak))
 
-        if self.dim == 'xyt':
+        if box.dim == 'xyt':
             x = box.axes[0]
             y = box.axes[1]
             transverse_profile = np.exp(
-                            -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/w0**2 )
-            self.field.field[...] = transverse_profile[:,:,np.newaxis] * \
-                                      long_profile[np.newaxis, np.newaxis, :]
-        elif self.dim == 'rt':
+                    -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/self.w0**2 )
+            envelope[...] = transverse_profile[:,:,np.newaxis] * \
+                    long_profile[np.newaxis, np.newaxis, :]
+        elif box.dim == 'rt':
             r = box.axes[0]
-            transverse_profile = np.exp( -r**2/w0**2 )
+            transverse_profile = np.exp( -r**2/self.w0**2 )
             # Store field purely in mode 0
-            self.field.field[0,:,:] = transverse_profile[:,np.newaxis] * \
-                                      long_profile[np.newaxis, :]
+            envelope[0,:,:] = transverse_profile[:,np.newaxis] * \
+                            long_profile[np.newaxis, :]
 
         # Normalize to the correct energy
-        current_energy = self._compute_laser_energy()
-        norm_factor = (laser_energy/current_energy)**.5
-        self.field.field *= norm_factor
+        current_energy = compute_laser_energy(envelope, box)
+        norm_factor = (self.laser_energy/current_energy)**.5
+        envelope *= norm_factor
