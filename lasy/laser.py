@@ -53,7 +53,7 @@ class Laser:
             assert(rlim is not None)
             lo = (rlim[0], tlim[0])
             hi = (rlim[1], tlim[1])
-        else dim == 'xyt':
+        else:
             assert(xlim is not None and ylim is not None)            
             lo = (xlim[0], ylim[0], tlim[0])
             hi = (xlim[1], ylim[1], tlim[1])
