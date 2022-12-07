@@ -5,14 +5,14 @@ from scipy.special.orthogonal import hermite
 
 class HermiteGaussianLaser(Laser):
     """
-    Derived class for an analytic profile of high-order Gaussian
-    laser pulses in xyz coordinates.
+    Derived class for an analytic profile of a high-order Gaussian
+    laser pulse expressed in the Hermite-Gaussian formalism.
     """
 
     def __init__(self, wavelength, pol,
                 laser_energy, w0, n_x, n_y, tau, t_peak, cep_phase=0):
         """
-        Defines a Hermite Gaussian laser pulse.
+        Defines a Hermite-Gaussian laser pulse.
         More precisely, the electric field corresponds to:
         .. math::
             E_u(\boldsymbol{x}_\perp,t) = Re\left[ E_0\,
@@ -26,6 +26,7 @@ class HermiteGaussianLaser(Laser):
         :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
         to the propagation direction). The other parameters in this formula
         are defined below.
+
         Parameters:
         -----------
         wavelength: float (in meter)
@@ -103,7 +104,7 @@ class HermiteGaussianLaser(Laser):
             """
             import warnings
             warnings.warn(
-            "Hermite Gauss not implemented in rt. Defaulting to Gaussian",
+            "Hermite Gauss not implemented in rt. Defaulting to Gaussian"
             )
             transverse_profile = np.exp( -r**2/self.w0**2 )
             # Store field purely in mode 0
