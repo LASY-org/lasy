@@ -70,19 +70,17 @@ class GaussianLaser(LaserProfile):
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
-    def evaluate(self, box):
+    def evaluate( self, envelope, box ):
         """
-        Return the envelope field of the laser
+        Fills the envelope field of the laser
 
         Parameters
         -----------
+        envelope: ndarrays (V/m)
+            Contains the values of the envelope field, to be filled
+
         box: an object of type lasy.utils.Box
             Defines the points at which evaluate the laser
-
-        Returns:
-        --------
-        envelope: ndarrays (V/m)
-            Contains the value of the envelope field
         """
         t = box.axes[-1]
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
@@ -93,21 +91,16 @@ class GaussianLaser(LaserProfile):
             y = box.axes[1]
             transverse_profile = np.exp(
                     -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/self.w0**2 )
-            env = transverse_profile[:,:,np.newaxis] * \
+            envelope[...] = transverse_profile[:,:,np.newaxis] * \
                     long_profile[np.newaxis, np.newaxis, :]
         elif box.dim == 'rt':
             r = box.axes[0]
             transverse_profile = np.exp( -r**2/self.w0**2 )
             # Store field purely in mode 0
-            env = transverse_profile[:,np.newaxis] * \
+            envelope[0,:,:] = transverse_profile[:,np.newaxis] * \
                             long_profile[np.newaxis, :]
-            # Reshape to satisfy the fact the first dimension corresponds
-            # to the number of modes
-            env = env.reshape( (1, env.shape[0], env.shape[1]) )
 
         # Normalize to the correct energy
-        current_energy = compute_laser_energy(env, box)
+        current_energy = compute_laser_energy(envelope, box)
         norm_factor = (self.laser_energy/current_energy)**.5
-        env *= norm_factor
-
-        return env
+        envelope *= norm_factor

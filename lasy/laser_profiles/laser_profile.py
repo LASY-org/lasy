@@ -35,20 +35,18 @@ class LaserProfile(object):
         self.lambda0 = wavelength
         self.omega0 = 2*scc.pi*scc.c/self.lambda0
 
-    def evaluate( self, box ):
+    def evaluate( self, envelope, box ):
         """
-        Return the envelope field of the laser
+        Fills the envelope field of the laser
 
         Parameters
         -----------
+        envelope: ndarrays (V/m)
+            Contains the values of the envelope field, to be filled
+
         box: an object of type lasy.utils.Box
             Defines the points at which evaluate the laser
-
-        Returns:
-        --------
-        envelope: ndarrays (V/m)
-            Contains the value of the envelope field
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
-        return np.zeros( box.npoints, dtype='complex128' )
+        pass

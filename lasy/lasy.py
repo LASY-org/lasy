@@ -41,7 +41,7 @@ class Lasy:
         self.profile = profile
 
         # Evaluate the laser profile on the grid
-        self.field.field[...] = profile.evaluate( self.box )
+        profile.evaluate( self.field.field, self.box )
 
     def propagate(self, distance):
         """
