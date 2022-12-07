@@ -1,5 +1,5 @@
 import numpy as np
-from lasy.lasy import Lasy
+from lasy.laser import Laser
 from lasy.laser_profiles.gaussian_laser import GaussianLaser
 
 wavelength=.8e-6
@@ -17,7 +17,7 @@ lo = (-10e-6, -10e-6, -60e-15)
 hi = (+10e-6, +10e-6, +60e-15)
 npoints=(100,100,100)
 
-laser = Lasy(dim, lo, hi, npoints, profile)
+laser = Laser(dim, lo, hi, npoints, profile)
 laser.write_to_file('laser3d')
 laser.propagate(1)
 laser.write_to_file('laser3d')
@@ -29,7 +29,7 @@ lo = (0e-6, -60e-15)
 hi = (10e-6, +60e-15)
 npoints=(50,100)
 
-laser = Lasy(dim, lo, hi, npoints, profile)
+laser = Laser(dim, lo, hi, npoints, profile)
 laser.write_to_file('laserRZ')
 laser.propagate(1)
 laser.write_to_file('laserRZ')
