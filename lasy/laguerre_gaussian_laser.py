@@ -3,8 +3,6 @@ from .laser_profile import LaserProfile
 import numpy as np
 from scipy.special import genlaguerre
 
-from scipy.special.orthogonal import hermite
-
 class LaguerreGaussianLaser(Laser):
     """
     Derived class for an analytic profile of a high-order Gaussian
