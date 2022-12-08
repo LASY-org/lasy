@@ -37,6 +37,6 @@ def compute_laser_energy(envelope, box):
         energy = (dV[:,np.newaxis] * scc.epsilon_0 * 0.5 * \
                 abs(envelope[0,:,:])**2).sum()
         # TODO: generalize for higher-order modes
-        assert envelope.shape[0] == 1
+        assert box.n_azimuthal_modes == 1
 
     return energy
