@@ -76,6 +76,11 @@ class GaussianLaser(LaserProfile):
                evaluate(dim, envelope, r, t) (2D cylindrical)
         t is always the last axis to be read.
 
+        Example use cases:
+            evaluate('rt', env, 0, 0) # evaluate at a single point (0,0)
+            X, Y, T = np.meshgrid(x,y,t,indexing='ij') where x, y and t are 1darray-s
+            evaluate('rt', env, X, Y, T)
+
         Parameters
         -----------
         dim: string
@@ -87,6 +92,8 @@ class GaussianLaser(LaserProfile):
         axes: Coordinates at which the envelope should be evaluated.
             Can be 2 elements in cylindrical geometry (r,t) or
             3 elements in Cartesian geometry (x,y,t).
+            elements should be scalars or numpy arrays. In the latter case,
+            all elements should have the same shape.
         """
 
         t = axes[-1]

@@ -42,3 +42,23 @@ def compute_laser_energy(grid):
         assert envelope.shape[0] == 1
 
     return energy
+
+def normalize_energy(energy, grid):
+    """
+    Normalize energy of the laser pulse contained in grid
+
+    Parameters
+    -----------
+    energy: scalar (J)
+        Energy of the laser pulse after normalization
+
+    grid: a Grid object
+        Contains value of the laser envelope and metadata
+    """
+
+    if energy is None:
+        return
+
+    current_energy = compute_laser_energy(grid)
+    norm_factor = (energy/current_energy)**.5
+    grid.field *= norm_factor

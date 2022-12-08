@@ -1,5 +1,5 @@
 
-class LaserProfile(object):
+class TransverseProfile(object):
     """
     Base class for all transverse profiles.
 
