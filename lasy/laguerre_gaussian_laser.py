@@ -15,7 +15,7 @@ class LaguerreGaussianLaser(LaserProfile):
         Defines a Laguerre-Gaussian laser pulse.
         More precisely, the electric field corresponds to:
         .. math::
-            E_u(r,\theta,t) = Re\left[ E_0\,
+            E_u(r,\theta,t) = Re\left[ E_0\, r^{m} \,
             L_p^m\left( \frac{2 r^2 }{w_0^2}\right )\, 
             \cos\left ( m(\theta-\theta_0)\right)\,
             \exp\left( -\frac{\boldsymbol{x}_\perp^2}{w_0^2}
@@ -91,24 +91,22 @@ class LaguerreGaussianLaser(LaserProfile):
         if box.dim == 'xyt':
             x = box.axes[0]
             y = box.axes[1]
-            scaled_rad_squared = (x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/ \
-                self.w0**2
+            radius = np.sqrt(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)
+            scaled_rad_squared = (radius**2)/self.w0**2
             theta = np.arctan2(y[np.newaxis, :],x[:,np.newaxis])
             angle_term = np.cos(self.m*(theta-self.theta0))
-            transverse_profile = genlaguerre(self.p, self.m)(
+            transverse_profile = radius**self.m * genlaguerre(self.p, self.m)(
                 2*scaled_rad_squared) * angle_term * \
                 np.exp(-scaled_rad_squared)
             envelope[...] = transverse_profile[:,:,np.newaxis] * \
                     long_profile[np.newaxis, np.newaxis, :]
         elif box.dim == 'rt':
             r = box.axes[0]
-            if self.m > 0:
-                import warnings
-                warnings.warn(
-                "In rt, Laguerre-Gauss is not currently defined for m > 0"
-                )
+            
+            assert self.m == 0,"Only m=0 modes are currently supported"
+
             scaled_rad_squared = r**2/self.w0**2
-            transverse_profile = genlaguerre(self.p, self.m)(
+            transverse_profile = r**self.m * genlaguerre(self.p, self.m)(
                 2*scaled_rad_squared) * \
                 np.exp( -scaled_rad_squared )
             # Store field purely in mode 0

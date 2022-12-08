@@ -84,7 +84,7 @@ class HermiteGaussianLaser(LaserProfile):
         """
         t = box.axes[-1]
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
-                              + 1.j*(self.cep_phase + self.omega0*self.t_peak))
+                            + 1.j*(self.cep_phase + self.omega0*self.t_peak))
 
         if box.dim == 'xyt':
             x = box.axes[0]
@@ -104,12 +104,11 @@ class HermiteGaussianLaser(LaserProfile):
             reresentation. Until then, we pass a simple gaussian
             and a warning
             """
-            import warnings
-            warnings.warn(
-            "Hermite Gauss not implemented in rt. Defaulting to Gaussian"
-            )
+            assert ((self.n_x ==0) and (self.n_y == 0 )),"Modes for \
+                n_x > 0 or n_y > 0 are not yet implemented in dimension rt"
+        
             transverse_profile = np.exp( -r**2/self.w0**2 )
-            # Store field purely in mode 0
+            
             envelope[0,:,:] = transverse_profile[:,np.newaxis] * \
                             long_profile[np.newaxis, :]
 
