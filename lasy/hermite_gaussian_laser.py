@@ -73,6 +73,7 @@ class HermiteGaussianLaser(LaserProfile):
     def evaluate( self, envelope, box ):
         """
         Fills the envelope field of the laser
+        
         Parameters
         -----------
         envelope: ndarrays (V/m)
