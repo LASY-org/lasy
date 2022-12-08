@@ -34,9 +34,7 @@ def compute_laser_energy(envelope, box):
         dr = box.dx[0]
         # 1D array that computes the volume of radial cells
         dV = np.pi*( (r+0.5*dr)**2 - (r-0.5*dr)**2 ) * dz
-        energy = (dV[:,np.newaxis] * scc.epsilon_0 * 0.5 * \
-                abs(envelope[0,:,:])**2).sum()
-        # TODO: generalize for higher-order modes
-        assert box.n_azimuthal_modes == 1
+        energy = (dV[np.newaxis,:,np.newaxis] * scc.epsilon_0 * 0.5 * \
+                abs(envelope[:,:,:])**2).sum()
 
     return energy
