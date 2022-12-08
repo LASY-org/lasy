@@ -16,16 +16,16 @@ class LaguerreGaussianLaser(LaserProfile):
         More precisely, the electric field corresponds to:
         .. math::
             E_u(r,\theta,t) = Re\left[ E_0\, r^{m} \,
-            L_p^m\left( \frac{2 r^2 }{w_0^2}\right )\, 
+            L_p^m\left( \frac{2 r^2 }{w_0^2}\right )\,
             \cos\left ( m(\theta-\theta_0)\right)\,
             \exp\left( -\frac{\boldsymbol{x}_\perp^2}{w_0^2}
             - \frac{(t-t_{peak})^2}{\tau^2} -i\omega_0(t-t_{peak})
             + i\phi_{cep}\right) \times p_u \right]
         where :math:`u` is either :math:`x` or :math:`y`, :math:`L_p^m` is the
-        Generalised Laguerre polynomial of radial order :math:`p` and 
-        azimuthal order :math:`m`, :math:`p_u` is the polarization 
-        vector, :math:`Re` represent the real part, and :math:`r` is the radial 
-        coordinate (orthogonal to the propagation direction) and :math:`theta` 
+        Generalised Laguerre polynomial of radial order :math:`p` and
+        azimuthal order :math:`m`, :math:`p_u` is the polarization
+        vector, :math:`Re` represent the real part, and :math:`r` is the radial
+        coordinate (orthogonal to the propagation direction) and :math:`theta`
         is the azmiuthal coordinate. The other parameters in this formula
         are defined below.
 
@@ -47,9 +47,9 @@ class LaguerreGaussianLaser(LaserProfile):
         w0: float (in meter)
             The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
         p: int (dimensionless)
-            The radial order of Generalized Laguerre polynomial 
+            The radial order of Generalized Laguerre polynomial
         m: int (dimensionless)
-            The azimuthal order of Generalized Laguerre polynomial 
+            The azimuthal order of Generalized Laguerre polynomial
         tau: float (in second)
             The duration of the laser pulse, i.e. :math:`\tau` in the above
             formula. Note that :math:`\tau = \tau_{FWHM}/\sqrt{2\log(2)}`,
@@ -68,8 +68,8 @@ class LaguerreGaussianLaser(LaserProfile):
         super().__init__(wavelength, pol)
         self.laser_energy = laser_energy
         self.w0 = w0
-        self.p = p 
-        self.m = m 
+        self.p = p
+        self.m = m
         self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
@@ -102,16 +102,17 @@ class LaguerreGaussianLaser(LaserProfile):
                     long_profile[np.newaxis, np.newaxis, :]
         elif box.dim == 'rt':
             r = box.axes[0]
-            
-            assert self.m == 0,"Only m=0 modes are currently supported"
 
             scaled_rad_squared = r**2/self.w0**2
             transverse_profile = r**self.m * genlaguerre(self.p, self.m)(
                 2*scaled_rad_squared) * \
                 np.exp( -scaled_rad_squared )
-            # Store field purely in mode 0
-            envelope[0,:,:] = transverse_profile[:,np.newaxis] * \
-                            long_profile[np.newaxis, :]
+            # Store field in proper azimuthal modes
+            profile = transverse_profile[:,np.newaxis] * \
+                        long_profile[np.newaxis, :]
+            envelope[self.m,:,:] = np.exp(j*self.m*self.theta0) * profile
+            if self.m != 0:
+                envelope[-self.m,:,:] = np.exp(-j*self.m*self.theta0) * profile
 
         # Normalize to the correct energy
         current_energy = compute_laser_energy(envelope, box)
