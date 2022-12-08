@@ -2,6 +2,7 @@ import scipy.constants as scc
 
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
+from lasy.utils.laser_energy import compute_laser_energy
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
 class Laser:
@@ -41,7 +42,19 @@ class Laser:
         self.profile = profile
 
         # Evaluate the laser profile on the grid
-        profile.evaluate( self.field.field, self.box )
+        # This could be put in a Laser.evaluate function.
+        # Then, profile.evaluate could be called profile.envelope instead.
+        if profile.separable:
+            array = profile.evaluate(self.box.dim, *self.box.axes)
+        else:
+            array = profile.evaluate(self.box.dim, meshgrid=self.box.get_meshgrid())
+
+        # Normalize to the correct energy
+        current_energy = compute_laser_energy(array, self.box)
+        norm_factor = (profile.laser_energy/current_energy)**.5
+        array *= norm_factor
+
+        self.field = Grid(self.box, array=array)
 
     def propagate(self, distance):
         """

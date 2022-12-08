@@ -69,8 +69,9 @@ class GaussianLaser(LaserProfile):
         self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
+        self.separable = True
 
-    def evaluate( self, envelope, box ):
+    def evaluate( self, dim, *axes, meshgrid=None ):
         """
         Fills the envelope field of the laser
 
@@ -82,25 +83,33 @@ class GaussianLaser(LaserProfile):
         box: an object of type lasy.utils.Box
             Defines the points at which evaluate the laser
         """
-        t = box.axes[-1]
+
+        assert(meshgrid==None)
+
+        # Temporal longitudinal profile
+        t = axes[-1]
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
                               + 1.j*(self.cep_phase + self.omega0*self.t_peak))
 
-        if box.dim == 'xyt':
-            x = box.axes[0]
-            y = box.axes[1]
+        # Transverse profile
+        if dim == 'xyt':
+            x = axes[0]
+            y = axes[1]
+            envelope = np.zeros((x.size, y.size, t.size), dtype='complex128')
             transverse_profile = np.exp(
                     -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/self.w0**2 )
             envelope[...] = transverse_profile[:,:,np.newaxis] * \
                     long_profile[np.newaxis, np.newaxis, :]
-        elif box.dim == 'rt':
-            r = box.axes[0]
+        elif dim == 'rt':
+            r = axes[0]
+            envelope = np.zeros((1, r.size, t.size), dtype='complex128')
             transverse_profile = np.exp( -r**2/self.w0**2 )
             # Store field purely in mode 0
             envelope[0,:,:] = transverse_profile[:,np.newaxis] * \
                             long_profile[np.newaxis, :]
+        return envelope
 
-        # Normalize to the correct energy
-        current_energy = compute_laser_energy(envelope, box)
-        norm_factor = (self.laser_energy/current_energy)**.5
-        envelope *= norm_factor
+#         # Normalize to the correct energy
+#         current_energy = compute_laser_energy(envelope, box)
+#         norm_factor = (self.laser_energy/current_energy)**.5
+#         envelope *= norm_factor

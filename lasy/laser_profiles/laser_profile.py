@@ -34,8 +34,12 @@ class LaserProfile(object):
         self.pol = np.array([pol[0]/norm_pol, pol[1]/norm_pol])
         self.lambda0 = wavelength
         self.omega0 = 2*scc.pi*scc.c/self.lambda0
+        # separable means that the envelope can be written as the product of a
+        # longitudinal (temporal) profile and a transverse profile.
+        # By default, a profile is not separable
+        self.separable = False
 
-    def evaluate( self, envelope, box ):
+    def evaluate( self, dim, *axes, meshgrid=None ):
         """
         Fills the envelope field of the laser
 

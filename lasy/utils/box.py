@@ -43,3 +43,8 @@ class Box:
         for i in range(self.ndims):
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
             self.dx.append(self.axes[i][1] - self.axes[i][0])
+
+
+        def get_meshgrid():
+            # Returns XYT or RT meshgrid
+            return np.meshgrid(*box.axes)
