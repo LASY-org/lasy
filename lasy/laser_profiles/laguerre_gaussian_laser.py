@@ -20,7 +20,7 @@ class LaguerreGaussianLaser(LaserProfile):
             \exp\left( -\frac{\boldsymbol{x}_\perp^2}{w_0^2}
             - \frac{(t-t_{peak})^2}{\tau^2} -i\omega_0(t-t_{peak})
             + i\phi_{cep}\right) \times p_u \right]
-        where :math:`u` is either :math:`x` or :math:`y`, :math:`L_p^m` is the
+        where :math:`u` is either :math:`x` or :math:`y`, :math:`L_p^{|m|}` is the
         Generalised Laguerre polynomial of radial order :math:`p` and
         azimuthal order :math:`|m|`, :math:`p_u` is the polarization
         vector, :math:`Re` represent the real part, and :math:`r` is the radial
