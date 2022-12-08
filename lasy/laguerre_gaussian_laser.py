@@ -94,7 +94,7 @@ class LaguerreGaussianLaser(LaserProfile):
             scaled_rad_squared = (x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/ \
                 self.w0**2
             theta = np.arctan2(y[np.newaxis, :],x[:,np.newaxis])
-            angle_term = np.exp(1.j*self.m*(theta-self.theta0))
+            angle_term = np.cos(self.m*(theta-self.theta0))
             transverse_profile = genlaguerre(self.p, self.m)(
                 2*scaled_rad_squared) * angle_term * \
                 np.exp(-scaled_rad_squared)
