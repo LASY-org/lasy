@@ -19,6 +19,6 @@ class Grid:
         elif self.box.dim == 'rt':
             # Azimuthal modes are arranged in the following order:
             # 0, 1, 2, ..., n_azimuthal_modes-1, -n_azimuthal_modes+1, ..., -1
-            ncomp = 2*n_azimuthal_modes-1
+            ncomp = 2*self.box.n_azimuthal_modes-1
             self.field = np.zeros((ncomp, box.npoints[0], box.npoints[1]),
                                     dtype='complex128')
