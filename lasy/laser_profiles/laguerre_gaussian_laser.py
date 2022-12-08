@@ -110,9 +110,9 @@ class LaguerreGaussianLaser(LaserProfile):
             # Store field in proper azimuthal modes
             profile = transverse_profile[:,np.newaxis] * \
                         long_profile[np.newaxis, :]
-            envelope[self.m,:,:] = np.exp(j*self.m*self.theta0) * profile
+            envelope[self.m,:,:] = np.exp(1j*self.m*self.theta0) * profile
             if self.m != 0:
-                envelope[-self.m,:,:] = np.exp(-j*self.m*self.theta0) * profile
+                envelope[-self.m,:,:] = np.exp(-1j*self.m*self.theta0) * profile
 
         # Normalize to the correct energy
         current_energy = compute_laser_energy(envelope, box)
