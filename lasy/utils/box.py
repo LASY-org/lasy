@@ -47,4 +47,4 @@ class Box:
 
         def get_meshgrid():
             # Returns XYT or RT meshgrid
-            return np.meshgrid(*box.axes)
+            return np.meshgrid(*self.axes)
