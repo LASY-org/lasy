@@ -5,7 +5,7 @@ class Grid:
     Contains data for fields (in position or Fourier space), including metadata
     """
 
-    def __init__(self, box, ncomps=1, array_in=None):
+    def __init__(self, box, ncomps=1):
         """
 
         Parameters
@@ -21,8 +21,9 @@ class Grid:
         """
         self.box = box
         self.ncomps = ncomps
-        if array_in is not None:
-            assert(box.npoints == array_in.shape)
-            self.field = array_in
-        else:
-            self.field = np.zeros(box.npoints)
+        if self.box.dim == 'xyt':
+            self.field = np.zeros(box.npoints, dtype='complex128')
+        elif self.box.dim == 'rt':
+            # Supports only 1 azimuthal mode for now
+            self.field = np.zeros((1, box.npoints[0], box.npoints[1]),
+                                    dtype='complex128')
