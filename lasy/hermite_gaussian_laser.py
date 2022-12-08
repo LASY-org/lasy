@@ -16,7 +16,8 @@ class HermiteGaussianLaser(LaserProfile):
         More precisely, the electric field corresponds to:
         .. math::
             E_u(\boldsymbol{x}_\perp,t) = Re\left[ E_0\,
-            H_{n_u}\left ( \frac{\sqrt{2} \boldsymbol{x}_\perp }{w_0}\right )\,
+            H_{n_x}\left ( \frac{\sqrt{2} x}{w_0}\right )\,
+            H_{n_y}\left ( \frac{\sqrt{2} y}{w_0}\right )\,            
             \exp\left( -\frac{\boldsymbol{x}_\perp^2}{w_0^2}
             - \frac{(t-t_{peak})^2}{\tau^2} -i\omega_0(t-t_{peak})
             + i\phi_{cep}\right) \times p_u \right]
