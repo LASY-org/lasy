@@ -1,5 +1,3 @@
-import numpy as np
-import scipy.constants as scc
 
 class LaserProfile(object):
     """
