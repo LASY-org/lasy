@@ -17,7 +17,7 @@ class LaguerreGaussianLaser(LaserProfile):
         .. math::
             E_u(r,\theta,t) = Re\left[ E_0\,
             L_p^m\left( \frac{2 r^2 }{w_0^2}\right )\, 
-            \cos\left ( \theta-\theta_0\right)\,
+            \cos\left ( m(\theta-\theta_0)\right)\,
             \exp\left( -\frac{\boldsymbol{x}_\perp^2}{w_0^2}
             - \frac{(t-t_{peak})^2}{\tau^2} -i\omega_0(t-t_{peak})
             + i\phi_{cep}\right) \times p_u \right]
