@@ -1,7 +1,6 @@
 import openpmd_api as io
 
-def write_to_openpmd_file(file_prefix, file_format, box,
-                          dim, array_in, wavelength, pol):
+def write_to_openpmd_file(file_prefix, file_format, grid, wavelength, pol):
     """
     Write the laser field into an openPMD file
 
@@ -13,15 +12,10 @@ def write_to_openpmd_file(file_prefix, file_format, box,
     file_format: string
         Format to be used for the output file. Options are "h5" and "bp".
 
-    box: an object of type lasy.utils.box.Box
-        Defines the grid over which the laser is dumped
-
-    dim: string
-        Dimension of the array, 'rt' or 'xyt'
-
-    array_in: numpy complex array
-        n-dimensional (n=2 for dim='rt', n=3 for dim='xyt') array with laser field
-        The array should contain the complex envelope of the electric field.
+    grid: Grid
+        A grid object containing the array (n-dimensional, n=2 for
+        dim='rt', n=3 for dim='xyt') with complex envelope of the electric field.
+        and metadata
 
     wavelength: scalar
         Central wavelength for which the laser pulse envelope is defined.
@@ -29,6 +23,10 @@ def write_to_openpmd_file(file_prefix, file_format, box,
     pol: list of 2 complex numbers
         Polarization vector that multiplies array_in to get the Ex and Ey array_ins.
     """
+    array_in = grid.field
+    box = grid.box
+    dim = box.dim
+
     # Create file
     series = io.Series(
         "{}_%05T.{}".format(file_prefix, file_format),
