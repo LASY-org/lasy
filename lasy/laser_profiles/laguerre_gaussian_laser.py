@@ -88,8 +88,11 @@ class LaguerreGaussianLaser(LaserProfile):
         if box.dim == 'xyt':
             x = box.axes[0]
             y = box.axes[1]
-            # complex_position corresponds to r e^{-i\theta}
-            complex_position = x[:,np.newaxis] - 1j*y[np.newaxis, :]
+            # complex_position corresponds to r e^{+/-i\theta}
+            if self.m > 0:
+                complex_position = x[:,np.newaxis] - 1j*y[np.newaxis, :]
+            else:
+                complex_position = x[:,np.newaxis] + 1j*y[np.newaxis, :]
             radius = abs(complex_position)
             scaled_rad_squared = (radius**2)/self.w0**2
             transverse_profile = complex_position**abs(self.m) * \
