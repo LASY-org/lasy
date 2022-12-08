@@ -3,6 +3,7 @@ import scipy.constants as scc
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
 from lasy.utils.openpmd_output import write_to_openpmd_file
+from lasy.utils.laser_energy import compute_laser_energy
 
 class Laser:
     """
@@ -41,7 +42,8 @@ class Laser:
         self.profile = profile
 
         # Evaluate the laser profile on the grid
-        profile.evaluate( self.field.field, self.box )
+        profile.evaluate( dim, self.field.field, *self.box.get_meshgrid() )
+        self.normalize_energy(profile.laser_energy, self.field)
 
     def propagate(self, distance):
         """
@@ -73,3 +75,24 @@ class Laser:
         write_to_openpmd_file( file_prefix, file_format,
                                self.field.box, self.dim, self.field.field,
                                self.profile.lambda0, self.profile.pol )
+
+
+    def normalize_energy(self, energy, grid):
+        """
+        Normalize energy of the laser pulse contained in grid
+
+        Parameters
+        -----------
+        energy: scalar (J)
+            Energy of the laser pulse after normalization
+
+        grid: a Grid object
+            Contains value of the laser envelope and metadata
+        """
+
+        if energy is None:
+            return
+
+        current_energy = compute_laser_energy(grid)
+        norm_factor = (energy/current_energy)**.5
+        grid.field *= norm_factor
