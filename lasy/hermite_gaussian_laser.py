@@ -3,7 +3,7 @@ from .laser_profile import LaserProfile
 import numpy as np
 from scipy.special.orthogonal import hermite
 
-class HermiteGaussianLaser(Laser):
+class HermiteGaussianLaser(LaserProfile):
     """
     Derived class for an analytic profile of a high-order Gaussian
     laser pulse expressed in the Hermite-Gaussian formalism.
@@ -88,7 +88,7 @@ class HermiteGaussianLaser(Laser):
             x = box.axes[0]
             y = box.axes[1]
             transverse_profile = hermite(self.n_x)(
-                np.sqrt(2)*x[:,np.newaxis]/self.w0) \ hermite(self.n_y)(
+                np.sqrt(2)*x[:,np.newaxis]/self.w0) * hermite(self.n_y)(
                     np.sqrt(2)*y[np.newaxis,:]/self.w0) * np.exp(
                     -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/self.w0**2 )
             envelope[...] = transverse_profile[:,:,np.newaxis] * \
