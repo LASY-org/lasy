@@ -10,22 +10,21 @@ class LaguerreGaussianLaser(LaserProfile):
     """
 
     def __init__(self, wavelength, pol,
-                laser_energy, w0, p, m, tau, t_peak, cep_phase=0,theta0=0):
+                laser_energy, w0, p, m, tau, t_peak, cep_phase=0):
         """
         Defines a Laguerre-Gaussian laser pulse.
         More precisely, the electric field corresponds to:
         .. math::
-            E_u(r,\theta,t) = Re\left[ E_0\, r^{m} \,
-            L_p^m\left( \frac{2 r^2 }{w_0^2}\right )\, 
-            \cos\left ( m(\theta-\theta_0)\right)\,
+            E_u(r,\theta,t) = Re\left[ E_0\, r^{|m|}e^{-im\theta} \,
+            L_p^{|m|}\left( \frac{2 r^2 }{w_0^2}\right )\,
             \exp\left( -\frac{\boldsymbol{x}_\perp^2}{w_0^2}
             - \frac{(t-t_{peak})^2}{\tau^2} -i\omega_0(t-t_{peak})
             + i\phi_{cep}\right) \times p_u \right]
         where :math:`u` is either :math:`x` or :math:`y`, :math:`L_p^m` is the
-        Generalised Laguerre polynomial of radial order :math:`p` and 
-        azimuthal order :math:`m`, :math:`p_u` is the polarization 
-        vector, :math:`Re` represent the real part, and :math:`r` is the radial 
-        coordinate (orthogonal to the propagation direction) and :math:`theta` 
+        Generalised Laguerre polynomial of radial order :math:`p` and
+        azimuthal order :math:`|m|`, :math:`p_u` is the polarization
+        vector, :math:`Re` represent the real part, and :math:`r` is the radial
+        coordinate (orthogonal to the propagation direction) and :math:`theta`
         is the azmiuthal coordinate. The other parameters in this formula
         are defined below.
 
@@ -47,9 +46,9 @@ class LaguerreGaussianLaser(LaserProfile):
         w0: float (in meter)
             The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
         p: int (dimensionless)
-            The radial order of Generalized Laguerre polynomial 
+            The radial order of Generalized Laguerre polynomial
         m: int (dimensionless)
-            The azimuthal order of Generalized Laguerre polynomial 
+            Defines the phase rotation, i.e. :math:`m` in the above formula.
         tau: float (in second)
             The duration of the laser pulse, i.e. :math:`\tau` in the above
             formula. Note that :math:`\tau = \tau_{FWHM}/\sqrt{2\log(2)}`,
@@ -62,14 +61,12 @@ class LaguerreGaussianLaser(LaserProfile):
             The Carrier Enveloppe Phase (CEP), i.e. :math:`\phi_{cep}`
             in the above formula (i.e. the phase of the laser
             oscillation, at the time where the laser envelope is maximum)
-        theta0: float (in radian), optional
-            The azimuthal offset of the mode
         """
         super().__init__(wavelength, pol)
         self.laser_energy = laser_energy
         self.w0 = w0
-        self.p = p 
-        self.m = m 
+        self.p = p
+        self.m = m
         self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
@@ -91,23 +88,23 @@ class LaguerreGaussianLaser(LaserProfile):
         if box.dim == 'xyt':
             x = box.axes[0]
             y = box.axes[1]
-            radius = np.sqrt(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)
+            # complex_position corresponds to r e^{-i\theta}
+            complex_position = x[:,np.newaxis] - 1j*y[np.newaxis, :]
+            radius = abs(complex_position)
             scaled_rad_squared = (radius**2)/self.w0**2
-            theta = np.arctan2(y[np.newaxis, :],x[:,np.newaxis])
-            angle_term = np.cos(self.m*(theta-self.theta0))
-            transverse_profile = radius**self.m * genlaguerre(self.p, self.m)(
-                2*scaled_rad_squared) * angle_term * \
+            transverse_profile = complex_position**abs(self.m) * \
+                genlaguerre(self.p, abs(self.m))(2*scaled_rad_squared) * \
                 np.exp(-scaled_rad_squared)
             envelope[...] = transverse_profile[:,:,np.newaxis] * \
                     long_profile[np.newaxis, np.newaxis, :]
         elif box.dim == 'rt':
             r = box.axes[0]
-            
+
             assert self.m == 0,"Only m=0 modes are currently supported"
 
             scaled_rad_squared = r**2/self.w0**2
-            transverse_profile = r**self.m * genlaguerre(self.p, self.m)(
-                2*scaled_rad_squared) * \
+            transverse_profile = r**abs(self.m) * \
+                genlaguerre(self.p, abs(self.m))(2*scaled_rad_squared) * \
                 np.exp( -scaled_rad_squared )
             # Store field purely in mode 0
             envelope[0,:,:] = transverse_profile[:,np.newaxis] * \
