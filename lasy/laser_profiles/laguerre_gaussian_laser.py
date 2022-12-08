@@ -112,8 +112,3 @@ class LaguerreGaussianLaser(LaserProfile):
             # Store field purely in mode 0
             envelope[0,:,:] = transverse_profile[:,np.newaxis] * \
                             long_profile[np.newaxis, :]
-
-        # Normalize to the correct energy
-        current_energy = compute_laser_energy(envelope, box)
-        norm_factor = (self.laser_energy/current_energy)**.5
-        envelope *= norm_factor
