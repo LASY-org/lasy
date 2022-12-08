@@ -21,8 +21,8 @@ class HermiteGaussianLaser(LaserProfile):
             \exp\left( -\frac{\boldsymbol{x}_\perp^2}{w_0^2}
             - \frac{(t-t_{peak})^2}{\tau^2} -i\omega_0(t-t_{peak})
             + i\phi_{cep}\right) \times p_u \right]
-        where :math:`u` is either :math:`x` or :math:`y`, :math:`H_{n_u}` is the
-        Hermite polynomial of order :math:`n_u`, :math:`p_u` is the polarization 
+        where :math:`u` is either :math:`x` or :math:`y`, :math:`H_{n}` is the
+        Hermite polynomial of order :math:`n`, :math:`p_u` is the polarization 
         vector, :math:`Re` represent the real part, and
         :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
         to the propagation direction). The other parameters in this formula
