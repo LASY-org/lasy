@@ -73,8 +73,9 @@ def write_to_openpmd_file(file_prefix, file_format, grid,
                 data = array.imag.copy()
 
         elif dim == 'rt':
-            # The representation of modes in openPMD is different than
-            # the representation of modes internal to lasy.
+            # The representation of modes in openPMD
+            # (see https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record)
+            # is different than the representation of modes internal to lasy.
             # Thus, there is a non-trivial conversion here
             ncomp = 2*box.n_azimuthal_modes - 1
             data = np.zeros( (ncomp, box.npoints[0], box.npoints[1]) )
@@ -85,7 +86,7 @@ def write_to_openpmd_file(file_prefix, file_format, grid,
                     data[2*m-1,:,:] = array[m,:,:].real + array[-m,:,:].real
                     # Imaginary part of the mode
                     data[2*m,:,:] = array[m,:,:].imag - array[-m,:,:].imag
-            if comp_name == 'E_real':
+            elif comp_name == 'E_imag':
                 data[0,:,:] = array[0,:,:].imag
                 for m in range(1,ncomp):
                     # Real part of the mode
