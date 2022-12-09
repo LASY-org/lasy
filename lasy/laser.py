@@ -3,6 +3,7 @@ import scipy.constants as scc
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
 from lasy.utils.openpmd_output import write_to_openpmd_file
+from lasy.utils.laser_energy import normalize_energy
 
 class Laser:
     """
@@ -46,7 +47,8 @@ class Laser:
         self.profile = profile
 
         # Evaluate the laser profile on the grid
-        profile.evaluate( self.field.field, self.box )
+        profile.evaluate( dim, self.field.field, *self.box.get_meshgrid() )
+        normalize_energy(profile.laser_energy, self.field)
 
     def propagate(self, distance):
         """
@@ -75,6 +77,5 @@ class Laser:
         file_format: string
             Format to be used for the output file. Options are "h5" and "bp".
         """
-        write_to_openpmd_file( file_prefix, file_format,
-                               self.field.box, self.dim, self.field.field,
+        write_to_openpmd_file( file_prefix, file_format, self.field,
                                self.profile.lambda0, self.profile.pol )

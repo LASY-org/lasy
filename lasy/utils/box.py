@@ -50,3 +50,9 @@ class Box:
 
         if dim == 'rt':
             self.n_azimuthal_modes = n_azimuthal_modes
+
+    def get_meshgrid(self):
+        """
+        Get the meshgrid corresponding to the current box
+        """
+        return np.meshgrid(*self.axes, indexing='ij')

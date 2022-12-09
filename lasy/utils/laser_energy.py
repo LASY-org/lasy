@@ -1,18 +1,16 @@
 import numpy as np
 import scipy.constants as scc
 
-def compute_laser_energy(envelope, box):
+def compute_laser_energy(grid):
     """
     Computes the total laser energy that corresponds to the current
     envelope data. This is used mainly for normalization purposes.
 
     Parameters:
     -----------
-    envelope: ndarrays (V/m)
-        Contains the value of the envelope field
-
-    box: an object of type lasy.utils.Box
-        Defines the points at which evaluate the laser
+    grid: a Grid object. It contains a ndarrays (V/m) with
+          the value of the envelope field and an object of type
+          lasy.utils.Box that defines the points at which evaluate the laser
 
     Returns:
     --------
@@ -23,7 +21,11 @@ def compute_laser_energy(envelope, box):
     # which assumes that we can average over the oscilations at the
     # specified laser wavelength.
     # This probably needs to be generalized for few-cycle laser pulses.
-    dz = box.dx[-1] * scc.c # (Last dimension is time)
+
+    envelope = grid.field
+    box = grid.box
+
+    dz = box.dx[-1]*scc.c
 
     if box.dim == 'xyt':
         dV = box.dx[0] * box.dx[1] * dz
@@ -38,3 +40,23 @@ def compute_laser_energy(envelope, box):
                 abs(envelope[:,:,:])**2).sum()
 
     return energy
+
+def normalize_energy(energy, grid):
+    """
+    Normalize energy of the laser pulse contained in grid
+
+    Parameters
+    -----------
+    energy: scalar (J)
+        Energy of the laser pulse after normalization
+
+    grid: a Grid object
+        Contains value of the laser envelope and metadata
+    """
+
+    if energy is None:
+        return
+
+    current_energy = compute_laser_energy(grid)
+    norm_factor = (energy/current_energy)**.5
+    grid.field *= norm_factor

@@ -1,4 +1,3 @@
-from ..utils.laser_energy import compute_laser_energy
 from .laser_profile import LaserProfile
 import numpy as np
 from scipy.special import genlaguerre
@@ -110,8 +109,3 @@ class LaguerreGaussianLaser(LaserProfile):
             # Store field in the proper azimuthal modes
             envelope[self.m,:,:] = transverse_profile[:,np.newaxis] * \
                         long_profile[np.newaxis, :]
-
-        # Normalize to the correct energy
-        current_energy = compute_laser_energy(envelope, box)
-        norm_factor = (self.laser_energy/current_energy)**.5
-        envelope *= norm_factor
