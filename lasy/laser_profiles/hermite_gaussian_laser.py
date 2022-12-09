@@ -70,43 +70,23 @@ class HermiteGaussianLaser(LaserProfile):
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
-    def evaluate( self, envelope, box ):
+    def evaluate( self, x, y, t ):
         """
-        Fills the envelope field of the laser
+        Returns the envelope field of the laser
 
         Parameters
         -----------
-        envelope: ndarrays (V/m)
-            Contains the values of the envelope field, to be filled
-        box: an object of type lasy.utils.Box
-            Defines the points at which evaluate the laser
+        TODO: Mention that all axes need to have the same shape
+        This returns an array of complex, of the same shaep
         """
-        t = box.axes[-1]
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
                             + 1.j*(self.cep_phase + self.omega0*self.t_peak))
 
-        if box.dim == 'xyt':
-            x = box.axes[0]
-            y = box.axes[1]
-            transverse_profile = hermite(self.n_x)(
-                np.sqrt(2)*x[:,np.newaxis]/self.w0) * hermite(self.n_y)(
-                    np.sqrt(2)*y[np.newaxis,:]/self.w0) * np.exp(
-                    -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/self.w0**2 )
-            envelope[...] = transverse_profile[:,:,np.newaxis] * \
-                    long_profile[np.newaxis, np.newaxis, :]
-        elif box.dim == 'rt':
-            r = box.axes[0]
-            """
-            For these modes to make sense in rt, we need to
-            have multiple modes and likely represent as a
-            series of Laguerre Gauss Modes for accurate
-            reresentation. Until then, we pass a simple gaussian
-            and a warning
-            """
-            assert ((self.n_x ==0) and (self.n_y == 0 )),"Modes for \
-                n_x > 0 or n_y > 0 are not yet implemented in dimension rt"
+        transverse_profile = hermite(self.n_x)(
+            np.sqrt(2)*x[:,np.newaxis]/self.w0) * hermite(self.n_y)(
+                np.sqrt(2)*y[np.newaxis,:]/self.w0) * np.exp(
+                -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/self.w0**2 )
+        envelope = transverse_profile[:,:,np.newaxis] * \
+                long_profile[np.newaxis, np.newaxis, :]
 
-            transverse_profile = np.exp( -r**2/self.w0**2 )
-
-            envelope[0,:,:] = transverse_profile[:,np.newaxis] * \
-                            long_profile[np.newaxis, :]
+        return envelope

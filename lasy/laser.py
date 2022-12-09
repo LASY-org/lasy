@@ -42,7 +42,7 @@ class Laser:
         self.profile = profile
 
         # Evaluate the laser profile on the grid
-        profile.evaluate( dim, self.field.field, *self.box.get_meshgrid() )
+        self.field.field[...] = profile.evaluate( *self.box.get_meshgrid() )
         normalize_energy(profile.laser_energy, self.field)
 
     def propagate(self, distance):
