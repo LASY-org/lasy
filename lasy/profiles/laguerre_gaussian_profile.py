@@ -71,7 +71,7 @@ class LaguerreGaussianProfile(Profile):
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
-    def evaluate( self, envelope, box ):
+    def evaluate( self, x, y, t ):
         """
         Returns the envelope field of the laser
 
@@ -84,15 +84,14 @@ class LaguerreGaussianProfile(Profile):
                               + 1.j*(self.cep_phase + self.omega0*self.t_peak))
         # complex_position corresponds to r e^{+/-i\theta}
         if self.m > 0:
-            complex_position = x[:,np.newaxis] - 1j*y[np.newaxis, :]
+            complex_position = x - 1j*y
         else:
-            complex_position = x[:,np.newaxis] + 1j*y[np.newaxis, :]
+            complex_position = x + 1j*y
         radius = abs(complex_position)
         scaled_rad_squared = (radius**2)/self.w0**2
         transverse_profile = complex_position**abs(self.m) * \
             genlaguerre(self.p, abs(self.m))(2*scaled_rad_squared) * \
             np.exp(-scaled_rad_squared)
-        envelope[...] = transverse_profile[:,:,np.newaxis] * \
-                long_profile[np.newaxis, np.newaxis, :]
+        envelope = transverse_profile * long_profile
 
         return envelope

@@ -82,11 +82,9 @@ class HermiteGaussianProfile(Profile):
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
                             + 1.j*(self.cep_phase + self.omega0*self.t_peak))
 
-        transverse_profile = hermite(self.n_x)(
-            np.sqrt(2)*x[:,np.newaxis]/self.w0) * hermite(self.n_y)(
-                np.sqrt(2)*y[np.newaxis,:]/self.w0) * np.exp(
-                -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/self.w0**2 )
-        envelope = transverse_profile[:,:,np.newaxis] * \
-                long_profile[np.newaxis, np.newaxis, :]
+        transverse_profile = hermite(self.n_x)(np.sqrt(2)*x/self.w0) * \
+                             hermite(self.n_y)(np.sqrt(2)*y/self.w0) * \
+                             np.exp( -(x**2 + y**2)/self.w0**2 )
+        envelope = transverse_profile * long_profile
 
         return envelope
