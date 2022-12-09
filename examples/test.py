@@ -1,6 +1,6 @@
 import numpy as np
 from lasy.laser import Laser
-from lasy.laser_profiles.gaussian_laser import GaussianLaser
+from lasy.profiles.gaussian_profile import GaussianProfile
 
 wavelength=.8e-6
 pol = (1,0)
@@ -8,7 +8,7 @@ laser_energy = 1. # J
 t_peak = 0.e-15 # s
 tau = 30.e-15 # s
 w0 = 5.e-6 # m
-profile = GaussianLaser(wavelength, pol, laser_energy, w0, tau, t_peak)
+profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
 # 3D Cartesian case
 

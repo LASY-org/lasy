@@ -1,8 +1,8 @@
-from .laser_profile import LaserProfile
+from .profile import Profile
 import numpy as np
 from scipy.special import genlaguerre
 
-class LaguerreGaussianLaser(LaserProfile):
+class LaguerreGaussianProfile(Profile):
     """
     Derived class for an analytic profile of a high-order Gaussian
     laser pulse expressed in the Laguerre-Gaussian formalism.
