@@ -43,3 +43,10 @@ class Box:
         for i in range(self.ndims):
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
             self.dx.append(self.axes[i][1] - self.axes[i][0])
+
+
+    def get_meshgrid(self):
+        """
+        Get the meshgrid corresponding to the current box
+        """
+        return np.meshgrid(*self.axes, indexing='ij')
