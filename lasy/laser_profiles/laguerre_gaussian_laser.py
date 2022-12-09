@@ -1,4 +1,3 @@
-from ..utils.laser_energy import compute_laser_energy
 from .laser_profile import LaserProfile
 import numpy as np
 from scipy.special import genlaguerre
