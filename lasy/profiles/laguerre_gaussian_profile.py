@@ -1,31 +1,32 @@
-from .laser_profile import LaserProfile
+from .profile import Profile
 import numpy as np
-from scipy.special.orthogonal import hermite
+from scipy.special import genlaguerre
 
-class HermiteGaussianLaser(LaserProfile):
+class LaguerreGaussianProfile(Profile):
     """
     Derived class for an analytic profile of a high-order Gaussian
-    laser pulse expressed in the Hermite-Gaussian formalism.
+    laser pulse expressed in the Laguerre-Gaussian formalism.
     """
 
     def __init__(self, wavelength, pol,
-                laser_energy, w0, n_x, n_y, tau, t_peak, cep_phase=0):
+                laser_energy, w0, p, m, tau, t_peak, cep_phase=0):
         """
-        Defines a Hermite-Gaussian laser pulse.
+        Defines a Laguerre-Gaussian laser pulse.
         More precisely, the electric field corresponds to:
         .. math::
-            E_u(\boldsymbol{x}_\perp,t) = Re\left[ E_0\,
-            H_{n_x}\left ( \frac{\sqrt{2} x}{w_0}\right )\,
-            H_{n_y}\left ( \frac{\sqrt{2} y}{w_0}\right )\,
-            \exp\left( -\frac{\boldsymbol{x}_\perp^2}{w_0^2}
+            E_u(r,\theta,t) = Re\left[ E_0\, r^{|m|}e^{-im\theta} \,
+            L_p^{|m|}\left( \frac{2 r^2 }{w_0^2}\right )\,
+            \exp\left( -\frac{r^2}{w_0^2}
             - \frac{(t-t_{peak})^2}{\tau^2} -i\omega_0(t-t_{peak})
             + i\phi_{cep}\right) \times p_u \right]
-        where :math:`u` is either :math:`x` or :math:`y`, :math:`H_{n}` is the
-        Hermite polynomial of order :math:`n`, :math:`p_u` is the polarization
-        vector, :math:`Re` represent the real part, and
-        :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
-        to the propagation direction). The other parameters in this formula
-        are defined below.
+        where :math:`u` is either :math:`x = r \cos{\theta}` or
+        :math:`y = r \sin{\theta}`, :math:`L_p^{|m|}` is the
+        Generalised Laguerre polynomial of radial order :math:`p` and
+        azimuthal order :math:`|m|`, :math:`p_u` is the polarization
+        vector, :math:`Re` represent the real part, and :math:`r` is the radial
+        coordinate (orthogonal to the propagation direction) and :math:`\theta`
+        is the azmiuthal coordinate and :math:`t` is time. The other parameters
+        in this formula are defined below.
 
         Parameters:
         -----------
@@ -44,10 +45,10 @@ class HermiteGaussianLaser(LaserProfile):
             calculated so that the pulse has the prescribed energy.
         w0: float (in meter)
             The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
-        n_x: int (dimensionless)
-            The order of hermite polynomial in the x direction
-        n_y: int (dimensionless)
-            The order of hermite polynomial in the y direction
+        p: int (dimensionless)
+            The radial order of Generalized Laguerre polynomial
+        m: int (dimensionless)
+            Defines the phase rotation, i.e. :math:`m` in the above formula.
         tau: float (in second)
             The duration of the laser pulse, i.e. :math:`\tau` in the above
             formula. Note that :math:`\tau = \tau_{FWHM}/\sqrt{2\log(2)}`,
@@ -64,13 +65,13 @@ class HermiteGaussianLaser(LaserProfile):
         super().__init__(wavelength, pol)
         self.laser_energy = laser_energy
         self.w0 = w0
-        self.n_x = n_x
-        self.n_y = n_y
+        self.p = p
+        self.m = m
         self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
-    def evaluate( self, x, y, t ):
+    def evaluate( self, envelope, box ):
         """
         Returns the envelope field of the laser
 
@@ -80,13 +81,18 @@ class HermiteGaussianLaser(LaserProfile):
         This returns an array of complex, of the same shaep
         """
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
-                            + 1.j*(self.cep_phase + self.omega0*self.t_peak))
-
-        transverse_profile = hermite(self.n_x)(
-            np.sqrt(2)*x[:,np.newaxis]/self.w0) * hermite(self.n_y)(
-                np.sqrt(2)*y[np.newaxis,:]/self.w0) * np.exp(
-                -(x[:,np.newaxis]**2 + y[np.newaxis, :]**2)/self.w0**2 )
-        envelope = transverse_profile[:,:,np.newaxis] * \
+                              + 1.j*(self.cep_phase + self.omega0*self.t_peak))
+        # complex_position corresponds to r e^{+/-i\theta}
+        if self.m > 0:
+            complex_position = x[:,np.newaxis] - 1j*y[np.newaxis, :]
+        else:
+            complex_position = x[:,np.newaxis] + 1j*y[np.newaxis, :]
+        radius = abs(complex_position)
+        scaled_rad_squared = (radius**2)/self.w0**2
+        transverse_profile = complex_position**abs(self.m) * \
+            genlaguerre(self.p, abs(self.m))(2*scaled_rad_squared) * \
+            np.exp(-scaled_rad_squared)
+        envelope[...] = transverse_profile[:,:,np.newaxis] * \
                 long_profile[np.newaxis, np.newaxis, :]
 
         return envelope

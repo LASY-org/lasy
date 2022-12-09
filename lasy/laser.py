@@ -33,7 +33,7 @@ class Laser:
             One element per direction (2 for dim='rt', 3 for dim='xyt')
             For the moment, the lower end is assumed to be (0,0) in rt and (0,0,0) in xyt
 
-        profile: an object of type lasy.laser_profiles.laser_profile.LaserProfile
+        profile: an object of type lasy.profiles.profile.Profile
             Defines how to evaluate the envelope field
         """
         self.box = Box(dim, lo, hi, npoints)
