@@ -74,10 +74,17 @@ class HermiteGaussianProfile(Profile):
         """
         Returns the envelope field of the laser
 
-        Parameters
+        Parameters:
         -----------
-        TODO: Mention that all axes need to have the same shape
-        This returns an array of complex, of the same shaep
+        x, y, t: ndarrays of floats
+            Define points on which to evaluate the envelope
+            These arrays need to all have the same shape.
+
+        Returns:
+        --------
+        envelope: ndarray of complexs
+            Contains the value of the envelope at the specified points
+            This array as the same shape as the arrays x, y, t
         """
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
                             + 1.j*(self.cep_phase + self.omega0*self.t_peak))
