@@ -11,7 +11,8 @@ class Laser:
     propagate it, and write it to a file.
     """
 
-    def __init__(self, dim, lo, hi, npoints, profile):
+    def __init__(self, dim, lo, hi, npoints, profile,
+                 n_azimuthal_modes=1 ):
         """
         Construct a laser object
 
@@ -35,8 +36,12 @@ class Laser:
 
         profile: an object of type lasy.profiles.profile.Profile
             Defines how to evaluate the envelope field
+
+        n_azimuthal_modes: int (optional)
+            Only used if `dim` is 'rt'. The number of azimuthal modes
+            used in order to represent the laser field.
         """
-        self.box = Box(dim, lo, hi, npoints)
+        self.box = Box(dim, lo, hi, npoints, n_azimuthal_modes)
         self.field = Grid(self.box)
         self.dim = self.box.dim
         self.profile = profile

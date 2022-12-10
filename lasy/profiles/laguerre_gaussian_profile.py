@@ -19,7 +19,7 @@ class LaguerreGaussianProfile(Profile):
             \exp\left( -\frac{r^2}{w_0^2}
             - \frac{(t-t_{peak})^2}{\tau^2} -i\omega_0(t-t_{peak})
             + i\phi_{cep}\right) \times p_u \right]
-        where :math:`u` is either :math:`x = r \cos{\theta}` or 
+        where :math:`u` is either :math:`x = r \cos{\theta}` or
         :math:`y = r \sin{\theta}`, :math:`L_p^{|m|}` is the
         Generalised Laguerre polynomial of radial order :math:`p` and
         azimuthal order :math:`|m|`, :math:`p_u` is the polarization
@@ -103,12 +103,10 @@ class LaguerreGaussianProfile(Profile):
         elif box.dim == 'rt':
             r = box.axes[0]
 
-            assert self.m == 0,"Only m=0 modes are currently supported"
-
             scaled_rad_squared = r**2/self.w0**2
             transverse_profile = r**abs(self.m) * \
                 genlaguerre(self.p, abs(self.m))(2*scaled_rad_squared) * \
                 np.exp( -scaled_rad_squared )
-            # Store field purely in mode 0
-            envelope[0,:,:] = transverse_profile[:,np.newaxis] * \
-                            long_profile[np.newaxis, :]
+            # Store field in the proper azimuthal modes
+            envelope[self.m,:,:] = transverse_profile[:,np.newaxis] * \
+                        long_profile[np.newaxis, :]
