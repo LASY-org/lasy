@@ -83,16 +83,20 @@ def write_to_openpmd_file(file_prefix, file_format, grid,
                 data[0,:,:] = array[0,:,:].real
                 for mode in range(1,box.n_azimuthal_modes):
                     # Real part of the mode
-                    data[2*m-1,:,:] = array[m,:,:].real + array[-m,:,:].real
+                    data[2*mode-1,:,:] = array[mode,:,:].real \
+                                            + array[-mode,:,:].real
                     # Imaginary part of the mode
-                    data[2*m,:,:] = array[m,:,:].imag - array[-m,:,:].imag
+                    data[2*mode,:,:] = array[mode,:,:].imag \
+                                            - array[-mode,:,:].imag
             elif comp_name == 'E_imag':
                 data[0,:,:] = array[0,:,:].imag
-                for m in range(1,ncomp):
+                for mode in range(1,box.n_azimuthal_modes):
                     # Real part of the mode
-                    data[2*m-1,:,:] = array[m,:,:].imag + array[-m,:,:].imag
+                    data[2*mode-1,:,:] = array[mode,:,:].imag \
+                                            + array[-mode,:,:].imag
                     # Imaginary part of the mode
-                    data[2*m,:,:] = -array[m,:,:].real + array[-m,:,:].real
+                    data[2*mode,:,:] = -array[mode,:,:].real \
+                                            + array[-mode,:,:].real
 
         E.store_chunk( data )
 
