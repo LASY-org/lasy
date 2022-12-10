@@ -63,7 +63,7 @@ class Laser:
             # Evaluate the profile on the generated grid
             envelope = profile.evaluate( x, y, t )
             # Perform the azimuthal decomposition
-            self.field.field[...] = np.fft.fft(envelope, axis=0)/n_theta
+            self.field.field[...] = np.fft.ifft(envelope, axis=0)
 
         normalize_energy(profile.laser_energy, self.field)
 
