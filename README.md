@@ -35,6 +35,7 @@ python examples/test.py
 ```
 ## Creating Documentation
 ```bash
-cd docs
-make html
+$ pip install sphinx-rtd-theme
+$ cd docs
+$ make html
 ```
