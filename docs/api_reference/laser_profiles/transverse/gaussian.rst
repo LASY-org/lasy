@@ -1,4 +1,4 @@
-Gaussian Laser Pulse
+Gaussian Laser
 ====================
 
 .. math::

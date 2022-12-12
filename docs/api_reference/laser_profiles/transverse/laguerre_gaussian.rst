@@ -1,4 +1,4 @@
-Laguerre-Gaussian Laser Pulse
+Laguerre-Gaussian Laser
 ==============================
 
 Used to define a Laguerre-Gaussian transverse laser profile. 

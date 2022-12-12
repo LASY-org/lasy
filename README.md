@@ -33,3 +33,8 @@ At the moment LASY only support axisymmetric envelope profiles: $N_m=1$.
 python setup.py install
 python examples/test.py
 ```
+## Creating Documentation
+```bash
+cd docs
+make html
+```

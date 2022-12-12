@@ -1,4 +1,4 @@
-Laser 
+Laser Class
 ================
 `laser` objects are composed of transverse and longtidunal profiles
 

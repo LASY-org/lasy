@@ -1,4 +1,4 @@
-Hermite-Gaussian Laser Pulse
+Hermite-Gaussian Laser 
 ============================
 
 Used to define a Hermite-Gaussian transverse laser profile. 
