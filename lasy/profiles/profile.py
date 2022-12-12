@@ -35,24 +35,22 @@ class Profile(object):
         self.lambda0 = wavelength
         self.omega0 = 2*scc.pi*scc.c/self.lambda0
 
-    def evaluate( self, dim, envelope, *axes ):
+    def evaluate( self, x, y, t ):
         """
-        Fills the envelope field of the laser
-        Usage: evaluate(dim, envelope, x, y, t) (3D Cartesian) or
-               evaluate(dim, envelope, r, t) (2D cylindrical)
+        Returns the envelope field of the laser
 
-        Parameters
+        Parameters:
         -----------
-        dim: string
-            'rt' or 'xyt'
+        x, y, t: ndarrays of floats
+            Define points on which to evaluate the envelope
+            These arrays need to all have the same shape.
 
-        envelope: ndarrays (V/m)
-            Contains the values of the envelope field, to be filled
-
-        axes: Coordinates at which the envelope should be evaluated.
-            Can be 2 elements in cylindrical geometry (r,t) or
-            3 elements in Cartesian geometry (x,y,t).
+        Returns:
+        --------
+        envelope: ndarray of complex numbers
+            Contains the value of the envelope at the specified points
+            This array has the same shape as the arrays x, y, t
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
-        pass
+        return np.zeros_like(x, dtype='complex128')

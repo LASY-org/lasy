@@ -71,42 +71,34 @@ class LaguerreGaussianProfile(Profile):
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
-    def evaluate( self, envelope, box ):
+    def evaluate( self, x, y, t ):
         """
-        Fills the envelope field of the laser
-        Parameters
+        Returns the envelope field of the laser
+
+        Parameters:
         -----------
-        envelope: ndarrays (V/m)
-            Contains the values of the envelope field, to be filled
-        box: an object of type lasy.utils.Box
-            Defines the points at which evaluate the laser
+        x, y, t: ndarrays of floats
+            Define points on which to evaluate the envelope
+            These arrays need to all have the same shape.
+
+        Returns:
+        --------
+        envelope: ndarray of complex numbers
+            Contains the value of the envelope at the specified points
+            This array has the same shape as the arrays x, y, t
         """
-        t = box.axes[-1]
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
                               + 1.j*(self.cep_phase + self.omega0*self.t_peak))
+        # complex_position corresponds to r e^{+/-i\theta}
+        if self.m > 0:
+            complex_position = x - 1j*y
+        else:
+            complex_position = x + 1j*y
+        radius = abs(complex_position)
+        scaled_rad_squared = (radius**2)/self.w0**2
+        transverse_profile = complex_position**abs(self.m) * \
+            genlaguerre(self.p, abs(self.m))(2*scaled_rad_squared) * \
+            np.exp(-scaled_rad_squared)
+        envelope = transverse_profile * long_profile
 
-        if box.dim == 'xyt':
-            x = box.axes[0]
-            y = box.axes[1]
-            # complex_position corresponds to r e^{+/-i\theta}
-            if self.m > 0:
-                complex_position = x[:,np.newaxis] - 1j*y[np.newaxis, :]
-            else:
-                complex_position = x[:,np.newaxis] + 1j*y[np.newaxis, :]
-            radius = abs(complex_position)
-            scaled_rad_squared = (radius**2)/self.w0**2
-            transverse_profile = complex_position**abs(self.m) * \
-                genlaguerre(self.p, abs(self.m))(2*scaled_rad_squared) * \
-                np.exp(-scaled_rad_squared)
-            envelope[...] = transverse_profile[:,:,np.newaxis] * \
-                    long_profile[np.newaxis, np.newaxis, :]
-        elif box.dim == 'rt':
-            r = box.axes[0]
-
-            scaled_rad_squared = r**2/self.w0**2
-            transverse_profile = r**abs(self.m) * \
-                genlaguerre(self.p, abs(self.m))(2*scaled_rad_squared) * \
-                np.exp( -scaled_rad_squared )
-            # Store field in the proper azimuthal modes
-            envelope[self.m,:,:] = transverse_profile[:,np.newaxis] * \
-                        long_profile[np.newaxis, :]
+        return envelope

@@ -69,45 +69,25 @@ class GaussianProfile(Profile):
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
-    def evaluate( self, dim, envelope, *axes ):
+    def evaluate( self, x, y, t ):
         """
-        Fills the envelope field of the laser
-        Usage: evaluate(dim, envelope, x, y, t) (3D Cartesian) or
-               evaluate(dim, envelope, r, t) (2D cylindrical)
-        t is always the last axis to be read.
+        Returns the envelope field of the laser
 
-        Example use cases:
-            evaluate('rt', env, 0, 0) # evaluate at a single point (0,0)
-            X, Y, T = np.meshgrid(x,y,t,indexing='ij') where x, y and t are 1darray-s
-            evaluate('rt', env, X, Y, T)
-
-        Parameters
+        Parameters:
         -----------
-        dim: string
-            'rt' or 'xyt'
+        x, y, t: ndarrays of floats
+            Define points on which to evaluate the envelope
+            These arrays need to all have the same shape.
 
-        envelope: ndarrays (V/m)
-            Contains the values of the envelope field, to be filled
-
-        axes: Coordinates at which the envelope should be evaluated.
-            Can be 2 elements in cylindrical geometry (r,t) or
-            3 elements in Cartesian geometry (x,y,t).
-            elements should be scalars or numpy arrays. In the latter case,
-            all elements should have the same shape.
+        Returns:
+        --------
+        envelope: ndarray of complex numbers
+            Contains the value of the envelope at the specified points
+            This array has the same shape as the arrays x, y, t
         """
-
-        t = axes[-1]
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
                               + 1.j*(self.cep_phase + self.omega0*self.t_peak))
+        transverse_profile = np.exp( -(x**2 + y**2)/self.w0**2 )
+        envelope = transverse_profile * long_profile
 
-        if dim == 'xyt':
-            assert( all(axis.shape == envelope.shape for axis in axes) )
-            x = axes[0]
-            y = axes[1]
-            transverse_profile = np.exp( -(x**2 + y**2)/self.w0**2 )
-            envelope[:] = transverse_profile * long_profile
-        else:
-            r = axes[0]
-            transverse_profile = np.exp( -r**2/self.w0**2 )
-            # Store field purely in mode 0
-            envelope[0,:,:] = transverse_profile * long_profile
+        return envelope
