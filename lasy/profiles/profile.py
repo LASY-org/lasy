@@ -47,7 +47,7 @@ class Profile(object):
 
         Returns:
         --------
-        envelope: ndarray of complexs
+        envelope: ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
         """
