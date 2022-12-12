@@ -49,7 +49,7 @@ class Profile(object):
         --------
         envelope: ndarray of complexs
             Contains the value of the envelope at the specified points
-            This array as the same shape as the arrays x, y, t
+            This array has the same shape as the arrays x, y, t
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)

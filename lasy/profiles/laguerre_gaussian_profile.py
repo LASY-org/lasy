@@ -85,7 +85,7 @@ class LaguerreGaussianProfile(Profile):
         --------
         envelope: ndarray of complexs
             Contains the value of the envelope at the specified points
-            This array as the same shape as the arrays x, y, t
+            This array has the same shape as the arrays x, y, t
         """
         long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
                               + 1.j*(self.cep_phase + self.omega0*self.t_peak))
