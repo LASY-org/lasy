@@ -34,6 +34,8 @@ python setup.py install
 python examples/test.py
 ```
 ## Creating Documentation
+Install sphinx (https://www.sphinx-doc.org/en/master/usage/installation.html)
+
 ```bash
 $ pip install sphinx-rtd-theme
 $ cd docs
