@@ -45,30 +45,35 @@ ts_circ = OpenPMDTimeSeries('../examples/')
 # #3d-geometry
 # Slice across y (i.e. in a plane parallel to x-z)
 plt.figure()
-Ez_real1, info_Ez_real1 = ts_3d.get_field(field='E_real', coord='z', iteration=0, slice_across='t', plot=True)
+Ez_real1, info_Ez_real1 = ts_3d.get_field(field='E_real', coord='z', iteration=0,
+                                          slice_across='t', plot=True)
 plt.savefig('3dfield_Ez_real.png')
 
 # Slice across t (i.e. in a plane parallel to x-z)
 plt.figure()
-Ey_imag1, info_Ey_imag1 = ts_3d.get_field(field='E_imag', coord='y', iteration=0, slice_across='t', plot=True)
+Ey_imag1, info_Ey_imag1 = ts_3d.get_field(field='E_imag', coord='y', iteration=0,
+                                          slice_across='x', plot=True)
 plt.savefig('3dfield_Ey_imag.png')
 
 # Get the full 3D Cartesian array
-Ez_3d, info_Ez_3d = ts_3d.get_field(field='E_real', coord='z', iteration=0, slice_across=None)
-print(Ez_3d.ndim)
-# currently only 2 dimensions as there is only one time entry
+Ex_3d_real1, info_Ex_3d_real1 = ts_3d.get_field(field='E_real', coord='x', iteration=0,
+                                                slice_across=None)
+print(Ex_3d_real1.ndim)
 
 # #RZ-geometry
-# Slice across  (i.e. in a plane parallel to x-z)
+# Slice across t
 plt.figure()
-Ey2, info_Ey2 = ts_circ.get_field(field='E_real', coord='r', iteration=0, m='all', slice_across='t', plot=True)
-plt.savefig('RZfield_Ey.png')
+Ez_real2, info_Ez_real2 = ts_circ.get_field(field='E_real', coord='z', iteration=0,
+                                            m=0, slice_across='t', plot=True)
+plt.savefig('RZfield_Ez_real.png')
 
+# slice across x
 plt.figure()
-Er, info_Er = ts_circ.get_field(field='E_real', coord='r', iteration=0, m=0, slice_across='t', plot=True)
-plt.savefig('RZfield_Er.png')
+Ey_imag2, info_Ey_imag2 = ts_circ.get_field(field='E_imag', coord='y', iteration=0,
+                                            m='all', slice_across='x', plot=True)
+plt.savefig('RZfield_Ey_imag.png')
 
 # Get the full 3D radial array
-Ey_3d, info_Ey3d = ts_circ.get_field(field='E_real', coord='y', iteration=0)
-print(Ey_3d.ndim)
-# currently only 2 dimensions as there is only one time entry
+Ex_3d_real2, info_Ex3d_real2 = ts_circ.get_field(field='E_real', coord='x',
+                                                 iteration=0)
+print(Ex_3d_real2.ndim)
