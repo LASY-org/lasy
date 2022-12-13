@@ -26,17 +26,17 @@ At the moment LASY only support axisymmetric envelope profiles: $N_m=1$.
 
 # How to contribute
 
-All contributions are welcome! For all contribution, we use pull requests from forks. Below is a very rough summary, please have a look at the appropriate documentation at https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks and around.
+All contributions are welcome! For a new contribution, we use pull requests from forks. Below is a very rough summary, please have a look at the appropriate documentation at https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks and around.
 
 First, setup your fork workflow (only once):
-- Fork the repo by clicking the Fork button on the top right, and follow the prompts. This will create your own (remote) copy of the main https://github.com/LASY-org/LASY repo, located at https://github.com/<your username>/LASY.
-- Make your local copy aware of your fork: from your local repository, do `git remote add <blah> https://github.com/<your username>/LASY`. For `<blah>` it can be convenient to use e.g. your username.
+- Fork the repo by clicking the Fork button on the top right, and follow the prompts. This will create your own (remote) copy of the main https://github.com/LASY-org/LASY repo, located at https://github.com/[your username]/LASY.
+- Make your local copy aware of your fork: from your local repository, do `git remote add [blah] https://github.com/[your username]/LASY`. For `[blah]` it can be convenient to use e.g. your username.
 
 Then, for each contribution:
 - Get the last version of branch `development` from the main repo (e.g. `git checkout development && git pull`).
 - Create a new branch (e.g. `git checkout -b my_contribution`).
 - Do usual `git add` and `git commit` operations.
-- Push your branch to your own fork: `git push -u <blah> my_contribution`
+- Push your branch to your own fork: `git push -u [blah] my_contribution`
 - Whenever you're ready, open a PR from branch `my_contribution` on your fork to branch `development` on the main repo. Github typically suggests this very well.
 
 # Style conventions
