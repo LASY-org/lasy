@@ -4,16 +4,18 @@ import scipy.constants as scc
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
 from lasy.utils.openpmd_output import write_to_openpmd_file
+from lasy.utils.laser_energy import normalize_energy
 
 class Laser:
     """
-    Base class for laser profiles.
-    The laser pulse is assumed to propagate in the z direction.
+    Top-level class that can evaluate a laser profile on a grid,
+    propagate it, and write it to a file.
     """
 
-    def __init__(self, dim, lo, hi, array_in, wavelength, pol):
+    def __init__(self, dim, lo, hi, npoints, profile,
+                 n_azimuthal_modes=1 ):
         """
-        Construct Laser class from specified arrays
+        Construct a laser object
 
         Parameters
         ----------
@@ -24,48 +26,47 @@ class Laser:
             - 'rt' : The laser pulse is represented on a 2D grid:
                      Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-        lo: list of scalars
-            Lower end of the physical domain where the laser array is defined
+        lo, hi : list of scalars
+            Lower and higher end of the physical domain of the box.
+            One element per direction (2 for dim='rt', 3 for dim='xyt')
 
-        hi: list of scalars
-            Higher end of the physical domain where the laser array is defined
+        npoints : tuple of int
+            Number of points in each direction.
+            One element per direction (2 for dim='rt', 3 for dim='xyt')
+            For the moment, the lower end is assumed to be (0,0) in rt and (0,0,0) in xyt
 
-        array_in: numpy complex array
-            n-dimensional (n=2 for dim='rt', n=3 for dim='xyt') array with laser field
-            The array should contain the complex envelope of the electric field.
-            The magnetic field is assumed orthogonal to the electric field, with the same profile
-            and a magnitude c times lower.
+        profile: an object of type lasy.profiles.profile.Profile
+            Defines how to evaluate the envelope field
 
-        wavelength: scalar
-            Central wavelength for which the laser pulse envelope is defined.
-
-        pol: list of 2 complex numbers
-            Polarization vector that multiplies array_in to get the Ex and Ey fields.
-            The envelope of each component of the electric field is given by:
-            - Ex_env = array_in*pol(0)
-            - Ey_env = array_in*pol(1)
-            Standard polarizations can be obtained from:
-            - Linear polarization in x: pol = (1,0)
-            - Linear polarization in y: pol = (0,1)
-            - Circular polarization: pol = (1,j)/sqrt(2) (j is the imaginary number)
-            The polarization vector is normalized to have a unitary magnitude.
+        n_azimuthal_modes: int (optional)
+            Only used if `dim` is 'rt'. The number of azimuthal modes
+            used in order to represent the laser field.
         """
+        box = Box(dim, lo, hi, npoints, n_azimuthal_modes)
+        self.box = box
+        self.field = Grid(self.box)
+        self.dim = self.box.dim
+        self.profile = profile
 
-        self.ndims = 2 if dim == 'rt' else 3
+        # Create the grid on which to evaluate the laser, evaluate it
+        if box.dim == 'xyt':
+            x, y, t = np.meshgrid( *box.axes, indexing='ij')
+            self.field.field[...] = profile.evaluate( x, y, t )
+        elif box.dim == 'rt':
+            # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
+            # theta, to evaluate the laser
+            n_theta = 2*box.n_azimuthal_modes - 1
+            theta1d = 2*np.pi/n_theta * np.arange(n_theta)
+            theta, r, t = np.meshgrid( theta1d, *box.axes, indexing='ij')
+            x = r*np.cos(theta)
+            y = r*np.sin(theta)
+            # Evaluate the profile on the generated grid
+            envelope = profile.evaluate( x, y, t )
+            # Perform the azimuthal decomposition
+            self.field.field[...] = np.fft.ifft(envelope, axis=0)
 
-        assert(dim in ['rt', 'xyt'])
-        assert(len(lo) == self.ndims)
-        assert(len(hi) == self.ndims)
-        assert(array_in.ndim == self.ndims)
-        assert(len(pol) == 2)
+        normalize_energy(profile.laser_energy, self.field)
 
-        self.dim = dim
-        norm_pol = np.sqrt(np.abs(pol[0])**2 + np.abs(pol[1])**2)
-        self.pol = np.array([pol[0]/norm_pol, pol[1]/norm_pol])
-        self.lambda0 = wavelength
-        self.omega0 = 2*scc.pi*scc.c/self.lambda0
-        box = Box(dim, lo, hi, array_in.shape)
-        self.field = Grid(box, array_in=array_in)
 
     def propagate(self, distance):
         """
@@ -94,6 +95,5 @@ class Laser:
         file_format: string
             Format to be used for the output file. Options are "h5" and "bp".
         """
-        write_to_openpmd_file( file_prefix, file_format,
-                               self.field.box, self.dim, self.field.field,
-                               self.lambda0, self.pol )
+        write_to_openpmd_file( file_prefix, file_format, self.field,
+                               self.profile.lambda0, self.profile.pol )

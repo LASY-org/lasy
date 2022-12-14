@@ -7,7 +7,7 @@ class Box:
     as well as handy methods.
     """
 
-    def __init__(self, dim, lo, hi, npoints):
+    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes):
         """
         Initialize a Box object
 
@@ -28,9 +28,17 @@ class Box:
             Number of points in each direction.
             One element per direction (2 for dim='rt', 3 for dim='xyt')
             For the moment, the lower end is assumed to be (0,0) in rt and (0,0,0) in xyt
+
+        n_azimuthal_modes: int (optional)
+            Only used if `dim` is 'rt'. The number of azimuthal modes
+            used in order to represent the laser field.
         """
         self.dim = dim
         self.ndims = 2 if dim == 'rt' else 3
+        assert(dim in ['rt', 'xyt'])
+        assert(len(lo) == self.ndims)
+        assert(len(hi) == self.ndims)
+
         self.lo = list(lo)
         self.hi = list(hi)
         self.npoints = npoints
@@ -39,3 +47,6 @@ class Box:
         for i in range(self.ndims):
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
             self.dx.append(self.axes[i][1] - self.axes[i][0])
+
+        if dim == 'rt':
+            self.n_azimuthal_modes = n_azimuthal_modes
