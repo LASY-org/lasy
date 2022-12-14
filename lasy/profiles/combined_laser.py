@@ -19,5 +19,6 @@ class CombinedLongitudinalTransverseLaser(Profile):
         """
         TODO
         """
-        envelope = trans_profile.evaluate(x, y) * long_profile.evaluate(t)
+        envelope = self.trans_profile.evaluate(x, y) * \
+                    self.long_profile.evaluate(t)
         return envelope

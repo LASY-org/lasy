@@ -1,3 +1,4 @@
+import numpy as np
 
 class TransverseProfile(object):
     """
@@ -10,26 +11,16 @@ class TransverseProfile(object):
         """
         Initialize the transverse profile.
         """
+        pass
 
-    def evaluate( self, dim, envelope, *axes ):
+    def evaluate( self, x, y ):
         """
         Fills the envelope field of the laser
-        Usage: evaluate(dim, envelope, x, y) (3D Cartesian) or
-               evaluate(dim, envelope, r) (2D cylindrical)
 
         Parameters
         -----------
-        dim: string
-            'rt' or 'xyt'
-
-        envelope: ndarrays (V/m)
-            Contains the values of the transverse envelope field, to be filled
-            (1D for cylindrical coordinate, 2D for Cartesian coordinates)
-
-        axes: Coordinates at which the envelope should be evaluated.
-            Can be 1 elements in cylindrical geometry (r) or
-            3 elements in Cartesian geometry (x,y).
+        TODO
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
-        pass
+        return np.zeros( x.shape, dtype='complex128' )
