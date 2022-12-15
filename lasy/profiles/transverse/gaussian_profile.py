@@ -8,7 +8,7 @@ class GaussianTransverseProfile(TransverseProfile):
 
     def __init__(self, w0):
         """
-        Defines a transversally-Gaussian laser envelope.
+        Defines a Gaussian transverse envelope.
 
         More precisely, the transverse envelope
         (to be used in the :class:CombinedLongitudinalTransverseLaser class)
