@@ -43,7 +43,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
 
     def evaluate( self, x, y ):
         """
-        Returns the envelope field of the laser
+        Returns the transverse envelope
 
         Parameters:
         -----------

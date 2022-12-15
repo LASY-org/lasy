@@ -40,7 +40,7 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
 
     def evaluate( self, x, y, t ):
         """
-        Returns the envelope field of the laser
+        Returns the transverse envelope
 
         Parameters:
         -----------

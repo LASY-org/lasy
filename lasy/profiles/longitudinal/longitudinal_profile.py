@@ -10,18 +10,25 @@ class LongitudinalProfile(object):
     """
     def __init__( self, wavelength ):
         """
-        Initialize the propagation direction of the laser.
+        Initialize the longitudinal profile
         """
         self.lambda0 = wavelength
         self.omega0 = 2*scc.pi*scc.c/self.lambda0
 
     def evaluate( self, t ):
         """
-        Fills the envelope field of the laser
+        Returns the longitudinal envelope
 
-        Parameters
+        Parameters:
         -----------
-        TODO
+        t: ndarrays of floats
+            Define points on which to evaluate the envelope
+
+        Returns:
+        --------
+        envelope: ndarray of complex numbers
+            Contains the value of the longitudinal envelope at the
+            specified points. This array has the same shape as the array t.
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)

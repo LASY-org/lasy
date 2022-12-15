@@ -43,7 +43,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
 
     def evaluate( self, t ):
         """
-        Returns the envelope field of the laser
+        Returns the longitudinal envelope
 
         Parameters:
         -----------
