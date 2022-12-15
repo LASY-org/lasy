@@ -1,6 +1,6 @@
 from .profile import Profile
 
-class CombinedLongitudinalTransverseLaser(Profile):
+class CombinedLongitudinalTransverseProfile(Profile):
     """
     Class that combines a longitudinal and transverse laser profile
     """
@@ -11,7 +11,7 @@ class CombinedLongitudinalTransverseLaser(Profile):
         TODO
         """
         super().__init__(wavelength, pol)
-
+        self.laser_energy = laser_energy
         self.long_profile = long_profile
         self.trans_profile = trans_profile
 

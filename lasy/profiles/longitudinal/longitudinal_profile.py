@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.constants as scc
 
 class LongitudinalProfile(object):
     """
@@ -11,7 +12,8 @@ class LongitudinalProfile(object):
         """
         Initialize the propagation direction of the laser.
         """
-        pass
+        self.lambda0 = wavelength
+        self.omega0 = 2*scc.pi*scc.c/self.lambda0
 
     def evaluate( self, t ):
         """
