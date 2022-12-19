@@ -1,7 +1,8 @@
-import numpy as np
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.profiles.laguerre_gaussian_profile import LaguerreGaussianProfile
+from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
+from lasy.profiles.transverse.laguerre_gaussian_profile import LaguerreGaussianTransverseProfile
+from lasy.profiles.longitudinal.gaussian_profile import GaussianLongitudinalProfile
 
 # Case with Gaussian laser
 
@@ -43,8 +44,9 @@ laser_energy = 1. # J
 t_peak = 0.e-15 # s
 tau = 30.e-15 # s
 w0 = 5.e-6 # m
-profile = LaguerreGaussianProfile(wavelength, pol, laser_energy, w0,
-                                  0, 1, tau, t_peak)
+profile = CombinedLongitudinalTransverseProfile( wavelength, pol, laser_energy,
+            GaussianLongitudinalProfile( wavelength, tau, t_peak ),
+            LaguerreGaussianTransverseProfile( w0, p=0, m=1 ) )
 
 # - Cylindrical case
 dim = 'rt'
