@@ -16,7 +16,7 @@ class CombinedLongitudinalTransverseProfile(Profile):
         .. math::
 
             E_u(\boldsymbol{x}_\perp,t) = Re\left[ E_0\, \mathcal{T}(x, y)
-            times \mathcal{L}(t) e^{-i\omega_0 t} \times p_u \right]
+            \times \mathcal{L}(t) e^{-i\omega_0 t} \times p_u \right]
 
         where :math:`u` is either :math:`x` or :math:`y`, :math:`p_u` is
         the polarization vector, :math:`Re` represent the real part.
