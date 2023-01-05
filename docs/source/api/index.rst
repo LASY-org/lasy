@@ -5,9 +5,10 @@ The sections below describe the main objects that are accessible in
 the ``lasy`` package.
 
 .. toctree::
+   :hidden:
    :maxdepth: 4
 
-   laser_profiles/index
+   profiles/index
    utils/index
 
 
