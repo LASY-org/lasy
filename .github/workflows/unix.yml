@@ -6,8 +6,7 @@ jobs:
   test:
     strategy:
       matrix:
-        python-version: [3.7]
-        os: [ubuntu-20.04]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -34,18 +33,19 @@ jobs:
       run: |
         conda install -y -c conda-forge mamba
         mamba env create --file conda.yml
-        mamba install -y -c conda-forge python=${{ matrix.python-version }} pyflakes
+        mamba install -y -c conda-forge pyflakes
 
     - shell: bash -eo pipefail -l {0}
       name: Install
       run: |
-        python setup.py install
+        python3 -m pip install -v .
 
     - shell: bash -eo pipefail -l {0}
       name: pyflakes
       run: python -m pyflakes lasy
+
     - shell: bash -eo pipefail -l {0}
       name: test example
       run: |
         cd examples
-        python test.py
+        python3 test.py
