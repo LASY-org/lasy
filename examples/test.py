@@ -4,7 +4,7 @@ from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
 from lasy.profiles.transverse.laguerre_gaussian_profile import LaguerreGaussianTransverseProfile
 from lasy.profiles.longitudinal.gaussian_profile import GaussianLongitudinalProfile
 
-# Case with Gaussian laser
+## Case with Gaussian laser
 
 wavelength=.8e-6
 pol = (1,0)
