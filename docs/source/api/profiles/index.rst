@@ -11,7 +11,6 @@ the longitudinal and transverse profiles  of the laser
 
 .. toctree::
     :hidden:
-    :maxdepth: 4
 
    gaussian
    longitudinal/index

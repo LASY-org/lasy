@@ -26,16 +26,16 @@ LASY |release| Documentation
 
     ---
 
-    **Tutorials**
-    ^^^^^^^^^^^^
+    **Overview of the Code**
+    ^^^^^^^^^^^^^^^^^
 
-    Some step by step guides to using the code and some examples.
+    An overview of the key concepts and functionality of the code.
 
     +++
 
-    .. link-button:: tutorials/index
+    .. link-button:: code_overview/index
             :type: ref
-            :text: Show me some tutorials
+            :text: Get an overview of the code
             :classes: btn-outline-primary btn-block stretched-link
 
     ---
@@ -55,18 +55,17 @@ LASY |release| Documentation
 
     ---
 
-    **Overview of the Code**
-    ^^^^^^^^^^^^^^^^^
+    **Tutorials**
+    ^^^^^^^^^^^^
 
-    An overview of the key concepts and functionality of the code.
+    Some step by step guides to using the code and some examples.
 
     +++
 
-    .. link-button:: code_overview/index
+    .. link-button:: tutorials/index
             :type: ref
-            :text: Get an overview of the code
+            :text: Show me some tutorials
             :classes: btn-outline-primary btn-block stretched-link
-
 
 
 .. toctree::
@@ -74,7 +73,9 @@ LASY |release| Documentation
    :maxdepth: 4
 
    user_guide/index
-   tutorials/index
+   code_overview/index
    api/index
+   tutorials/index
+   
 
 
