@@ -37,7 +37,7 @@ jobs:
       name: Install dependencies
       run: |
         conda install -y -c conda-forge mamba
-        mamba install -y -c conda-forge python=${{ matrix.python-version }} pyflakes pytest
+        mamba install -y -c conda-forge python=${{ matrix.python-version }} openpmd-viewer pyflakes pytest
         mamba env update --name testing --file conda.yml
 
     - shell: bash -eo pipefail -l {0}

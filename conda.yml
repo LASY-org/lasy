@@ -16,7 +16,9 @@ dependencies:
   - mamba
   - numpy
   - openpmd-api~=0.14.5
+  - openpmd-viewer
   - python>=3.7
+  - pytest
   - scipy
 
 # just a note for later hackery, we could install pip packages inside the env, too:
