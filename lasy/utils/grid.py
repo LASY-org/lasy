@@ -7,6 +7,7 @@ class Grid:
 
     def __init__(self, dim, box):
         """
+        Initialize a grid object.
 
         Parameters
         ----------
