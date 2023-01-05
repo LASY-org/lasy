@@ -25,9 +25,9 @@ def gaussian():
     return profile
 
 @pytest.fixture(scope="function")
-def check_value(ist, soll):
-    #returns the relative error between ist and soll
-    return abs(ist-soll)/soll
+def check_value(real_value, target):
+    #returns the relative error between real_value and target
+    return abs(real_value-target)/target
 
 
 def test_profile_gaussian_3d_cartesian(gaussian):
@@ -45,7 +45,7 @@ def test_profile_gaussian_3d_cartesian(gaussian):
     r_tol = 1e-5
 
     # load in the data with openPMD-viewer
-    ts_3d = LpaDiagnostics('C:/Users/pblum/Documents/Projects/lasy/examples')
+    ts_3d = LpaDiagnostics('../')
 
     # check number of dimensions
     Ex_3d_real1, _ = ts_3d.get_field(field='E_real', coord='x', iteration=0,
