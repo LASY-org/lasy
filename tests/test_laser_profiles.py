@@ -38,14 +38,14 @@ def test_profile_gaussian_3d_cartesian(gaussian):
     npoints=(100,100,100)
 
     laser = Laser(dim, lo, hi, npoints, gaussian)
-    laser.write_to_file('gaussianlaser3d')
+    laser.write_to_file('testdata/gaussianlaser3d')
     laser.propagate(1)
-    laser.write_to_file('gaussianlaser3d')
+    laser.write_to_file('testdata/gaussianlaser3d')
 
     r_tol = 1e-5
 
     # load in the data with openPMD-viewer
-    ts_3d = LpaDiagnostics('../')
+    ts_3d = LpaDiagnostics('./testdata')
 
     # check number of dimensions
     Ex_3d_real1, _ = ts_3d.get_field(field='E_real', coord='x', iteration=0,
@@ -77,9 +77,9 @@ def test_profile_gaussian_cylindrical(gaussian):
     npoints=(50,100)
 
     laser = Laser(dim, lo, hi, npoints, gaussian)
-    laser.write_to_file('gaussianlaserRZ')
+    laser.write_to_file('testdata/gaussianlaserRZ')
     laser.propagate(1)
-    laser.write_to_file('gaussianlaserRZ')
+    laser.write_to_file('testdata/gaussianlaserRZ')
 
 
 def test_profile_laguerre_gauss():
@@ -95,6 +95,6 @@ def test_profile_laguerre_gauss():
     npoints=(50,100)
 
     laser = Laser(dim, lo, hi, npoints, profile, n_azimuthal_modes=2)
-    laser.write_to_file('laguerrelaserRZ')
+    laser.write_to_file('testdata/laguerrelaserRZ')
     laser.propagate(1)
-    laser.write_to_file('laguerrelaserRZ')
+    laser.write_to_file('testdata/laguerrelaserRZ')
