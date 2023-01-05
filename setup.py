@@ -10,5 +10,5 @@ setup(
     packages=find_packages('.'),
     description='LAser pulse manipulation made eaSY',
     install_requires=install_requires,
-    tests_require=["pytest"],
+    tests_require=["pytest", "openpmd_viewer"],
 )
