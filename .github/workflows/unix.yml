@@ -2,12 +2,16 @@ name: Unix
 
 on: [push, pull_request]
 
+concurrency:
+  group: ${{ github.ref }}-${{ github.head_ref }}-unix
+  cancel-in-progress: true
+
 jobs:
   test:
     strategy:
       matrix:
-        python-version: [3.7]
-        os: [ubuntu-20.04]
+        python-version: ["3.10"]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -29,17 +33,27 @@ jobs:
         channels: conda-forge,defaults
         channel-priority: true
 
-    - shell: bash -l {0}
+    - shell: bash -eo pipefail -l {0}
       name: Install dependencies
       run: |
-        conda install -c conda-forge python=${{ matrix.python-version }} numpy scipy;
-        pip3 install pyflakes;
-        python setup.py install
-    - shell: bash -l {0}
+        conda install -y -c conda-forge mamba
+        mamba install -y -c conda-forge python=${{ matrix.python-version }} pyflakes pytest
+        mamba env update --name testing --file conda.yml
+
+    - shell: bash -eo pipefail -l {0}
+      name: Install
+      run: python -m pip install -v .
+
+    - shell: bash -eo pipefail -l {0}
       name: pyflakes
       run: python -m pyflakes lasy
-    - shell: bash -l {0}
-      name: test example
+
+    - shell: bash -eo pipefail -l {0}
+      name: Run Unit Tests
+      run: python -m pytest tests/
+
+    - shell: bash -eo pipefail -l {0}
+      name: Run Examples
       run: |
         cd examples
         python test.py
