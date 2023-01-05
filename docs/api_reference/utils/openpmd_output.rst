@@ -1,2 +1,0 @@
-Openpmd Output
-===============

@@ -1,3 +1,0 @@
-Longitudinal Laser Profiles
-============================
-

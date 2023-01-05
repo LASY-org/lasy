@@ -8,4 +8,3 @@ Navigate into the directory and then run.
 .. code-block:: bash
 
     $ python setup.py install
-
