@@ -1,3 +1,4 @@
+import numpy as np
 import scipy.constants as scc
 
 from lasy.utils.box import Box
@@ -11,7 +12,8 @@ class Laser:
     propagate it, and write it to a file.
     """
 
-    def __init__(self, dim, lo, hi, npoints, profile):
+    def __init__(self, dim, lo, hi, npoints, profile,
+                 n_azimuthal_modes=1 ):
         """
         Construct a laser object
 
@@ -33,17 +35,38 @@ class Laser:
             One element per direction (2 for dim='rt', 3 for dim='xyt')
             For the moment, the lower end is assumed to be (0,0) in rt and (0,0,0) in xyt
 
-        profile: an object of type lasy.laser_profiles.laser_profile.LaserProfile
+        profile: an object of type lasy.profiles.profile.Profile
             Defines how to evaluate the envelope field
+
+        n_azimuthal_modes: int (optional)
+            Only used if `dim` is 'rt'. The number of azimuthal modes
+            used in order to represent the laser field.
         """
-        self.box = Box(dim, lo, hi, npoints)
+        box = Box(dim, lo, hi, npoints, n_azimuthal_modes)
+        self.box = box
         self.field = Grid(self.box)
         self.dim = self.box.dim
         self.profile = profile
 
-        # Evaluate the laser profile on the grid
-        profile.evaluate( dim, self.field.field, *self.box.get_meshgrid() )
+        # Create the grid on which to evaluate the laser, evaluate it
+        if box.dim == 'xyt':
+            x, y, t = np.meshgrid( *box.axes, indexing='ij')
+            self.field.field[...] = profile.evaluate( x, y, t )
+        elif box.dim == 'rt':
+            # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
+            # theta, to evaluate the laser
+            n_theta = 2*box.n_azimuthal_modes - 1
+            theta1d = 2*np.pi/n_theta * np.arange(n_theta)
+            theta, r, t = np.meshgrid( theta1d, *box.axes, indexing='ij')
+            x = r*np.cos(theta)
+            y = r*np.sin(theta)
+            # Evaluate the profile on the generated grid
+            envelope = profile.evaluate( x, y, t )
+            # Perform the azimuthal decomposition
+            self.field.field[...] = np.fft.ifft(envelope, axis=0)
+
         normalize_energy(profile.laser_energy, self.field)
+
 
     def propagate(self, distance):
         """

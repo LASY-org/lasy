@@ -22,16 +22,54 @@ In cylindrical coordinates, the envelope is decomposed in $N_m$ azimuthal modes 
 
 At the moment LASY only support axisymmetric envelope profiles: $N_m=1$.
  
-## Style conventions
+## Workflow
+
+# How to contribute
+
+All contributions are welcome! For a new contribution, we use pull requests from forks. Below is a very rough summary, please have a look at the appropriate documentation at https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks and around.
+
+First, setup your fork workflow (only once):
+- Fork the repo by clicking the Fork button on the top right, and follow the prompts. This will create your own (remote) copy of the main https://github.com/LASY-org/LASY repo, located at https://github.com/[yourusername]/LASY.
+- Make your local copy aware of your fork: from your local repository, do `git remote add [some-name] https://github.com/[your username]/LASY`. For `[some-name]` it can be convenient to use e.g. your username.
+
+Then, for each contribution:
+- Get the last version of branch `development` from the main repo (e.g. `git checkout development && git pull`).
+- Create a new branch (e.g. `git checkout -b my_contribution`).
+- Do usual `git add` and `git commit` operations.
+- Push your branch to your own fork: `git push -u [some-name] my_contribution`
+- Whenever you're ready, open a PR from branch `my_contribution` on your fork to branch `development` on the main repo. Github typically suggests this very well.
+
+# Style conventions
 
 - Docstrings are written using the Numpy style.
 - A PR should be open for any contribution: the description helps to explain the code and open dicussion.
 
+## Install
+
+```
+python3 -m pip install -v .
+```
+
+For tests, you need to have `pytest` installed:
+```bash
+python3 -m pip install -U pytest
+```
+
 ## Test
 
+After successful installation, you can run the unit tests:
 ```bash
-python setup.py install
-python examples/test.py
+# Run all tests
+python3 -m pytest tests/
+
+# Run tests from a single file
+python3 -m pytest tests/test_laser_profiles.py
+
+# Run a single test (useful during debugging)
+python3 -m pytest tests/test_laser_profiles.py::test_profile_gaussian_3d_cartesian
+
+# Run all tests, do not capture "print" output and be verbose
+python3 -m pytest -s -vvvv tests/
 ```
 ## Creating Documentation
 Install sphinx (https://www.sphinx-doc.org/en/master/usage/installation.html)

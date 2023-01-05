@@ -1,7 +1,8 @@
-import numpy as np
-from .laser_profile import LaserProfile
+from .combined_profile import CombinedLongitudinalTransverseProfile
+from .longitudinal.gaussian_profile import GaussianLongitudinalProfile
+from .transverse.gaussian_profile import GaussianTransverseProfile
 
-class GaussianLaser(LaserProfile):
+class GaussianProfile(CombinedLongitudinalTransverseProfile):
     """
     Derived class for the analytic profile of a Gaussian laser pulse.
     """
@@ -62,52 +63,6 @@ class GaussianLaser(LaserProfile):
             in the above formula (i.e. the phase of the laser
             oscillation, at the time where the laser envelope is maximum)
         """
-        super().__init__(wavelength, pol)
-        self.laser_energy = laser_energy
-        self.w0 = w0
-        self.tau = tau
-        self.t_peak = t_peak
-        self.cep_phase = cep_phase
-
-    def evaluate( self, dim, envelope, *axes ):
-        """
-        Fills the envelope field of the laser
-        Usage: evaluate(dim, envelope, x, y, t) (3D Cartesian) or
-               evaluate(dim, envelope, r, t) (2D cylindrical)
-        t is always the last axis to be read.
-
-        Example use cases:
-            evaluate('rt', env, 0, 0) # evaluate at a single point (0,0)
-            X, Y, T = np.meshgrid(x,y,t,indexing='ij') where x, y and t are 1darray-s
-            evaluate('rt', env, X, Y, T)
-
-        Parameters
-        -----------
-        dim: string
-            'rt' or 'xyt'
-
-        envelope: ndarrays (V/m)
-            Contains the values of the envelope field, to be filled
-
-        axes: Coordinates at which the envelope should be evaluated.
-            Can be 2 elements in cylindrical geometry (r,t) or
-            3 elements in Cartesian geometry (x,y,t).
-            elements should be scalars or numpy arrays. In the latter case,
-            all elements should have the same shape.
-        """
-
-        t = axes[-1]
-        long_profile = np.exp( -(t-self.t_peak)**2/self.tau**2 \
-                              + 1.j*(self.cep_phase + self.omega0*self.t_peak))
-
-        if dim == 'xyt':
-            assert( all(axis.shape == envelope.shape for axis in axes) )
-            x = axes[0]
-            y = axes[1]
-            transverse_profile = np.exp( -(x**2 + y**2)/self.w0**2 )
-            envelope[:] = transverse_profile * long_profile
-        else:
-            r = axes[0]
-            transverse_profile = np.exp( -r**2/self.w0**2 )
-            # Store field purely in mode 0
-            envelope[0,:,:] = transverse_profile * long_profile
+        super().__init__(wavelength, pol, laser_energy,
+            GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase),
+            GaussianTransverseProfile(w0) )
