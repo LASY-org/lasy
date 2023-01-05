@@ -9,5 +9,4 @@ What's this all about then?
    motivation
    data_standards
    codes_supporting_lasy
-   laser_initialization
    laser_propagation
