@@ -3,6 +3,7 @@
 import pytest
 from openpmd_viewer.addons import LpaDiagnostics
 from scipy.constants import c
+import numpy as np
 
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
