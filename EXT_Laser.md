@@ -56,7 +56,7 @@ On the `series` object, set the following attributes:
   - `propagationDirection`
     - type: *(floatX)*
     - scope: *optional*
-    - description: Propagation direction for the laser pulse
+    - description: Propagation direction for the laser pulse. Default is (0,0,1), i.e. propagation along the z coordinate.
     - components:
       - `x/`
       - `y/`
