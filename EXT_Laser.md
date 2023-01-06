@@ -18,12 +18,12 @@ The laser pulse is represented as a single complex field $\mathcal{E}$, describi
 
 ```math
    \begin{aligned}
-   E_x = \operatorname{Re}\left( \mathcal{E} e^{-i\omega_0t}p_x\right)\\
-   E_y = \operatorname{Re}\left( \mathcal{E} e^{-i\omega_0t}p_y\right)\\
-   E_z = 0\\
-   B_x = -c E_y\\
-   B_y = c E_x\\
-   B_z = 0\end{aligned}
+   E_x &= \operatorname{Re}\left( \mathcal{E} e^{-i\omega_0t}p_x\right)\\
+   E_y &= \operatorname{Re}\left( \mathcal{E} e^{-i\omega_0t}p_y\right)\\
+   E_z &= 0\\
+   B_x &= -c E_y\\
+   B_y &= c E_x\\
+   B_z &= 0\end{aligned}
 ```
 
 where $\operatorname{Re}$ stands for real part,  $E_x$ (resp. $E_y$) is the laser electric field in the x (resp. y) direction, $\mathcal{E}$ is the complex laser envelope described in the standard, $\omega_0 = 2\pi c/\lambda_0$ is the angular frequency defined from the laser wavelength $\lambda_0$ and $(p_x,p_y)$ is the (complex and normalized) polarization vector. The polarization state (linear, circular, elliptical) is controlled by the phase of the polarization vector. For instance, if $arg(p_x) = arg(p_y)$, the polarization is linear. If $arg(p_x) = arg(p_y) + \pi/2$, the polarization is circular.
@@ -34,7 +34,7 @@ When added to an output, the following naming conventions shall be used for comp
   - type: *(complexX)*
   - scope: *(required)*
   - decription: Scalar field for the envelope (in V/m). See above for description.
-  - unitDimension = `(1., 1., -3., -1., 0., 0., 0.)` $(V/m = kg * m / (A * s^3))$
+  - unitDimension = `(1., 1., -3., -1., 0., 0., 0.)` $(V/m = kg . m / (A . s^3))$
 
 ### Additional attributes on the `mesh record` named `electricField`
 
