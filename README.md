@@ -75,9 +75,8 @@ python3 -m pytest -s -vvvv tests/
 Install sphinx (https://www.sphinx-doc.org/en/master/usage/installation.html)
 
 ```bash
-$ pip install pydata-sphinx-theme
-$ pip install sphinx-gallery
-$ pip install sphinx-panels
-$ cd docs
-$ sphinx-build -b html source _build
+# In an environment where all requirements of LASY are installed# In an environment where all requirements of LASY are installed
+cd docs
+python -m pip install -r requirements.txt
+sphinx-build -b html source _build
 ```
