@@ -56,7 +56,7 @@ LASY |release| Documentation
     ---
 
     **Tutorials**
-    ^^^^^^^^^^^^
+    ^^^^^^^^^^^^^
 
     Some step by step guides to using the code and some examples.
 
