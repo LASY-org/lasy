@@ -94,8 +94,7 @@ def normalize_peak_intensity(peak_intensity, grid):
 
     if peak_intensity is None:
         return
-    intensity = grid.field**2 / 2 / scc.epsilon_0
+    intensity = np.abs(scc.epsilon_0 * grid.field**2 / 2 * scc.c)
     input_peak_intensity = intensity.max()
-    intensity = intensity/input_peak_intensity * peak_intensity
 
-    grid.field = np.sqrt(grid.field) * 2 * scc.epsilon_0
+    grid.field *= np.sqrt( peak_intensity / input_peak_intensity )
