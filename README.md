@@ -75,7 +75,9 @@ python3 -m pytest -s -vvvv tests/
 Install sphinx (https://www.sphinx-doc.org/en/master/usage/installation.html)
 
 ```bash
-$ pip install sphinx-rtd-theme
+$ pip install pydata-sphinx-theme
+$ pip install sphinx-gallery
+$ pip install sphinx-panels
 $ cd docs
-$ make html
+$ sphinx-build -b html source _build
 ```
