@@ -74,7 +74,7 @@ html_theme = 'pydata_sphinx_theme'
 html_static_path = ['_static']
 
 # Logo
-html_logo = "_static/logo.png"
+html_logo = "https://user-images.githubusercontent.com/27694869/211026764-b55a7406-3e7c-44ab-b314-a08c75aca46e.png"
 
 # Theme options
 html_theme_options = {
