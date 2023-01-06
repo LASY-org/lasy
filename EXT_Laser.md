@@ -1,13 +1,13 @@
 Domain-Specific Naming Conventions for a laser envelope profile
 ===============================================================
 
-openPMD extension name: `Laser`
+openPMD extension name: `LaserEnvelope`
 
 
 Introduction
 ------------
 
-This extension is specifically designed for the domain of laser propagation codes.
+This extension is specifically designed for the modeling laser beam propagation.
 
 Mesh Based Records (Fields)
 ---------------------------
