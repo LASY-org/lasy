@@ -1,5 +1,5 @@
 Transverse Laser Profiles
-===========================
+=========================
 
 
 .. autoclass:: lasy.profiles.transverse.transverse_profile.TransverseProfile
