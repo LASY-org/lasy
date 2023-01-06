@@ -5,8 +5,8 @@ The sections below describe the main objects that are accessible in
 the ``lasy`` package.
 
 .. toctree::
-   :hidden:
    :maxdepth: 4
+   :hidden:
 
    profiles/index
    utils/index

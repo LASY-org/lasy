@@ -10,8 +10,8 @@ the longitudinal and transverse profiles  of the laser
 
 
 .. toctree::
-   :hidden:
 
    gaussian
+   combined_profile
    longitudinal/index
    transverse/index

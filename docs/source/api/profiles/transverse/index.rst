@@ -6,9 +6,12 @@ Transverse Laser Profiles
     :members:
 
 
-List of available transverse profiles 
-***************************************
+---------
+
 .. toctree::
    :maxdepth: 4
+   :hidden:
 
    gaussian
+   laguerre_gaussian_profile
+   hermite_gaussian_profile

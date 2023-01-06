@@ -7,9 +7,10 @@ Longitudinal Laser Profiles
     :members:
 
 
-List of available longitudinal profiles 
-***************************************
+---------
+
 .. toctree::
    :maxdepth: 4
+   :hidden:
 
    gaussian
