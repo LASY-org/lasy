@@ -19,13 +19,13 @@ class LongitudinalProfile(object):
         """
         Returns the longitudinal envelope
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         t: ndarrays of floats
             Define points on which to evaluate the envelope
 
-        Returns:
-        --------
+        Returns
+        -------
         envelope: ndarray of complex numbers
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
