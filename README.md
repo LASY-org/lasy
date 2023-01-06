@@ -72,6 +72,7 @@ python3 -m pytest tests/test_laser_profiles.py::test_profile_gaussian_3d_cartesi
 python3 -m pytest -s -vvvv tests/
 ```
 ## Creating Documentation
+
 Install sphinx (https://www.sphinx-doc.org/en/master/usage/installation.html)
 
 ```bash
