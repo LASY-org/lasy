@@ -19,8 +19,8 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             \mathcal{L}(t) = \exp\left( - \frac{(t-t_{peak})^2}{\tau^2}
                             + i\omega_0t_{peak} \right)
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         tau: float (in second)
             The duration of the laser pulse, i.e. :math:`\tau` in the above
             formula. Note that :math:`\tau = \tau_{FWHM}/\sqrt{2\log(2)}`,
@@ -45,8 +45,8 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         """
         Returns the longitudinal envelope
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         t: ndarrays of floats
             Define points on which to evaluate the envelope
 

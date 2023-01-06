@@ -22,8 +22,8 @@ class CombinedLongitudinalTransverseProfile(Profile):
         the polarization vector, :math:`Re` represent the real part.
         The other parameters in this formula are defined below.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         wavelength: float (in meter)
             The main laser wavelength :math:`\lambda_0` of the laser, which
             defines :math:`\omega_0` in the above formula, according to
@@ -57,14 +57,14 @@ class CombinedLongitudinalTransverseProfile(Profile):
         """
         Returns the envelope field of the laser
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         x, y, t: ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
-        Returns:
-        --------
+        Returns
+        -------
         envelope: ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
