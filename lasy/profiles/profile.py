@@ -13,8 +13,8 @@ class Profile(object):
         Initialize the propagation direction of the laser.
         (Each subclass should call this method at initialization.)
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         wavelength: scalar
             Central wavelength for which the laser pulse envelope is defined.
 
@@ -39,14 +39,14 @@ class Profile(object):
         """
         Returns the envelope field of the laser
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         x, y, t: ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
-        Returns:
-        --------
+        Returns
+        -------
         envelope: ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t

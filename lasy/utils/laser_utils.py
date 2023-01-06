@@ -6,14 +6,14 @@ def compute_laser_energy(grid):
     Computes the total laser energy that corresponds to the current
     envelope data. This is used mainly for normalization purposes.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     grid: a Grid object. It contains a ndarrays (V/m) with
           the value of the envelope field and an object of type
           lasy.utils.Box that defines the points at which evaluate the laser
 
-    Returns:
-    --------
+    Returns
+    -------
     energy: float (in Joules)
     """
     # This uses the following volume integral:
@@ -46,7 +46,7 @@ def normalize_energy(energy, grid):
     Normalize energy of the laser pulse contained in grid
 
     Parameters
-    -----------
+    ----------
     energy: scalar (J)
         Energy of the laser pulse after normalization
 
