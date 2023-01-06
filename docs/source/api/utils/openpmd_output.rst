@@ -1,2 +1,2 @@
-openpmd Output
+openPMD Output
 ==============
