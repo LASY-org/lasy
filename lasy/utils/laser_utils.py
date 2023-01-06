@@ -67,7 +67,7 @@ def normalize_peak_field_amplitude(amplitude, grid):
     Normalize energy of the laser pulse contained in grid
 
     Parameters
-    -----------
+    ----------
     amplitude: scalar (V/m)
         Peak field amplitude of the laser pulse after normalization
 
@@ -84,7 +84,7 @@ def normalize_peak_intensity(peak_intensity, grid):
     Normalize energy of the laser pulse contained in grid
 
     Parameters
-    -----------
+    ----------
     peak_intensity: scalar (W/m^2)
         Peak field amplitude of the laser pulse after normalization
 
