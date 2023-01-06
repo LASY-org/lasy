@@ -68,11 +68,6 @@ exclude_patterns = []
 #
 html_theme = 'pydata_sphinx_theme'
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
-
 # Logo
 html_logo = "https://user-images.githubusercontent.com/27694869/211026764-b55a7406-3e7c-44ab-b314-a08c75aca46e.png"
 
