@@ -26,11 +26,11 @@ where $\operatorname{Re}$ stands for real part,  $E_x$ (resp. $E_y$) is the lase
 
 When added to an output, the following naming conventions shall be used for complex electric field `mesh records`.
 
-
 - `envelope/`
   - type: *(complexX)*
   - scope: *(required)*
   - decription: Scalar field for the envelope (in V/m). See above for description.
+  - unitDimension = `(1., 1., -3., -1., 0., 0., 0.)` $(V/m = kg * m / (A * s^3))$
 
 ### Additional attributes on the `mesh record` named `electricField`
 
