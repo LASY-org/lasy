@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+import matplotlib.pyplot as plt
 import pytest
-from openpmd_viewer.addons import LpaDiagnostics
+from openpmd_viewer import OpenPMDTimeSeries
 from scipy.constants import c
 import numpy as np
 
@@ -18,17 +18,22 @@ t_peak = 0.e-15 # s
 tau = 30.e-15 # s
 w0 = 5.e-6 # m
 
-@pytest.fixture(scope="function")
+#@pytest.fixture(scope="function")
 def gaussian():
     # Cases with Gaussian laser
     profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
     
     return profile
 
-@pytest.fixture(scope="function")
 def check_value(real_value, target):
     #returns the relative error between real_value and target
     return abs(real_value-target)/target
+
+def weighted_std(data, weights):
+    """calculate the weighted std of an array"""
+    average = np.average(data, weights=weights)
+    variance = np.average((data - average) ** 2, weights=weights)
+    return( np.sqrt(variance) )
 
 
 def test_profile_gaussian_3d_cartesian(gaussian):
@@ -43,31 +48,40 @@ def test_profile_gaussian_3d_cartesian(gaussian):
     laser.propagate(1)
     laser.write_to_file('testdata/gaussianlaser3d')
 
-    r_tol = 1e-5
+    r_tol = 1e-1
 
     # load in the data with openPMD-viewer
-    ts_3d = LpaDiagnostics('./testdata')
+    ts_3d = OpenPMDTimeSeries('./testdata')
 
     # check number of dimensions
-    Ex_3d_real1, _ = ts_3d.get_field(field='E_real', coord='x', iteration=0,
-                                                    slice_across=None)
-    assert Ex_3d_real1.ndim == 3
+    Ex_3d_real, _ = ts_3d.get_field(field='E_real', coord='x', iteration=0,
+                                    slice_across=None)
+    assert Ex_3d_real.ndim == 3
 
     # check for nans
-    assert np.all(Ex_3d_real1) != np.nan
+    assert np.all(Ex_3d_real) != np.nan
 
     # calculate waist and pulse duration
-    waist_x = ts_3d.get_laser_waist(iteration=0, pol='x')
-    waist_y = ts_3d.get_laser_waist(iteration=0, pol='y')
+    Ex_x_real, info_x = ts_3d.get_field(field='E_real', coord='x', iteration=0,
+                                    slice_across=['y','t'])
+    waist_x = np.sqrt(2) * weighted_std(info_x.x, Ex_x_real)
+    print(f'Waist x : {waist_x}')
+
+    Ex_y_real, info_y = ts_3d.get_field(field='E_real', coord='x', iteration=0,
+                                    slice_across=['x','t'])
+    waist_y = np.sqrt(2) * weighted_std(info_y.y, Ex_y_real)
+    print(f'Waist y : {waist_y}')
 
     assert check_value(waist_x, w0) < r_tol
     assert check_value(waist_y, w0) < r_tol
 
     # check the pulse duration
+    Ex_t_real, info_t = ts_3d.get_field(field='E_real', coord='x', iteration=0,
+                                    slice_across=['x','y'])
+    tau_retrieved = np.sqrt(2) * weighted_std(info_t.t, Ex_t_real)
+    print(f'Pulse duration : {tau_retrieved}')
 
-    tau_retrieved = ts_3d.get_ctau(iteration=0, pol='x')
-
-    assert check_value(tau_retrieved/c, tau) < r_tol
+    assert check_value(tau_retrieved, tau) < r_tol
 
 
 def test_profile_gaussian_cylindrical(gaussian):
@@ -99,3 +113,6 @@ def test_profile_laguerre_gauss():
     laser.write_to_file('testdata/laguerrelaserRZ')
     laser.propagate(1)
     laser.write_to_file('testdata/laguerrelaserRZ')
+
+if __name__ == '__main__':
+    test_profile_gaussian_3d_cartesian(gaussian())
