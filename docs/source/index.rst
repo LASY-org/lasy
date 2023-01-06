@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 LASY |release| Documentation
-==============================
+============================
 
 .. panels::
     :card: + intro-card text-center
