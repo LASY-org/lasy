@@ -14,15 +14,19 @@ Mesh Based Records (Fields)
 
 ### Naming Conventions for `mesh record`s (field records)
 
-The laser pulse is represented as a single complex array, describing the envelope of the laser electric field, i.e.:
+The laser pulse is represented as a single complex field $\mathcal{E}$, describing the envelope of the laser electric field in the paraxial approximation:
 
 ```math
    \begin{aligned}
    E_x = \operatorname{Re}\left( \mathcal{E} e^{-i\omega_0t}p_x\right)\\
-   E_y = \operatorname{Re}\left( \mathcal{E} e^{-i\omega_0t}p_y\right)\end{aligned}
+   E_y = \operatorname{Re}\left( \mathcal{E} e^{-i\omega_0t}p_y\right)\\
+   E_z = 0\\
+   B_x = -c E_y\\
+   B_y = c E_x\\
+   B_z = 0\end{aligned}
 ```
 
-where $\operatorname{Re}$ stands for real part,  $E_x$ (resp. $E_y$) is the laser electric field in the x (resp. y) direction, $\mathcal{E}$ is the complex laser envelope stored, $\omega_0 = 2\pi c/\lambda_0$ is the angular frequency defined from the laser wavelength $\lambda_0$ and $(p_x,p_y)$ is the (complex and normalized) polarization vector. The polarization state (linear, circular, elliptical) is controlled by the phase of the polarization vector. For instance, if $arg(p_x) = arg(p_y)$, the polarization is linear. If $arg(p_x) = arg(p_y) + \pi/2$, the polarization is circular.
+where $\operatorname{Re}$ stands for real part,  $E_x$ (resp. $E_y$) is the laser electric field in the x (resp. y) direction, $\mathcal{E}$ is the complex laser envelope described in the standard, $\omega_0 = 2\pi c/\lambda_0$ is the angular frequency defined from the laser wavelength $\lambda_0$ and $(p_x,p_y)$ is the (complex and normalized) polarization vector. The polarization state (linear, circular, elliptical) is controlled by the phase of the polarization vector. For instance, if $arg(p_x) = arg(p_y)$, the polarization is linear. If $arg(p_x) = arg(p_y) + \pi/2$, the polarization is circular.
 
 When added to an output, the following naming conventions shall be used for complex electric field `mesh records`.
 
