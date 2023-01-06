@@ -27,7 +27,7 @@ LASY |release| Documentation
     ---
 
     **Overview of the Code**
-    ^^^^^^^^^^^^^^^^^
+    ^^^^^^^^^^^^^^^^^^^^^^^^
 
     An overview of the key concepts and functionality of the code.
 
