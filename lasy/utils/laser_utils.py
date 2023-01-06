@@ -77,7 +77,7 @@ def normalize_peak_field_amplitude(amplitude, grid):
 
     if amplitude is None:
         return
-    grid.field = grid.field / grid.field.max() * amplitude
+    grid.field = grid.field / np.abs(grid.field).max() * amplitude
 
 def normalize_peak_intensity(peak_intensity, grid):
     """
