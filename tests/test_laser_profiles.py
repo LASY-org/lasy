@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import matplotlib.pyplot as plt
 import pytest
 from openpmd_viewer import OpenPMDTimeSeries
-from scipy.constants import c
 import numpy as np
 
 from lasy.laser import Laser
@@ -18,7 +16,7 @@ t_peak = 0.e-15 # s
 tau = 30.e-15 # s
 w0 = 5.e-6 # m
 
-#@pytest.fixture(scope="function")
+@pytest.fixture(scope="function")
 def gaussian():
     # Cases with Gaussian laser
     profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
@@ -113,6 +111,3 @@ def test_profile_laguerre_gauss():
     laser.write_to_file('testdata/laguerrelaserRZ')
     laser.propagate(1)
     laser.write_to_file('testdata/laguerrelaserRZ')
-
-if __name__ == '__main__':
-    test_profile_gaussian_3d_cartesian(gaussian())
