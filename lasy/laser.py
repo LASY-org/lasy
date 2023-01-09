@@ -6,6 +6,8 @@ from lasy.utils.grid import Grid
 from lasy.utils.openpmd_output import write_to_openpmd_file
 from lasy.utils.laser_energy import normalize_energy
 
+from axiprop.lib import PropagatorSymmetric, PropagatorFFT2
+
 class Laser:
     """
     Top-level class that can evaluate a laser profile on a grid,
@@ -67,6 +69,54 @@ class Laser:
 
         normalize_energy(profile.laser_energy, self.field)
 
+    def propagate_axprp(self, distance):
+        """
+        Propagate the laser pulse by the distance specified
+
+        Parameters
+        ----------
+        distance: scalar
+            Distance by which the laser pulse should be propagated
+        """
+
+        dt = self.field.box.dx[-1]
+        omega0 = self.profile.omega0
+
+        if self.box.dim == 'rt':
+
+            m_azimuthal_mode = 0
+            A_local = self.field.field[m_azimuthal_mode].T
+            Nr, Nt = self.field.field[m_azimuthal_mode].shape
+
+            Rmax, Tmax = self.field.box.hi
+            Rmin, Tmin = self.field.box.lo
+            Rmax = Rmax - Rmin
+            Propagator = PropagatorSymmetric
+            spatial_axes = ( ( Rmax, Nr ), )
+
+        elif self.box.dim == 'xyt':
+            A_local = self.field.field.T
+
+            Nx, Ny, Nt = self.field.field.shape
+            Xmax, Ymax, Tmax = self.field.box.hi
+            Xmin, Ymin, Tmin = self.field.box.lo
+            Lx = Xmax - Xmin
+            Ly = Ymax - Ymin
+
+            Propagator = PropagatorFFT2
+            spatial_axes = ( (Lx, Nx), (Ly, Ny),)
+
+        A_local = np.fft.fft( A_local, axis=0 )
+        omega_axis = 2 * np.pi * np.fft.fftfreq( Nt, dt )  + omega0
+
+        prop = Propagator( *spatial_axes, omega_axis/scc.c )
+        A_local = prop.step( A_local, distance )
+        A_local = np.fft.ifft( A_local, axis=0 )
+
+        if self.box.dim == 'rt':
+            self.field.field[m_azimuthal_mode] = A_local.T
+        elif self.box.dim == 'xyt':
+            self.field.field = A_local.T
 
     def propagate(self, distance):
         """
