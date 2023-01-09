@@ -107,7 +107,7 @@ class Laser:
         omega_axis = 2 * np.pi * np.fft.fftfreq( Nt, dt )  + omega0
 
         prop = Propagator( *spatial_axes, omega_axis/scc.c )
-        A_local = prop.step( A_local, distance )
+        A_local = prop.step( A_local, distance, overwrite=True )
         A_local *= np.exp(-1j * omega_axis.reshape(omega_shape) \
                             * distance / scc.c)
         A_local = np.fft.ifft( A_local, axis=0 )
