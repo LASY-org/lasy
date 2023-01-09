@@ -1,0 +1,26 @@
+# This is a Conda environment file.
+#
+# Activating and installing this environment will provide all dependencies
+# that are needed for full-feature development:
+# - conda env create --file conda.yml
+# - conda activate lasy-dev
+#
+# If you need more packages in that environment, e.g. jupyter, run:
+# - mamba install -y -c conda-forge jupyter jupyterlab dask-labextension
+#
+
+name: lasy-dev
+channels:
+  - conda-forge
+dependencies:
+  - mamba
+  - numpy
+  - openpmd-api~=0.14.5
+  - openpmd-viewer
+  - pytest
+  - python>=3.7
+  - scipy
+
+# just a note for later hackery, we could install pip packages inside the env, too:
+#  - pip:
+#    - "-r requirements.txt"

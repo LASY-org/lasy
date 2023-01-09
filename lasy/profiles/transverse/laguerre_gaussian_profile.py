@@ -18,17 +18,17 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
 
         .. math::
 
-            \mathcal{T}(x, y) = r^{|m|}e^{-im\theta} \,
-            L_p^{|m|}\left( \frac{2 r^2 }{w_0^2}\right )\,
-            \exp\left( -\frac{r^2}{w_0^2} \right)
+            \\mathcal{T}(x, y) = r^{|m|}e^{-im\\theta} \\,
+            L_p^{|m|}\\left( \\frac{2 r^2 }{w_0^2}\\right )\\,
+            \\exp\\left( -\\frac{r^2}{w_0^2} \\right)
 
-        where :math:`x = r \cos{\theta}`,
-        :math:`y = r \sin{\theta}`, :math:`L_p^{|m|}` is the
+        where :math:`x = r \\cos{\\theta}`,
+        :math:`y = r \\sin{\\theta}`, :math:`L_p^{|m|}` is the
         Generalised Laguerre polynomial of radial order :math:`p` and
         azimuthal order :math:`|m|`
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         w0: float (in meter)
             The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
         p: int (dimensionless)
@@ -45,14 +45,14 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         """
         Returns the transverse envelope
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         x, y: ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
-        Returns:
-        --------
+        Returns
+        -------
         envelope: ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y

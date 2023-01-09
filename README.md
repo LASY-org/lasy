@@ -44,9 +44,39 @@ Then, for each contribution:
 - Docstrings are written using the Numpy style.
 - A PR should be open for any contribution: the description helps to explain the code and open dicussion.
 
+## Install
+
+```
+python3 -m pip install -v .
+```
+
+For tests, you need to have a few extra packages, such as `pytest` and `openpmd-viewer` installed:
+```bash
+python3 -m pip install -r tests/requirements.txt
+```
+
 ## Test
 
+After successful installation, you can run the unit tests:
 ```bash
-python setup.py install
-python examples/test.py
+# Run all tests
+python3 -m pytest tests/
+
+# Run tests from a single file
+python3 -m pytest tests/test_laser_profiles.py
+
+# Run a single test (useful during debugging)
+python3 -m pytest tests/test_laser_profiles.py::test_profile_gaussian_3d_cartesian
+
+# Run all tests, do not capture "print" output and be verbose
+python3 -m pytest -s -vvvv tests/
+```
+## Creating Documentation
+
+Install sphinx (https://www.sphinx-doc.org/en/master/usage/installation.html)
+
+```bash
+cd docs
+python -m pip install -r requirements.txt
+sphinx-build -b html source _build
 ```
