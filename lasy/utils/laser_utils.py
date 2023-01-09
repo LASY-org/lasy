@@ -60,3 +60,41 @@ def normalize_energy(energy, grid):
     current_energy = compute_laser_energy(grid)
     norm_factor = (energy/current_energy)**.5
     grid.field *= norm_factor
+
+
+def normalize_peak_field_amplitude(amplitude, grid):
+    """
+    Normalize energy of the laser pulse contained in grid
+
+    Parameters
+    ----------
+    amplitude: scalar (V/m)
+        Peak field amplitude of the laser pulse after normalization
+
+    grid: a Grid object
+        Contains value of the laser envelope and metadata
+    """
+
+    if amplitude is None:
+        return
+    grid.field = grid.field / np.abs(grid.field).max() * amplitude
+
+def normalize_peak_intensity(peak_intensity, grid):
+    """
+    Normalize energy of the laser pulse contained in grid
+
+    Parameters
+    ----------
+    peak_intensity: scalar (W/m^2)
+        Peak field amplitude of the laser pulse after normalization
+
+    grid: a Grid object
+        Contains value of the laser envelope and metadata
+    """
+
+    if peak_intensity is None:
+        return
+    intensity = np.abs(scc.epsilon_0 * grid.field**2 / 2 * scc.c)
+    input_peak_intensity = intensity.max()
+
+    grid.field *= np.sqrt( peak_intensity / input_peak_intensity )

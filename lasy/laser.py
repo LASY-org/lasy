@@ -4,7 +4,7 @@ import scipy.constants as scc
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
 from lasy.utils.openpmd_output import write_to_openpmd_file
-from lasy.utils.laser_energy import normalize_energy
+from lasy.utils.laser_utils import normalize_energy, normalize_peak_field_amplitude, normalize_peak_intensity
 
 class Laser:
     """
@@ -65,7 +65,29 @@ class Laser:
             # Perform the azimuthal decomposition
             self.field.field[...] = np.fft.ifft(envelope, axis=0)
 
-        normalize_energy(profile.laser_energy, self.field)
+
+    def normalize(self, value, kind=None):
+        """
+        Normalize the pulse either to the energy, peak field amplitude or peak intensity
+
+        Parameters
+        ----------
+        value: scalar
+            Value to which to normalize the field property that is defined in 'kind'
+        kind: string
+            Distance by which the laser pulse should be propagated
+            Options: 'energy', 'field', 'intensity'
+        """
+        
+        if kind == 'energy':
+            normalize_energy(value, self.field)
+        elif kind == 'field':
+            normalize_peak_field_amplitude(value, self.field)
+        elif kind == 'intensity':
+            normalize_peak_intensity(value, self.field)
+        else:
+            raise ValueError(f'kind "{kind}" not recognized')
+            
 
 
     def propagate(self, distance):
