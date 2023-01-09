@@ -33,18 +33,17 @@ class Box:
             Only used if `dim` is 'rt'. The number of azimuthal modes
             used in order to represent the laser field.
         """
-        self.dim = dim
-        self.ndims = 2 if dim == 'rt' else 3
+        ndims = 2 if dim == 'rt' else 3
         assert(dim in ['rt', 'xyt'])
-        assert(len(lo) == self.ndims)
-        assert(len(hi) == self.ndims)
+        assert(len(lo) == ndims)
+        assert(len(hi) == ndims)
 
         self.lo = list(lo)
         self.hi = list(hi)
         self.npoints = npoints
         self.axes = []
         self.dx = []
-        for i in range(self.ndims):
+        for i in range(ndims):
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
             self.dx.append(self.axes[i][1] - self.axes[i][0])
 
