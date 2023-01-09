@@ -69,7 +69,7 @@ class Laser:
 
         normalize_energy(profile.laser_energy, self.field)
 
-    def propagate_axprp(self, distance):
+    def propagate(self, distance):
         """
         Propagate the laser pulse by the distance specified
 
@@ -79,30 +79,27 @@ class Laser:
             Distance by which the laser pulse should be propagated
         """
 
-        dt = self.field.box.dx[-1]
+        dt = self.box.dx[-1]
         omega0 = self.profile.omega0
 
         if self.box.dim == 'rt':
 
             m_azimuthal_mode = 0
             A_local = self.field.field[m_azimuthal_mode].T
-            Nr, Nt = self.field.field[m_azimuthal_mode].shape
+            Nt, Nr = A_local.shape
+            omega_shape = ( Nt, 1 )
 
-            Rmax, Tmax = self.field.box.hi
-            Rmin, Tmin = self.field.box.lo
-            Rmax = Rmax - Rmin
+            Rmax = self.field.box.hi[0]
             Propagator = PropagatorSymmetric
             spatial_axes = ( ( Rmax, Nr ), )
 
         elif self.box.dim == 'xyt':
             A_local = self.field.field.T
-
             Nx, Ny, Nt = self.field.field.shape
-            Xmax, Ymax, Tmax = self.field.box.hi
-            Xmin, Ymin, Tmin = self.field.box.lo
-            Lx = Xmax - Xmin
-            Ly = Ymax - Ymin
+            omega_shape = ( Nt, 1, 1 )
 
+            Lx = self.box.hi[0] - self.box.lo[0]
+            Ly = self.box.hi[1] - self.box.lo[1]
             Propagator = PropagatorFFT2
             spatial_axes = ( (Lx, Nx), (Ly, Ny),)
 
@@ -111,14 +108,16 @@ class Laser:
 
         prop = Propagator( *spatial_axes, omega_axis/scc.c )
         A_local = prop.step( A_local, distance )
+        A_local *= np.exp(-1j * omega_axis.reshape(omega_shape) \
+                            * distance / scc.c)
         A_local = np.fft.ifft( A_local, axis=0 )
 
         if self.box.dim == 'rt':
             self.field.field[m_azimuthal_mode] = A_local.T
         elif self.box.dim == 'xyt':
-            self.field.field = A_local.T
+            self.field.field[:] = A_local.T
 
-    def propagate(self, distance):
+    def propagate_mimic(self, distance):
         """
         Propagate the laser pulse by the distance specified
 
