@@ -1,13 +1,20 @@
 import numpy as np
 import openpmd_api as io
 
-def write_to_openpmd_file(file_prefix, file_format, grid,
+def write_to_openpmd_file(dim, file_prefix, file_format, grid,
                           wavelength, pol):
     """
     Write the laser field into an openPMD file
 
     Parameters
     ----------
+    dim: string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
     file_prefix: string
         The file name will start with this prefix.
 
@@ -26,7 +33,6 @@ def write_to_openpmd_file(file_prefix, file_format, grid,
     """
     array = grid.field
     box = grid.box
-    dim = box.dim
 
     # Create file
     series = io.Series(
