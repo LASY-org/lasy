@@ -17,10 +17,10 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         corresponds to:
 
         .. math::
-            \mathcal{T}(x, y) =
-            H_{n_x}\left ( \frac{\sqrt{2} x}{w_0}\right )\,
-            H_{n_y}\left ( \frac{\sqrt{2} y}{w_0}\right )\,
-            \exp\left( -\frac{x^2+y^2}{w_0^2} \right)
+            \\mathcal{T}(x, y) =
+            H_{n_x}\\left ( \\frac{\\sqrt{2} x}{w_0}\\right )\\,
+            H_{n_y}\\left ( \\frac{\\sqrt{2} y}{w_0}\\right )\\,
+            \\exp\\left( -\\frac{x^2+y^2}{w_0^2} \\right)
 
         where  :math:`H_{n}` is the Hermite polynomial of order :math:`n`.
 
