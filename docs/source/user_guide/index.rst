@@ -1,7 +1,6 @@
 User Guide
 ==========
 
-
 How to get started.
 
 .. toctree::

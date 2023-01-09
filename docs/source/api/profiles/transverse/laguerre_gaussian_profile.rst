@@ -9,7 +9,6 @@ The modes can have azimuthally varying fields (for :math:`m > 0`) but any single
 .. image:: https://user-images.githubusercontent.com/27694869/211018326-d0ec3684-4ad9-4ed5-a252-18e2641ad402.png
     :alt: Laguerre-Gaussian-Modes
 
-
 ------------
 
 .. autoclass:: lasy.profiles.transverse.laguerre_gaussian_profile.LaguerreGaussianTransverseProfile

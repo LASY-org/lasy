@@ -40,7 +40,6 @@ LASY |release| Documentation
 
     ---
 
-
     **API Reference**
     ^^^^^^^^^^^^^^^^^
 
@@ -67,7 +66,6 @@ LASY |release| Documentation
             :text: Show me some tutorials
             :classes: btn-outline-primary btn-block stretched-link
 
-
 .. toctree::
    :hidden:
    :maxdepth: 4
@@ -76,6 +74,5 @@ LASY |release| Documentation
    code_overview/index
    api/index
    tutorials/index
-   
-
+  
 

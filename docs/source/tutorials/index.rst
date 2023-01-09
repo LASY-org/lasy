@@ -1,8 +1,6 @@
 Tutorials
 =========
 
-
-
 .. toctree::
    :hidden:
    :maxdepth: 4

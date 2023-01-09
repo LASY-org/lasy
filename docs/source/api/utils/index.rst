@@ -3,6 +3,7 @@ Utils
 
 .. toctree::
    :maxdepth: 4
+   :hidden:
 
    box
    grid
