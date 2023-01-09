@@ -46,15 +46,15 @@ class Laser:
         """
         box = Box(dim, lo, hi, npoints, n_azimuthal_modes)
         self.box = box
-        self.field = Grid(self.box)
-        self.dim = self.box.dim
+        self.field = Grid(dim, self.box)
+        self.dim = dim
         self.profile = profile
 
         # Create the grid on which to evaluate the laser, evaluate it
-        if box.dim == 'xyt':
+        if self.dim == 'xyt':
             x, y, t = np.meshgrid( *box.axes, indexing='ij')
             self.field.field[...] = profile.evaluate( x, y, t )
-        elif box.dim == 'rt':
+        elif self.dim == 'rt':
             # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
             # theta, to evaluate the laser
             n_theta = 2*box.n_azimuthal_modes - 1
@@ -67,7 +67,7 @@ class Laser:
             # Perform the azimuthal decomposition
             self.field.field[...] = np.fft.ifft(envelope, axis=0)
 
-        normalize_energy(profile.laser_energy, self.field)
+        normalize_energy(self.dim, profile.laser_energy, self.field)
 
     def propagate(self, distance):
         """
@@ -144,5 +144,5 @@ class Laser:
         file_format: string
             Format to be used for the output file. Options are "h5" and "bp".
         """
-        write_to_openpmd_file( file_prefix, file_format, self.field,
+        write_to_openpmd_file(self.dim, file_prefix, file_format, self.field,
                                self.profile.lambda0, self.profile.pol )
