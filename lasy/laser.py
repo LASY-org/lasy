@@ -7,6 +7,7 @@ from lasy.utils.openpmd_output import write_to_openpmd_file
 from lasy.utils.laser_energy import normalize_energy
 
 from axiprop.lib import PropagatorSymmetric, PropagatorFFT2
+from axiprop.utils import get_temporal_radial, get_temporal_slice2d
 
 class Laser:
     """
@@ -82,20 +83,19 @@ class Laser:
         dt = self.box.dx[-1]
         omega0 = self.profile.omega0
 
-        if self.box.dim == 'rt':
+        if self.dim == 'rt':
 
             m_azimuthal_mode = 0
             A_local = self.field.field[m_azimuthal_mode].T
             Nt, Nr = A_local.shape
             omega_shape = ( Nt, 1 )
-
-            Rmax = self.field.box.hi[0]
+            Rmax = self.box.hi[0]
             Propagator = PropagatorSymmetric
             spatial_axes = ( ( Rmax, Nr ), )
 
-        elif self.box.dim == 'xyt':
+        elif self.dim == 'xyt':
             A_local = self.field.field.T
-            Nx, Ny, Nt = self.field.field.shape
+            Nt, Nx, Ny = A_local.shape
             omega_shape = ( Nt, 1, 1 )
 
             Lx = self.box.hi[0] - self.box.lo[0]
@@ -108,14 +108,59 @@ class Laser:
 
         prop = Propagator( *spatial_axes, omega_axis/scc.c )
         A_local = prop.step( A_local, distance, overwrite=True )
+
         A_local *= np.exp(-1j * omega_axis.reshape(omega_shape) \
-                            * distance / scc.c)
+                            *  distance / scc.c)
+
         A_local = np.fft.ifft( A_local, axis=0 )
 
-        if self.box.dim == 'rt':
+        if self.dim == 'rt':
             self.field.field[m_azimuthal_mode] = A_local.T
-        elif self.box.dim == 'xyt':
+        elif self.dim == 'xyt':
             self.field.field[:] = A_local.T
+
+    def get_full_field(self, T_range, dt_new=None, dNr=1):
+        dt = self.box.dx[-1]
+        omega0 = self.profile.omega0
+        Tmin = self.field.box.lo[-1]
+
+        if dt_new is None:
+            dt_new = 2*np.pi / omega0 / 24
+
+        if self.dim == 'rt':
+            m_azimuthal_mode = 0
+            A_local = self.field.field[m_azimuthal_mode].T
+            Nt = A_local.shape[0]
+            Rmax = self.box.hi[0]
+            Rmin = 0.0
+            omega_shape = ( Nt, 1 )
+        elif self.dim == 'xyt':
+            A_local = self.field.field.T
+            Nt = A_local.shape[0]
+            omega_shape = ( Nt, 1, 1 )
+            Rmax = self.box.hi[0]
+            Rmin = self.box.lo[0]
+
+        A_local = np.fft.fft( A_local, axis=0, norm="forward" )
+        A_local = np.fft.fftshift(A_local, axes=0)
+
+
+        omega_axis = 2 * np.pi * np.fft.fftfreq( Nt, dt )  + omega0
+        omega_axis = np.fft.fftshift(omega_axis)
+
+        A_local *= np.exp(-1j * omega_axis.reshape(omega_shape) * Tmin)
+
+        tt = np.arange(*T_range, dt_new)
+        Et = np.zeros((tt.size, A_local.shape[1]))
+
+        if self.dim == 'rt':
+            Et = get_temporal_radial(A_local[:,::dNr], Et, tt, omega_axis/scc.c)
+        elif self.dim == 'xyt':
+            Et = get_temporal_slice2d(A_local[:,::dNr], Et, tt, omega_axis/scc.c)
+
+        extent = np.r_[ T_range, [Rmin, Rmax] ]
+
+        return Et, extent
 
     def propagate_mimic(self, distance):
         """
