@@ -6,7 +6,7 @@ from lasy.utils.grid import Grid
 from lasy.utils.openpmd_output import write_to_openpmd_file
 from lasy.utils.laser_energy import normalize_energy
 
-from axiprop.lib import PropagatorSymmetric, PropagatorFFT2
+from axiprop.lib import PropagatorSymmetric, PropagatorFFT2, PropagatorResampling
 from axiprop.utils import get_temporal_radial, get_temporal_slice2d
 
 class Laser:
@@ -70,7 +70,7 @@ class Laser:
 
         normalize_energy(self.dim, profile.laser_energy, self.field)
 
-    def propagate(self, distance):
+    def propagate(self, distance, nr_boundary=16):
         """
         Propagate the laser pulse by the distance specified
 
@@ -84,15 +84,16 @@ class Laser:
         omega0 = self.profile.omega0
 
         if self.dim == 'rt':
-
             m_azimuthal_mode = 0
             A_local = self.field.field[m_azimuthal_mode].T
             Nt, Nr = A_local.shape
             omega_shape = ( Nt, 1 )
             Rmax = self.box.hi[0]
-            Propagator = PropagatorSymmetric
-            spatial_axes = ( ( Rmax, Nr ), )
-
+            Propagator = PropagatorResampling
+            spatial_axes = ( self.box.axes[0] + 0.75 * self.box.dx[0], )
+            # Propagator = PropagatorSymmetric
+            # spatial_axes = ( ( Rmax, Nr ), )
+            A_local[:,-nr_boundary:] *= np.cos(np.r_[0:np.pi/2:nr_boundary*1j])**0.5
         elif self.dim == 'xyt':
             A_local = self.field.field.T
             Nt, Nx, Ny = A_local.shape
@@ -106,9 +107,12 @@ class Laser:
         A_local = np.fft.fft( A_local, axis=0 )
         omega_axis = 2 * np.pi * np.fft.fftfreq( Nt, dt )  + omega0
 
-        prop = Propagator( *spatial_axes, omega_axis/scc.c )
-        A_local = prop.step( A_local, distance, overwrite=True )
+        try:
+            self.prop;
+        except:
+            self.prop = Propagator( *spatial_axes, omega_axis/scc.c )
 
+        A_local = self.prop.step( A_local, distance, overwrite=True )
         A_local *= np.exp(-1j * omega_axis.reshape(omega_shape) \
                             *  distance / scc.c)
 
