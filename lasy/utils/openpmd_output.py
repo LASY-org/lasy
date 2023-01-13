@@ -60,10 +60,10 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid,
         }
         if dim == 'xyt':
             m.geometry = io.Geometry.cartesian
-            m.axis_labels = ['x', 'y', 't']
+            m.axis_labels = ['t', 'x', 'y']
         elif dim == 'rt':
             m.geometry = io.Geometry.thetaMode
-            m.axis_labels = ['r', 't']
+            m.axis_labels = ['t', 'r']
 
         # Define the dataset
         dataset = io.Dataset(array.real.dtype, array.real.shape)
