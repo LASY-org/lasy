@@ -78,6 +78,10 @@ class Laser:
         ----------
         distance: scalar
             Distance by which the laser pulse should be propagated
+
+        nr_boundary: integer (optional for 'rt')
+            Number of cells at the end of radial axis, where the field
+            will be attenuated (to assert proper Hankel transform)
         """
 
         dt = self.box.dx[-1]
@@ -90,15 +94,15 @@ class Laser:
             omega_shape = ( Nt, 1 )
             Rmax = self.box.hi[0]
             Propagator = PropagatorResampling
-            spatial_axes = ( self.box.axes[0] + 0.75 * self.box.dx[0], )
-            # Propagator = PropagatorSymmetric
-            # spatial_axes = ( ( Rmax, Nr ), )
-            A_local[:,-nr_boundary:] *= np.cos(np.r_[0:np.pi/2:nr_boundary*1j])**0.5
+            spatial_axes = ( self.box.axes[0], )
+            # apply the boundary "absorbtion"
+            absorb_layer_shape = np.cos(np.r_[0:np.pi/2:nr_boundary*1j])**0.5
+            absorb_layer_shape[-1] = 0.0
+            A_local[:,-nr_boundary:] *= absorb_layer_shape
         elif self.dim == 'xyt':
             A_local = self.field.field.T
             Nt, Nx, Ny = A_local.shape
             omega_shape = ( Nt, 1, 1 )
-
             Lx = self.box.hi[0] - self.box.lo[0]
             Ly = self.box.hi[1] - self.box.lo[1]
             Propagator = PropagatorFFT2
@@ -113,6 +117,7 @@ class Laser:
             self.prop = Propagator( *spatial_axes, omega_axis/scc.c )
 
         A_local = self.prop.step( A_local, distance, overwrite=True )
+        # translate the time coordinate back (TO BE DISCUSSED)
         A_local *= np.exp(-1j * omega_axis.reshape(omega_shape) \
                             *  distance / scc.c)
 
@@ -147,7 +152,6 @@ class Laser:
 
         A_local = np.fft.fft( A_local, axis=0, norm="forward" )
         A_local = np.fft.fftshift(A_local, axes=0)
-
 
         omega_axis = 2 * np.pi * np.fft.fftfreq( Nt, dt )  + omega0
         omega_axis = np.fft.fftshift(omega_axis)
