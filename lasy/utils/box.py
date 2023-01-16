@@ -53,8 +53,9 @@ class Box:
         else:
             coords = [-1, 0]
         for i in coords:
-            self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
-            self.dx.append(self.axes[i][1] - self.axes[i][0])
+            axis = np.linspace(lo[i], hi[i], npoints[i])
+            self.axes.append(axis)
+            self.dx.append(axis[1] - axis[0])
             self.npoints.append( npoints[i] )
             self.lo.append( lo[i] )
             self.hi.append( hi[i] )
