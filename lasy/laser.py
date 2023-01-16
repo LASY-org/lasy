@@ -70,6 +70,36 @@ class Laser:
 
         normalize_energy(self.dim, profile.laser_energy, self.field)
 
+    def time_to_frequency(self):
+        times_axis = {'rt': 1, 'xyt': 0}[self.dim]
+        self.field.field_fft = np.fft.fft( self.field.field, \
+                                           axis=times_axis,
+                                           norm="forward")
+        try:
+            self.field.omega;
+        except:
+            dt = self.box.dx[0]
+            omega0 = self.profile.omega0
+            Nt = self.field.field.shape[times_axis]
+            self.field.omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+
+    def frequency_to_time(self):
+        times_axis = {'rt': 1, 'xyt': 0}[self.dim]
+        self.field.field = np.fft.ifft( self.field.field_fft,
+                                        axis=times_axis,
+                                        norm="forward" )
+
+    def translate_spectral(self, translate):
+        if self.dim == 'rt':
+            Nt = self.field.field.shape[1]
+            omega_shape = ( 1, Nt, 1 )
+        elif self.dim == 'xyt':
+            Nt = self.field.field.shape[0]
+            omega_shape = ( Nt, 1, 1 )
+
+        self.field.field_fft *= np.exp( -1j * translate \
+                                * self.field.omega.reshape(omega_shape) )
+
     def propagate(self, distance, nr_boundary=16):
         """
         Propagate the laser pulse by the distance specified
@@ -83,90 +113,73 @@ class Laser:
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform)
         """
-
-        dt = self.box.dx[-1]
-        omega0 = self.profile.omega0
-
         if self.dim == 'rt':
-            m_azimuthal_mode = 0
-            A_local = self.field.field[m_azimuthal_mode].T
-            Nt, Nr = A_local.shape
-            omega_shape = ( Nt, 1 )
-            Rmax = self.box.hi[0]
             Propagator = PropagatorResampling
-            spatial_axes = ( self.box.axes[0], )
+            spatial_axes = ( self.box.axes[1], )
             # apply the boundary "absorbtion"
             absorb_layer_shape = np.cos(np.r_[0:np.pi/2:nr_boundary*1j])**0.5
             absorb_layer_shape[-1] = 0.0
-            A_local[:,-nr_boundary:] *= absorb_layer_shape
+            self.field.field[..., -nr_boundary:] *= absorb_layer_shape
         elif self.dim == 'xyt':
-            A_local = self.field.field.T
-            Nt, Nx, Ny = A_local.shape
-            omega_shape = ( Nt, 1, 1 )
-            Lx = self.box.hi[0] - self.box.lo[0]
-            Ly = self.box.hi[1] - self.box.lo[1]
+            Nt, Nx, Ny = self.field.field.shape
+            Lx = self.box.hi[1] - self.box.lo[1]
+            Ly = self.box.hi[2] - self.box.lo[2]
             Propagator = PropagatorFFT2
             spatial_axes = ( (Lx, Nx), (Ly, Ny),)
 
-        A_local = np.fft.fft( A_local, axis=0 )
-        omega_axis = 2 * np.pi * np.fft.fftfreq( Nt, dt )  + omega0
+        self.time_to_frequency()
 
         try:
             self.prop;
         except:
-            self.prop = Propagator( *spatial_axes, omega_axis/scc.c )
+            if self.dim == 'rt':
+                azimuthal_modes = np.r_[ \
+                    np.arange(self.box.n_azimuthal_modes), \
+                    np.arange(-self.box.n_azimuthal_modes+1, 0, 1) ]
 
-        A_local = self.prop.step( A_local, distance, overwrite=True )
-        # translate the time coordinate back (TO BE DISCUSSED)
-        A_local *= np.exp(-1j * omega_axis.reshape(omega_shape) \
-                            *  distance / scc.c)
-
-        A_local = np.fft.ifft( A_local, axis=0 )
+                self.prop = [ Propagator( *spatial_axes,\
+                                    self.field.omega/scc.c, mode=m ) \
+                              for m in azimuthal_modes]
+            elif self.dim == 'xyt':
+                self.prop = Propagator( *spatial_axes, self.field.omega/scc.c )
 
         if self.dim == 'rt':
-            self.field.field[m_azimuthal_mode] = A_local.T
+            for m in range(self.field.field_fft.shape[0]):
+                self.field.field_fft[m] = self.prop[m].step( \
+                        self.field.field_fft[m], distance, overwrite=True )
         elif self.dim == 'xyt':
-            self.field.field[:] = A_local.T
+            self.field.field_fft = self.prop.step( self.field.field_fft,
+                                                   distance, overwrite=True )
 
-    def get_full_field(self, T_range, dt_new=None, dNr=1):
-        dt = self.box.dx[-1]
-        omega0 = self.profile.omega0
-        Tmin = self.field.box.lo[-1]
+        self.translate_spectral(distance / scc.c)
+        self.frequency_to_time()
+
+    def get_full_field(self, T_range, dt_new=None):
+        try:
+            self.field.field_fft;
+        except:
+            self.time_to_frequency()
+
+        Tmin = self.field.box.lo[0]
+        self.translate_spectral(Tmin)
 
         if dt_new is None:
-            dt_new = 2*np.pi / omega0 / 24
+            dt_new = 2*np.pi / self.profile.omega0 / 24
 
-        if self.dim == 'rt':
-            m_azimuthal_mode = 0
-            A_local = self.field.field[m_azimuthal_mode].T
-            Nt = A_local.shape[0]
-            Rmax = self.box.hi[0]
-            Rmin = 0.0
-            omega_shape = ( Nt, 1 )
-        elif self.dim == 'xyt':
-            A_local = self.field.field.T
-            Nt = A_local.shape[0]
-            omega_shape = ( Nt, 1, 1 )
-            Rmax = self.box.hi[0]
-            Rmin = self.box.lo[0]
-
-        A_local = np.fft.fft( A_local, axis=0, norm="forward" )
-        A_local = np.fft.fftshift(A_local, axes=0)
-
-        omega_axis = 2 * np.pi * np.fft.fftfreq( Nt, dt )  + omega0
-        omega_axis = np.fft.fftshift(omega_axis)
-
-        A_local *= np.exp(-1j * omega_axis.reshape(omega_shape) * Tmin)
-
+        omega = self.field.omega
         tt = np.arange(*T_range, dt_new)
-        Et = np.zeros((tt.size, A_local.shape[1]))
+        Et = np.zeros((tt.size, self.field.field.shape[-1]))
 
         if self.dim == 'rt':
-            Et = get_temporal_radial(A_local[:,::dNr], Et, tt, omega_axis/scc.c)
+            for m in range(self.field.field.shape[0]):
+                Et = get_temporal_radial( self.field.field_fft[m], \
+                                          Et, tt, omega/scc.c )
         elif self.dim == 'xyt':
-            Et = get_temporal_slice2d(A_local[:,::dNr], Et, tt, omega_axis/scc.c)
+            Et = get_temporal_slice2d( self.field.field_fft, \
+                                       Et, tt, omega/scc.c )
 
-        extent = np.r_[ T_range, [Rmin, Rmax] ]
+        extent = np.r_[ T_range, [self.box.lo[1], self.box.hi[1]] ]
+        self.time_to_frequency() # restore initial field_fft
 
         return Et, extent
 
