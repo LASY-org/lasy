@@ -96,7 +96,7 @@ class Laser:
                                         axis=times_axis,
                                         norm="forward" )
 
-    def translate_spectral(self, translate):
+    def translate_spectral(self, translate_time):
         """
         Add the phase corresponding to the time-axis translation by
 
@@ -115,7 +115,7 @@ class Laser:
             Nt = self.field.field.shape[0]
             omega_shape = ( Nt, 1, 1 )
 
-        self.field.field_fft *= np.exp( -1j * translate \
+        self.field.field_fft *= np.exp( -1j * translate_time \
                                 * self.field.omega.reshape(omega_shape) )
 
     def propagate(self, distance, nr_boundary=16):
