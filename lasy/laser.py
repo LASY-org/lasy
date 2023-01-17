@@ -71,6 +71,10 @@ class Laser:
         normalize_energy(self.dim, profile.laser_energy, self.field)
 
     def time_to_frequency(self):
+        """
+        Transform field from the temporal to the frequency domain via FFT,
+        and create the frequency axis if necessary
+        """
         times_axis = {'rt': 1, 'xyt': 0}[self.dim]
         self.field.field_fft = np.fft.fft( self.field.field, \
                                            axis=times_axis,
@@ -84,12 +88,26 @@ class Laser:
             self.field.omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
 
     def frequency_to_time(self):
+        """
+        Transform field from the frequency to the temporal domain via iFFT
+        """
         times_axis = {'rt': 1, 'xyt': 0}[self.dim]
         self.field.field = np.fft.ifft( self.field.field_fft,
                                         axis=times_axis,
                                         norm="forward" )
 
     def translate_spectral(self, translate):
+        """
+        Add the phase corresponding to the time-axis translation by
+
+        Parameters
+        ----------
+        translate_time: float (m)
+            Time interval by which the time axis of the field should be
+            translated. Note, that after `time_to_frequency()` call the
+            time region for `get_full_field()` is set to `[0, Tmax-Tmin]`.
+        """
+
         if self.dim == 'rt':
             Nt = self.field.field.shape[1]
             omega_shape = ( 1, Nt, 1 )
@@ -155,32 +173,51 @@ class Laser:
         self.frequency_to_time()
 
     def get_full_field(self, T_range, dt_new=None):
+        """
+        Reconstruct the laser pulse with carrier frequency using DFT
+
+        Parameters
+        ----------
+        T_range: list or tuple (Tmin, Tmax) with Tmin, Tmax floats (s)
+            Time interval in which the field should be reconstructed
+
+        dt_new: float (s) (optional)
+            Size of the step that is used to resolve T_range. Default `None`
+            corresponds to the step of 1/24 of the optical cycle of the
+            carrier frequency `omega0`
+
+        Returns:
+        --------
+            Et: ndarray (V/m)
+                The reconstructed field of the shape (Nt_new, Nr) (for `rt`)
+                of (Nt_new, Nx) (for `xyt`), with `Nt_new=(Tmax-Tmin)/dt_new`
+            extent: ndarray (Tmin, Tmax, Xmin, Xmax)
+                Physical extent of the reconstructed field
+        """
         try:
             self.field.field_fft;
         except:
             self.time_to_frequency()
 
-        Tmin = self.field.box.lo[0]
-        self.translate_spectral(Tmin)
+        Tmin_box = self.field.box.lo[0]
+        self.translate_spectral(Tmin_box)
+        extent = np.r_[ T_range, [self.box.lo[1], self.box.hi[1]] ]
 
         if dt_new is None:
             dt_new = 2*np.pi / self.profile.omega0 / 24
 
-        omega = self.field.omega
         tt = np.arange(*T_range, dt_new)
         Et = np.zeros((tt.size, self.field.field.shape[-1]))
 
         if self.dim == 'rt':
             for m in range(self.field.field.shape[0]):
                 Et = get_temporal_radial( self.field.field_fft[m], \
-                                          Et, tt, omega/scc.c )
+                                          Et, tt, self.field.omega/scc.c )
         elif self.dim == 'xyt':
             Et = get_temporal_slice2d( self.field.field_fft, \
-                                       Et, tt, omega/scc.c )
+                                       Et, tt, self.field.omega/scc.c )
 
-        extent = np.r_[ T_range, [self.box.lo[1], self.box.hi[1]] ]
-        self.time_to_frequency() # restore initial field_fft
-
+        self.translate_spectral(-Tmin_box) # restore initial field_fft
         return Et, extent
 
     def propagate_mimic(self, distance):
