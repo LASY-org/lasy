@@ -44,27 +44,26 @@ class Laser:
         """
         box = Box(dim, lo, hi, npoints, n_azimuthal_modes)
         self.box = box
-        self.field = Grid(self.box)
-        self.dim = self.box.dim
+        self.field = Grid(dim, self.box)
+        self.dim = dim
         self.profile = profile
 
         # Create the grid on which to evaluate the laser, evaluate it
-        if box.dim == 'xyt':
-            x, y, t = np.meshgrid( *box.axes, indexing='ij')
+        if self.dim == 'xyt':
+            t, x, y = np.meshgrid( *box.axes, indexing='ij')
             self.field.field[...] = profile.evaluate( x, y, t )
-        elif box.dim == 'rt':
+        elif self.dim == 'rt':
             # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
             # theta, to evaluate the laser
             n_theta = 2*box.n_azimuthal_modes - 1
             theta1d = 2*np.pi/n_theta * np.arange(n_theta)
-            theta, r, t = np.meshgrid( theta1d, *box.axes, indexing='ij')
+            theta, t, r = np.meshgrid( theta1d, *box.axes, indexing='ij')
             x = r*np.cos(theta)
             y = r*np.sin(theta)
             # Evaluate the profile on the generated grid
             envelope = profile.evaluate( x, y, t )
             # Perform the azimuthal decomposition
             self.field.field[...] = np.fft.ifft(envelope, axis=0)
-
 
     def normalize(self, value, kind=None):
         """
@@ -87,7 +86,6 @@ class Laser:
             normalize_peak_intensity(value, self.field)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
-            
 
 
     def propagate(self, distance):
@@ -100,8 +98,8 @@ class Laser:
             Distance by which the laser pulse should be propagated
         """
 
-        self.field.box.lo[-1] += distance/scc.c
-        self.field.box.hi[-1] += distance/scc.c
+        self.field.box.lo[0] += distance/scc.c
+        self.field.box.hi[0] += distance/scc.c
         # This mimics a laser pulse propagating rigidly.
         # TODO: actual propagation.
 
@@ -117,5 +115,5 @@ class Laser:
         file_format: string
             Format to be used for the output file. Options are "h5" and "bp".
         """
-        write_to_openpmd_file( file_prefix, file_format, self.field,
+        write_to_openpmd_file(self.dim, file_prefix, file_format, self.field,
                                self.profile.lambda0, self.profile.pol )
