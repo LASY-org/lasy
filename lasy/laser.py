@@ -76,9 +76,9 @@ class Laser:
         and create the frequency axis if necessary
         """
         times_axis = {'rt': 1, 'xyt': 0}[self.dim]
-        self.field.field_fft = np.fft.fft( self.field.field, \
-                                           axis=times_axis,
-                                           norm="forward")
+        self.field.field_fft = np.fft.fft(self.field.field,
+                                          axis=times_axis,
+                                          norm="forward")
         try:
             self.field.omega;
         except:
@@ -92,9 +92,9 @@ class Laser:
         Transform field from the frequency to the temporal domain via iFFT
         """
         times_axis = {'rt': 1, 'xyt': 0}[self.dim]
-        self.field.field = np.fft.ifft( self.field.field_fft,
-                                        axis=times_axis,
-                                        norm="forward" )
+        self.field.field = np.fft.ifft(self.field.field_fft,
+                                       axis=times_axis,
+                                       norm="forward")
 
     def translate_spectral(self, translate_time):
         """
@@ -110,13 +110,13 @@ class Laser:
 
         if self.dim == 'rt':
             Nt = self.field.field.shape[1]
-            omega_shape = ( 1, Nt, 1 )
+            omega_shape = (1, Nt, 1)
         elif self.dim == 'xyt':
             Nt = self.field.field.shape[0]
-            omega_shape = ( Nt, 1, 1 )
+            omega_shape = (Nt, 1, 1)
 
-        self.field.field_fft *= np.exp( -1j * translate_time \
-                                * self.field.omega.reshape(omega_shape) )
+        self.field.field_fft *= np.exp(-1j * translate_time \
+                                       * self.field.omega.reshape(omega_shape))
 
     def propagate(self, distance, nr_boundary=16):
         """
@@ -133,9 +133,10 @@ class Laser:
         """
         if self.dim == 'rt':
             Propagator = PropagatorResampling
-            spatial_axes = ( self.box.axes[1], )
+            spatial_axes = (self.box.axes[1],)
             # apply the boundary "absorbtion"
-            absorb_layer_shape = np.cos(np.r_[0:np.pi/2:nr_boundary*1j])**0.5
+            absorb_layer_axis = np.r_[0 : np.pi/2 : nr_boundary*1j]
+            absorb_layer_shape = np.cos(absorb_layer_axis)**0.5
             absorb_layer_shape[-1] = 0.0
             self.field.field[..., -nr_boundary:] *= absorb_layer_shape
         elif self.dim == 'xyt':
@@ -143,7 +144,7 @@ class Laser:
             Lx = self.box.hi[1] - self.box.lo[1]
             Ly = self.box.hi[2] - self.box.lo[2]
             Propagator = PropagatorFFT2
-            spatial_axes = ( (Lx, Nx), (Ly, Ny),)
+            spatial_axes = ((Lx, Nx), (Ly, Ny))
 
         self.time_to_frequency()
 
@@ -159,15 +160,15 @@ class Laser:
                                     self.field.omega/scc.c, mode=m ) \
                               for m in azimuthal_modes]
             elif self.dim == 'xyt':
-                self.prop = Propagator( *spatial_axes, self.field.omega/scc.c )
+                self.prop = Propagator(*spatial_axes, self.field.omega/scc.c)
 
         if self.dim == 'rt':
             for m in range(self.field.field_fft.shape[0]):
                 self.field.field_fft[m] = self.prop[m].step( \
-                        self.field.field_fft[m], distance, overwrite=True )
+                        self.field.field_fft[m], distance, overwrite=True)
         elif self.dim == 'xyt':
-            self.field.field_fft = self.prop.step( self.field.field_fft,
-                                                   distance, overwrite=True )
+            self.field.field_fft = self.prop.step(self.field.field_fft,
+                                                  distance, overwrite=True)
 
         self.translate_spectral(distance / scc.c)
         self.frequency_to_time()
@@ -201,7 +202,7 @@ class Laser:
 
         Tmin_box = self.field.box.lo[0]
         self.translate_spectral(Tmin_box)
-        extent = np.r_[ T_range, [self.box.lo[1], self.box.hi[1]] ]
+        extent = np.r_[T_range, [self.box.lo[1], self.box.hi[1]]]
 
         if dt_new is None:
             dt_new = 2*np.pi / self.profile.omega0 / 24
@@ -211,13 +212,13 @@ class Laser:
 
         if self.dim == 'rt':
             for m in range(self.field.field.shape[0]):
-                Et = get_temporal_radial( self.field.field_fft[m], \
-                                          Et, tt, self.field.omega/scc.c )
+                Et = get_temporal_radial(self.field.field_fft[m],
+                                         Et, tt, self.field.omega/scc.c)
         elif self.dim == 'xyt':
-            Et = get_temporal_slice2d( self.field.field_fft, \
-                                       Et, tt, self.field.omega/scc.c )
-
-        self.translate_spectral(-Tmin_box) # restore initial field_fft
+            Et = get_temporal_slice2d(self.field.field_fft,
+                                      Et, tt, self.field.omega/scc.c)
+        # restore initial field_fft
+        self.translate_spectral(-Tmin_box)
         return Et, extent
 
     def propagate_mimic(self, distance):
