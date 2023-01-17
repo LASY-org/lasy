@@ -6,7 +6,7 @@ from lasy.utils.grid import Grid
 from lasy.utils.openpmd_output import write_to_openpmd_file
 from lasy.utils.laser_energy import normalize_energy
 
-from axiprop.lib import PropagatorSymmetric, PropagatorFFT2, PropagatorResampling
+from axiprop.lib import PropagatorResampling, PropagatorFFT2
 from axiprop.utils import get_temporal_radial, get_temporal_slice2d
 
 class Laser:
@@ -115,8 +115,8 @@ class Laser:
             Nt = self.field.field.shape[0]
             omega_shape = (Nt, 1, 1)
 
-        self.field.field_fft *= np.exp(-1j * translate_time \
-                                       * self.field.omega.reshape(omega_shape))
+        self.field.field_fft *= np.exp(-1j * translate_time
+                                * self.field.omega.reshape(omega_shape))
 
     def propagate(self, distance, nr_boundary=16):
         """
@@ -152,19 +152,18 @@ class Laser:
             self.prop;
         except:
             if self.dim == 'rt':
-                azimuthal_modes = np.r_[ \
-                    np.arange(self.box.n_azimuthal_modes), \
+                azimuthal_modes = np.r_[
+                    np.arange(self.box.n_azimuthal_modes),
                     np.arange(-self.box.n_azimuthal_modes+1, 0, 1) ]
 
-                self.prop = [ Propagator( *spatial_axes,\
-                                    self.field.omega/scc.c, mode=m ) \
-                              for m in azimuthal_modes]
+                self.prop = [Propagator(*spatial_axes, self.field.omega/scc.c,
+                                         mode=m) for m in azimuthal_modes]
             elif self.dim == 'xyt':
                 self.prop = Propagator(*spatial_axes, self.field.omega/scc.c)
 
         if self.dim == 'rt':
             for m in range(self.field.field_fft.shape[0]):
-                self.field.field_fft[m] = self.prop[m].step( \
+                self.field.field_fft[m] = self.prop[m].step(
                         self.field.field_fft[m], distance, overwrite=True)
         elif self.dim == 'xyt':
             self.field.field_fft = self.prop.step(self.field.field_fft,
