@@ -30,7 +30,7 @@ where $\operatorname{Re}$ stands for real part,  $E_x$ (resp. $E_y$) is the lase
 
 When added to an output, the following naming conventions shall be used for complex electric field `mesh records`.
 
-- `envelope/`
+- `laser_envelope/`
   - type: *(complexX)*
   - scope: *(required)*
   - decription: Scalar field for the envelope (in V/m). See above for description.
