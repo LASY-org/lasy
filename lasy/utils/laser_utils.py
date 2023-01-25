@@ -6,8 +6,8 @@ def compute_laser_energy(dim, grid):
     Computes the total laser energy that corresponds to the current
     envelope data. This is used mainly for normalization purposes.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     dim: string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
@@ -19,8 +19,8 @@ def compute_laser_energy(dim, grid):
           the value of the envelope field and an object of type
           lasy.utils.Box that defines the points at which evaluate the laser
 
-    Returns:
-    --------
+    Returns
+    -------
     energy: float (in Joules)
     """
     # This uses the following volume integral:
@@ -74,3 +74,41 @@ def normalize_energy(dim, energy, grid):
     current_energy = compute_laser_energy(dim, grid)
     norm_factor = (energy/current_energy)**.5
     grid.field *= norm_factor
+
+
+def normalize_peak_field_amplitude(amplitude, grid):
+    """
+    Normalize energy of the laser pulse contained in grid
+
+    Parameters
+    ----------
+    amplitude: scalar (V/m)
+        Peak field amplitude of the laser pulse after normalization
+
+    grid: a Grid object
+        Contains value of the laser envelope and metadata
+    """
+
+    if amplitude is None:
+        return
+    grid.field = grid.field / np.abs(grid.field).max() * amplitude
+
+def normalize_peak_intensity(peak_intensity, grid):
+    """
+    Normalize energy of the laser pulse contained in grid
+
+    Parameters
+    ----------
+    peak_intensity: scalar (W/m^2)
+        Peak field amplitude of the laser pulse after normalization
+
+    grid: a Grid object
+        Contains value of the laser envelope and metadata
+    """
+
+    if peak_intensity is None:
+        return
+    intensity = np.abs(scc.epsilon_0 * grid.field**2 / 2 * scc.c)
+    input_peak_intensity = intensity.max()
+
+    grid.field *= np.sqrt( peak_intensity / input_peak_intensity )
