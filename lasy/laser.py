@@ -161,9 +161,10 @@ class Laser:
         distance: scalar
             Distance by which the laser pulse should be propagated
 
-        nr_boundary: integer (optional for 'rt')
+        nr_boundary: integer (optional)
             Number of cells at the end of radial axis, where the field
-            will be attenuated (to assert proper Hankel transform)
+            will be attenuated (to assert proper Hankel transform).
+            Only used for 'rt'.
         """
         if self.dim == 'rt':
             Propagator = PropagatorResampling
