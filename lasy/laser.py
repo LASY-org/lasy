@@ -109,7 +109,7 @@ class Laser:
 
     def frequency_to_time(self):
         """
-        Transform field from the frequency to the temporal domain via iFFT
+        Transform field from the frequency to the temporal domain via iFFT.
         """
         times_axis = {'rt': 1, 'xyt': 0}[self.dim]
         self.field.field = np.fft.ifft(self.field.field_fft,
@@ -119,10 +119,11 @@ class Laser:
     def translate_spectral(self, translate_time):
         """
         Add the phase corresponding to the time-axis translation by
+        a given amount.
 
         Parameters
         ----------
-        translate_time: float (m)
+        translate_time: float (s)
             Time interval by which the time axis of the field should be
             translated. Note, that after `time_to_frequency()` call the
             time region for `get_full_field()` is set to `[0, Tmax-Tmin]`.
@@ -154,8 +155,8 @@ class Laser:
         if self.dim == 'rt':
             Propagator = PropagatorResampling
             spatial_axes = (self.box.axes[1],)
-            # apply the boundary "absorbtion"
-            absorb_layer_axis = np.r_[0 : np.pi/2 : nr_boundary*1j]
+            # apply the boundary "absorption"
+            absorb_layer_axis = np.r_[0: np.pi/2: nr_boundary*1j]
             absorb_layer_shape = np.cos(absorb_layer_axis)**0.5
             absorb_layer_shape[-1] = 0.0
             self.field.field[..., -nr_boundary:] *= absorb_layer_shape
@@ -191,6 +192,21 @@ class Laser:
 
         self.translate_spectral(distance / scc.c)
         self.frequency_to_time()
+
+    def write_to_file(self, file_prefix="laser", file_format='h5'):
+        """
+        Write the laser profile + metadata to file.
+
+        Parameters
+        ----------
+        file_prefix: string
+            The file name will start with this prefix.
+
+        file_format: string
+            Format to be used for the output file. Options are "h5" and "bp".
+        """
+        write_to_openpmd_file(self.dim, file_prefix, file_format, self.field,
+                               self.profile.lambda0, self.profile.pol )
 
     def get_full_field(self, T_range, dt_new=None):
         """
@@ -239,33 +255,3 @@ class Laser:
         # restore initial field_fft
         self.translate_spectral(-Tmin_box)
         return Et, extent
-
-    def propagate_mimic(self, distance):
-        """
-        Propagate the laser pulse by the distance specified
-
-        Parameters
-        ----------
-        distance: scalar
-            Distance by which the laser pulse should be propagated
-        """
-
-        self.field.box.lo[0] += distance/scc.c
-        self.field.box.hi[0] += distance/scc.c
-        # This mimics a laser pulse propagating rigidly.
-        # TODO: actual propagation.
-
-    def write_to_file(self, file_prefix="laser", file_format='h5'):
-        """
-        Write the laser profile + metadata to file.
-
-        Parameters
-        ----------
-        file_prefix: string
-            The file name will start with this prefix.
-
-        file_format: string
-            Format to be used for the output file. Options are "h5" and "bp".
-        """
-        write_to_openpmd_file(self.dim, file_prefix, file_format, self.field,
-                               self.profile.lambda0, self.profile.pol )
