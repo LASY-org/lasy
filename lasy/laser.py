@@ -139,6 +139,20 @@ class Laser:
         self.field.field_fft *= np.exp(-1j * translate_time
                                 * self.field.omega.reshape(omega_shape))
 
+    def translate_temporal(self, translate_time):
+        """
+        TRanslate the `box` in time by a given amount.
+
+        Parameters
+        ----------
+        translate_time: float (s)
+            Time interval by which the time temporal definitions of the
+            laser should be translated.
+        """
+        self.box.lo[0] += translate_time
+        self.box.hi[0] += translate_time
+        self.box.axes[0] += translate_time
+
     def propagate(self, distance, nr_boundary=16):
         """
         Propagate the laser pulse by the distance specified
@@ -190,6 +204,7 @@ class Laser:
             self.field.field_fft = self.prop.step(self.field.field_fft,
                                                   distance, overwrite=True)
 
+        self.translate_temporal(distance / scc.c)
         self.translate_spectral(distance / scc.c)
         self.frequency_to_time()
 
@@ -208,50 +223,46 @@ class Laser:
         write_to_openpmd_file(self.dim, file_prefix, file_format, self.field,
                                self.profile.lambda0, self.profile.pol )
 
-    def get_full_field(self, T_range, dt_new=None):
+    def get_full_field(self, theta=0, slice=0):
         """
-        Reconstruct the laser pulse with carrier frequency using DFT
+        Reconstruct the laser pulse with carrier frequency on the default grid
 
         Parameters
         ----------
-        T_range: list or tuple (Tmin, Tmax) with Tmin, Tmax floats (s)
-            Time interval in which the field should be reconstructed
+        theta: float (rad) (optional)
+            Azimuthal angle
 
-        dt_new: float (s) (optional)
-            Size of the step that is used to resolve T_range. Default `None`
-            corresponds to the step of 1/24 of the optical cycle of the
-            carrier frequency `omega0`
+        slice: float (optional)
+            normalised position of the slice from -0.5 to 0.5
 
         Returns:
         --------
             Et: ndarray (V/m)
                 The reconstructed field of the shape (Nt_new, Nr) (for `rt`)
-                of (Nt_new, Nx) (for `xyt`), with `Nt_new=(Tmax-Tmin)/dt_new`
+                or (Nt_new, Nx) (for `xyt`)
+
             extent: ndarray (Tmin, Tmax, Xmin, Xmax)
                 Physical extent of the reconstructed field
         """
-        try:
-            self.field.field_fft;
-        except:
-            self.time_to_frequency()
-
-        Tmin_box = self.field.box.lo[0]
-        self.translate_spectral(Tmin_box)
-        extent = np.r_[T_range, [self.box.lo[1], self.box.hi[1]]]
-
-        if dt_new is None:
-            dt_new = 2*np.pi / self.profile.omega0 / 24
-
-        tt = np.arange(*T_range, dt_new)
-        Et = np.zeros((tt.size, self.field.field.shape[-1]))
+        omega0 = self.profile.omega0
+        field = self.field.field.copy()
+        time_axis = self.box.axes[0][:, None]
 
         if self.dim == 'rt':
-            for m in range(self.field.field.shape[0]):
-                Et = get_temporal_radial(self.field.field_fft[m],
-                                         Et, tt, self.field.omega/scc.c)
+            azimuthal_modes = np.r_[
+                np.arange(self.box.n_azimuthal_modes),
+                np.arange(-self.box.n_azimuthal_modes+1, 0, 1) ]
+            azimuthal_phase = np.exp(1j * azimuthal_modes * theta)
+            field *= azimuthal_phase[:, None, None]
+            field = field.sum(0)
         elif self.dim == 'xyt':
-            Et = get_temporal_slice2d(self.field.field_fft,
-                                      Et, tt, self.field.omega/scc.c)
-        # restore initial field_fft
-        self.translate_spectral(-Tmin_box)
-        return Et, extent
+            Ny_middle = field.shape[-1] // 2 - 1
+            Ny_slice = int( (1 + slice) * Ny_middle )
+            field = field[:, Ny_slice, :]
+
+        field *= np.exp(-1j * omega0 * time_axis)
+        field = np.real(field)
+        ext = np.r_[self.box.lo[0], self.box.hi[0],
+                    self.box.lo[1], self.box.hi[1]]
+
+        return field, ext
