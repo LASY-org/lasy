@@ -196,6 +196,7 @@ class Laser:
                 self.prop = Propagator(*spatial_axes, self.field.omega/scc.c)
 
         if self.dim == 'rt':
+            # Loop over modes and propagate each mode by distance
             for m in range(self.field.field_fft.shape[0]):
                 self.field.field_fft[m] = self.prop[m].step(
                         self.field.field_fft[m], distance, overwrite=True)
