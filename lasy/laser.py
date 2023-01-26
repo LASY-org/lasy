@@ -7,7 +7,6 @@ from lasy.utils.openpmd_output import write_to_openpmd_file
 from lasy.utils.laser_utils import normalize_energy, normalize_peak_field_amplitude, normalize_peak_intensity
 
 from axiprop.lib import PropagatorResampling, PropagatorFFT2
-from axiprop.utils import get_temporal_radial, get_temporal_slice2d
 
 class Laser:
     """
@@ -251,7 +250,7 @@ class Laser:
         if self.dim == 'rt':
             azimuthal_modes = np.r_[
                 np.arange(self.box.n_azimuthal_modes),
-                np.arange(-self.box.n_azimuthal_modes+1, 0, 1) ]
+                np.arange(-self.box.n_azimuthal_modes + 1, 0, 1) ]
             azimuthal_phase = np.exp(1j * azimuthal_modes * theta)
             field *= azimuthal_phase[:, None, None]
             field = field.sum(0)
