@@ -149,9 +149,10 @@ class Laser:
         distance: scalar
             Distance by which the laser pulse should be propagated
 
-        nr_boundary: integer (optional for 'rt')
+        nr_boundary: integer (optional)
             Number of cells at the end of radial axis, where the field
-            will be attenuated (to assert proper Hankel transform)
+            will be attenuated (to assert proper Hankel transform).
+            Only used for 'rt'.
         """
         if self.dim == 'rt':
             Propagator = PropagatorResampling
@@ -184,6 +185,7 @@ class Laser:
                 self.prop = Propagator(*spatial_axes, self.field.omega/scc.c)
 
         if self.dim == 'rt':
+            # Loop over modes and propagate each mode by distance
             for m in range(self.field.field_fft.shape[0]):
                 self.field.field_fft[m] = self.prop[m].step(
                         self.field.field_fft[m], distance, overwrite=True)
