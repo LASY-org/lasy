@@ -106,14 +106,27 @@ class Laser:
             Nt = self.field.field.shape[times_axis]
             self.field.omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
 
-    def frequency_to_time(self):
+    def frequency_to_time(self, translate_time):
         """
         Transform field from the frequency to the temporal domain via iFFT.
         """
         times_axis = {'rt': 1, 'xyt': 0}[self.dim]
+
+        if self.dim == 'rt':
+            Nt = self.field.field.shape[1]
+            omega_shape = (1, Nt, 1)
+        elif self.dim == 'xyt':
+            Nt = self.field.field.shape[0]
+            omega_shape = (Nt, 1, 1)
+
+        self.field.field_fft *= np.exp(-1j * translate_time
+                                * self.field.omega.reshape(omega_shape))
+
         self.field.field = np.fft.ifft(self.field.field_fft,
                                        axis=times_axis,
                                        norm="forward")
+
+        self.field.field *= np.exp(1j * translate_time * self.profile.omega0)
 
     def move_time_window(self, translate_time):
         """
@@ -129,16 +142,6 @@ class Laser:
         self.box.lo[0] += translate_time
         self.box.hi[0] += translate_time
         self.box.axes[0] += translate_time
-
-        if self.dim == 'rt':
-            Nt = self.field.field.shape[1]
-            omega_shape = (1, Nt, 1)
-        elif self.dim == 'xyt':
-            Nt = self.field.field.shape[0]
-            omega_shape = (Nt, 1, 1)
-
-        self.field.field_fft *= np.exp(-1j * translate_time
-                                * self.field.omega.reshape(omega_shape))
 
     def propagate(self, distance, nr_boundary=16):
         """
@@ -194,7 +197,7 @@ class Laser:
                                                   distance, overwrite=True)
 
         self.move_time_window(distance / scc.c)
-        self.frequency_to_time()
+        self.frequency_to_time(distance / scc.c)
 
     def write_to_file(self, file_prefix="laser", file_format='h5'):
         """
