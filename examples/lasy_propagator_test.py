@@ -16,6 +16,7 @@ w0 = 5.e-6        # m
 
 profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
+# - RT Cartesian case
 dim = 'rt'
 lo = (0e-6, -150e-15)
 hi = (100e-6, 150e-15)
@@ -49,8 +50,6 @@ for step in range(2):
 
     laser.propagate(propagate_step);
 
-# Case with Gaussian laser
-
 wavelength = 0.8e-6
 pol = (1, 0)
 laser_energy = 1. # J
@@ -69,7 +68,7 @@ laser = Laser(dim, lo, hi, npoints, profile)
 
 propagate_step = 800e-6
 
-for step in range(1):
+for step in range(2):
     E_xt, imshow_extent = laser.get_full_field()
     imshow_extent[:2] *= 1e15
     imshow_extent[2:] *= 1e6
@@ -125,3 +124,4 @@ plt.xlim(t0-70, t0+70)
 plt.xlabel(r'time (fs)', fontsize=14)
 plt.ylabel(r'R ($\mu$m)', fontsize=14);
 
+plt.show()

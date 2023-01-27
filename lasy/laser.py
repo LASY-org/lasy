@@ -115,32 +115,10 @@ class Laser:
                                        axis=times_axis,
                                        norm="forward")
 
-    def translate_spectral(self, translate_time):
+    def move_time_window(self, translate_time):
         """
-        Add the phase corresponding to the time-axis translation by
+        Translate the `box` and the phase of the field_fft in time by
         a given amount.
-
-        Parameters
-        ----------
-        translate_time: float (s)
-            Time interval by which the time axis of the field should be
-            translated. Note, that after `time_to_frequency()` call the
-            time region for `get_full_field()` is set to `[0, Tmax-Tmin]`.
-        """
-
-        if self.dim == 'rt':
-            Nt = self.field.field.shape[1]
-            omega_shape = (1, Nt, 1)
-        elif self.dim == 'xyt':
-            Nt = self.field.field.shape[0]
-            omega_shape = (Nt, 1, 1)
-
-        self.field.field_fft *= np.exp(-1j * translate_time
-                                * self.field.omega.reshape(omega_shape))
-
-    def translate_temporal(self, translate_time):
-        """
-        TRanslate the `box` in time by a given amount.
 
         Parameters
         ----------
@@ -151,6 +129,16 @@ class Laser:
         self.box.lo[0] += translate_time
         self.box.hi[0] += translate_time
         self.box.axes[0] += translate_time
+
+        if self.dim == 'rt':
+            Nt = self.field.field.shape[1]
+            omega_shape = (1, Nt, 1)
+        elif self.dim == 'xyt':
+            Nt = self.field.field.shape[0]
+            omega_shape = (Nt, 1, 1)
+
+        self.field.field_fft *= np.exp(-1j * translate_time
+                                * self.field.omega.reshape(omega_shape))
 
     def propagate(self, distance, nr_boundary=16):
         """
@@ -203,8 +191,7 @@ class Laser:
             self.field.field_fft = self.prop.step(self.field.field_fft,
                                                   distance, overwrite=True)
 
-        self.translate_temporal(distance / scc.c)
-        self.translate_spectral(distance / scc.c)
+        self.move_time_window(distance / scc.c)
         self.frequency_to_time()
 
     def write_to_file(self, file_prefix="laser", file_format='h5'):
@@ -251,7 +238,7 @@ class Laser:
             azimuthal_modes = np.r_[
                 np.arange(self.box.n_azimuthal_modes),
                 np.arange(-self.box.n_azimuthal_modes + 1, 0, 1) ]
-            azimuthal_phase = np.exp(1j * azimuthal_modes * theta)
+            azimuthal_phase = np.exp(-1j * azimuthal_modes * theta)
             field *= azimuthal_phase[:, None, None]
             field = field.sum(0)
         elif self.dim == 'xyt':
