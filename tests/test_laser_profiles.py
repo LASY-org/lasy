@@ -70,3 +70,26 @@ def test_profile_laguerre_gauss():
     laser.write_to_file('laguerrelaserRZ')
     laser.propagate(1e-6)
     laser.write_to_file('laguerrelaserRZ')
+
+def test_profile_jinc():
+    # Case with Jinc laser
+    wavelength=.8e-6
+    pol = (1,0)
+    laser_energy = 1. # J
+    t_peak = 0.e-15 # s
+    tau = 30.e-15 # s
+    w0 = 5.e-6 # m
+    profile = CombinedLongitudinalTransverseProfile( wavelength, pol, laser_energy,
+                GaussianLongitudinalProfile( wavelength, tau, t_peak ),
+                JincTransverseProfile( w0 ) )
+
+    # - Cylindrical case
+    dim = 'rt'
+    lo = (0e-6, -60e-15)
+    hi = (10e-6, +60e-15)
+    npoints=(50,100)
+
+    laser = Laser(dim, lo, hi, npoints, profile, n_azimuthal_modes=2)
+    laser.write_to_file('jinclaserRZ')
+    laser.propagate(1e-6)
+    laser.write_to_file('jinclaserRZ')
