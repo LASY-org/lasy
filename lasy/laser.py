@@ -81,7 +81,7 @@ class Laser:
         """
         
         if kind == 'energy':
-            normalize_energy(value, self.field)
+            normalize_energy(self.dim, value, self.field)
         elif kind == 'field':
             normalize_peak_field_amplitude(value, self.field)
         elif kind == 'intensity':

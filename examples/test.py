@@ -21,6 +21,7 @@ hi = (+10e-6, +10e-6, +60e-15)
 npoints=(100,100,100)
 
 laser = Laser(dim, lo, hi, npoints, profile)
+laser.normalize(laser_energy, kind='energy')
 laser.write_to_file('gaussianlaser3d')
 laser.propagate(1)
 laser.write_to_file('gaussianlaser3d')
