@@ -83,7 +83,7 @@ def test_profile_super_gauss():
     beta = 10.0 # m
     profile = CombinedLongitudinalTransverseProfile( wavelength, pol, laser_energy,
                 GaussianLongitudinalProfile( wavelength, tau, t_peak ),
-                SuperGaussianTransverseProfile( w0, beta=10 ) )
+                SuperGaussianTransverseProfile( w0, n_order=10 ) )
 
     # - Cylindrical case
     dim = 'rt'
