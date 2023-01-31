@@ -9,10 +9,9 @@ laser pulses, in simulations of laser-plasma interactions.
 
 More specifically, `lasy` offers many ways to define complex laser pulses
 (e.g. from commonly-known analytical formulas, from experimental measurements,
-etc.) and then computes and saves the corresponding laser field in a
-standardized file. This file can then be read by external plasma simulation
-codes, which will then simulate the interaction between the complex laser pulse
- and a plasma.
+etc.) and offers pre-processing functionalities (e.g. propagation,
+re-normalization, geometry conversion). The laser field is then exported
+in a standardized file, that can be read by external simulation codes.
 
 ## Documentation
 
