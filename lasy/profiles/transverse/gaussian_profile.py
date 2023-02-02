@@ -23,6 +23,7 @@ class GaussianTransverseProfile(TransverseProfile):
         w0: float (in meter)
             The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
         """
+        super().__init__()
         self.w0 = w0
 
     def evaluate( self, x, y ):
