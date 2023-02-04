@@ -24,8 +24,8 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
 
         where  :math:`H_{n}` is the Hermite polynomial of order :math:`n`.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         w0: float (in meter)
             The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
         n_x: int (dimensionless)
@@ -38,18 +38,18 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         self.n_x = n_x
         self.n_y = n_y
 
-    def evaluate( self, x, y, t ):
+    def evaluate( self, x, y ):
         """
         Returns the transverse envelope
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         x, y: ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
-        Returns:
-        --------
+        Returns
+        -------
         envelope: ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y

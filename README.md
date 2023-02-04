@@ -56,9 +56,9 @@ Then, for each contribution:
 python3 -m pip install -v .
 ```
 
-For tests, you need to have `pytest` installed:
+For tests, you need to have a few extra packages, such as `pytest` and `openpmd-viewer` installed:
 ```bash
-python3 -m pip install -U pytest
+python3 -m pip install -r tests/requirements.txt
 ```
 
 ## Test

@@ -27,11 +27,11 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
         to the propagation direction). The other parameters in this formula
         are defined below.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         wavelength: float (in meter)
             The main laser wavelength :math:`\\lambda_0` of the laser, which
-            defines :math:`\omega_0` in the above formula, according to
+            defines :math:`\\omega_0` in the above formula, according to
             :math:`\\omega_0 = 2\\pi c/\\lambda_0`.
 
         pol: list of 2 complex numbers (dimensionless)

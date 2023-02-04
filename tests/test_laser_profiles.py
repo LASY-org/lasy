@@ -18,7 +18,7 @@ def gaussian():
     tau = 30.e-15 # s
     w0 = 5.e-6 # m
     profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
-    
+
     return profile
 
 
@@ -31,7 +31,7 @@ def test_profile_gaussian_3d_cartesian(gaussian):
 
     laser = Laser(dim, lo, hi, npoints, gaussian)
     laser.write_to_file('gaussianlaser3d')
-    laser.propagate(1)
+    laser.propagate(1e-6)
     laser.write_to_file('gaussianlaser3d')
 
 
@@ -44,7 +44,7 @@ def test_profile_gaussian_cylindrical(gaussian):
 
     laser = Laser(dim, lo, hi, npoints, gaussian)
     laser.write_to_file('gaussianlaserRZ')
-    laser.propagate(1)
+    laser.propagate(1e-6)
     laser.write_to_file('gaussianlaserRZ')
 
 
@@ -68,5 +68,5 @@ def test_profile_laguerre_gauss():
 
     laser = Laser(dim, lo, hi, npoints, profile, n_azimuthal_modes=2)
     laser.write_to_file('laguerrelaserRZ')
-    laser.propagate(1)
+    laser.propagate(1e-6)
     laser.write_to_file('laguerrelaserRZ')
