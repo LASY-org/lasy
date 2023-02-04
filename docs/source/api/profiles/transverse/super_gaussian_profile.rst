@@ -4,7 +4,7 @@ Super-Gaussian Transverse Profile
 Used to define a super-Gaussian transverse laser profile.
 
 Super-Gaussian profiles are modified Gaussian-like profiles with a flat-top and a Gaussian fall-off.
-The shape of the profile is characterised by one "order" parameter :math:`n`.
+The shape of the profile is characterised by the waist :math:`w_0` and by one "order parameter" :math:`n`.
 
 ------------
 
