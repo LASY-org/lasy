@@ -74,5 +74,3 @@ LASY |release| Documentation
    code_overview/index
    api/index
    tutorials/index
-  
-

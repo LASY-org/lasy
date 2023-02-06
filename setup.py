@@ -9,12 +9,12 @@ with open("./tests/requirements.txt") as f:
     tests_require = [line.strip("\n") for line in f.readlines()]
 
 setup(
-    name='lasy',
-    packages=find_packages('.'),
-    description='LAser pulse manipulation made eaSY',
+    name="lasy",
+    packages=find_packages("."),
+    description="LAser pulse manipulation made eaSY",
     install_requires=install_requires,
     tests_require=tests_require,
-    extras_require = {
-        'tests': tests_require,
+    extras_require={
+        "tests": tests_require,
     },
 )

@@ -1,4 +1,4 @@
+axiprop @ https://github.com/hightower8083/axiprop/archive/refs/heads/main.zip
 numpy
 openpmd-api~=0.14.5
 scipy
-axiprop @ https://github.com/hightower8083/axiprop/archive/refs/heads/main.zip

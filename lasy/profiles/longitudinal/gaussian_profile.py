@@ -1,5 +1,7 @@
 import numpy as np
+
 from .longitudinal_profile import LongitudinalProfile
+
 
 class GaussianLongitudinalProfile(LongitudinalProfile):
     """
@@ -41,7 +43,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
-    def evaluate( self, t ):
+    def evaluate(self, t):
         """
         Returns the longitudinal envelope
 
@@ -56,7 +58,9 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
         """
-        envelope = np.exp( -(t-self.t_peak)**2/self.tau**2 \
-                              + 1.j*(self.cep_phase + self.omega0*self.t_peak))
+        envelope = np.exp(
+            -((t - self.t_peak) ** 2) / self.tau**2
+            + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
+        )
 
         return envelope

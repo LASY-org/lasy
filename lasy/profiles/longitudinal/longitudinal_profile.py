@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.constants as scc
 
+
 class LongitudinalProfile(object):
     """
     Base class for longitudinal profiles of laser pulses.
@@ -8,14 +9,15 @@ class LongitudinalProfile(object):
     Any new longitudinal profile should inherit from this class, and define
     its own `evaluate` method, using the same signature as the method below.
     """
-    def __init__( self, wavelength ):
+
+    def __init__(self, wavelength):
         """
         Initialize the longitudinal profile
         """
         self.lambda0 = wavelength
-        self.omega0 = 2*scc.pi*scc.c/self.lambda0
+        self.omega0 = 2 * scc.pi * scc.c / self.lambda0
 
-    def evaluate( self, t ):
+    def evaluate(self, t):
         """
         Returns the longitudinal envelope
 
@@ -32,4 +34,4 @@ class LongitudinalProfile(object):
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
-        return np.zeros( t.shape, dtype='complex128' )
+        return np.zeros(t.shape, dtype="complex128")

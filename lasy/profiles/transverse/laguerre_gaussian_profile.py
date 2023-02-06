@@ -1,6 +1,8 @@
-from .transverse_profile import TransverseProfile
 import numpy as np
 from scipy.special import genlaguerre
+
+from .transverse_profile import TransverseProfile
+
 
 class LaguerreGaussianTransverseProfile(TransverseProfile):
     """
@@ -41,7 +43,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         self.p = p
         self.m = m
 
-    def evaluate( self, x, y ):
+    def evaluate(self, x, y):
         """
         Returns the transverse envelope
 
@@ -59,13 +61,15 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         """
         # complex_position corresponds to r e^{+/-i\theta}
         if self.m > 0:
-            complex_position = x - 1j*y
+            complex_position = x - 1j * y
         else:
-            complex_position = x + 1j*y
+            complex_position = x + 1j * y
         radius = abs(complex_position)
-        scaled_rad_squared = (radius**2)/self.w0**2
-        envelope = complex_position**abs(self.m) * \
-            genlaguerre(self.p, abs(self.m))(2*scaled_rad_squared) * \
-            np.exp(-scaled_rad_squared)
+        scaled_rad_squared = (radius**2) / self.w0**2
+        envelope = (
+            complex_position ** abs(self.m)
+            * genlaguerre(self.p, abs(self.m))(2 * scaled_rad_squared)
+            * np.exp(-scaled_rad_squared)
+        )
 
         return envelope

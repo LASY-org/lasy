@@ -1,12 +1,12 @@
 from .profile import Profile
 
+
 class CombinedLongitudinalTransverseProfile(Profile):
     """
     Class that combines a longitudinal and transverse laser profile
     """
 
-    def __init__(self, wavelength, pol, laser_energy,
-                       long_profile, trans_profile):
+    def __init__(self, wavelength, pol, laser_energy, long_profile, trans_profile):
         """
         Defines a laser pulse as the product of a longitudinal and transverse
         profile.
@@ -69,6 +69,5 @@ class CombinedLongitudinalTransverseProfile(Profile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
         """
-        envelope = self.trans_profile.evaluate(x, y) * \
-                    self.long_profile.evaluate(t)
+        envelope = self.trans_profile.evaluate(x, y) * self.long_profile.evaluate(t)
         return envelope

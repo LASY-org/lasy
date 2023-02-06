@@ -1,5 +1,7 @@
 import numpy as np
+
 from .transverse_profile import TransverseProfile
+
 
 class GaussianTransverseProfile(TransverseProfile):
     """
@@ -26,7 +28,7 @@ class GaussianTransverseProfile(TransverseProfile):
         super().__init__()
         self.w0 = w0
 
-    def evaluate( self, x, y ):
+    def evaluate(self, x, y):
         """
         Returns the transverse envelope
 
@@ -42,6 +44,6 @@ class GaussianTransverseProfile(TransverseProfile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-        envelope = np.exp( -(x**2 + y**2)/self.w0**2 )
+        envelope = np.exp(-(x**2 + y**2) / self.w0**2)
 
         return envelope
