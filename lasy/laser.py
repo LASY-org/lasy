@@ -79,7 +79,7 @@ class Laser:
             Distance by which the laser pulse should be propagated
             Options: 'energy', 'field', 'intensity'
         """
-        
+
         if kind == 'energy':
             normalize_energy(self.dim, value, self.field)
         elif kind == 'field':
@@ -98,9 +98,8 @@ class Laser:
         self.field.field_fft = np.fft.fft(self.field.field,
                                           axis=times_axis,
                                           norm="forward")
-        try:
-            self.field.omega;
-        except:
+
+        if not hasattr(self.field, "omega"):
             dt = self.box.dx[0]
             omega0 = self.profile.omega0
             Nt = self.field.field.shape[times_axis]
@@ -170,9 +169,7 @@ class Laser:
 
         self.time_to_frequency()
 
-        try:
-            self.prop;
-        except:
+        if not hasattr(self, "prop"):
             if self.dim == 'rt':
                 azimuthal_modes = np.r_[
                     np.arange(self.box.n_azimuthal_modes),

@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.constants as scc
 
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
