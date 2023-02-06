@@ -153,7 +153,7 @@ class Laser:
             for i_m in range(self.box.azimuthal_modes.size):
                 self.field.field_fft[i_m] = self.prop[i_m].step(
                         self.field.field_fft[i_m], distance, overwrite=True)
-        elif self.dim == 'xyt':
+        else:
             # make 3D shape for the frequency axis
             omega_shape = (self.field.field.shape[0], 1, 1)
             # Construct the propagator (check if exists)
@@ -229,7 +229,7 @@ class Laser:
             azimuthal_phase = np.exp(-1j * self.box.azimuthal_modes * theta)
             field *= azimuthal_phase[:, None, None]
             field = field.sum(0)
-        elif self.dim == 'xyt':
+        else:
             Ny_middle = field.shape[-1] // 2 - 1
             Ny_slice = int( (1 + slice) * Ny_middle )
             field = field[:, Ny_slice, :]
