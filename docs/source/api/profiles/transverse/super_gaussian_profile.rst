@@ -1,5 +1,5 @@
 Super-Gaussian Transverse Profile
-===================================
+=================================
 
 Used to define a super-Gaussian transverse laser profile.
 
