@@ -26,6 +26,7 @@ class SuperGaussianTransverseProfile(TransverseProfile):
             If :math:`n=2` the super-Gaussian becomes a standard Gaussian function.
             If :math:`n=1` the super-Gaussian becomes a Laplace function.
         """
+        super().__init__()
         self.w0 = w0
         self.n_order = n_order
 
