@@ -114,30 +114,6 @@ class Laser:
                                        axis=times_axis,
                                        norm="forward")
 
-    def move_time_window(self, translate_time):
-        """
-        Translate the `box` and phase of `field_fft` in time by a given amount.
-
-        Parameters
-        ----------
-        translate_time: float (s)
-            Time interval by which the time temporal definitions of the
-            laser should be translated.
-        """
-        self.box.lo[0] += translate_time
-        self.box.hi[0] += translate_time
-        self.box.axes[0] += translate_time
-
-        if self.dim == 'rt':
-            Nt = self.field.field.shape[1]
-            omega_shape = (1, Nt, 1)
-        elif self.dim == 'xyt':
-            Nt = self.field.field.shape[0]
-            omega_shape = (Nt, 1, 1)
-
-        self.field.field_fft *= np.exp(-1j * translate_time
-                                * self.field.omega.reshape(omega_shape))
-
     def propagate(self, distance, nr_boundary=16):
         """
         Propagate the laser pulse by the distance specified
@@ -152,44 +128,59 @@ class Laser:
             will be attenuated (to assert proper Hankel transform).
             Only used for 'rt'.
         """
+        # apply boundary "absorption" for DHT stability
         if self.dim == 'rt':
-            Propagator = PropagatorResampling
-            spatial_axes = (self.box.axes[1],)
-            # apply the boundary "absorption"
             absorb_layer_axis = np.r_[0: np.pi/2: nr_boundary*1j]
             absorb_layer_shape = np.cos(absorb_layer_axis)**0.5
             absorb_layer_shape[-1] = 0.0
             self.field.field[..., -nr_boundary:] *= absorb_layer_shape
-        elif self.dim == 'xyt':
-            Nt, Nx, Ny = self.field.field.shape
-            Lx = self.box.hi[1] - self.box.lo[1]
-            Ly = self.box.hi[2] - self.box.lo[2]
-            Propagator = PropagatorFFT2
-            spatial_axes = ((Lx, Nx), (Ly, Ny))
 
+        # Transform the field from temporal to frequency domain
         self.time_to_frequency()
 
-        if not hasattr(self, "prop"):
-            if self.dim == 'rt':
-                azimuthal_modes = np.r_[
-                    np.arange(self.box.n_azimuthal_modes),
-                    np.arange(-self.box.n_azimuthal_modes+1, 0, 1) ]
-
-                self.prop = [Propagator(*spatial_axes, self.field.omega/scc.c,
-                                         mode=m) for m in azimuthal_modes]
-            elif self.dim == 'xyt':
-                self.prop = Propagator(*spatial_axes, self.field.omega/scc.c)
-
         if self.dim == 'rt':
-            # Loop over modes and propagate each mode by distance
-            for m in range(self.field.field_fft.shape[0]):
-                self.field.field_fft[m] = self.prop[m].step(
-                        self.field.field_fft[m], distance, overwrite=True)
+            # make 3D shape for the frequency axis
+            omega_shape = (1, self.field.field.shape[1], 1)
+            # Construct the propagator (check if exists)
+            if not hasattr(self, "prop"):
+                spatial_axes = (self.box.axes[1],)
+                self.prop = []
+                for m in self.box.azimuthal_modes:
+                    self.prop.append( PropagatorResampling(*spatial_axes,
+                                        self.field.omega/scc.c, mode=m,
+                                        backend='NP', verbose=False) )
+            # Propagate the spectral image
+            for i_m in range(self.box.azimuthal_modes.size):
+                self.field.field_fft[i_m] = self.prop[i_m].step(
+                        self.field.field_fft[i_m], distance, overwrite=True)
         elif self.dim == 'xyt':
+            # make 3D shape for the frequency axis
+            omega_shape = (self.field.field.shape[0], 1, 1)
+            # Construct the propagator (check if exists)
+            if not hasattr(self, "prop"):
+                Nt, Nx, Ny = self.field.field.shape
+                Lx = self.box.hi[1] - self.box.lo[1]
+                Ly = self.box.hi[2] - self.box.lo[2]
+                spatial_axes = ((Lx, Nx), (Ly, Ny))
+                self.prop = PropagatorFFT2(*spatial_axes,
+                                        self.field.omega/scc.c,
+                                        backend='NP', verbose=False)
+            # Propagate the spectral image
             self.field.field_fft = self.prop.step(self.field.field_fft,
-                                                  distance, overwrite=True)
+                                                distance, overwrite=True)
 
-        self.move_time_window(distance / scc.c)
+        # Choose the time translation assuming limunal propagation
+        translate_time = distance / scc.c
+        # Translate the box
+        self.box.lo[0] += translate_time
+        self.box.hi[0] += translate_time
+        self.box.axes[0] += translate_time
+
+        # Translate the phase of spectral image
+        self.field.field_fft *= np.exp(-1j * translate_time
+                                * self.field.omega.reshape(omega_shape))
+
+        # Transform field from frequency to temporal domain
         self.frequency_to_time()
         # Translate phase of the retrieved envelope by the distance
         self.field.field *= np.exp(1j * self.profile.omega0 * distance / scc.c)
@@ -235,10 +226,7 @@ class Laser:
         time_axis = self.box.axes[0][:, None]
 
         if self.dim == 'rt':
-            azimuthal_modes = np.r_[
-                np.arange(self.box.n_azimuthal_modes),
-                np.arange(-self.box.n_azimuthal_modes + 1, 0, 1) ]
-            azimuthal_phase = np.exp(-1j * azimuthal_modes * theta)
+            azimuthal_phase = np.exp(-1j * self.box.azimuthal_modes * theta)
             field *= azimuthal_phase[:, None, None]
             field = field.sum(0)
         elif self.dim == 'xyt':

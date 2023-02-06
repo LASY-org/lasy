@@ -62,3 +62,6 @@ class Box:
 
         if dim == 'rt':
             self.n_azimuthal_modes = n_azimuthal_modes
+            self.azimuthal_modes = np.r_[
+                np.arange(n_azimuthal_modes),
+                np.arange(-n_azimuthal_modes+1, 0, 1) ]
