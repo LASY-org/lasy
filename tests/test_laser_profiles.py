@@ -80,7 +80,6 @@ def test_profile_super_gauss():
     t_peak = 0.e-15 # s
     tau = 30.e-15 # s
     w0 = 5.e-6 # m
-    beta = 10.0 # m
     profile = CombinedLongitudinalTransverseProfile( wavelength, pol, laser_energy,
                 GaussianLongitudinalProfile( wavelength, tau, t_peak ),
                 SuperGaussianTransverseProfile( w0, n_order=10 ) )
