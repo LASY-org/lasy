@@ -89,32 +89,7 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def time_to_frequency(self):
-        """
-        Transform field from the temporal to the frequency domain via FFT,
-        and create the frequency axis if necessary.
-        """
-        times_axis = {'rt': 1, 'xyt': 0}[self.dim]
-        self.field.field_fft = np.fft.fft(self.field.field,
-                                          axis=times_axis,
-                                          norm="forward")
-
-        if not hasattr(self.field, "omega"):
-            dt = self.box.dx[0]
-            omega0 = self.profile.omega0
-            Nt = self.field.field.shape[times_axis]
-            self.field.omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
-
-    def frequency_to_time(self):
-        """
-        Transform field from the frequency to the temporal domain via iFFT.
-        """
-        times_axis = {'rt': 1, 'xyt': 0}[self.dim]
-        self.field.field = np.fft.ifft(self.field.field_fft,
-                                       axis=times_axis,
-                                       norm="forward")
-
-    def propagate(self, distance, nr_boundary=16):
+    def propagate(self, distance, nr_boundary=None, backend='NP'):
         """
         Propagate the laser pulse by the distance specified
 
@@ -128,15 +103,37 @@ class Laser:
             will be attenuated (to assert proper Hankel transform).
             Only used for 'rt'.
         """
-        # apply boundary "absorption" for DHT stability
-        if self.dim == 'rt':
+        time_axis_indx = {'rt': 1, 'xyt': 0}[self.dim]
+
+        # apply boundary "absorption" if required
+        if nr_boundary is not None:
+            assert( type(nr_boundary) is int and nr_boundary>0 )
             absorb_layer_axis = np.r_[0: np.pi/2: nr_boundary*1j]
             absorb_layer_shape = np.cos(absorb_layer_axis)**0.5
             absorb_layer_shape[-1] = 0.0
-            self.field.field[..., -nr_boundary:] *= absorb_layer_shape
+            if self.dim == 'rt':
+                self.field.field[..., -nr_boundary:] *= absorb_layer_shape
+            else:
+                self.field.field[:,-nr_boundary:,:] *= \
+                    absorb_layer_shape[None,:,None]
+                self.field.field[:,:,-nr_boundary:] *= \
+                    absorb_layer_shape[None,None,:]
+                self.field.field[:,:nr_boundary,:] *= \
+                    absorb_layer_shape[::-1][None,:,None]
+                self.field.field[:,:,:nr_boundary] *= \
+                    absorb_layer_shape[::-1][None,None,:]
 
         # Transform the field from temporal to frequency domain
-        self.time_to_frequency()
+        self.field.field_fft = np.fft.fft(self.field.field,
+                                          axis=time_axis_indx,
+                                          norm="forward")
+
+        # Create the frequency axis if necessary
+        if not hasattr(self.field, "omega"):
+            dt = self.box.dx[0]
+            omega0 = self.profile.omega0
+            Nt = self.field.field.shape[time_axis_indx]
+            self.field.omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
 
         if self.dim == 'rt':
             # make 3D shape for the frequency axis
@@ -147,8 +144,8 @@ class Laser:
                 self.prop = []
                 for m in self.box.azimuthal_modes:
                     self.prop.append( PropagatorResampling(*spatial_axes,
-                                        self.field.omega/scc.c, mode=m,
-                                        backend='NP', verbose=False) )
+                                      self.field.omega/scc.c, mode=m,
+                                      backend=backend, verbose=False) )
             # Propagate the spectral image
             for i_m in range(self.box.azimuthal_modes.size):
                 self.field.field_fft[i_m] = self.prop[i_m].step(
@@ -163,13 +160,13 @@ class Laser:
                 Ly = self.box.hi[2] - self.box.lo[2]
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
                 self.prop = PropagatorFFT2(*spatial_axes,
-                                        self.field.omega/scc.c,
-                                        backend='NP', verbose=False)
+                                           self.field.omega/scc.c,
+                                           backend=backend, verbose=False)
             # Propagate the spectral image
             self.field.field_fft = self.prop.step(self.field.field_fft,
                                                 distance, overwrite=True)
 
-        # Choose the time translation assuming limunal propagation
+        # Choose the time translation assuming propagation at v=c
         translate_time = distance / scc.c
         # Translate the box
         self.box.lo[0] += translate_time
@@ -181,7 +178,10 @@ class Laser:
                                 * self.field.omega.reshape(omega_shape))
 
         # Transform field from frequency to temporal domain
-        self.frequency_to_time()
+        self.field.field = np.fft.ifft(self.field.field_fft,
+                                       axis=time_axis_indx,
+                                       norm="forward")
+
         # Translate phase of the retrieved envelope by the distance
         self.field.field *= np.exp(1j * self.profile.omega0 * distance / scc.c)
 
@@ -200,7 +200,7 @@ class Laser:
         write_to_openpmd_file(self.dim, file_prefix, file_format, self.field,
                                self.profile.lambda0, self.profile.pol )
 
-    def get_full_field(self, theta=0, slice=0):
+    def get_full_field(self, theta=0, slice=0, slice_axis='x'):
         """
         Reconstruct the laser pulse with carrier frequency on the default grid
 
@@ -229,10 +229,16 @@ class Laser:
             azimuthal_phase = np.exp(-1j * self.box.azimuthal_modes * theta)
             field *= azimuthal_phase[:, None, None]
             field = field.sum(0)
-        else:
+        elif slice_axis == 'x':
+            Nx_middle = field.shape[-2] // 2 - 1
+            Nx_slice = int( (1 + slice) * Nx_middle )
+            field = field[:, Nx_slice, :]
+        elif slice_axis == 'y':
             Ny_middle = field.shape[-1] // 2 - 1
             Ny_slice = int( (1 + slice) * Ny_middle )
-            field = field[:, Ny_slice, :]
+            field = field[:, :, Ny_slice]
+        else:
+            return None
 
         field *= np.exp(-1j * omega0 * time_axis)
         field = np.real(field)
