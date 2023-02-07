@@ -2,13 +2,13 @@ from .combined_profile import CombinedLongitudinalTransverseProfile
 from .longitudinal.gaussian_profile import GaussianLongitudinalProfile
 from .transverse.gaussian_profile import GaussianTransverseProfile
 
+
 class GaussianProfile(CombinedLongitudinalTransverseProfile):
     """
     Derived class for the analytic profile of a Gaussian laser pulse.
     """
 
-    def __init__(self, wavelength, pol,
-                laser_energy, w0, tau, t_peak, cep_phase=0):
+    def __init__(self, wavelength, pol, laser_energy, w0, tau, t_peak, cep_phase=0):
         """
         Defines a Gaussian laser pulse.
 
@@ -63,6 +63,10 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
             in the above formula (i.e. the phase of the laser
             oscillation, at the time where the laser envelope is maximum)
         """
-        super().__init__(wavelength, pol, laser_energy,
+        super().__init__(
+            wavelength,
+            pol,
+            laser_energy,
             GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase),
-            GaussianTransverseProfile(w0) )
+            GaussianTransverseProfile(w0),
+        )

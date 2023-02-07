@@ -33,10 +33,10 @@ class Box:
             Only used if `dim` is 'rt'. The number of azimuthal modes
             used in order to represent the laser field.
         """
-        ndims = 2 if dim == 'rt' else 3
-        assert(dim in ['rt', 'xyt'])
-        assert(len(lo) == ndims)
-        assert(len(hi) == ndims)
+        ndims = 2 if dim == "rt" else 3
+        assert dim in ["rt", "xyt"]
+        assert len(lo) == ndims
+        assert len(hi) == ndims
 
         self.lo = []
         self.hi = []
@@ -48,7 +48,7 @@ class Box:
         # in 3D Cartesian (index 0 and 1) or with r in cylindrical (index 0)
         # This is in order to make time the slowest-varying variable
         # throughout the code (i.e. first variable, in C-order arrays)
-        if dim == 'xyt':
+        if dim == "xyt":
             coords = [-1, 0, 1]
         else:
             coords = [-1, 0]
@@ -56,11 +56,11 @@ class Box:
             axis = np.linspace(lo[i], hi[i], npoints[i])
             self.axes.append(axis)
             self.dx.append(axis[1] - axis[0])
-            self.npoints.append( npoints[i] )
-            self.lo.append( lo[i] )
-            self.hi.append( hi[i] )
+            self.npoints.append(npoints[i])
+            self.lo.append(lo[i])
+            self.hi.append(hi[i])
 
-        if dim == 'rt':
+        if dim == "rt":
             self.n_azimuthal_modes = n_azimuthal_modes
             self.azimuthal_modes = np.r_[
                 np.arange(n_azimuthal_modes),

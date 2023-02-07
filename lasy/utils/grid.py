@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Grid:
     """
     Contains data for fields (in position or Fourier space), including metadata
@@ -22,11 +23,12 @@ class Grid:
             Object containing metadata for the grid array
         """
         self.box = box
-        if dim == 'xyt':
-            self.field = np.zeros(box.npoints, dtype='complex128')
-        elif dim == 'rt':
+        if dim == "xyt":
+            self.field = np.zeros(box.npoints, dtype="complex128")
+        elif dim == "rt":
             # Azimuthal modes are arranged in the following order:
             # 0, 1, 2, ..., n_azimuthal_modes-1, -n_azimuthal_modes+1, ..., -1
-            ncomp = 2*self.box.n_azimuthal_modes-1
-            self.field = np.zeros((ncomp, box.npoints[0], box.npoints[1]),
-                                    dtype='complex128')
+            ncomp = 2 * self.box.n_azimuthal_modes - 1
+            self.field = np.zeros(
+                (ncomp, box.npoints[0], box.npoints[1]), dtype="complex128"
+            )

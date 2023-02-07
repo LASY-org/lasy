@@ -1,12 +1,16 @@
 import numpy as np
 import scipy.constants as scc
+from axiprop.lib import PropagatorFFT2, PropagatorResampling
 
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
+from lasy.utils.laser_utils import (
+    normalize_energy,
+    normalize_peak_field_amplitude,
+    normalize_peak_intensity,
+)
 from lasy.utils.openpmd_output import write_to_openpmd_file
-from lasy.utils.laser_utils import normalize_energy, normalize_peak_field_amplitude, normalize_peak_intensity
 
-from axiprop.lib import PropagatorResampling, PropagatorFFT2
 
 class Laser:
     """
@@ -14,8 +18,7 @@ class Laser:
     propagate it, and write it to a file.
     """
 
-    def __init__(self, dim, lo, hi, npoints, profile,
-                 n_azimuthal_modes=1 ):
+    def __init__(self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1):
         """
         Construct a laser object
 
@@ -51,19 +54,19 @@ class Laser:
         self.profile = profile
 
         # Create the grid on which to evaluate the laser, evaluate it
-        if self.dim == 'xyt':
-            t, x, y = np.meshgrid( *box.axes, indexing='ij')
-            self.field.field[...] = profile.evaluate( x, y, t )
-        elif self.dim == 'rt':
+        if self.dim == "xyt":
+            t, x, y = np.meshgrid(*box.axes, indexing="ij")
+            self.field.field[...] = profile.evaluate(x, y, t)
+        elif self.dim == "rt":
             # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
             # theta, to evaluate the laser
-            n_theta = 2*box.n_azimuthal_modes - 1
-            theta1d = 2*np.pi/n_theta * np.arange(n_theta)
-            theta, t, r = np.meshgrid( theta1d, *box.axes, indexing='ij')
-            x = r*np.cos(theta)
-            y = r*np.sin(theta)
+            n_theta = 2 * box.n_azimuthal_modes - 1
+            theta1d = 2 * np.pi / n_theta * np.arange(n_theta)
+            theta, t, r = np.meshgrid(theta1d, *box.axes, indexing="ij")
+            x = r * np.cos(theta)
+            y = r * np.sin(theta)
             # Evaluate the profile on the generated grid
-            envelope = profile.evaluate( x, y, t )
+            envelope = profile.evaluate(x, y, t)
             # Perform the azimuthal decomposition
             self.field.field[...] = np.fft.ifft(envelope, axis=0)
 
@@ -80,11 +83,11 @@ class Laser:
             Options: 'energy', 'field', 'intensity'
         """
 
-        if kind == 'energy':
+        if kind == "energy":
             normalize_energy(self.dim, value, self.field)
-        elif kind == 'field':
+        elif kind == "field":
             normalize_peak_field_amplitude(value, self.field)
-        elif kind == 'intensity':
+        elif kind == "intensity":
             normalize_peak_intensity(value, self.field)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
@@ -185,7 +188,7 @@ class Laser:
         # Translate phase of the retrieved envelope by the distance
         self.field.field *= np.exp(1j * self.profile.omega0 * distance / scc.c)
 
-    def write_to_file(self, file_prefix="laser", file_format='h5'):
+    def write_to_file(self, file_prefix="laser", file_format="h5"):
         """
         Write the laser profile + metadata to file.
 
@@ -197,8 +200,14 @@ class Laser:
         file_format: string
             Format to be used for the output file. Options are "h5" and "bp".
         """
-        write_to_openpmd_file(self.dim, file_prefix, file_format, self.field,
-                               self.profile.lambda0, self.profile.pol )
+        write_to_openpmd_file(
+            self.dim,
+            file_prefix,
+            file_format,
+            self.field,
+            self.profile.lambda0,
+            self.profile.pol,
+        )
 
     def get_full_field(self, theta=0, slice=0, slice_axis='x'):
         """
@@ -242,7 +251,6 @@ class Laser:
 
         field *= np.exp(-1j * omega0 * time_axis)
         field = np.real(field)
-        ext = np.r_[self.box.lo[0], self.box.hi[0],
-                    self.box.lo[1], self.box.hi[1]]
+        ext = np.r_[self.box.lo[0], self.box.hi[0], self.box.lo[1], self.box.hi[1]]
 
         return field, ext

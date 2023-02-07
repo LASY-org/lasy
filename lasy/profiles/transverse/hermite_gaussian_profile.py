@@ -1,6 +1,8 @@
-from .transverse_profile import TransverseProfile
 import numpy as np
 from scipy.special.orthogonal import hermite
+
+from .transverse_profile import TransverseProfile
+
 
 class HermiteGaussianTransverseProfile(TransverseProfile):
     """
@@ -38,7 +40,7 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         self.n_x = n_x
         self.n_y = n_y
 
-    def evaluate( self, x, y ):
+    def evaluate(self, x, y):
         """
         Returns the transverse envelope
 
@@ -54,8 +56,10 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-        envelope = hermite(self.n_x)(np.sqrt(2)*x/self.w0) * \
-                             hermite(self.n_y)(np.sqrt(2)*y/self.w0) * \
-                             np.exp( -(x**2 + y**2)/self.w0**2 )
+        envelope = (
+            hermite(self.n_x)(np.sqrt(2) * x / self.w0)
+            * hermite(self.n_y)(np.sqrt(2) * y / self.w0)
+            * np.exp(-(x**2 + y**2) / self.w0**2)
+        )
 
         return envelope
