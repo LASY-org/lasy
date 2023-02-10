@@ -1,10 +1,12 @@
 from lasy.profiles.transverse.transverse_profile import TransverseProfile
 from lasy.profiles.transverse.transverse_profile_from_data import TransverseProfileFromData
+from lasy.profiles.transverse.hermite_gaussian_profile import HermiteGaussianTransverseProfile
+
 from lasy.laser import Laser
 import numpy as np
 
 
-def hermite_gauss_decomposition(laserProfile):
+def hermite_gauss_decomposition(laserProfile,nMax=12,mMax=12):
     """
     Decomposes a `lasy` laser profile into a set of hermite-gaussian
     modes. 
@@ -15,6 +17,10 @@ def hermite_gauss_decomposition(laserProfile):
     instance of `Laser` is passed then the intensity of this profile 
     is projected onto an x-y plane for the decomposition.
 
+    Parameters
+    ----------
+    ???
+
 
     """
 
@@ -23,7 +29,9 @@ def hermite_gauss_decomposition(laserProfile):
 
     if isinstance(laserProfile,TransverseProfile):
         
-        # Get sensible spatial bounds for the profile
+        # Get the intensity, sensible spatial bounds for the profile and a
+        # sensible estimate of w0
+
         lo = [None,None]
         hi = [None,None]
         if isinstance(laserProfile,TransverseProfileFromData):
@@ -48,3 +56,14 @@ def hermite_gauss_decomposition(laserProfile):
     else:
         raise ValueError(
             'Provided profile is not an instance of TransverseProfile or Profile')
+
+
+    # Next we need to create
+    for i in range(nMax):
+        for j in range(mMax):
+            HGMode = HermiteGaussianTransverseProfile(w0,i,j)
+            HGModeInten = HGMode.evaluate()
+            coef = np.sum(profile*self.evaluate(X,Y)) # modalDecomposition
+            if math.isnan(coef): # due to a numerical issue the coefficient might be nan and will be excluded. Should not happen before mode 63
+                coef = 0
+            coefficients[(i,j)] = coef
