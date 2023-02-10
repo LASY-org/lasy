@@ -1,8 +1,8 @@
 from lasy.profiles.transverse.transverse_profile import TransverseProfile
 from lasy.profiles.transverse.transverse_profile_from_data import TransverseProfileFromData
 from lasy.profiles.transverse.hermite_gaussian_profile import HermiteGaussianTransverseProfile
+from lasy.utils.exp_data_utils import find_d4sigma
 
-from lasy.laser import Laser
 import numpy as np
 import math
 
@@ -69,7 +69,7 @@ def hermite_gauss_decomposition(laserProfile,n_x_max=12,n_y_max=12):
 
 
     # Get estimate of w0
-    w0 = estimate_best_waist(x,y,field)
+    w0 = estimate_best_HG_waist(x,y,field)
     
 
     # Next we loop over the modes and calculate the relevant weights
@@ -85,7 +85,7 @@ def hermite_gauss_decomposition(laserProfile,n_x_max=12,n_y_max=12):
     return weights
 
 
-def estimate_best_waist(x,y,field):
+def estimate_best_HG_waist(x,y,field):
     """
     Estimate the waist that maximises the weighting of the first mode.
 
