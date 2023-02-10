@@ -131,9 +131,7 @@ class Laser:
                 ]
 
         # Transform the field from temporal to frequency domain
-        field_fft = np.fft.fft(
-            self.field.field, axis=time_axis_indx, norm="forward"
-        )
+        field_fft = np.fft.fft(self.field.field, axis=time_axis_indx, norm="forward")
 
         # Create the frequency axis
         dt = self.box.dx[time_axis_indx]
@@ -191,12 +189,10 @@ class Laser:
         self.box.axes[time_axis_indx] += translate_time
 
         # Translate the phase of spectral image
-        field_fft *= np.exp(
-            -1j * translate_time * omega.reshape(omega_shape)
-        )
+        field_fft *= np.exp(-1j * translate_time * omega.reshape(omega_shape))
 
         # Transform field from frequency to temporal domain
-        self.field.field[:,:,:] = np.fft.ifft(
+        self.field.field[:, :, :] = np.fft.ifft(
             field_fft, axis=time_axis_indx, norm="forward"
         )
 
