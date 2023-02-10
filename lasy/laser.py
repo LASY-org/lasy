@@ -106,16 +106,16 @@ class Laser:
             will be attenuated (to assert proper Hankel transform).
             Only used for 'rt'.
         """
-        time_axis_indx = {"rt": 1, "xyt": 0}[self.dim]
+        time_axis_indx = -1
 
         # apply boundary "absorption" if required
         if nr_boundary is not None:
             assert type(nr_boundary) is int and nr_boundary > 0
-            absorb_layer_axis = np.r_[0 : np.pi / 2 : nr_boundary * 1j]
+            absorb_layer_axis = np.linspace(0, np.pi / 2, nr_boundary)
             absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
             absorb_layer_shape[-1] = 0.0
             if self.dim == "rt":
-                self.field.field[..., -nr_boundary:] *= absorb_layer_shape
+                self.field.field[:,-nr_boundary:,:] *= absorb_layer_shape
             else:
                 self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
                     None, :, None
@@ -137,17 +137,17 @@ class Laser:
 
         # Create the frequency axis if necessary
         if not hasattr(self.field, "omega"):
-            dt = self.box.dx[0]
+            dt = self.box.dx[time_axis_indx]
             omega0 = self.profile.omega0
             Nt = self.field.field.shape[time_axis_indx]
             self.field.omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
 
         if self.dim == "rt":
             # make 3D shape for the frequency axis
-            omega_shape = (1, self.field.field.shape[1], 1)
+            omega_shape = (1, self.field.field.shape[time_axis_indx], 1)
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
-                spatial_axes = (self.box.axes[1],)
+                spatial_axes = (self.box.axes[0],)
                 self.prop = []
                 for m in self.box.azimuthal_modes:
                     self.prop.append(
@@ -166,12 +166,12 @@ class Laser:
                 )
         else:
             # make 3D shape for the frequency axis
-            omega_shape = (self.field.field.shape[0], 1, 1)
+            omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
-                Nt, Nx, Ny = self.field.field.shape
-                Lx = self.box.hi[1] - self.box.lo[1]
-                Ly = self.box.hi[2] - self.box.lo[2]
+                Nx, Ny, Nt = self.field.field.shape
+                Lx = self.box.hi[0] - self.box.lo[0]
+                Ly = self.box.hi[1] - self.box.lo[1]
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
                 self.prop = PropagatorFFT2(
                     *spatial_axes,
@@ -180,16 +180,16 @@ class Laser:
                     verbose=False,
                 )
             # Propagate the spectral image
-            self.field.field_fft = self.prop.step(
-                self.field.field_fft, distance, overwrite=True
-            )
+            transform_data = np.transpose( self.field.field_fft ).copy()
+            self.prop.step( transform_data, distance, overwrite=True )
+            self.field.field_fft[:,:,:] = np.transpose( transform_data ).copy()
 
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / scc.c
         # Translate the box
-        self.box.lo[0] += translate_time
-        self.box.hi[0] += translate_time
-        self.box.axes[0] += translate_time
+        self.box.lo[time_axis_indx] += translate_time
+        self.box.hi[time_axis_indx] += translate_time
+        self.box.axes[time_axis_indx] += translate_time
 
         # Translate the phase of spectral image
         self.field.field_fft *= np.exp(
@@ -248,20 +248,20 @@ class Laser:
         """
         omega0 = self.profile.omega0
         field = self.field.field.copy()
-        time_axis = self.box.axes[0][:, None]
+        time_axis = self.box.axes[-1][:, None]
 
         if self.dim == "rt":
             azimuthal_phase = np.exp(-1j * self.box.azimuthal_modes * theta)
             field *= azimuthal_phase[:, None, None]
             field = field.sum(0)
         elif slice_axis == "x":
-            Nx_middle = field.shape[-2] // 2 - 1
+            Nx_middle = field.shape[0] // 2 - 1
             Nx_slice = int((1 + slice) * Nx_middle)
-            field = field[:, Nx_slice, :]
+            field = field[Nx_slice, :, :]
         elif slice_axis == "y":
-            Ny_middle = field.shape[-1] // 2 - 1
+            Ny_middle = field.shape[1] // 2 - 1
             Ny_slice = int((1 + slice) * Ny_middle)
-            field = field[:, :, Ny_slice]
+            field = field[:, Ny_slice, :]
         else:
             return None
 
