@@ -7,6 +7,7 @@ The sections below describe the main objects that are accessible in the ``lasy``
    :maxdepth: 4
    :hidden:
 
+   laser
    profiles/index
    utils/index
 

@@ -9,27 +9,28 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
 
     Parameters
     ----------
-    dim: string
+    dim : string
         Dimensionality of the array. Options are:
+
         - 'xyt': The laser pulse is represented on a 3D grid:
                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    file_prefix: string
+    file_prefix : string
         The file name will start with this prefix.
 
-    file_format: string
+    file_format : string
         Format to be used for the output file. Options are "h5" and "bp".
 
-    grid: Grid
+    grid : Grid
         A grid object containing the 3-dimensional array
         with complex envelope of the electric field and metadata
 
-    wavelength: scalar
+    wavelength : scalar
         Central wavelength for which the laser pulse envelope is defined.
 
-    pol: list of 2 complex numbers
+    pol : list of 2 complex numbers
         Polarization vector that multiplies array to get the Ex and Ey arrays.
     """
     array = grid.field

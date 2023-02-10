@@ -1,4 +1,6 @@
 -r ../requirements.txt
+matplotlib
+numpydoc
 pydata-sphinx-theme
 pydata-sphinx-theme
 sphinx-gallery
