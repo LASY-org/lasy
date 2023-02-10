@@ -70,8 +70,9 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
 
     # Pick the correct field
     if dim == "xyt":
-        data = array
-
+        # Switch from x,y,t (internal to lasy) to t,y,x (in openPMD file)
+        # This is because many PIC codes expect x to be the fastest index
+        data = np.transpose( array )
     elif dim == "rt":
         # The representation of modes in openPMD
         # (see https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record)
@@ -85,6 +86,9 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
             data[2 * mode - 1, :, :] = array[mode, :, :] + array[-mode, :, :]
             # sin(m*theta) part of the mode
             data[2 * mode, :, :] = -1.0j * array[mode, :, :] + 1.0j * array[-mode, :, :]
+        # Switch from m,r,t (internal to lasy) to m,t,r (in openPMD file)
+        # This is because many PIC codes expect r to be the fastest index
+        data = np.transpose( data, axes=[0, 2, 1] )
 
     env.store_chunk(data)
 
