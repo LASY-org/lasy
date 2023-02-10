@@ -225,7 +225,6 @@ class Laser:
             self.profile.pol,
         )
 
-
     def get_full_field(self, theta=0, slice=0, slice_axis="x"):
         """
         Reconstruct the laser pulse with carrier frequency on the default grid
@@ -264,7 +263,8 @@ class Laser:
 
         field *= np.exp(-1j * omega0 * time_axis)
         field = np.real(field)
-        ext = np.array([self.box.lo[0], self.box.hi[0],
-                        self.box.lo[-1], self.box.hi[-1]])
+        ext = np.array(
+            [self.box.lo[0], self.box.hi[0], self.box.lo[-1], self.box.hi[-1]]
+        )
 
         return field, ext
