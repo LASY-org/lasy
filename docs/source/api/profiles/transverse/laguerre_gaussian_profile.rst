@@ -10,7 +10,7 @@ The modes can have azimuthally varying fields (for :math:`m > 0`) but any single
     :alt: Laguerre-Gaussian-Modes
 
 Laguerre-Gaussian beams can be added and scaled to create compositions of Laguerre-Gaussian beams::
-    
+
     p1 = LaguerreGaussianTransverseProfile(20e-6, p=0, m=1)
     p2 = LaguerreGaussianTransverseProfile(20e-6, p=0, m=1)
     composition = 3 * p1 + p2 * 3

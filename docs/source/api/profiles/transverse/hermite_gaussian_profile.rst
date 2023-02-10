@@ -8,7 +8,7 @@ Hermite-Gaussian modes are a family of solutions to the paraxial wave equation w
     :alt: Hermite-Gauss-Modes
 
 Hermite Gaussian beams can be added and scaled to create compositions of Hermite-Gaussian beams::
-    
+
     p1 = HermiteGaussianTransverseProfile(20e-6, n_x=2, n_y=1)
     p2 = HermiteGaussianTransverseProfile(20e-6, n_x=0, n_y=1)
     composition = 3 * p1 + p2 * 3
