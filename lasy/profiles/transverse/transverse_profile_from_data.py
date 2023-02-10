@@ -41,6 +41,8 @@ class TransverseProfileFromData(TransverseProfile):
             center of mass.
 
         """
+        super().__init__()
+        
         intensity_data = intensity_data.astype("float64")
 
         n_y, n_x = np.shape(intensity_data)
@@ -56,20 +58,6 @@ class TransverseProfileFromData(TransverseProfile):
         # Normalise the profile such that its squared integeral == 1
         intensity_data /= np.sum(intensity_data) * dx * dy
 
-        if center_beam:
-            # find the beam center using COM
-            img_tot = np.sum(intensity_data)
-            x0 = np.sum(np.dot(intensity_data, x_data)) / img_tot
-            y0 = np.sum(np.dot(intensity_data.T, y_data)) / img_tot
-
-            x_data -= x0
-            y_data -= y0
-
-            self.beam_shift_x = x0
-            self.beam_shift_y = y0
-        else:
-            self.beam_shift_x = 0
-            self.beam_shift_y = 0
 
         # Note here we use the square root of intensity to get the 'field'
         self.field_interp = RegularGridInterpolator(
@@ -81,7 +69,7 @@ class TransverseProfileFromData(TransverseProfile):
 
         self.center_beam = center_beam
 
-    def evaluate(self, x, y):
+    def _evaluate(self, x, y):
         """
         Returns the transverse envelope
 
