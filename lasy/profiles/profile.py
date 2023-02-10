@@ -24,7 +24,7 @@ class Profile(object):
         - Linear polarization in y: pol = (0,1)
         - Circular polarization: pol = (1,j)/sqrt(2) (j is the imaginary number)
         The polarization vector is normalized to have a unitary magnitude.
-        
+
     """
 
     def __init__(self, wavelength, pol):

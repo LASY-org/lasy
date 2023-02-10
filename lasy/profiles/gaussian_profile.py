@@ -60,7 +60,7 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
 
     Examples
     --------
-    
+
     >>> import matplotlib.pyplot as plt
     >>> from lasy.laser import Laser
     >>> from lasy.profiles.gaussian_profile import GaussianProfile
