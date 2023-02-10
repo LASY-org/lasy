@@ -144,7 +144,7 @@ class Laser:
 
         if self.dim == "rt":
             # make 3D shape for the frequency axis
-            omega_shape = (1, self.field.field.shape[time_axis_indx], 1)
+            omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
                 spatial_axes = (self.box.axes[0],)
@@ -161,9 +161,9 @@ class Laser:
                     )
             # Propagate the spectral image
             for i_m in range(self.box.azimuthal_modes.size):
-                self.field.field_fft[i_m] = self.prop[i_m].step(
-                    self.field.field_fft[i_m], distance, overwrite=True
-                )
+                transform_data = np.transpose(self.field.field_fft[i_m]).copy()
+                self.prop[i_m].step( transform_data, distance, overwrite=True )
+                self.field.field_fft[i_m,:,:] = np.transpose( transform_data ).copy()
         else:
             # make 3D shape for the frequency axis
             omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
@@ -267,6 +267,6 @@ class Laser:
 
         field *= np.exp(-1j * omega0 * time_axis)
         field = np.real(field)
-        ext = np.r_[self.box.lo[0], self.box.hi[0], self.box.lo[1], self.box.hi[1]]
+        ext = np.r_[self.box.lo[-1], self.box.hi[-1], self.box.lo[0], self.box.hi[0]]
 
         return field, ext
