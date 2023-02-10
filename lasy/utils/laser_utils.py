@@ -9,16 +9,18 @@ def compute_laser_energy(dim, grid):
 
     Parameters
     ----------
-    dim: string
+    dim : string
         Dimensionality of the array. Options are:
+
         - 'xyt': The laser pulse is represented on a 3D grid:
                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    grid: a Grid object. It contains a ndarrays (V/m) with
-          the value of the envelope field and an object of type
-          lasy.utils.Box that defines the points at which evaluate the laser
+    grid : a Grid object.
+        It contains a ndarrays (V/m) with
+        the value of the envelope field and an object of type
+        lasy.utils.Box that defines the points at which evaluate the laser
 
     Returns
     -------
@@ -61,6 +63,7 @@ def normalize_energy(dim, energy, grid):
     -----------
     dim: string
         Dimensionality of the array. Options are:
+
         - 'xyt': The laser pulse is represented on a 3D grid:
                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
