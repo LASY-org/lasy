@@ -5,7 +5,10 @@ import pytest
 from lasy.laser import Laser
 from lasy.profiles import CombinedLongitudinalTransverseProfile, GaussianProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
-from lasy.profiles.transverse import LaguerreGaussianTransverseProfile, SuperGaussianTransverseProfile
+from lasy.profiles.transverse import (
+    LaguerreGaussianTransverseProfile,
+    SuperGaussianTransverseProfile,
+)
 
 
 @pytest.fixture(scope="function")
