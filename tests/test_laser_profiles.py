@@ -11,7 +11,7 @@ from lasy.profiles.transverse import (
     GaussianTransverseProfile,
     LaguerreGaussianTransverseProfile,
     SuperGaussianTransverseProfile,
-    HermiteGaussianTransverseProfile
+    HermiteGaussianTransverseProfile,
 )
 
 
@@ -48,7 +48,7 @@ def test_transverse_profiles_rt():
     print("LaguerreGaussianLaserProfile")
     p = 2
     m = 0
-    std_th = 1.2969576587040524e-05 # WRONG, just measured
+    std_th = 1.2969576587040524e-05  # WRONG, just measured
     profile = LaguerreGaussianTransverseProfile(w0, p, m)
     r = np.linspace(0, 6 * w0, npoints)
     field = profile.evaluate(r, np.zeros_like(r))
@@ -61,7 +61,7 @@ def test_transverse_profiles_rt():
     print("SuperGaussianLaserProfile")
     # close to flat-top, compared with flat-top theory
     n_order = 100
-    std_th = w0/np.sqrt(3)
+    std_th = w0 / np.sqrt(3)
     profile = SuperGaussianTransverseProfile(w0, n_order)
     r = np.linspace(0, 6 * w0, npoints)
     field = profile.evaluate(r, np.zeros_like(r))
@@ -69,6 +69,7 @@ def test_transverse_profiles_rt():
     print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
+
 
 def test_transverse_profiles_3d():
     npoints = 200
@@ -78,15 +79,16 @@ def test_transverse_profiles_3d():
     print("HermiteGaussianTransverseProfile")
     n_x = 2
     n_y = 2
-    std_th = 1.2151311989441392e-05 # WRONG, just measured here
+    std_th = 1.2151311989441392e-05  # WRONG, just measured here
     profile = HermiteGaussianTransverseProfile(w0, n_x, n_y)
-    x = np.linspace(-4*w0, 4*w0, npoints)
+    x = np.linspace(-4 * w0, 4 * w0, npoints)
     y = np.zeros_like(x)
     field = profile.evaluate(x, y)
     std = np.sqrt(np.average(x**2, weights=np.abs(field)))
     print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
+
 
 def test_profile_gaussian_3d_cartesian(gaussian):
     # - 3D Cartesian case
