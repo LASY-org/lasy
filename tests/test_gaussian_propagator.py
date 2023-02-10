@@ -25,7 +25,7 @@ def get_w0(laser):
     # Calculate the laser waist
     if laser.dim == "xyt":
         Nx, Ny, Nt = laser.field.field.shape
-        A2 = (np.abs(laser.field.field[Nx // 2 - 1, :, :]) ** 2).sum(0)
+        A2 = (np.abs(laser.field.field[:, :, Nt // 2 - 1]) ** 2).sum(0)
         ax = laser.box.axes[1]
     else:
         A2 = (np.abs(laser.field.field[0]) ** 2).sum(0)
