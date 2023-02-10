@@ -42,7 +42,7 @@ class TransverseProfileFromData(TransverseProfile):
 
         """
         super().__init__()
-        
+
         intensity_data = intensity_data.astype("float64")
 
         n_y, n_x = np.shape(intensity_data)
@@ -57,7 +57,6 @@ class TransverseProfileFromData(TransverseProfile):
 
         # Normalise the profile such that its squared integeral == 1
         intensity_data /= np.sum(intensity_data) * dx * dy
-
 
         # Note here we use the square root of intensity to get the 'field'
         self.field_interp = RegularGridInterpolator(
