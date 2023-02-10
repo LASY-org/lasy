@@ -1,6 +1,6 @@
-from .combined_profile import CombinedLongitudinalTransverseProfile
-from .longitudinal.gaussian_profile import GaussianLongitudinalProfile
-from .transverse.gaussian_profile import GaussianTransverseProfile
+from . import CombinedLongitudinalTransverseProfile
+from .longitudinal import GaussianLongitudinalProfile
+from .transverse import GaussianTransverseProfile
 
 
 class GaussianProfile(CombinedLongitudinalTransverseProfile):

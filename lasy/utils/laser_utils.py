@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.constants as scc
+from scipy.constants import c, epsilon_0
 
 
 def compute_laser_energy(dim, grid):
@@ -35,19 +35,19 @@ def compute_laser_energy(dim, grid):
     envelope = grid.field
     box = grid.box
 
-    dz = box.dx[0] * scc.c
+    dz = box.dx[-1] * c
 
     if dim == "xyt":
-        dV = box.dx[1] * box.dx[2] * dz
-        energy = ((dV * scc.epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
+        dV = box.dx[0] * box.dx[1] * dz
+        energy = ((dV * epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
     elif dim == "rt":
-        r = box.axes[1]
-        dr = box.dx[1]
+        r = box.axes[0]
+        dr = box.dx[0]
         # 1D array that computes the volume of radial cells
         dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
         energy = (
-            dV[np.newaxis, np.newaxis, :]
-            * scc.epsilon_0
+            dV[np.newaxis, :, np.newaxis]
+            * epsilon_0
             * 0.5
             * abs(envelope[:, :, :]) ** 2
         ).sum()
@@ -117,7 +117,7 @@ def normalize_peak_intensity(peak_intensity, grid):
 
     if peak_intensity is None:
         return
-    intensity = np.abs(scc.epsilon_0 * grid.field**2 / 2 * scc.c)
+    intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
     input_peak_intensity = intensity.max()
 
     grid.field *= np.sqrt(peak_intensity / input_peak_intensity)

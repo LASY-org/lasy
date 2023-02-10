@@ -29,7 +29,7 @@ class SuperGaussianTransverseProfile(TransverseProfile):
         self.w0 = w0
         self.n_order = n_order
 
-    def evaluate(self, x, y):
+    def _evaluate(self, x, y):
         """
         Returns the transverse envelope
 

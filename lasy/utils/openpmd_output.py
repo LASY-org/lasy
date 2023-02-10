@@ -48,7 +48,7 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     m = i.meshes["laserEnvelope"]
     m.grid_spacing = [
         (hi - lo) / npoints for hi, lo, npoints in zip(box.hi, box.lo, box.npoints)
-    ]
+    ][::-1]
     m.grid_global_offset = box.lo
     m.unit_dimension = {
         io.Unit_Dimension.M: 1,
@@ -58,21 +58,16 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     }
     if dim == "xyt":
         m.geometry = io.Geometry.cartesian
-        m.axis_labels = ["t", "x", "y"]
+        m.axis_labels = ["t", "y", "x"]
     elif dim == "rt":
         m.geometry = io.Geometry.thetaMode
         m.axis_labels = ["t", "r"]
 
-    # Define the dataset
-    dataset = io.Dataset(array.dtype, array.shape)
-    env = m[io.Mesh_Record_Component.SCALAR]
-    env.position = [0] * len(dim)
-    env.reset_dataset(dataset)
-
     # Pick the correct field
     if dim == "xyt":
-        data = array
-
+        # Switch from x,y,t (internal to lasy) to t,y,x (in openPMD file)
+        # This is because many PIC codes expect x to be the fastest index
+        data = np.transpose(array).copy()
     elif dim == "rt":
         # The representation of modes in openPMD
         # (see https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record)
@@ -86,7 +81,15 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
             data[2 * mode - 1, :, :] = array[mode, :, :] + array[-mode, :, :]
             # sin(m*theta) part of the mode
             data[2 * mode, :, :] = -1.0j * array[mode, :, :] + 1.0j * array[-mode, :, :]
+        # Switch from m,r,t (internal to lasy) to m,t,r (in openPMD file)
+        # This is because many PIC codes expect r to be the fastest index
+        data = np.transpose(data, axes=[0, 2, 1]).copy()
 
+    # Define the dataset
+    dataset = io.Dataset(data.dtype, data.shape)
+    env = m[io.Mesh_Record_Component.SCALAR]
+    env.position = [0] * len(dim)
+    env.reset_dataset(dataset)
     env.store_chunk(data)
 
     series.flush()

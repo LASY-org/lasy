@@ -25,7 +25,7 @@ class GaussianTransverseProfile(TransverseProfile):
         super().__init__()
         self.w0 = w0
 
-    def evaluate(self, x, y):
+    def _evaluate(self, x, y):
         """
         Returns the transverse envelope
 
