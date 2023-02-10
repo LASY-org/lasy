@@ -323,14 +323,14 @@ class Laser:
     def get_full_field(self, theta=0, slice=0, slice_axis="x"):
         """
         Reconstruct the laser pulse with carrier frequency on the default grid
-        
+
         Parameters
         ----------
         theta : float (rad) (optional)
             Azimuthal angle
         slice : float (optional)
             Normalised position of the slice from -0.5 to 0.5
-        
+
         Returns
         -------
             Et : ndarray (V/m)
