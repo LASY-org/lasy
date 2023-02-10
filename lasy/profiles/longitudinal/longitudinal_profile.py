@@ -11,9 +11,6 @@ class LongitudinalProfile(object):
     """
 
     def __init__(self, wavelength):
-        """
-        Initialize the longitudinal profile
-        """
         self.lambda0 = wavelength
         self.omega0 = 2 * scc.pi * scc.c / self.lambda0
 

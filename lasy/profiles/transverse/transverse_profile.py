@@ -10,9 +10,6 @@ class TransverseProfile(object):
     """
 
     def __init__(self):
-        """
-        Initialize the transverse profile.
-        """
         pass
 
     def evaluate(self, x, y):

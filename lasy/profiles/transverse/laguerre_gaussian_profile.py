@@ -8,36 +8,33 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
     """
     Derived class for an analytic profile of a high-order Gaussian
     laser pulse expressed in the Laguerre-Gaussian formalism.
+
+    More precisely, the transverse envelope
+    (to be used in the :class:CombinedLongitudinalTransverseLaser class)
+    corresponds to:
+
+    .. math::
+
+        \\mathcal{T}(x, y) = r^{|m|}e^{-im\\theta} \\,
+        L_p^{|m|}\\left( \\frac{2 r^2 }{w_0^2}\\right )\\,
+        \\exp\\left( -\\frac{r^2}{w_0^2} \\right)
+
+    where :math:`x = r \\cos{\\theta}`,
+    :math:`y = r \\sin{\\theta}`, :math:`L_p^{|m|}` is the
+    Generalised Laguerre polynomial of radial order :math:`p` and
+    azimuthal order :math:`|m|`
+
+    Parameters
+    ----------
+    w0: float (in meter)
+        The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
+    p: int (dimensionless)
+        The radial order of Generalized Laguerre polynomial
+    m: int (dimensionless)
+        Defines the phase rotation, i.e. :math:`m` in the above formula.
     """
 
     def __init__(self, w0, p, m):
-        """
-        Defines a Laguerre-Gaussian transverse envelope
-
-        More precisely, the transverse envelope
-        (to be used in the :class:CombinedLongitudinalTransverseLaser class)
-        corresponds to:
-
-        .. math::
-
-            \\mathcal{T}(x, y) = r^{|m|}e^{-im\\theta} \\,
-            L_p^{|m|}\\left( \\frac{2 r^2 }{w_0^2}\\right )\\,
-            \\exp\\left( -\\frac{r^2}{w_0^2} \\right)
-
-        where :math:`x = r \\cos{\\theta}`,
-        :math:`y = r \\sin{\\theta}`, :math:`L_p^{|m|}` is the
-        Generalised Laguerre polynomial of radial order :math:`p` and
-        azimuthal order :math:`|m|`
-
-        Parameters
-        ----------
-        w0: float (in meter)
-            The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
-        p: int (dimensionless)
-            The radial order of Generalized Laguerre polynomial
-        m: int (dimensionless)
-            Defines the phase rotation, i.e. :math:`m` in the above formula.
-        """
         super().__init__()
         self.w0 = w0
         self.p = p
