@@ -30,7 +30,7 @@ def get_w0(laser):
     else:
         A2 = (np.abs(laser.field.field[0]) ** 2).sum(0)
         ax = laser.box.axes[-1]
-        if ax[0]>0:
+        if ax[0] > 0:
             A2 = np.r_[A2[::-1], A2]
             ax = np.r_[-ax[::-1], ax]
         else:
