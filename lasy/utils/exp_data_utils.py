@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def find_com(img):
+def find_center_of_mass(img):
     """
     Finds the center of mass of an image.
 
