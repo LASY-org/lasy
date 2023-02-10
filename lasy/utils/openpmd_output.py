@@ -46,8 +46,7 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     # Define the mesh
     m = i.meshes["laserEnvelope"]
     m.grid_spacing = [
-        (hi - lo) / npoints for hi, lo, npoints \
-        in zip(box.hi, box.lo, box.npoints)
+        (hi - lo) / npoints for hi, lo, npoints in zip(box.hi, box.lo, box.npoints)
     ][::-1]
     m.grid_global_offset = box.lo
     m.unit_dimension = {
