@@ -13,8 +13,9 @@ class Box:
 
         Parameters
         ----------
-        dim: string
+        dim : string
             Dimensionality of the array. Options are:
+
             - 'xyt': The laser pulse is represented on a 3D grid:
                      Cartesian (x,y) transversely, and temporal (t) longitudinally.
             - 'rt' : The laser pulse is represented on a 2D grid:
