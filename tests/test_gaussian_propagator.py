@@ -22,6 +22,7 @@ def gaussian():
 
 
 def get_w0(laser):
+    # Calculate the laser waist
     if laser.dim == "xyt":
         Nt, Nx, Ny = laser.field.field.shape
         A2 = (np.abs(laser.field.field[:, :, Nx // 2 - 1]) ** 2).sum(0)
@@ -29,8 +30,12 @@ def get_w0(laser):
     else:
         A2 = (np.abs(laser.field.field[0]) ** 2).sum(0)
         ax = laser.box.axes[-1]
-        A2 = np.r_[A2[::-1][:-1], A2]
-        ax = np.r_[-ax[::-1][:-1], ax]
+        if ax[0]>0:
+            A2 = np.r_[A2[::-1], A2]
+            ax = np.r_[-ax[::-1], ax]
+        else:
+            A2 = np.r_[A2[::-1][:-1], A2]
+            ax = np.r_[-ax[::-1][:-1], ax]
 
     sigma = 2 * np.sqrt(np.average(ax**2, weights=A2))
 
@@ -40,7 +45,7 @@ def get_w0(laser):
 def check_gaussian_propagation(
     laser, propagation_distance=100e-6, propagation_step=10e-6
 ):
-
+    # Do the propagation and check evolution of waist with theory
     w0 = laser.profile.trans_profile.w0
     L_R = np.pi * w0**2 / laser.profile.lambda0
 
@@ -59,6 +64,7 @@ def check_gaussian_propagation(
 
 
 def test_3D_case(gaussian):
+    # - 3D case
     dim = "xyt"
     lo = (-25e-6, -25e-6, -60e-15)
     hi = (+25e-6, +25e-6, +60e-15)
@@ -69,6 +75,7 @@ def test_3D_case(gaussian):
 
 
 def test_RT_case(gaussian):
+    # - Cylindrical case
     dim = "rt"
     lo = (0e-6, -60e-15)
     hi = (25e-6, +60e-15)
