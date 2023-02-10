@@ -35,19 +35,17 @@ def find_d4sigma(img):
     in x and y in pixels.
 
     https://en.wikipedia.org/wiki/Beam_diameter#D4%CF%83_or_second-moment_width
-    
+
     """
 
     rows, cols = np.shape(img)
     x = np.linspace(0, cols - 1, cols)
     y = np.linspace(0, rows - 1, rows)
-    
-    x0,y0 = find_center_of_mass(img)
+
+    x0, y0 = find_center_of_mass(img)
 
     img_tot = np.sum(img)
-    D4sigX = 4*np.sqrt(np.sum(np.dot(img,   (x-x0)**2)) / img_tot)
-    D4sigY = 4*np.sqrt(np.sum(np.dot(img.T, (y-y0)**2)) / img_tot)
+    D4sigX = 4 * np.sqrt(np.sum(np.dot(img, (x - x0) ** 2)) / img_tot)
+    D4sigY = 4 * np.sqrt(np.sum(np.dot(img.T, (y - y0) ** 2)) / img_tot)
 
     return D4sigX, D4sigY
-
-

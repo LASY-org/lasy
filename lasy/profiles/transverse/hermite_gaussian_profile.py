@@ -54,10 +54,10 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
             This array has the same shape as the arrays x, y
         """
         envelope = (
-            np.sqrt(2/np.pi)
-            *np.sqrt(1 / (2**(self.n_x) * factorial(self.n_x) *self.w0))
-            *np.sqrt(1 / (2**(self.n_y) * factorial(self.n_y) *self.w0))
-            *hermite(self.n_x)(np.sqrt(2) * x / self.w0)
+            np.sqrt(2 / np.pi)
+            * np.sqrt(1 / (2 ** (self.n_x) * factorial(self.n_x) * self.w0))
+            * np.sqrt(1 / (2 ** (self.n_y) * factorial(self.n_y) * self.w0))
+            * hermite(self.n_x)(np.sqrt(2) * x / self.w0)
             * hermite(self.n_y)(np.sqrt(2) * y / self.w0)
             * np.exp(-(x**2 + y**2) / self.w0**2)
         )
