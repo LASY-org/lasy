@@ -35,26 +35,16 @@ release = "0.0"
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
-    "sphinx.ext.napoleon",
-    "sphinx_panels",
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
+    "sphinx_panels",
+    "numpydoc",
+    'matplotlib.sphinxext.plot_directive'
 ]
 
-# Napoleon settings
-napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
-napoleon_include_private_with_doc = False
-napoleon_include_special_with_doc = True
-napoleon_use_admonition_for_examples = False
-napoleon_use_admonition_for_notes = False
-napoleon_use_admonition_for_references = False
-napoleon_use_ivar = False
-napoleon_use_param = True
-napoleon_use_rtype = True
-napoleon_preprocess_types = False
-napoleon_type_aliases = None
-napoleon_attr_annotations = True
+# Numpydoc settings
+numpydoc_show_class_members = False
+numpydoc_use_plots = True
 
 # Autodoc Settings
 add_module_names = False
@@ -103,4 +93,34 @@ sphinx_gallery_conf = {
     "gallery_dirs": "tutorials",
     "filename_pattern": ".",
     "within_subsection_order": FileNameSortKey,
+}
+
+#------------------------------------------------------------------------------
+# Matplotlib plot_directive options
+#------------------------------------------------------------------------------
+
+plot_include_source = True
+plot_formats = [('png', 96)]
+plot_html_show_formats = False
+plot_html_show_source_link = False
+
+import math
+phi = (math.sqrt(5) + 1)/2
+
+font_size = 13*72/96.0  # 13 px
+
+plot_rcparams = {
+    'font.size': font_size,
+    'axes.titlesize': font_size,
+    'axes.labelsize': font_size,
+    'xtick.labelsize': font_size,
+    'ytick.labelsize': font_size,
+    'legend.fontsize': font_size,
+    'figure.figsize': (3*phi, 3),
+    'figure.subplot.bottom': 0.2,
+    'figure.subplot.left': 0.2,
+    'figure.subplot.right': 0.9,
+    'figure.subplot.top': 0.85,
+    'figure.subplot.wspace': 0.4,
+    'text.usetex': False,
 }
