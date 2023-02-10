@@ -57,7 +57,7 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     }
     if dim == "xyt":
         m.geometry = io.Geometry.cartesian
-        m.axis_labels = ["t", "x", "y"]
+        m.axis_labels = ["t", "y", "x"]
     elif dim == "rt":
         m.geometry = io.Geometry.thetaMode
         m.axis_labels = ["t", "r"]
