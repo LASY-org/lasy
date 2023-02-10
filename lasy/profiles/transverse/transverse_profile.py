@@ -41,7 +41,7 @@ class TransverseProfile(object):
     def evaluate(self, x, y):
         """
         Returns the transverse envelope modified by any spatial offsets.
-        This is the public facing evaluate method.
+        This is the public facing evaluate method, it calls the _evaluate function of the derived class.
 
         Parameters
         ----------
