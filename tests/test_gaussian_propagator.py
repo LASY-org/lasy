@@ -60,6 +60,7 @@ def check_gaussian_propagation(
         err = 2 * np.abs(w0_theor - w0_num) / (w0_theor + w0_num)
         assert err < 1e-3
 
+
 def test_3D_case(gaussian):
     # - 3D case
     dim = "xyt"
