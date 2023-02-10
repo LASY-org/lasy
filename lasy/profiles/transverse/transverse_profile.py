@@ -33,9 +33,9 @@ class TransverseProfile(object):
         # (This should be replaced by any class that inherits from this one.)
         return np.zeros(x.shape, dtype="complex128")
 
-    def __add__( self, other ):
+    def __add__(self, other):
         """Overload the + operations for laser profiles."""
-        return( SummedTransverseProfile( self, other ) )
+        return SummedTransverseProfile(self, other)
 
     def __mul__(self, other):
         """Overload the * operations for laser profiles."""
@@ -60,7 +60,7 @@ class SummedTransverseProfile(TransverseProfile):
         """
         super().__init__()
         self.profiles = profiles
-    
+
     def evaluate(self, x, y):
         """Return the sum of the profiles."""
         return sum([p.evaluate(x, y) for p in self.profiles])
