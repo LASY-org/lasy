@@ -37,6 +37,14 @@ class TransverseProfile(object):
         """Overload the + operations for laser profiles."""
         return( SummedTransverseProfile( self, other ) )
 
+    def __mul__(self, other):
+        """Overload the * operations for laser profiles."""
+        return( ScaledTransverseProfile( self, other ) )
+    
+    def __rmul__(self, other):
+        """Overload the * operations for laser profiles."""
+        return( ScaledTransverseProfile( self, other ) )
+
 
 class SummedTransverseProfile(TransverseProfile):
     """Class for a transverse profile that is the sum of several profiles."""
@@ -56,3 +64,27 @@ class SummedTransverseProfile(TransverseProfile):
     def evaluate(self, x, y):
         """Return the sum of the profiles."""
         return sum([p.evaluate(x, y) for p in self.profiles])
+
+class ScaledTransverseProfile(TransverseProfile):
+    """Class for a transverse profile that is scaled by a factor."""
+
+    def __init__(self, profile, factor):
+        """
+        Initialize the transverse profile.
+
+        Parameters
+        ----------
+        profile: TransverseProfile object
+            The profile to be scaled.
+        factor: float
+            The scaling factor.
+        """
+        super().__init__()
+        self.profile = profile
+        self.factor = factor
+        if not isinstance(self.factor, (int, float)):
+            raise ValueError("The scaling factor must be a float.")
+
+    def evaluate(self, x, y):
+        """Return the scaled profile."""
+        return self.factor * self.profile.evaluate(x, y)
