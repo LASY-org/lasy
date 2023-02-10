@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.special.orthogonal import hermite
-
+from math import factorial
 from .transverse_profile import TransverseProfile
 
 
@@ -20,6 +20,8 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
 
         .. math::
             \\mathcal{T}(x, y) =
+            \\sqrt{\frac{2}{\\pi}} \\sqrt{\frac{1}{2^{n} n! w_0}}\\,
+            \\sqrt{\frac{1}{2^{n} n! w_0}}\\,
             H_{n_x}\\left ( \\frac{\\sqrt{2} x}{w_0}\\right )\\,
             H_{n_y}\\left ( \\frac{\\sqrt{2} y}{w_0}\\right )\\,
             \\exp\\left( -\\frac{x^2+y^2}{w_0^2} \\right)
@@ -57,7 +59,10 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
             This array has the same shape as the arrays x, y
         """
         envelope = (
-            hermite(self.n_x)(np.sqrt(2) * x / self.w0)
+            np.sqrt(2/np.pi)
+            *np.sqrt(1 / (2**(self.n_x) * factorial(self.n_x) *self.w0))
+            *np.sqrt(1 / (2**(self.n_y) * factorial(self.n_y) *self.w0))
+            *hermite(self.n_x)(np.sqrt(2) * x / self.w0)
             * hermite(self.n_y)(np.sqrt(2) * y / self.w0)
             * np.exp(-(x**2 + y**2) / self.w0**2)
         )
