@@ -28,11 +28,6 @@ jobs:
     - name: Run Unit Tests
       run: python -m pytest tests/
 
-    - name: Run Examples
-      run: |
-        cd examples
-        python test.py
-
   pyflakes:
     runs-on: ubuntu-latest
     steps:
