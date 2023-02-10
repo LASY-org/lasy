@@ -35,18 +35,18 @@ def compute_laser_energy(dim, grid):
     envelope = grid.field
     box = grid.box
 
-    dz = box.dx[0] * scc.c
+    dz = box.dx[-1] * scc.c
 
     if dim == "xyt":
-        dV = box.dx[1] * box.dx[2] * dz
+        dV = box.dx[0] * box.dx[1] * dz
         energy = ((dV * scc.epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
     elif dim == "rt":
-        r = box.axes[1]
-        dr = box.dx[1]
+        r = box.axes[0]
+        dr = box.dx[0]
         # 1D array that computes the volume of radial cells
         dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
         energy = (
-            dV[np.newaxis, np.newaxis, :]
+            dV[np.newaxis, :, np.newaxis]
             * scc.epsilon_0
             * 0.5
             * abs(envelope[:, :, :]) ** 2
