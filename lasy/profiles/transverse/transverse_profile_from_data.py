@@ -41,7 +41,8 @@ class TransverseProfileFromData(TransverseProfile):
             center of mass.
 
         """
-
+        intensity_data = intensity_data.astype('float64')
+        
         n_y, n_x = np.shape(intensity_data)
         
         dx = (hi[0] - lo[0])/n_x
@@ -51,10 +52,12 @@ class TransverseProfileFromData(TransverseProfile):
         y_data = np.linspace(lo[1],hi[1],n_y)
         
         assert dx == dy, "Data elements are not square"
-
+        
+        # Normalise the profile such that its squared integeral == 1
+        intensity_data /= np.sum(intensity_data)*dx*dy
 
         if center_beam:
-            # find the beam center
+            # find the beam center using COM
             img_tot = np.sum(intensity_data)
             x0 = np.sum(np.dot(intensity_data, x_data)) / img_tot
             y0 = np.sum(np.dot(intensity_data.T, y_data)) / img_tot
@@ -68,9 +71,10 @@ class TransverseProfileFromData(TransverseProfile):
             self.beam_shift_x = 0
             self.beam_shift_y = 0
 
+        # Note here we use the square root of intensity to get the 'field'
         self.field_interp = RegularGridInterpolator((y_data,x_data),
                                 np.sqrt(intensity_data), bounds_error=False,
-                                fill_value=0)
+                                fill_value=0.0)
                                 
         self.center_beam = center_beam
 
