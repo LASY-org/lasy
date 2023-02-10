@@ -40,7 +40,7 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         self.n_x = n_x
         self.n_y = n_y
 
-    def evaluate(self, x, y):
+    def _evaluate(self, x, y):
         """
         Returns the transverse envelope
 

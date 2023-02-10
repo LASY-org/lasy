@@ -43,7 +43,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         self.p = p
         self.m = m
 
-    def evaluate(self, x, y):
+    def _evaluate(self, x, y):
         """
         Returns the transverse envelope.
 
