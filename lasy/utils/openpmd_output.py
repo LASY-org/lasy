@@ -11,6 +11,7 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     ----------
     dim : string
         Dimensionality of the array. Options are:
+
         - 'xyt': The laser pulse is represented on a 3D grid:
                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
@@ -26,7 +27,7 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
         A grid object containing the 3-dimensional array
         with complex envelope of the electric field and metadata
 
-    wavelength: scalar
+    wavelength : scalar
         Central wavelength for which the laser pulse envelope is defined.
 
     pol : list of 2 complex numbers
