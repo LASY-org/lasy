@@ -26,25 +26,26 @@ class Laser:
         ----------
         dim: string
             Dimensionality of the array. Options are:
-            - 'xyt': The laser pulse is represented on a 3D grid:
+
+            - ``'xyt'``: The laser pulse is represented on a 3D grid:
                      Cartesian (x,y) transversely, and temporal (t) longitudinally.
-            - 'rt' : The laser pulse is represented on a 2D grid:
+            - ``'rt'`` : The laser pulse is represented on a 2D grid:
                      Cylindrical (r) transversely, and temporal (t) longitudinally.
 
         lo, hi : list of scalars
             Lower and higher end of the physical domain of the box.
-            One element per direction (2 for dim='rt', 3 for dim='xyt')
+            One element per direction (2 for ``dim='rt'``, 3 for ``dim='xyt'``)
 
         npoints : tuple of int
             Number of points in each direction.
-            One element per direction (2 for dim='rt', 3 for dim='xyt')
+            One element per direction (2 for ``dim='rt'``, 3 for ``dim='xyt'``)
             For the moment, the lower end is assumed to be (0,0) in rt and (0,0,0) in xyt
 
         profile: an object of type lasy.profiles.profile.Profile
             Defines how to evaluate the envelope field
 
         n_azimuthal_modes: int (optional)
-            Only used if `dim` is 'rt'. The number of azimuthal modes
+            Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
             used in order to represent the laser field.
         """
         box = Box(dim, lo, hi, npoints, n_azimuthal_modes)
@@ -77,10 +78,10 @@ class Laser:
         Parameters
         ----------
         value: scalar
-            Value to which to normalize the field property that is defined in 'kind'
+            Value to which to normalize the field property that is defined in ``kind``
         kind: string (optional)
             Distance by which the laser pulse should be propagated
-            Options: 'energy', 'field', 'intensity' (default is 'energy')
+            Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
 
         if kind == "energy":
@@ -119,7 +120,7 @@ class Laser:
 
     def move_time_window(self, translate_time):
         """
-        Translate the `box` and phase of `field_fft` in time by a given amount.
+        Translate the ``box`` and phase of ``field_fft`` in time by a given amount.
 
         Parameters
         ----------
@@ -154,7 +155,7 @@ class Laser:
         nr_boundary: integer (optional)
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
-            Only used for 'rt'.
+            Only used for ``'rt'``.
         """
         if self.dim == "rt":
             Propagator = PropagatorResampling
@@ -213,7 +214,7 @@ class Laser:
             The file name will start with this prefix.
 
         file_format: string
-            Format to be used for the output file. Options are "h5" and "bp".
+            Format to be used for the output file. Options are ``"h5"`` and ``"bp"``.
         """
         write_to_openpmd_file(
             self.dim,
@@ -234,13 +235,13 @@ class Laser:
             Azimuthal angle
 
         slice: float (optional)
-            normalised position of the slice from -0.5 to 0.5
+            Normalised position of the slice from -0.5 to 0.5
 
-        Returns:
-        --------
+        Returns
+        -------
             Et: ndarray (V/m)
-                The reconstructed field of the shape (Nt_new, Nr) (for `rt`)
-                or (Nt_new, Nx) (for `xyt`)
+                The reconstructed field of the shape (Nt_new, Nr) (for ``'rt'``)
+                or (Nt_new, Nx) (for ``'xyt'``)
 
             extent: ndarray (Tmin, Tmax, Xmin, Xmax)
                 Physical extent of the reconstructed field
