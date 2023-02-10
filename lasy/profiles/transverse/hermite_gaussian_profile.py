@@ -76,6 +76,7 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         """Overload the * operations for laser profiles."""
         return ScaledTransverseProfile(self, other)
 
+
 class SummedTransverseProfile(HermiteGaussianTransverseProfile):
     """Class for a transverse profile that is the sum of several profiles."""
 
@@ -103,10 +104,13 @@ class SummedTransverseProfile(HermiteGaussianTransverseProfile):
         self.n_x = None
         self.n_y = None
         # Check if all profiles are instances of HermiteGaussianTransverseProfile
-        if not all([isinstance(p, HermiteGaussianTransverseProfile) for p in self.profiles]):
+        if not all(
+            [isinstance(p, HermiteGaussianTransverseProfile) for p in self.profiles]
+        ):
             # If not, raise a ValueError
-            raise ValueError("All profiles must be HermiteGaussianTransverseProfile objects.")
-
+            raise ValueError(
+                "All profiles must be HermiteGaussianTransverseProfile objects."
+            )
 
     def _evaluate(self, x, y):
         """Return the sum of the profiles."""
@@ -138,5 +142,3 @@ class ScaledTransverseProfile(HermiteGaussianTransverseProfile):
     def _evaluate(self, x, y):
         """Return the scaled profile."""
         return self.factor * self.profile.evaluate(x, y)
-
-
