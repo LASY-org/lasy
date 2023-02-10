@@ -42,6 +42,52 @@ class Laser:
     n_azimuthal_modes : int (optional)
         Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
         used in order to represent the laser field.
+
+    Examples
+    --------
+
+    >>> import matplotlib.pyplot as plt
+    >>> from lasy.laser import Laser
+    >>> from lasy.profiles.gaussian_profile import GaussianProfile
+    >>> # Create profile.
+    >>> profile = GaussianProfile(
+    ...     wavelength=0.6e-6,  # m
+    ...     pol=(1, 0),
+    ...     laser_energy=1.,  # J
+    ...     w0=5e-6,  # m
+    ...     tau=30e-15,  # s
+    ...     t_peak=0.  # s
+    ... )
+    >>> # Create laser with given profile in `rt` geometry.
+    >>> laser = Laser(
+    ...     dim="rt",
+    ...     lo=(0e-6, -60e-15),
+    ...     hi=(10e-6, +60e-15),
+    ...     npoints=(50, 400),
+    ...     profile=profile
+    ... )
+    >>> # Propagate and visualize.
+    >>> n_steps = 3
+    >>> propagate_step = 1e-3
+    >>> fig, axes = plt.subplots(1, n_steps, sharey=True)
+    >>> for step in range(n_steps):
+    >>>     laser.propagate(propagate_step)
+    >>>     E_rt, imshow_extent = laser.get_full_field()
+    >>>     imshow_extent[:2] *= 1e12
+    >>>     imshow_extent[2:] *= 1e6
+    >>>     vmax = np.abs(E_rt).max()
+    >>>     axes[step].imshow(
+    ...         E_rt.T,
+    ...         origin="lower",
+    ...         aspect="auto",
+    ...         vmax=vmax,
+    ...         vmin=-vmax,
+    ...         extent=imshow_extent,
+    ...         cmap='bwr',
+    ...     )
+    >>>     axes[step].set(xlabel='t (ps)')
+    >>>     if step == 0:
+    >>>         axes[step].set(ylabel='r (µm)')
     """
 
     def __init__(self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1):
