@@ -69,10 +69,11 @@ class Profile(object):
         """Return the scaled profile."""
         return ScaledProfile(self, factor)
 
+
 class SummedProfile(Profile):
     """
     Base class for profiles that are the sum of several other profiles.
-    
+
     Profile class that represents the sum of multiple profiles.
 
     Parameters
@@ -80,21 +81,27 @@ class SummedProfile(Profile):
     profiles: list of Profile objects
         List of profiles to be summed.
     """
-    
+
     def __init__(self, *profiles):
         """Initialize the summed profile."""
         # Check that all profiles are Profile objects
-        assert all([isinstance(p, Profile) for p in profiles]), "All summands must be Profile objects."
+        assert all(
+            [isinstance(p, Profile) for p in profiles]
+        ), "All summands must be Profile objects."
         self.profiles = profiles
         # Get the wavelength values from each profile
         self.lambda0 = [p.lambda0 for p in self.profiles]
         self.pol = [p.pol for p in self.profiles]
         # Check that all wavelengths are the same
-        assert np.allclose(self.lambda0, self.lambda0[0]), "Added profiles must have the same wavelength."
+        assert np.allclose(
+            self.lambda0, self.lambda0[0]
+        ), "Added profiles must have the same wavelength."
         self.lambda0 = profiles[0].lambda0
         self.omega0 = 2 * np.pi * c / self.lambda0
         # Check that all polarizations are the same
-        assert np.allclose(self.pol, self.pol[0]), "Added profiles must have the same polarization."
+        assert np.allclose(
+            self.pol, self.pol[0]
+        ), "Added profiles must have the same polarization."
         self.pol = profiles[0].pol
 
     def evaluate(self, x, y, t):
@@ -102,10 +109,11 @@ class SummedProfile(Profile):
         # Sum the fields of each profile
         return sum([p.evaluate(x, y, t) for p in self.profiles])
 
+
 class ScaledProfile(Profile):
     """
     Base class for profiles that are scaled by a factor.
-    
+
     Profile class that represents scaled profiles.
 
     Parameters
@@ -115,7 +123,7 @@ class ScaledProfile(Profile):
     factor: int or float
         Factor by which to scale the profile.
     """
-    
+
     def __init__(self, profile, factor):
         """Initialize the summed profile."""
         # Check that the factor is a number
