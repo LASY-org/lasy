@@ -3,13 +3,10 @@
 import pytest
 
 from lasy.laser import Laser
-from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
-from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.profiles.longitudinal.gaussian_profile import GaussianLongitudinalProfile
-from lasy.profiles.transverse.laguerre_gaussian_profile import (
+from lasy.profiles import CombinedLongitudinalTransverseProfile, GaussianProfile
+from lasy.profiles.longitudinal import GaussianLongitudinalProfile
+from lasy.profiles.transverse import (
     LaguerreGaussianTransverseProfile,
-)
-from lasy.profiles.transverse.super_gaussian_profile import (
     SuperGaussianTransverseProfile,
 )
 
