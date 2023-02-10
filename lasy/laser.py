@@ -137,56 +137,6 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def time_to_frequency(self):
-        """
-        Transform field from the temporal to the frequency domain via FFT,
-        and create the frequency axis if necessary.
-        """
-        times_axis = {"rt": 1, "xyt": 0}[self.dim]
-        self.field.field_fft = np.fft.fft(
-            self.field.field, axis=times_axis, norm="forward"
-        )
-
-        if not hasattr(self.field, "omega"):
-            dt = self.box.dx[0]
-            omega0 = self.profile.omega0
-            Nt = self.field.field.shape[times_axis]
-            self.field.omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
-
-    def frequency_to_time(self):
-        """
-        Transform field from the frequency to the temporal domain via iFFT.
-        """
-        times_axis = {"rt": 1, "xyt": 0}[self.dim]
-        self.field.field = np.fft.ifft(
-            self.field.field_fft, axis=times_axis, norm="forward"
-        )
-
-    def move_time_window(self, translate_time):
-        """
-        Translate the ``box`` and phase of ``field_fft`` in time by a given amount.
-
-        Parameters
-        ----------
-        translate_time: float (s)
-            Time interval by which the time temporal definitions of the
-            laser should be translated.
-        """
-        self.box.lo[0] += translate_time
-        self.box.hi[0] += translate_time
-        self.box.axes[0] += translate_time
-
-        if self.dim == "rt":
-            Nt = self.field.field.shape[1]
-            omega_shape = (1, Nt, 1)
-        elif self.dim == "xyt":
-            Nt = self.field.field.shape[0]
-            omega_shape = (Nt, 1, 1)
-
-        self.field.field_fft *= np.exp(
-            -1j * translate_time * self.field.omega.reshape(omega_shape)
-        )
-
     def propagate(self, distance, nr_boundary=None, backend="NP"):
         """
         Propagate the laser pulse by the distance specified
