@@ -55,14 +55,14 @@ class Laser:
 
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
-            x, y, t = np.meshgrid( *box.axes, indexing='ij')
-            self.field.field[...] = profile.evaluate( x, y, t )
+            x, y, t = np.meshgrid(*box.axes, indexing="ij")
+            self.field.field[...] = profile.evaluate(x, y, t)
         elif self.dim == "rt":
             # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
             # theta, to evaluate the laser
             n_theta = 2 * box.n_azimuthal_modes - 1
-            theta1d = 2 * np.pi/n_theta * np.arange(n_theta)
-            theta, r, t = np.meshgrid( theta1d, *box.axes, indexing="ij")
+            theta1d = 2 * np.pi / n_theta * np.arange(n_theta)
+            theta, r, t = np.meshgrid(theta1d, *box.axes, indexing="ij")
             x = r * np.cos(theta)
             y = r * np.sin(theta)
             # Evaluate the profile on the generated grid
