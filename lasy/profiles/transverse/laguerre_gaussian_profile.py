@@ -86,6 +86,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         """Overload the * operations for laser profiles."""
         return ScaledTransverseProfile(self, other)
 
+
 class SummedTransverseProfile(LaguerreGaussianTransverseProfile):
     """Class for a transverse profile that is the sum of several profiles."""
 
@@ -113,10 +114,11 @@ class SummedTransverseProfile(LaguerreGaussianTransverseProfile):
         self.p = None
         self.m = None
         # Check if all profiles are instances of LaguerreGaussianTransverseProfile
-        if not all([isinstance(p, LaguerreGaussianTransverseProfile) for p in self.profiles]):
+        if not all(
+            [isinstance(p, LaguerreGaussianTransverseProfile) for p in self.profiles]
+        ):
             # If not, raise a ValueError
             raise ValueError("All profiles must be LaguerreGaussian objects.")
-
 
     def _evaluate(self, x, y):
         """Return the sum of the profiles."""
@@ -148,4 +150,3 @@ class ScaledTransverseProfile(LaguerreGaussianTransverseProfile):
     def _evaluate(self, x, y):
         """Return the scaled profile."""
         return self.factor * self.profile.evaluate(x, y)
-
