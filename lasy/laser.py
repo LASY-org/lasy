@@ -115,7 +115,7 @@ class Laser:
             absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
             absorb_layer_shape[-1] = 0.0
             if self.dim == "rt":
-                self.field.field[:,-nr_boundary:,:] *= absorb_layer_shape
+                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape
             else:
                 self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
                     None, :, None
@@ -162,8 +162,8 @@ class Laser:
             # Propagate the spectral image
             for i_m in range(self.box.azimuthal_modes.size):
                 transform_data = np.transpose(self.field.field_fft[i_m]).copy()
-                self.prop[i_m].step( transform_data, distance, overwrite=True )
-                self.field.field_fft[i_m,:,:] = np.transpose( transform_data ).copy()
+                self.prop[i_m].step(transform_data, distance, overwrite=True)
+                self.field.field_fft[i_m, :, :] = np.transpose(transform_data).copy()
         else:
             # make 3D shape for the frequency axis
             omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
@@ -180,9 +180,9 @@ class Laser:
                     verbose=False,
                 )
             # Propagate the spectral image
-            transform_data = np.transpose( self.field.field_fft ).copy()
-            self.prop.step( transform_data, distance, overwrite=True )
-            self.field.field_fft[:,:,:] = np.transpose( transform_data ).copy()
+            transform_data = np.transpose(self.field.field_fft).copy()
+            self.prop.step(transform_data, distance, overwrite=True)
+            self.field.field_fft[:, :, :] = np.transpose(transform_data).copy()
 
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / scc.c
