@@ -1,4 +1,5 @@
 -r ../requirements.txt
 pydata-sphinx-theme
 pydata-sphinx-theme
+sphinx-gallery
 sphinx-panels
