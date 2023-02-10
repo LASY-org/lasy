@@ -39,11 +39,11 @@ class TransverseProfile(object):
 
     def __mul__(self, other):
         """Overload the * operations for laser profiles."""
-        return( ScaledTransverseProfile( self, other ) )
-    
+        return ScaledTransverseProfile(self, other)
+
     def __rmul__(self, other):
         """Overload the * operations for laser profiles."""
-        return( ScaledTransverseProfile( self, other ) )
+        return ScaledTransverseProfile(self, other)
 
 
 class SummedTransverseProfile(TransverseProfile):
@@ -64,6 +64,7 @@ class SummedTransverseProfile(TransverseProfile):
     def evaluate(self, x, y):
         """Return the sum of the profiles."""
         return sum([p.evaluate(x, y) for p in self.profiles])
+
 
 class ScaledTransverseProfile(TransverseProfile):
     """Class for a transverse profile that is scaled by a factor."""
