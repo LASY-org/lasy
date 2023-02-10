@@ -59,7 +59,7 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
             i.e. :math:`t_{peak}` in the above formula.
 
         cep_phase: float (in radian), optional
-            The Carrier Enveloppe Phase (CEP), i.e. :math:`\\phi_{cep}`
+            The Carrier Envelope Phase (CEP), i.e. :math:`\\phi_{cep}`
             in the above formula (i.e. the phase of the laser
             oscillation, at the time where the laser envelope is maximum)
         """
