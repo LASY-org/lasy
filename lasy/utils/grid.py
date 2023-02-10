@@ -7,7 +7,7 @@ class Grid:
     
     Parameters
     ----------
-    dim: string
+    dim : string
         Dimensionality of the array. Options are:
         
         - 'xyt': The laser pulse is represented on a 3D grid:

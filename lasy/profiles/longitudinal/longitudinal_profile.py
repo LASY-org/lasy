@@ -20,7 +20,7 @@ class LongitudinalProfile(object):
 
         Parameters
         ----------
-        t: ndarrays of floats
+        t : ndarrays of floats
             Define points on which to evaluate the envelope
 
         Returns

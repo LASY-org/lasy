@@ -15,10 +15,10 @@ class SuperGaussianTransverseProfile(TransverseProfile):
 
     Parameters
     ----------
-    w0: float (in meter)
+    w0 : float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
 
-    n_order: float (in meter)
+    n_order : float (in meter)
         The shape parameter of the super-gaussian function, i.e. :math:`n` in the above formula.
         If :math:`n=2` the super-Gaussian becomes a standard Gaussian function.
         If :math:`n=1` the super-Gaussian becomes a Laplace function.
@@ -35,7 +35,7 @@ class SuperGaussianTransverseProfile(TransverseProfile):
 
         Parameters
         ----------
-        x, y: ndarrays of floats
+        x, y : ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 

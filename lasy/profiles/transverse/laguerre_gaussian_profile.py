@@ -26,11 +26,11 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
 
     Parameters
     ----------
-    w0: float (in meter)
+    w0 : float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
-    p: int (dimensionless)
+    p : int (dimensionless)
         The radial order of Generalized Laguerre polynomial
-    m: int (dimensionless)
+    m : int (dimensionless)
         Defines the phase rotation, i.e. :math:`m` in the above formula.
     """
 

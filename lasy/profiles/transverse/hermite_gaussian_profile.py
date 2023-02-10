@@ -23,11 +23,11 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
 
     Parameters
     ----------
-    w0: float (in meter)
+    w0 : float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
-    n_x: int (dimensionless)
+    n_x : int (dimensionless)
         The order of hermite polynomial in the x direction
-    n_y: int (dimensionless)
+    n_y : int (dimensionless)
         The order of hermite polynomial in the y direction
     """
 

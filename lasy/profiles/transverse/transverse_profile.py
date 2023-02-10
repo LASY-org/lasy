@@ -18,7 +18,7 @@ class TransverseProfile(object):
 
         Parameters
         ----------
-        x, y: ndarrays of floats
+        x, y : ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 

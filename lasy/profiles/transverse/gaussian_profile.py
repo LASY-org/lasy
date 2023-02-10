@@ -17,7 +17,7 @@ class GaussianTransverseProfile(TransverseProfile):
 
     Parameters
     ----------
-    w0: float (in meter)
+    w0 : float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
     """
 
@@ -31,13 +31,13 @@ class GaussianTransverseProfile(TransverseProfile):
 
         Parameters
         ----------
-        x, y: ndarrays of floats
+        x, y : ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
         Returns
         -------
-        envelope: ndarray of complex numbers
+        envelope : ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """

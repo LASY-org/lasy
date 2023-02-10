@@ -11,10 +11,10 @@ class Profile(object):
 
     Parameters
     ----------
-    wavelength: scalar
+    wavelength : scalar
         Central wavelength for which the laser pulse envelope is defined.
 
-    pol: list of 2 complex numbers
+    pol : list of 2 complex numbers
         Polarization vector that multiplies array_in to get the Ex and Ey fields.
         The envelope of each component of the electric field is given by:
         - Ex_env = array_in*pol(0)
