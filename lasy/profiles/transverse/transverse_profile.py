@@ -60,6 +60,8 @@ class SummedTransverseProfile(TransverseProfile):
         """
         super().__init__()
         self.profiles = profiles
+        if not all([isinstance(p, TransverseProfile) for p in self.profiles]):
+            raise ValueError("All profiles must be TransverseProfile objects.")
 
     def evaluate(self, x, y):
         """Return the sum of the profiles."""
