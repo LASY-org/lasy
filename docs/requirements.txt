@@ -2,3 +2,4 @@
 pydata-sphinx-theme
 pydata-sphinx-theme
 sphinx-panels
+sphinx-gallery
