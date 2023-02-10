@@ -8,30 +8,30 @@ class TransverseProfileFromData(TransverseProfile):
     """
     Derived class for transverse laser profile created using
     data from an experimental measurement or from the output
-    of another code. 
+    of another code.
     """
 
-    def __init__(self,intensity_data,lo,hi,center_beam=True):
+    def __init__(self, intensity_data, lo, hi, center_beam=True):
         """
         Uses user supplied data to define the transverse profile
         of the laser pulse.
 
-        The data must be supplied as a 2D numpy array of intensity 
-        values (for example an imported cameran image from an 
-        experimental measurement). 
-        
-        In the case of experimental measurements, this data 
-        should already have some undergone some preprocessing 
+        The data must be supplied as a 2D numpy array of intensity
+        values (for example an imported cameran image from an
+        experimental measurement).
+
+        In the case of experimental measurements, this data
+        should already have some undergone some preprocessing
         such as background subtraction and noise removal.
 
         The beam will be imported and automatically centered unless
         otherwise specified.
-        
+
         Parameters:
         -----------
-        intensity_data: 2Darray of floats 
-            The 2D transverse intensity profile of the laser pulse. 
-            
+        intensity_data: 2Darray of floats
+            The 2D transverse intensity profile of the laser pulse.
+
         lo, hi : list of scalars (in meters)
             Lower and higher end of the physical domain of the data.
             One element per direction (in this case 2)
@@ -41,20 +41,20 @@ class TransverseProfileFromData(TransverseProfile):
             center of mass.
 
         """
-        intensity_data = intensity_data.astype('float64')
-        
-        n_y, n_x = np.shape(intensity_data)
-        
-        dx = (hi[0] - lo[0])/n_x
-        dy = (hi[1] - lo[1])/n_y
+        intensity_data = intensity_data.astype("float64")
 
-        x_data = np.linspace(lo[0],hi[0],n_x)
-        y_data = np.linspace(lo[1],hi[1],n_y)
-        
+        n_y, n_x = np.shape(intensity_data)
+
+        dx = (hi[0] - lo[0]) / n_x
+        dy = (hi[1] - lo[1]) / n_y
+
+        x_data = np.linspace(lo[0], hi[0], n_x)
+        y_data = np.linspace(lo[1], hi[1], n_y)
+
         assert dx == dy, "Data elements are not square"
-        
+
         # Normalise the profile such that its squared integeral == 1
-        intensity_data /= np.sum(intensity_data)*dx*dy
+        intensity_data /= np.sum(intensity_data) * dx * dy
 
         if center_beam:
             # find the beam center using COM
@@ -72,14 +72,14 @@ class TransverseProfileFromData(TransverseProfile):
             self.beam_shift_y = 0
 
         # Note here we use the square root of intensity to get the 'field'
-        self.field_interp = RegularGridInterpolator((y_data,x_data),
-                                np.sqrt(intensity_data), bounds_error=False,
-                                fill_value=0.0)
-                                
+        self.field_interp = RegularGridInterpolator(
+            (y_data, x_data),
+            np.sqrt(intensity_data),
+            bounds_error=False,
+            fill_value=0.0,
+        )
+
         self.center_beam = center_beam
-
-
-
 
     def evaluate(self, x, y):
         """
@@ -98,7 +98,6 @@ class TransverseProfileFromData(TransverseProfile):
             This array has the same shape as the arrays x, y
         """
 
-        envelope = self.field_interp((y,x))
+        envelope = self.field_interp((y, x))
 
         return envelope
-
