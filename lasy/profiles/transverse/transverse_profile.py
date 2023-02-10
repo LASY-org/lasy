@@ -58,7 +58,7 @@ class TransverseProfile(object):
 
         return self._evaluate(x + self.x_offset, y + self.y_offset)
 
-    def offset(self, x_offset, y_offset):
+    def set_offset(self, x_offset, y_offset):
         """
         Populates the x and y spatial offsets of the profile
         The profile will be shifted by these according to
