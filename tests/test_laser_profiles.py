@@ -27,9 +27,11 @@ def gaussian():
     return profile
 
 
-def test_gaussian_transverse_profile():
+def test_transverse_profiles_rt():
     npoints = 200
     w0 = 10.0e-6
+
+    # GaussianTransverseProfile
     std_th = w0 / np.sqrt(2)
     profile = GaussianTransverseProfile(w0)
     r = np.linspace(0, 6 * w0, npoints)
@@ -39,6 +41,17 @@ def test_gaussian_transverse_profile():
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
 
+    # LaguerreGaussianLaserProfile
+    p = 2
+    m = 0
+    std_th = 1.
+    profile = LaguerreGaussianTransverseProfile(w0, p, m)
+    r = np.linspace(0, 6 * w0, npoints)
+    field = profile.evaluate(r, np.zeros_like(r))
+    std = np.sqrt(np.average(r**2, weights=np.abs(field)))
+    print("std_th = ", std_th)
+    print("std = ", std)
+    assert(0)
 
 def test_profile_gaussian_3d_cartesian(gaussian):
     # - 3D Cartesian case
