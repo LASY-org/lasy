@@ -82,17 +82,18 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     ...     profile=profile
     ... )
     >>> # Visualize field.
-    >>> E_rt, imshow_extent = laser.get_full_field()
-    >>> imshow_extent[:2] *= 1e15
-    >>> imshow_extent[2:] *= 1e6
+    >>> E_rt, extent = laser.get_full_field()
+    >>> extent[:2] *= 1e6
+    >>> extent[2:] *= 1e15
+    >>> rmin, rmax, tmin, tmax = extent
     >>> vmax = np.abs(E_rt).max()
     >>> plt.imshow(
-    ...     E_rt.T,
+    ...     E_rt,
     ...     origin="lower",
     ...     aspect="auto",
     ...     vmax=vmax,
     ...     vmin=-vmax,
-    ...     extent=imshow_extent,
+    ...     extent=[tmin, tmax, rmin, rmax],
     ...     cmap='bwr',
     ... )
     >>> plt.xlabel('t (fs)')

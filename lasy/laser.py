@@ -72,17 +72,18 @@ class Laser:
     >>> fig, axes = plt.subplots(1, n_steps, sharey=True)
     >>> for step in range(n_steps):
     >>>     laser.propagate(propagate_step)
-    >>>     E_rt, imshow_extent = laser.get_full_field()
-    >>>     imshow_extent[:2] *= 1e12
-    >>>     imshow_extent[2:] *= 1e6
+    >>>     E_rt, extent = laser.get_full_field()
+    >>>     extent[:2] *= 1e6
+    >>>     extent[2:] *= 1e12
+    >>>     rmin, rmax, tmin, tmax = extent
     >>>     vmax = np.abs(E_rt).max()
     >>>     axes[step].imshow(
-    ...         E_rt.T,
+    ...         E_rt,
     ...         origin="lower",
     ...         aspect="auto",
     ...         vmax=vmax,
     ...         vmin=-vmax,
-    ...         extent=imshow_extent,
+    ...         extent=[tmin, tmax, rmin, rmax],
     ...         cmap='bwr',
     ...     )
     >>>     axes[step].set(xlabel='t (ps)')
@@ -192,10 +193,10 @@ class Laser:
 
         Parameters
         ----------
-        distance: scalar
+        distance : scalar
             Distance by which the laser pulse should be propagated
 
-        nr_boundary: integer (optional)
+        nr_boundary : integer (optional)
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
             Only used for ``'rt'``.
@@ -304,10 +305,10 @@ class Laser:
 
         Parameters
         ----------
-        file_prefix: string
+        file_prefix : string
             The file name will start with this prefix.
 
-        file_format: string
+        file_format : string
             Format to be used for the output file. Options are ``"h5"`` and ``"bp"``.
         """
         write_to_openpmd_file(
@@ -322,18 +323,20 @@ class Laser:
     def get_full_field(self, theta=0, slice=0, slice_axis="x"):
         """
         Reconstruct the laser pulse with carrier frequency on the default grid
+        
         Parameters
         ----------
-        theta: float (rad) (optional)
+        theta : float (rad) (optional)
             Azimuthal angle
-        slice: float (optional)
+        slice : float (optional)
             Normalised position of the slice from -0.5 to 0.5
-        Returns:
-        --------
-            Et: ndarray (V/m)
+        
+        Returns
+        -------
+            Et : ndarray (V/m)
                 The reconstructed field, with shape (Nr, Nt_new) (for `rt`)
                 or (Nx, Nt_new) (for `xyt`)
-            extent: ndarray (Xmin, Xmax, Tmin, Tmax)
+            extent : ndarray (Xmin, Xmax, Tmin, Tmax)
                 Physical extent of the reconstructed field
         """
         omega0 = self.profile.omega0
