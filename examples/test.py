@@ -1,6 +1,5 @@
 from lasy.laser import Laser
-from lasy.profiles import CombinedLongitudinalTransverseProfile
-from lasy.profiles import GaussianProfile
+from lasy.profiles import CombinedLongitudinalTransverseProfile, GaussianProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import LaguerreGaussianTransverseProfile
 
