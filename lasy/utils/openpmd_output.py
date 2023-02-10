@@ -46,7 +46,8 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     # Define the mesh
     m = i.meshes["laserEnvelope"]
     m.grid_spacing = [
-        (hi - lo) / npoints for hi, lo, npoints in zip(box.hi, box.lo, box.npoints)
+        (hi - lo) / npoints for hi, lo, npoints \
+        in zip(box.hi, box.lo, box.npoints)[::-1]
     ]
     m.grid_global_offset = box.lo
     m.unit_dimension = {
@@ -61,12 +62,6 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     elif dim == "rt":
         m.geometry = io.Geometry.thetaMode
         m.axis_labels = ["t", "r"]
-
-    # Define the dataset
-    dataset = io.Dataset(array.dtype, array.shape)
-    env = m[io.Mesh_Record_Component.SCALAR]
-    env.position = [0] * len(dim)
-    env.reset_dataset(dataset)
 
     # Pick the correct field
     if dim == "xyt":
@@ -90,6 +85,11 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
         # This is because many PIC codes expect r to be the fastest index
         data = np.transpose( data, axes=[0, 2, 1] )
 
+    # Define the dataset
+    dataset = io.Dataset(data.dtype, data.shape)
+    env = m[io.Mesh_Record_Component.SCALAR]
+    env.position = [0] * len(dim)
+    env.reset_dataset(dataset)
     env.store_chunk(data)
 
     series.flush()
