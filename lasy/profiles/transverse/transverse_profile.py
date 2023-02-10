@@ -10,14 +10,12 @@ class TransverseProfile(object):
     """
 
     def __init__(self):
-        """
-        Initialize the transverse profile.
-        """
+        """Initialize the transverse profile."""
         pass
 
     def evaluate(self, x, y):
         """
-        Returns the transverse envelope
+        Return the transverse envelope.
 
         Parameters
         ----------
@@ -34,3 +32,27 @@ class TransverseProfile(object):
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
         return np.zeros(x.shape, dtype="complex128")
+
+    def __add__( self, other ):
+        """Overload the + operations for laser profiles."""
+        return( SummedTransverseProfile( self, other ) )
+
+
+class SummedTransverseProfile(TransverseProfile):
+    """Class for a transverse profile that is the sum of several profiles."""
+
+    def __init__(self, *profiles):
+        """
+        Initialize the transverse profile.
+
+        Parameters
+        ----------
+        *profiles: list of TransverseProfile objects
+            The profiles to be summed.
+        """
+        super().__init__()
+        self.profiles = profiles
+    
+    def evaluate(self, x, y):
+        """Return the sum of the profiles."""
+        return sum([p.evaluate(x, y) for p in self.profiles])
