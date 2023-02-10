@@ -9,6 +9,7 @@ from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import LaguerreGaussianTransverseProfile
 from lasy.profiles.transverse import SuperGaussianTransverseProfile
 
+
 @pytest.fixture(scope="function")
 def gaussian():
     # Cases with Gaussian laser
