@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.constants as scc
 
+
 class Profile(object):
     """
     Base class for all laser profiles.
@@ -8,7 +9,8 @@ class Profile(object):
     Any new laser profile should inherit from this class, and define its own
     `evaluate` method, using the same signature as the method below.
     """
-    def __init__( self, wavelength, pol ):
+
+    def __init__(self, wavelength, pol):
         """
         Initialize the propagation direction of the laser.
         (Each subclass should call this method at initialization.)
@@ -29,13 +31,13 @@ class Profile(object):
             - Circular polarization: pol = (1,j)/sqrt(2) (j is the imaginary number)
             The polarization vector is normalized to have a unitary magnitude.
         """
-        assert(len(pol) == 2)
-        norm_pol = np.sqrt(np.abs(pol[0])**2 + np.abs(pol[1])**2)
-        self.pol = np.array([pol[0]/norm_pol, pol[1]/norm_pol])
+        assert len(pol) == 2
+        norm_pol = np.sqrt(np.abs(pol[0]) ** 2 + np.abs(pol[1]) ** 2)
+        self.pol = np.array([pol[0] / norm_pol, pol[1] / norm_pol])
         self.lambda0 = wavelength
-        self.omega0 = 2*scc.pi*scc.c/self.lambda0
+        self.omega0 = 2 * scc.pi * scc.c / self.lambda0
 
-    def evaluate( self, x, y, t ):
+    def evaluate(self, x, y, t):
         """
         Returns the envelope field of the laser
 
@@ -53,4 +55,4 @@ class Profile(object):
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
-        return np.zeros_like(x, dtype='complex128')
+        return np.zeros_like(x, dtype="complex128")

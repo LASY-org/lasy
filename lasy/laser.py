@@ -1,12 +1,16 @@
 import numpy as np
 import scipy.constants as scc
+from axiprop.lib import PropagatorFFT2, PropagatorResampling
 
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
+from lasy.utils.laser_utils import (
+    normalize_energy,
+    normalize_peak_field_amplitude,
+    normalize_peak_intensity,
+)
 from lasy.utils.openpmd_output import write_to_openpmd_file
-from lasy.utils.laser_utils import normalize_energy, normalize_peak_field_amplitude, normalize_peak_intensity
 
-from axiprop.lib import PropagatorResampling, PropagatorFFT2
 
 class Laser:
     """
@@ -14,8 +18,7 @@ class Laser:
     propagate it, and write it to a file.
     """
 
-    def __init__(self, dim, lo, hi, npoints, profile,
-                 n_azimuthal_modes=1 ):
+    def __init__(self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1):
         """
         Construct a laser object
 
@@ -51,23 +54,23 @@ class Laser:
         self.profile = profile
 
         # Create the grid on which to evaluate the laser, evaluate it
-        if self.dim == 'xyt':
-            t, x, y = np.meshgrid( *box.axes, indexing='ij')
-            self.field.field[...] = profile.evaluate( x, y, t )
-        elif self.dim == 'rt':
+        if self.dim == "xyt":
+            t, x, y = np.meshgrid(*box.axes, indexing="ij")
+            self.field.field[...] = profile.evaluate(x, y, t)
+        elif self.dim == "rt":
             # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
             # theta, to evaluate the laser
-            n_theta = 2*box.n_azimuthal_modes - 1
-            theta1d = 2*np.pi/n_theta * np.arange(n_theta)
-            theta, t, r = np.meshgrid( theta1d, *box.axes, indexing='ij')
-            x = r*np.cos(theta)
-            y = r*np.sin(theta)
+            n_theta = 2 * box.n_azimuthal_modes - 1
+            theta1d = 2 * np.pi / n_theta * np.arange(n_theta)
+            theta, t, r = np.meshgrid(theta1d, *box.axes, indexing="ij")
+            x = r * np.cos(theta)
+            y = r * np.sin(theta)
             # Evaluate the profile on the generated grid
-            envelope = profile.evaluate( x, y, t )
+            envelope = profile.evaluate(x, y, t)
             # Perform the azimuthal decomposition
             self.field.field[...] = np.fft.ifft(envelope, axis=0)
 
-    def normalize(self, value, kind=None):
+    def normalize(self, value, kind="energy"):
         """
         Normalize the pulse either to the energy, peak field amplitude or peak intensity
 
@@ -75,16 +78,16 @@ class Laser:
         ----------
         value: scalar
             Value to which to normalize the field property that is defined in 'kind'
-        kind: string
+        kind: string (optional)
             Distance by which the laser pulse should be propagated
-            Options: 'energy', 'field', 'intensity'
+            Options: 'energy', 'field', 'intensity' (default is 'energy')
         """
 
-        if kind == 'energy':
+        if kind == "energy":
             normalize_energy(self.dim, value, self.field)
-        elif kind == 'field':
+        elif kind == "field":
             normalize_peak_field_amplitude(value, self.field)
-        elif kind == 'intensity':
+        elif kind == "intensity":
             normalize_peak_intensity(value, self.field)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
@@ -94,10 +97,10 @@ class Laser:
         Transform field from the temporal to the frequency domain via FFT,
         and create the frequency axis if necessary.
         """
-        times_axis = {'rt': 1, 'xyt': 0}[self.dim]
-        self.field.field_fft = np.fft.fft(self.field.field,
-                                          axis=times_axis,
-                                          norm="forward")
+        times_axis = {"rt": 1, "xyt": 0}[self.dim]
+        self.field.field_fft = np.fft.fft(
+            self.field.field, axis=times_axis, norm="forward"
+        )
 
         if not hasattr(self.field, "omega"):
             dt = self.box.dx[0]
@@ -109,10 +112,10 @@ class Laser:
         """
         Transform field from the frequency to the temporal domain via iFFT.
         """
-        times_axis = {'rt': 1, 'xyt': 0}[self.dim]
-        self.field.field = np.fft.ifft(self.field.field_fft,
-                                       axis=times_axis,
-                                       norm="forward")
+        times_axis = {"rt": 1, "xyt": 0}[self.dim]
+        self.field.field = np.fft.ifft(
+            self.field.field_fft, axis=times_axis, norm="forward"
+        )
 
     def move_time_window(self, translate_time):
         """
@@ -128,15 +131,16 @@ class Laser:
         self.box.hi[0] += translate_time
         self.box.axes[0] += translate_time
 
-        if self.dim == 'rt':
+        if self.dim == "rt":
             Nt = self.field.field.shape[1]
             omega_shape = (1, Nt, 1)
-        elif self.dim == 'xyt':
+        elif self.dim == "xyt":
             Nt = self.field.field.shape[0]
             omega_shape = (Nt, 1, 1)
 
-        self.field.field_fft *= np.exp(-1j * translate_time
-                                * self.field.omega.reshape(omega_shape))
+        self.field.field_fft *= np.exp(
+            -1j * translate_time * self.field.omega.reshape(omega_shape)
+        )
 
     def propagate(self, distance, nr_boundary=16):
         """
@@ -152,15 +156,15 @@ class Laser:
             will be attenuated (to assert proper Hankel transform).
             Only used for 'rt'.
         """
-        if self.dim == 'rt':
+        if self.dim == "rt":
             Propagator = PropagatorResampling
             spatial_axes = (self.box.axes[1],)
             # apply the boundary "absorption"
-            absorb_layer_axis = np.r_[0: np.pi/2: nr_boundary*1j]
-            absorb_layer_shape = np.cos(absorb_layer_axis)**0.5
+            absorb_layer_axis = np.r_[0 : np.pi / 2 : nr_boundary * 1j]
+            absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
             absorb_layer_shape[-1] = 0.0
             self.field.field[..., -nr_boundary:] *= absorb_layer_shape
-        elif self.dim == 'xyt':
+        elif self.dim == "xyt":
             Nt, Nx, Ny = self.field.field.shape
             Lx = self.box.hi[1] - self.box.lo[1]
             Ly = self.box.hi[2] - self.box.lo[2]
@@ -170,31 +174,36 @@ class Laser:
         self.time_to_frequency()
 
         if not hasattr(self, "prop"):
-            if self.dim == 'rt':
+            if self.dim == "rt":
                 azimuthal_modes = np.r_[
                     np.arange(self.box.n_azimuthal_modes),
-                    np.arange(-self.box.n_azimuthal_modes+1, 0, 1) ]
+                    np.arange(-self.box.n_azimuthal_modes + 1, 0, 1),
+                ]
 
-                self.prop = [Propagator(*spatial_axes, self.field.omega/scc.c,
-                                         mode=m) for m in azimuthal_modes]
-            elif self.dim == 'xyt':
-                self.prop = Propagator(*spatial_axes, self.field.omega/scc.c)
+                self.prop = [
+                    Propagator(*spatial_axes, self.field.omega / scc.c, mode=m)
+                    for m in azimuthal_modes
+                ]
+            elif self.dim == "xyt":
+                self.prop = Propagator(*spatial_axes, self.field.omega / scc.c)
 
-        if self.dim == 'rt':
+        if self.dim == "rt":
             # Loop over modes and propagate each mode by distance
             for m in range(self.field.field_fft.shape[0]):
                 self.field.field_fft[m] = self.prop[m].step(
-                        self.field.field_fft[m], distance, overwrite=True)
-        elif self.dim == 'xyt':
-            self.field.field_fft = self.prop.step(self.field.field_fft,
-                                                  distance, overwrite=True)
+                    self.field.field_fft[m], distance, overwrite=True
+                )
+        elif self.dim == "xyt":
+            self.field.field_fft = self.prop.step(
+                self.field.field_fft, distance, overwrite=True
+            )
 
         self.move_time_window(distance / scc.c)
         self.frequency_to_time()
         # Translate phase of the retrieved envelope by the distance
         self.field.field *= np.exp(1j * self.profile.omega0 * distance / scc.c)
 
-    def write_to_file(self, file_prefix="laser", file_format='h5'):
+    def write_to_file(self, file_prefix="laser", file_format="h5"):
         """
         Write the laser profile + metadata to file.
 
@@ -206,8 +215,14 @@ class Laser:
         file_format: string
             Format to be used for the output file. Options are "h5" and "bp".
         """
-        write_to_openpmd_file(self.dim, file_prefix, file_format, self.field,
-                               self.profile.lambda0, self.profile.pol )
+        write_to_openpmd_file(
+            self.dim,
+            file_prefix,
+            file_format,
+            self.field,
+            self.profile.lambda0,
+            self.profile.pol,
+        )
 
     def get_full_field(self, theta=0, slice=0):
         """
@@ -234,21 +249,21 @@ class Laser:
         field = self.field.field.copy()
         time_axis = self.box.axes[0][:, None]
 
-        if self.dim == 'rt':
+        if self.dim == "rt":
             azimuthal_modes = np.r_[
                 np.arange(self.box.n_azimuthal_modes),
-                np.arange(-self.box.n_azimuthal_modes + 1, 0, 1) ]
+                np.arange(-self.box.n_azimuthal_modes + 1, 0, 1),
+            ]
             azimuthal_phase = np.exp(-1j * azimuthal_modes * theta)
             field *= azimuthal_phase[:, None, None]
             field = field.sum(0)
-        elif self.dim == 'xyt':
+        elif self.dim == "xyt":
             Ny_middle = field.shape[-1] // 2 - 1
-            Ny_slice = int( (1 + slice) * Ny_middle )
+            Ny_slice = int((1 + slice) * Ny_middle)
             field = field[:, Ny_slice, :]
 
         field *= np.exp(-1j * omega0 * time_axis)
         field = np.real(field)
-        ext = np.r_[self.box.lo[0], self.box.hi[0],
-                    self.box.lo[1], self.box.hi[1]]
+        ext = np.r_[self.box.lo[0], self.box.hi[0], self.box.lo[1], self.box.hi[1]]
 
         return field, ext

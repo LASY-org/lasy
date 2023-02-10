@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.constants as scc
 
+
 def compute_laser_energy(dim, grid):
     """
     Computes the total laser energy that corresponds to the current
@@ -8,16 +9,18 @@ def compute_laser_energy(dim, grid):
 
     Parameters
     ----------
-    dim: string
+    dim : string
         Dimensionality of the array. Options are:
+
         - 'xyt': The laser pulse is represented on a 3D grid:
                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    grid: a Grid object. It contains a ndarrays (V/m) with
-          the value of the envelope field and an object of type
-          lasy.utils.Box that defines the points at which evaluate the laser
+    grid : a Grid object.
+        It contains a ndarrays (V/m) with
+        the value of the envelope field and an object of type
+        lasy.utils.Box that defines the points at which evaluate the laser
 
     Returns
     -------
@@ -32,21 +35,25 @@ def compute_laser_energy(dim, grid):
     envelope = grid.field
     box = grid.box
 
-    dz = box.dx[0]*scc.c
+    dz = box.dx[0] * scc.c
 
-    if dim == 'xyt':
+    if dim == "xyt":
         dV = box.dx[1] * box.dx[2] * dz
-        energy = ((dV * scc.epsilon_0 * 0.5) * \
-                abs(envelope)**2).sum()
-    elif dim == 'rt':
+        energy = ((dV * scc.epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
+    elif dim == "rt":
         r = box.axes[1]
         dr = box.dx[1]
         # 1D array that computes the volume of radial cells
-        dV = np.pi*( (r+0.5*dr)**2 - (r-0.5*dr)**2 ) * dz
-        energy = (dV[np.newaxis,np.newaxis,:] * scc.epsilon_0 * 0.5 * \
-                abs(envelope[:,:,:])**2).sum()
+        dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
+        energy = (
+            dV[np.newaxis, np.newaxis, :]
+            * scc.epsilon_0
+            * 0.5
+            * abs(envelope[:, :, :]) ** 2
+        ).sum()
 
     return energy
+
 
 def normalize_energy(dim, energy, grid):
     """
@@ -56,6 +63,7 @@ def normalize_energy(dim, energy, grid):
     -----------
     dim: string
         Dimensionality of the array. Options are:
+
         - 'xyt': The laser pulse is represented on a 3D grid:
                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
@@ -72,7 +80,7 @@ def normalize_energy(dim, energy, grid):
         return
 
     current_energy = compute_laser_energy(dim, grid)
-    norm_factor = (energy/current_energy)**.5
+    norm_factor = (energy / current_energy) ** 0.5
     grid.field *= norm_factor
 
 
@@ -93,6 +101,7 @@ def normalize_peak_field_amplitude(amplitude, grid):
         return
     grid.field = grid.field / np.abs(grid.field).max() * amplitude
 
+
 def normalize_peak_intensity(peak_intensity, grid):
     """
     Normalize energy of the laser pulse contained in grid
@@ -111,4 +120,4 @@ def normalize_peak_intensity(peak_intensity, grid):
     intensity = np.abs(scc.epsilon_0 * grid.field**2 / 2 * scc.c)
     input_peak_intensity = intensity.max()
 
-    grid.field *= np.sqrt( peak_intensity / input_peak_intensity )
+    grid.field *= np.sqrt(peak_intensity / input_peak_intensity)
