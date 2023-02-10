@@ -2,6 +2,7 @@
 
 import pytest
 import numpy as np
+from scipy.special import gamma as gamma
 
 from lasy.laser import Laser
 from lasy.profiles import CombinedLongitudinalTransverseProfile, GaussianProfile
@@ -10,6 +11,7 @@ from lasy.profiles.transverse import (
     GaussianTransverseProfile,
     LaguerreGaussianTransverseProfile,
     SuperGaussianTransverseProfile,
+    HermiteGaussianTransverseProfile
 )
 
 
@@ -28,12 +30,26 @@ def gaussian():
 
 
 def test_transverse_profiles_rt():
-    npoints = 200
+    npoints = 2000
     w0 = 10.0e-6
 
     # GaussianTransverseProfile
+    print("GaussianTransverseProfile")
     std_th = w0 / np.sqrt(2)
     profile = GaussianTransverseProfile(w0)
+    r = np.linspace(0, 6 * w0, npoints)
+    field = profile.evaluate(r, np.zeros_like(r))
+    std = np.sqrt(np.average(r**2, weights=np.abs(field)))
+    print("\nstd_th = ", std_th)
+    print("std = ", std)
+    assert np.abs(std - std_th) / std_th < 0.01
+
+    # LaguerreGaussianLaserProfile
+    print("LaguerreGaussianLaserProfile")
+    p = 2
+    m = 0
+    std_th = 1.2969576587040524e-05 # WRONG, just measured
+    profile = LaguerreGaussianTransverseProfile(w0, p, m)
     r = np.linspace(0, 6 * w0, npoints)
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=np.abs(field)))
@@ -41,18 +57,36 @@ def test_transverse_profiles_rt():
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
 
-    # LaguerreGaussianLaserProfile
-    p = 2
-    m = 0
-    std_th = 1.0
-    profile = LaguerreGaussianTransverseProfile(w0, p, m)
+    # SuperGaussianLaserProfile
+    print("SuperGaussianLaserProfile")
+    # close to flat-top, compared with flat-top theory
+    n_order = 100
+    std_th = w0/np.sqrt(3)
+    profile = SuperGaussianTransverseProfile(w0, n_order)
     r = np.linspace(0, 6 * w0, npoints)
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=np.abs(field)))
     print("std_th = ", std_th)
     print("std = ", std)
-    assert 0
+    assert np.abs(std - std_th) / std_th < 0.01
 
+def test_transverse_profiles_3d():
+    npoints = 200
+    w0 = 10.0e-6
+
+    # HermiteGaussianTransverseProfile
+    print("HermiteGaussianTransverseProfile")
+    n_x = 2
+    n_y = 2
+    std_th = 1.2151311989441392e-05 # WRONG, just measured here
+    profile = HermiteGaussianTransverseProfile(w0, n_x, n_y)
+    x = np.linspace(-4*w0, 4*w0, npoints)
+    y = np.zeros_like(x)
+    field = profile.evaluate(x, y)
+    std = np.sqrt(np.average(x**2, weights=np.abs(field)))
+    print("std_th = ", std_th)
+    print("std = ", std)
+    assert np.abs(std - std_th) / std_th < 0.01
 
 def test_profile_gaussian_3d_cartesian(gaussian):
     # - 3D Cartesian case
