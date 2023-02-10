@@ -26,17 +26,19 @@ def gaussian():
 
     return profile
 
+
 def test_gaussian_transverse_profile():
     npoints = 200
-    w0 = 10.e-6
-    std_th = w0/np.sqrt(2)
+    w0 = 10.0e-6
+    std_th = w0 / np.sqrt(2)
     profile = GaussianTransverseProfile(w0)
-    r = np.linspace(0, 6*w0, npoints)
+    r = np.linspace(0, 6 * w0, npoints)
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=np.abs(field)))
     print("std_th = ", std_th)
     print("std = ", std)
-    assert(np.abs(std-std_th)/std_th < 0.01)
+    assert np.abs(std - std_th) / std_th < 0.01
+
 
 def test_profile_gaussian_3d_cartesian(gaussian):
     # - 3D Cartesian case
