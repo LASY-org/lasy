@@ -11,7 +11,7 @@ class TransverseProfileFromData(TransverseProfile):
     of another code.
     """
 
-    def __init__(self, intensity_data, lo, hi, center_beam=True):
+    def __init__(self, intensity_data, lo, hi):
         """
         Uses user supplied data to define the transverse profile
         of the laser pulse.
@@ -35,11 +35,6 @@ class TransverseProfileFromData(TransverseProfile):
         lo, hi : list of scalars (in meters)
             Lower and higher end of the physical domain of the data.
             One element per direction (in this case 2)
-
-        center_beam: bool
-            If True (default), the beam will be centered based on its
-            center of mass.
-
         """
         super().__init__()
 
@@ -65,8 +60,6 @@ class TransverseProfileFromData(TransverseProfile):
             bounds_error=False,
             fill_value=0.0,
         )
-
-        self.center_beam = center_beam
 
     def _evaluate(self, x, y):
         """
