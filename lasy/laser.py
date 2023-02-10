@@ -70,7 +70,7 @@ class Laser:
             # Perform the azimuthal decomposition
             self.field.field[...] = np.fft.ifft(envelope, axis=0)
 
-    def normalize(self, value, kind=None):
+    def normalize(self, value, kind="energy"):
         """
         Normalize the pulse either to the energy, peak field amplitude or peak intensity
 
@@ -78,9 +78,9 @@ class Laser:
         ----------
         value: scalar
             Value to which to normalize the field property that is defined in 'kind'
-        kind: string
+        kind: string (optional)
             Distance by which the laser pulse should be propagated
-            Options: 'energy', 'field', 'intensity'
+            Options: 'energy', 'field', 'intensity' (default is 'energy')
         """
 
         if kind == "energy":
