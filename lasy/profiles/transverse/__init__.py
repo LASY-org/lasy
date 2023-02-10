@@ -7,5 +7,5 @@ __all__ = [
     "GaussianTransverseProfile",
     "HermiteGaussianTransverseProfile",
     "LaguerreGaussianTransverseProfile",
-    "SuperGaussianTransverProfile",
+    "SuperGaussianTransverseProfile",
 ]
