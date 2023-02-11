@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.constants as scc
+from scipy.interpolate import interp1d
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 
 from lasy.utils.box import Box
@@ -272,7 +273,8 @@ class Laser:
             self.profile.pol,
         )
 
-    def get_full_field(self, theta=0, slice=0, slice_axis="x"):
+    def get_full_field(self, theta=0, slice=0, slice_axis="x",
+                       refine_time_axis_factor=2):
         """
         Reconstruct the laser pulse with carrier frequency on the default grid
 
@@ -309,6 +311,35 @@ class Laser:
             field = field[:, Ny_slice, :]
         else:
             return None
+
+        if refine_time_axis_factor is not None:
+            Nt = time_axis.size
+            Nt_refined = refine_time_axis_factor * Nt
+            time_axis_refined = np.linspace(
+                self.box.lo[-1], self.box.hi[-1], Nt_refined
+            )
+            slice_abs = np.zeros(Nt)
+            slice_angl = np.zeros(Nt)
+            for ir in range(field.shape[0]):
+                slice_abs = np.abs(field[ir])
+                slice_angle = np.angle(field[ir])
+                
+
+
+                interp_fu_abs = interp1d(time_axis, np.abs(field[ir]),
+                                         fill_value='extrapolate',
+                                         kind='linear',
+                                         bounds_error=False )
+                slice_abs = interp_fu_abs(r_new)
+
+        interp_fu_angl = interp1d(r_loc, unwrap1d(np.angle(u_loc)),
+                             fill_value='extrapolate',
+                             kind='linear',
+                             bounds_error=False )
+        u_slice_angl = interp_fu_angl(r_new)
+        del interp_fu_abs, interp_fu_angl
+
+        u_slice_new = u_slice_abs * np.exp( 1j * u_slice_angl )
 
         field *= np.exp(-1j * omega0 * time_axis)
         field = np.real(field)
