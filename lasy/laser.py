@@ -160,19 +160,21 @@ class Laser:
             absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
             absorb_layer_shape[-1] = 0.0
             if self.dim == "rt":
-                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape
-            else:
                 self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
                     None, :, None
                 ]
-                self.field.field[:, :, -nr_boundary:] *= absorb_layer_shape[
-                    None, None, :
+            else:
+                self.field.field[-nr_boundary:, :, :] *= absorb_layer_shape[
+                    :, None, None
+                ]
+                self.field.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
+                    :, None, None
+                ]
+                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
+                    None, :, None
                 ]
                 self.field.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
                     None, :, None
-                ]
-                self.field.field[:, :, :nr_boundary] *= absorb_layer_shape[::-1][
-                    None, None, :
                 ]
 
         # Transform the field from temporal to frequency domain
@@ -298,12 +300,12 @@ class Laser:
             field *= azimuthal_phase[:, None, None]
             field = field.sum(0)
         elif slice_axis == "x":
-            Nx_middle = field.shape[-2] // 2 - 1
+            Nx_middle = field.shape[0] // 2 - 1
             Nx_slice = int((1 + slice) * Nx_middle)
-            field = field[Nx_slice, :, :]
+            field = field[Nx_slice, :]
         elif slice_axis == "y":
-            Ny_middle = field.shape[-1] // 2 - 1
-            Ny_slice = int((1 + slice) * Ny_middle)
+            Ny_middle = field.shape[1] // 2 - 1
+            Ny_slice = int((1 + slice) *     Ny_middle)
             field = field[:, Ny_slice, :]
         else:
             return None
@@ -311,7 +313,7 @@ class Laser:
         field *= np.exp(-1j * omega0 * time_axis)
         field = np.real(field)
         ext = np.array(
-            [self.box.lo[0], self.box.hi[0], self.box.lo[-1], self.box.hi[-1]]
+            [self.box.lo[-1], self.box.hi[-1], self.box.lo[0], self.box.hi[0]]
         )
 
         return field, ext
