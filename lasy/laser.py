@@ -273,8 +273,7 @@ class Laser:
             self.profile.pol,
         )
 
-    def get_full_field(self, theta=0, slice=0, slice_axis="x",
-                       refine_order=None):
+    def get_full_field(self, theta=0, slice=0, slice_axis="x", refine_order=None):
         """
         Reconstruct the laser pulse with carrier frequency on the default grid
 
@@ -317,19 +316,20 @@ class Laser:
         if refine_order is not None:
             Nr, Nt = field.shape
             Nt_refined = refine_order * Nt
-            time_axis_refined = np.linspace(self.box.lo[-1], self.box.hi[-1],
-            Nt_refined )
+            time_axis_refined = np.linspace(
+                self.box.lo[-1], self.box.hi[-1], Nt_refined
+            )
 
             field_refined = np.zeros((Nr, Nt_refined), dtype=field.dtype)
 
             for ir in range(Nr):
-                interp_fu_abs = interp1d(time_axis, np.abs(field[ir]) )
+                interp_fu_abs = interp1d(time_axis, np.abs(field[ir]))
                 slice_abs = interp_fu_abs(time_axis_refined)
 
                 interp_fu_angl = interp1d(time_axis, np.unwrap(np.angle(field[ir])))
                 slice_angl = interp_fu_angl(time_axis_refined)
 
-                field_refined[ir] = slice_abs * np.exp( 1j * slice_angl )
+                field_refined[ir] = slice_abs * np.exp(1j * slice_angl)
 
             time_axis = time_axis_refined
             field = field_refined
