@@ -305,7 +305,7 @@ class Laser:
             field = field[Nx_slice, :]
         elif slice_axis == "y":
             Ny_middle = field.shape[1] // 2 - 1
-            Ny_slice = int((1 + slice) *     Ny_middle)
+            Ny_slice = int((1 + slice) * Ny_middle)
             field = field[:, Ny_slice, :]
         else:
             return None
