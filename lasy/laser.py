@@ -274,7 +274,7 @@ class Laser:
         )
 
     def get_full_field(self, theta=0, slice=0, slice_axis="x",
-                       refine_time_axis_factor=2):
+                       refine_order=None):
         """
         Reconstruct the laser pulse with carrier frequency on the default grid
 
@@ -284,6 +284,8 @@ class Laser:
             Azimuthal angle
         slice : float (optional)
             Normalised position of the slice from -0.5 to 0.5
+        refine_order: int (optional)
+            A factor by with the time axis should be refined
 
         Returns
         -------
@@ -295,7 +297,7 @@ class Laser:
         """
         omega0 = self.profile.omega0
         field = self.field.field.copy()
-        time_axis = self.box.axes[-1][None, :]
+        time_axis = self.box.axes[-1]
 
         if self.dim == "rt":
             azimuthal_phase = np.exp(-1j * self.box.azimuthal_modes * theta)
@@ -312,36 +314,27 @@ class Laser:
         else:
             return None
 
-        if refine_time_axis_factor is not None:
-            Nt = time_axis.size
-            Nt_refined = refine_time_axis_factor * Nt
-            time_axis_refined = np.linspace(
-                self.box.lo[-1], self.box.hi[-1], Nt_refined
-            )
-            slice_abs = np.zeros(Nt)
-            slice_angl = np.zeros(Nt)
-            for ir in range(field.shape[0]):
-                slice_abs = np.abs(field[ir])
-                slice_angle = np.angle(field[ir])
-                
+        if refine_order is not None:
+            Nr, Nt = field.shape
+            Nt_refined = refine_order * Nt
+            time_axis_refined = np.linspace(self.box.lo[-1], self.box.hi[-1],
+            Nt_refined )
 
+            field_refined = np.zeros((Nr, Nt_refined), dtype=field.dtype)
 
-                interp_fu_abs = interp1d(time_axis, np.abs(field[ir]),
-                                         fill_value='extrapolate',
-                                         kind='linear',
-                                         bounds_error=False )
-                slice_abs = interp_fu_abs(r_new)
+            for ir in range(Nr):
+                interp_fu_abs = interp1d(time_axis, np.abs(field[ir]) )
+                slice_abs = interp_fu_abs(time_axis_refined)
 
-        interp_fu_angl = interp1d(r_loc, unwrap1d(np.angle(u_loc)),
-                             fill_value='extrapolate',
-                             kind='linear',
-                             bounds_error=False )
-        u_slice_angl = interp_fu_angl(r_new)
-        del interp_fu_abs, interp_fu_angl
+                interp_fu_angl = interp1d(time_axis, np.unwrap(np.angle(field[ir])))
+                slice_angl = interp_fu_angl(time_axis_refined)
 
-        u_slice_new = u_slice_abs * np.exp( 1j * u_slice_angl )
+                field_refined[ir] = slice_abs * np.exp( 1j * slice_angl )
 
-        field *= np.exp(-1j * omega0 * time_axis)
+            time_axis = time_axis_refined
+            field = field_refined
+
+        field *= np.exp(-1j * omega0 * time_axis[None, :])
         field = np.real(field)
         ext = np.array(
             [self.box.lo[-1], self.box.hi[-1], self.box.lo[0], self.box.hi[0]]
