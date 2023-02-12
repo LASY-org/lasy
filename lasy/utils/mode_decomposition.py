@@ -39,33 +39,35 @@ def hermite_gauss_decomposition(laserProfile,n_x_max=12,n_y_max=12):
     # Check if the provided laserProfile is a full laser profile or a
     # transverse profile.
 
-    if isinstance(laserProfile,TransverseProfile):
-        # Here we need to define a grid size to use for the calculation
-        # By default we will use N x N grid where N = 500
-        N = 500
+    assert isinstance(laserProfile,
+        TransverseProfile), "laserProfile must be an instance of TransverseProfile"
 
-        # Get the field, sensible spatial bounds for the profile 
-        lo = [None,None]
-        hi = [None,None]
-        if isinstance(laserProfile,TransverseProfileFromData):
-            lo[0] = laserProfile.field_interp.grid[0].min() + laserProfile.x_offset
-            lo[1] = laserProfile.field_interp.grid[1].min() + laserProfile.x_offset
-            hi[0] = laserProfile.field_interp.grid[0].max() + laserProfile.y_offset 
-            hi[1] = laserProfile.field_interp.grid[1].max() + laserProfile.y_offset
+    # Here we need to define a grid size to use for the calculation
+    # By default we will use N x N grid where N = 500
+    N = 500
 
-        else:
-            lo[0] = -laserProfile.w0*5 + laserProfile.x_offset
-            lo[1] = -laserProfile.w0*5 + laserProfile.x_offset
-            hi[0] = laserProfile.w0*5 + laserProfile.x_offset
-            hi[1] = laserProfile.w0*5 + laserProfile.x_offset
+    # Get the field, sensible spatial bounds for the profile 
+    lo = [None,None]
+    hi = [None,None]
+    if isinstance(laserProfile,TransverseProfileFromData):
+        lo[0] = laserProfile.field_interp.grid[0].min() + laserProfile.x_offset
+        lo[1] = laserProfile.field_interp.grid[1].min() + laserProfile.x_offset
+        hi[0] = laserProfile.field_interp.grid[0].max() + laserProfile.y_offset 
+        hi[1] = laserProfile.field_interp.grid[1].max() + laserProfile.y_offset
 
-        # Define spatial arrays
-        x = np.linspace(lo[0],hi[0],N)
-        y = np.linspace(lo[1],hi[1],N)
-        X,Y = np.meshgrid(x,y)
+    else:
+        lo[0] = -laserProfile.w0*5 + laserProfile.x_offset
+        lo[1] = -laserProfile.w0*5 + laserProfile.x_offset
+        hi[0] = laserProfile.w0*5 + laserProfile.x_offset
+        hi[1] = laserProfile.w0*5 + laserProfile.x_offset
 
-        # Get the field on this grid
-        field = laserProfile.evaluate(X,Y)
+    # Define spatial arrays
+    x = np.linspace(lo[0],hi[0],N)
+    y = np.linspace(lo[1],hi[1],N)
+    X,Y = np.meshgrid(x,y)
+
+    # Get the field on this grid
+    field = laserProfile.evaluate(X,Y)
 
 
     # Get estimate of w0
