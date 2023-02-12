@@ -321,9 +321,7 @@ class Laser:
 
         if Nt is not None:
             Nr = field.shape[0]
-            time_axis_new = np.linspace(
-                self.box.lo[-1], self.box.hi[-1], Nt
-            )
+            time_axis_new = np.linspace(self.box.lo[-1], self.box.hi[-1], Nt)
             field_new = np.zeros((Nr, Nt), dtype=field.dtype)
 
             for ir in range(Nr):
@@ -341,13 +339,11 @@ class Laser:
 
         if self.dim == "rt":
             ext = np.array(
-                [self.box.lo[-1], self.box.hi[-1],
-                 -self.box.hi[0], self.box.hi[0]]
+                [self.box.lo[-1], self.box.hi[-1], -self.box.hi[0], self.box.hi[0]]
             )
         else:
             ext = np.array(
-                [self.box.lo[-1], self.box.hi[-1],
-                 self.box.lo[0], self.box.hi[0]]
+                [self.box.lo[-1], self.box.hi[-1], self.box.lo[0], self.box.hi[0]]
             )
 
         return field, ext
