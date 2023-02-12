@@ -1,28 +1,32 @@
 from lasy.profiles.transverse.transverse_profile import TransverseProfile
-from lasy.profiles.transverse.transverse_profile_from_data import TransverseProfileFromData
-from lasy.profiles.transverse.hermite_gaussian_profile import HermiteGaussianTransverseProfile
+from lasy.profiles.transverse.transverse_profile_from_data import (
+    TransverseProfileFromData,
+)
+from lasy.profiles.transverse.hermite_gaussian_profile import (
+    HermiteGaussianTransverseProfile,
+)
 from lasy.utils.exp_data_utils import find_d4sigma
 
 import numpy as np
 import math
 
 
-def hermite_gauss_decomposition(laserProfile,n_x_max=12,n_y_max=12):
+def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12):
     """
     Decomposes a `lasy` laser profile into a set of hermite-gaussian
-    modes. 
+    modes.
 
-    The function takes either an instance of `TransverseProfile` or an 
-    instance of `Laser` (that is, either a transverse profile or the 
-    full 3D laser profile defined on a grid). In the case that an 
-    instance of `Laser` is passed then the intensity of this profile 
+    The function takes either an instance of `TransverseProfile` or an
+    instance of `Laser` (that is, either a transverse profile or the
+    full 3D laser profile defined on a grid). In the case that an
+    instance of `Laser` is passed then the intensity of this profile
     is projected onto an x-y plane for the decomposition.
 
     Parameters
     ----------
-    laserProfile: class instance 
+    laserProfile: class instance
         An instance of a class or sub-class of TransverseLaserProfile
-    
+
     n_x_max, n_y_max: ints
         The maximum values of `n_x` and `n_y` out to which the expansion
         will be performed
@@ -35,7 +39,7 @@ def hermite_gauss_decomposition(laserProfile,n_x_max=12,n_y_max=12):
         corresponding to (`n_x`,`n_y`)
 
     """
-    
+
     # Check if the provided laserProfile is a full laser profile or a
     # transverse profile.
 
@@ -71,23 +75,22 @@ def hermite_gauss_decomposition(laserProfile,n_x_max=12,n_y_max=12):
 
 
     # Get estimate of w0
-    w0 = estimate_best_HG_waist(x,y,field)
-    
+    w0 = estimate_best_HG_waist(x, y, field)
 
     # Next we loop over the modes and calculate the relevant weights
     weights = {}
     for i in range(n_x_max):
         for j in range(n_y_max):
-            HGMode = HermiteGaussianTransverseProfile(w0,i,j)
-            coef = np.sum(field*HGMode.evaluate(X,Y)) # modalDecomposition
-            if math.isnan(coef): 
+            HGMode = HermiteGaussianTransverseProfile(w0, i, j)
+            coef = np.sum(field * HGMode.evaluate(X, Y))  # modalDecomposition
+            if math.isnan(coef):
                 coef = 0
-            weights[(i,j)] = coef
+            weights[(i, j)] = coef
 
     return weights
 
 
-def estimate_best_HG_waist(x,y,field):
+def estimate_best_HG_waist(x, y, field):
     """
     Estimate the waist that maximises the weighting of the first mode.
 
@@ -96,7 +99,7 @@ def estimate_best_HG_waist(x,y,field):
 
     Parameters
     ---------
-    x,y: 1D numpy arrays 
+    x,y: 1D numpy arrays
         representing the x and y axes on which the intensity profile is defined.
 
     field: 2D numpy array
@@ -104,26 +107,26 @@ def estimate_best_HG_waist(x,y,field):
 
     """
 
-    dx = x[2]-x[1]
-    dy = y[2]-y[1]
+    dx = x[2] - x[1]
+    dy = y[2] - y[1]
 
-    assert dx == dy 
+    assert dx == dy
 
-    X, Y = np.meshgrid(x,y)
+    X, Y = np.meshgrid(x, y)
 
-    D4SigX, D4SigY = find_d4sigma(np.abs(field)**2)
+    D4SigX, D4SigY = find_d4sigma(np.abs(field) ** 2)
     print(D4SigX)
     print(D4SigY)
-    w0Est = np.mean((D4SigX, D4SigY))/2 * dx # convert this to a 1/e^2 width
+    w0Est = np.mean((D4SigX, D4SigY)) / 2 * dx  # convert this to a 1/e^2 width
 
-    waistTest = np.linspace(w0Est/2,w0Est*1.5,15)
+    waistTest = np.linspace(w0Est / 2, w0Est * 1.5, 15)
     coeffTest = np.zeros_like(waistTest)
 
     for i, wTest in enumerate(waistTest):
         # create a gaussian
-        HGMode = HermiteGaussianTransverseProfile(wTest,0,0)
-        profile = HGMode.evaluate(X,Y)
-        coeffTest[i] = np.sum(profile*field)
+        HGMode = HermiteGaussianTransverseProfile(wTest, 0, 0)
+        profile = HGMode.evaluate(X, Y)
+        coeffTest[i] = np.sum(profile * field)
     w0 = waistTest[np.argmax(coeffTest)]
 
     print(f"Estimated w0 {w0Est*1e6}")
