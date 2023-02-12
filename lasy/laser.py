@@ -16,37 +16,82 @@ class Laser:
     """
     Top-level class that can evaluate a laser profile on a grid,
     propagate it, and write it to a file.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    lo, hi : list of scalars
+        Lower and higher end of the physical domain of the box.
+        One element per direction (2 for ``dim='rt'``, 3 for ``dim='xyt'``)
+
+    npoints : tuple of int
+        Number of points in each direction.
+        One element per direction (2 for ``dim='rt'``, 3 for ``dim='xyt'``)
+        For the moment, the lower end is assumed to be (0,0) in rt and (0,0,0) in xyt
+
+    profile : an object of type lasy.profiles.profile.Profile
+        Defines how to evaluate the envelope field
+
+    n_azimuthal_modes : int (optional)
+        Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
+        used in order to represent the laser field.
+
+    Examples
+    --------
+
+    >>> import matplotlib.pyplot as plt
+    >>> from lasy.laser import Laser
+    >>> from lasy.profiles.gaussian_profile import GaussianProfile
+    >>> # Create profile.
+    >>> profile = GaussianProfile(
+    ...     wavelength=0.6e-6,  # m
+    ...     pol=(1, 0),
+    ...     laser_energy=1.,  # J
+    ...     w0=5e-6,  # m
+    ...     tau=30e-15,  # s
+    ...     t_peak=0.  # s
+    ... )
+    >>> # Create laser with given profile in `rt` geometry.
+    >>> laser = Laser(
+    ...     dim="rt",
+    ...     lo=(0e-6, -60e-15),
+    ...     hi=(10e-6, +60e-15),
+    ...     npoints=(50, 400),
+    ...     profile=profile
+    ... )
+    >>> # Propagate and visualize.
+    >>> n_steps = 3
+    >>> propagate_step = 1e-3
+    >>> fig, axes = plt.subplots(1, n_steps, sharey=True)
+    >>> for step in range(n_steps):
+    >>>     laser.propagate(propagate_step)
+    >>>     E_rt, extent = laser.get_full_field()
+    >>>     extent[:2] *= 1e6
+    >>>     extent[2:] *= 1e12
+    >>>     rmin, rmax, tmin, tmax = extent
+    >>>     vmax = np.abs(E_rt).max()
+    >>>     axes[step].imshow(
+    ...         E_rt,
+    ...         origin="lower",
+    ...         aspect="auto",
+    ...         vmax=vmax,
+    ...         vmin=-vmax,
+    ...         extent=[tmin, tmax, rmin, rmax],
+    ...         cmap='bwr',
+    ...     )
+    >>>     axes[step].set(xlabel='t (ps)')
+    >>>     if step == 0:
+    >>>         axes[step].set(ylabel='r (µm)')
     """
 
     def __init__(self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1):
-        """
-        Construct a laser object
-
-        Parameters
-        ----------
-        dim: string
-            Dimensionality of the array. Options are:
-            - 'xyt': The laser pulse is represented on a 3D grid:
-                     Cartesian (x,y) transversely, and temporal (t) longitudinally.
-            - 'rt' : The laser pulse is represented on a 2D grid:
-                     Cylindrical (r) transversely, and temporal (t) longitudinally.
-
-        lo, hi : list of scalars
-            Lower and higher end of the physical domain of the box.
-            One element per direction (2 for dim='rt', 3 for dim='xyt')
-
-        npoints : tuple of int
-            Number of points in each direction.
-            One element per direction (2 for dim='rt', 3 for dim='xyt')
-            For the moment, the lower end is assumed to be (0,0) in rt and (0,0,0) in xyt
-
-        profile: an object of type lasy.profiles.profile.Profile
-            Defines how to evaluate the envelope field
-
-        n_azimuthal_modes: int (optional)
-            Only used if `dim` is 'rt'. The number of azimuthal modes
-            used in order to represent the laser field.
-        """
         box = Box(dim, lo, hi, npoints, n_azimuthal_modes)
         self.box = box
         self.field = Grid(dim, self.box)
@@ -77,10 +122,10 @@ class Laser:
         Parameters
         ----------
         value: scalar
-            Value to which to normalize the field property that is defined in 'kind'
+            Value to which to normalize the field property that is defined in ``kind``
         kind: string (optional)
             Distance by which the laser pulse should be propagated
-            Options: 'energy', 'field', 'intensity' (default is 'energy')
+            Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
 
         if kind == "energy":
@@ -98,13 +143,13 @@ class Laser:
 
         Parameters
         ----------
-        distance: scalar
+        distance : scalar
             Distance by which the laser pulse should be propagated
 
-        nr_boundary: integer (optional)
+        nr_boundary : integer (optional)
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
-            Only used for 'rt'.
+            Only used for ``'rt'``.
         """
         time_axis_indx = -1
 
@@ -210,11 +255,11 @@ class Laser:
 
         Parameters
         ----------
-        file_prefix: string
+        file_prefix : string
             The file name will start with this prefix.
 
-        file_format: string
-            Format to be used for the output file. Options are "h5" and "bp".
+        file_format : string
+            Format to be used for the output file. Options are ``"h5"`` and ``"bp"``.
         """
         write_to_openpmd_file(
             self.dim,
@@ -228,18 +273,20 @@ class Laser:
     def get_full_field(self, theta=0, slice=0, slice_axis="x"):
         """
         Reconstruct the laser pulse with carrier frequency on the default grid
+
         Parameters
         ----------
-        theta: float (rad) (optional)
+        theta : float (rad) (optional)
             Azimuthal angle
-        slice: float (optional)
-            normalised position of the slice from -0.5 to 0.5
-        Returns:
-        --------
-            Et: ndarray (V/m)
+        slice : float (optional)
+            Normalised position of the slice from -0.5 to 0.5
+
+        Returns
+        -------
+            Et : ndarray (V/m)
                 The reconstructed field, with shape (Nr, Nt_new) (for `rt`)
                 or (Nx, Nt_new) (for `xyt`)
-            extent: ndarray (Xmin, Xmax, Tmin, Tmax)
+            extent : ndarray (Xmin, Xmax, Tmin, Tmax)
                 Physical extent of the reconstructed field
         """
         omega0 = self.profile.omega0

@@ -10,11 +10,7 @@ class TransverseProfile(object):
     """
 
     def __init__(self):
-        """
-        Initialize the transverse profile.
-
-        Here we initialise x and y spatial offsets as placeholders
-        """
+        # Initialise x and y spatial offsets as placeholders
         self.x_offset = 0
         self.y_offset = 0
 
@@ -24,7 +20,7 @@ class TransverseProfile(object):
 
         Parameters
         ----------
-        x, y: ndarrays of floats
+        x, y : ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 

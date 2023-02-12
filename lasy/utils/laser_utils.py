@@ -61,7 +61,7 @@ def normalize_energy(dim, energy, grid):
 
     Parameters
     -----------
-    dim: string
+    dim : string
         Dimensionality of the array. Options are:
 
         - 'xyt': The laser pulse is represented on a 3D grid:
@@ -69,7 +69,7 @@ def normalize_energy(dim, energy, grid):
         - 'rt' : The laser pulse is represented on a 2D grid:
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    energy: scalar (J)
+    energy : scalar (J)
         Energy of the laser pulse after normalization
 
     grid: a Grid object
@@ -90,10 +90,10 @@ def normalize_peak_field_amplitude(amplitude, grid):
 
     Parameters
     ----------
-    amplitude: scalar (V/m)
+    amplitude : scalar (V/m)
         Peak field amplitude of the laser pulse after normalization
 
-    grid: a Grid object
+    grid : a Grid object
         Contains value of the laser envelope and metadata
     """
 
@@ -108,10 +108,10 @@ def normalize_peak_intensity(peak_intensity, grid):
 
     Parameters
     ----------
-    peak_intensity: scalar (W/m^2)
+    peak_intensity : scalar (W/m^2)
         Peak field amplitude of the laser pulse after normalization
 
-    grid: a Grid object
+    grid : a Grid object
         Contains value of the laser envelope and metadata
     """
 
