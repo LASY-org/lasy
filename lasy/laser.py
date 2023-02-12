@@ -273,7 +273,7 @@ class Laser:
             self.profile.pol,
         )
 
-    def get_full_field(self, theta=0, slice=0, slice_axis="x", refine_order=None):
+    def get_full_field(self, theta=0, slice=0, slice_axis="x", Nt=None):
         """
         Reconstruct the laser pulse with carrier frequency on the default grid
 
@@ -283,15 +283,17 @@ class Laser:
             Azimuthal angle
         slice : float (optional)
             Normalised position of the slice from -0.5 to 0.5
-        refine_order: int (optional)
-            A factor by with the time axis should be refined
+        Nt: int (optional)
+            Number of time points on which field should be sampled. If is None,
+            the orignal time grid is used, otherwise field is interpolated on a
+            new grid.
 
         Returns
         -------
             Et : ndarray (V/m)
-                The reconstructed field, with shape (Nr, Nt_new) (for `rt`)
-                or (Nx, Nt_new) (for `xyt`)
-            extent : ndarray (Xmin, Xmax, Tmin, Tmax)
+                The reconstructed field, with shape (Nr, Nt) (for `rt`)
+                or (Nx, Nt) (for `xyt`)
+            extent : ndarray (Tmin, Tmax, Xmin, Xmax)
                 Physical extent of the reconstructed field
         """
         omega0 = self.profile.omega0
@@ -300,8 +302,12 @@ class Laser:
 
         if self.dim == "rt":
             azimuthal_phase = np.exp(-1j * self.box.azimuthal_modes * theta)
-            field *= azimuthal_phase[:, None, None]
-            field = field.sum(0)
+            field_upper = field * azimuthal_phase[:, None, None]
+            field_upper = field_upper.sum(0)
+            azimuthal_phase = np.exp(1j * self.box.azimuthal_modes * theta)
+            field_lower = field * azimuthal_phase[:, None, None]
+            field_lower = field_lower.sum(0)
+            field = np.vstack((field_lower[::-1][:-1], field_upper))
         elif slice_axis == "x":
             Nx_middle = field.shape[0] // 2 - 1
             Nx_slice = int((1 + slice) * Nx_middle)
@@ -313,31 +319,35 @@ class Laser:
         else:
             return None
 
-        if refine_order is not None:
-            Nr, Nt = field.shape
-            Nt_refined = refine_order * Nt
-            time_axis_refined = np.linspace(
-                self.box.lo[-1], self.box.hi[-1], Nt_refined
+        if Nt is not None:
+            Nr = field.shape[0]
+            time_axis_new = np.linspace(
+                self.box.lo[-1], self.box.hi[-1], Nt
             )
-
-            field_refined = np.zeros((Nr, Nt_refined), dtype=field.dtype)
+            field_new = np.zeros((Nr, Nt), dtype=field.dtype)
 
             for ir in range(Nr):
                 interp_fu_abs = interp1d(time_axis, np.abs(field[ir]))
-                slice_abs = interp_fu_abs(time_axis_refined)
-
+                slice_abs = interp_fu_abs(time_axis_new)
                 interp_fu_angl = interp1d(time_axis, np.unwrap(np.angle(field[ir])))
-                slice_angl = interp_fu_angl(time_axis_refined)
+                slice_angl = interp_fu_angl(time_axis_new)
+                field_new[ir] = slice_abs * np.exp(1j * slice_angl)
 
-                field_refined[ir] = slice_abs * np.exp(1j * slice_angl)
-
-            time_axis = time_axis_refined
-            field = field_refined
+            time_axis = time_axis_new
+            field = field_new
 
         field *= np.exp(-1j * omega0 * time_axis[None, :])
         field = np.real(field)
-        ext = np.array(
-            [self.box.lo[-1], self.box.hi[-1], self.box.lo[0], self.box.hi[0]]
-        )
+
+        if self.dim == "rt":
+            ext = np.array(
+                [self.box.lo[-1], self.box.hi[-1],
+                 -self.box.hi[0], self.box.hi[0]]
+            )
+        else:
+            ext = np.array(
+                [self.box.lo[-1], self.box.hi[-1],
+                 self.box.lo[0], self.box.hi[0]]
+            )
 
         return field, ext
