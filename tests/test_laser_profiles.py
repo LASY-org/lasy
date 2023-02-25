@@ -111,7 +111,7 @@ def test_profile_super_gauss():
 
 
 def test_profile_jinc():
-    # Case with jinc laser
+    # Case with Jinc laser
     wavelength = 0.8e-6
     pol = (1, 0)
     laser_energy = 1.0  # J
@@ -133,8 +133,8 @@ def test_profile_jinc():
     npoints = (50, 100)
 
     laser = Laser(dim, lo, hi, npoints, profile, n_azimuthal_modes=2)
-    laser.write_to_file("jinclaserRZ")
+    laser.write_to_file("JinclaserRZ")
     laser.propagate(1)
-    laser.write_to_file("jinclaserRZ")
+    laser.write_to_file("JinclaserRZ")
 
     return profile
