@@ -9,5 +9,5 @@ __all__ = [
     "HermiteGaussianTransverseProfile",
     "LaguerreGaussianTransverseProfile",
     "SuperGaussianTransverseProfile",
-    "JincTransverseProfile"
+    "JincTransverseProfile",
 ]
