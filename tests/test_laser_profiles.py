@@ -8,7 +8,7 @@ from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import (
     LaguerreGaussianTransverseProfile,
     SuperGaussianTransverseProfile,
-    JincTransverseProfile
+    JincTransverseProfile,
 )
 
 
