@@ -6,9 +6,15 @@
 LASY |release| Documentation
 ============================
 
-:mod:`lasy` (LAser SYmple manipulator) is a Python library that facilitates the initialization of complex laser pulses, in simulations of laser-plasma interactions.
+.. warning::
+        Warning: This library is currently in development, and it is, at this stage, only meant to be used/tested by developers. 
+        We plan on releasing the first version for general users (i.e. beta version) by summer 2023.
 
-More specifically, :mod:`lasy` offers many ways to define complex laser pulses (e.g. from commonly-known analytical formulas, from experimental measurements, etc.) and offers pre-processing functionalities (e.g. propagation, re-normalization, geometry conversion). 
+
+
+``lasy`` (LAser SYmple manipulator) is a Python library that facilitates the initialization of complex laser pulses, in simulations of laser-plasma interactions.
+
+More specifically, ``lasy`` offers many ways to define complex laser pulses (e.g. from commonly-known analytical formulas, from experimental measurements, etc.) and offers pre-processing functionalities (e.g. propagation, re-normalization, geometry conversion). 
 The laser field is then exported in a standardized file, that can be read by external simulation codes.
 
 The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>`__. Contributions are welcome!
@@ -22,7 +28,7 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
     **Getting Started**
     ^^^^^^^^^^^^^^
 
-    New to :mod:`lasy`? Check this out for installation instructions and a first example.
+    New to ``lasy``? Check this out for installation instructions and a first example.
 
     +++
 
@@ -50,7 +56,7 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
     **API Reference**
     ^^^^^^^^^^^^^^^^^
 
-    Get into the nuts and bolts of the :mod:`lasy` API with the documentation here.
+    Get into the nuts and bolts of the ``lasy`` API with the documentation here.
 
     +++
 
