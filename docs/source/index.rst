@@ -6,22 +6,29 @@
 LASY |release| Documentation
 ============================
 
+:mod:`lasy` (LAser SYmple manipulator) is a Python library that facilitates the initialization of complex laser pulses, in simulations of laser-plasma interactions.
+
+More specifically, :mod:`lasy` offers many ways to define complex laser pulses (e.g. from commonly-known analytical formulas, from experimental measurements, etc.) and offers pre-processing functionalities (e.g. propagation, re-normalization, geometry conversion). 
+The laser field is then exported in a standardized file, that can be read by external simulation codes.
+
+The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>`__. Contributions are welcome!
+
 .. panels::
     :card: + intro-card text-center
     :column: col-lg-6 col-md-6 col-sm-6 col-xs-12 p-2 d-flex
 
     ---
 
-    **User Guide**
+    **Getting Started**
     ^^^^^^^^^^^^^^
 
-    Instructions on getting started with the code.
+    New to :mod:`lasy`? Check this out for installation instructions and a first example.
 
     +++
 
     .. link-button:: user_guide/index
             :type: ref
-            :text: How do I LASY?
+            :text: More Information
             :classes: btn-outline-primary btn-block stretched-link
 
     ---
@@ -43,7 +50,7 @@ LASY |release| Documentation
     **API Reference**
     ^^^^^^^^^^^^^^^^^
 
-    Detailed documentation of the LASY API.
+    Get into the nuts and bolts of the :mod:`lasy` API with the documentation here.
 
     +++
 
@@ -57,7 +64,7 @@ LASY |release| Documentation
     **Tutorials**
     ^^^^^^^^^^^^^
 
-    Some step by step guides to using the code and some examples.
+    Some step-by-step guides to using the code and some common examples which you might find useful.
 
     +++
 
