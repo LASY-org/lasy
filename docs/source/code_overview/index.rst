@@ -2,10 +2,10 @@ Overview of the Code
 ====================
 
 ``lasy`` manipulates laser pulses, and operates on the laser envelope.
-It can be used to define the 3D profile of a laser pulse. 
+It can be used to define the 3D profile of a laser pulse.
 The user can define seperately the transverse and longitudinal profile of the laser pulse either from a range common analytic profiles or using experimental measurements.
 Once defined the laser pulse may be propagated to a user defined location.
-Finally the laser profile may outputed to file for use as an input to a variety of different simulation tools. 
+Finally the laser profile may outputed to file for use as an input to a variety of different simulation tools.
 
 Structure
 #########
@@ -13,11 +13,11 @@ All information pertaining to the representation of the laser pulse in the code 
 This contains both the physical and computational parameters.
 
 The physical laser pulse parameters are defined in the laser :doc:`profile <../api/profiles/index>`.
-This is typically constructed from a :doc:`combination <../api/profiles/combined_profile>` of two classes representing the :doc:`longitudinal <../api/profiles/longitudinal/index>` and :doc:`transverse <../api/profiles/transverse/index>` profiles of the laser. 
+This is typically constructed from a :doc:`combination <../api/profiles/combined_profile>` of two classes representing the :doc:`longitudinal <../api/profiles/longitudinal/index>` and :doc:`transverse <../api/profiles/transverse/index>` profiles of the laser.
 Alternatively, one can define the full 3D profile in a single function, for example the :doc:`GaussianProfile <../api/profiles/gaussian>`
 
 The data associated with a given laser pulse is stored on a :doc:`grid <../api/utils/grid>`.
-To create this grid and populate it with a laser pulse, we need to know something about the computational parmaeters being used. 
+To create this grid and populate it with a laser pulse, we need to know something about the computational parmaeters being used.
 For example, the metadata associated with this grid such as the coordinate system being used, lower and higher ends of the computational domain and number of points etc..
 All of this information is stored in the :doc:`box <../api/utils/box>` class.
 
