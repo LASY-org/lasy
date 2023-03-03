@@ -28,7 +28,11 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
     **Getting Started**
     ^^^^^^^^^^^^^^
 
+<<<<<<< HEAD
     New to ``lasy``? Check this out for installation instructions and a first example.
+=======
+    New to :mod:`lasy`? Check this out for installation instructions and a first example.
+>>>>>>> 3520659412e87dd3d7278db6c5fd8262a521017b
 
     +++
 
@@ -56,7 +60,11 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
     **API Reference**
     ^^^^^^^^^^^^^^^^^
 
+<<<<<<< HEAD
     Get into the nuts and bolts of the ``lasy`` API with the documentation here.
+=======
+    Get into the nuts and bolts of the :mod:`lasy` API with the documentation here.
+>>>>>>> 3520659412e87dd3d7278db6c5fd8262a521017b
 
     +++
 
