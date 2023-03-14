@@ -87,19 +87,20 @@ class SummedProfile(Profile):
         ), "All summands must be Profile objects."
         self.profiles = profiles
         # Get the wavelength values from each profile
-        self.lambda0 = [p.lambda0 for p in self.profiles]
-        self.pol = [p.pol for p in self.profiles]
+        lambda0s = [p.lambda0 for p in self.profiles]
+        pols = [p.pol for p in self.profiles]
         # Check that all wavelengths are the same
         assert np.allclose(
-            self.lambda0, self.lambda0[0]
+            lambda0s, lambda0s[0]
         ), "Added profiles must have the same wavelength."
-        self.lambda0 = profiles[0].lambda0
-        self.omega0 = 2 * np.pi * c / self.lambda0
+        lambda0 = profiles[0].lambda0
         # Check that all polarizations are the same
         assert np.allclose(
-            self.pol, self.pol[0]
+            pols, pols[0]
         ), "Added profiles must have the same polarization."
-        self.pol = profiles[0].pol
+        pol = profiles[0].pol
+        # Initialize the parent class
+        super().__init__(lambda0, pol)
 
     def evaluate(self, x, y, t):
         """Return the envelope field of the summed profile."""
@@ -129,11 +130,11 @@ class ScaledProfile(Profile):
         assert isinstance(profile, Profile), "The profile must be a Profile object."
         self.profile = profile
         self.factor = factor
-        # Get the wavelength and frequency
-        self.lambda0 = profile.lambda0
-        self.omega0 = profile.omega0
-        # Check that all polarizations are the same
-        self.pol = profile.pol
+        # Get the wavelength and polarization from the profile
+        lambda0 = profile.lambda0
+        pol = profile.pol
+        # Initialize the parent class
+        super().__init__(lambda0, pol)
 
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
