@@ -48,8 +48,6 @@ class TransverseProfileFromData(TransverseProfile):
         x_data = np.linspace(lo[0], hi[0], n_x)
         y_data = np.linspace(lo[1], hi[1], n_y)
 
-        assert dx == dy, "Data elements are not square"
-
         # Normalise the profile such that its squared integeral == 1
         intensity_data /= np.sum(intensity_data) * dx * dy
 

@@ -5,39 +5,36 @@ from .longitudinal_profile import LongitudinalProfile
 
 class GaussianLongitudinalProfile(LongitudinalProfile):
     """
-    Derived class for the analytic profile of a Gaussian laser pulse.
+    Derived class for the analytic profile of a longitudinally-Gaussian laser pulse.
+
+    More precisely, the longitudinal envelope
+    (to be used in the :class:CombinedLongitudinalTransverseProfile class)
+    corresponds to:
+
+    .. math::
+
+        \\mathcal{L}(t) = \\exp\\left( - \\frac{(t-t_{peak})^2}{\\tau^2}
+                        + i\\omega_0t_{peak} \\right)
+
+    Parameters
+    ----------
+    tau : float (in second)
+        The duration of the laser pulse, i.e. :math:`\\tau` in the above
+        formula. Note that :math:`\\tau = \\tau_{FWHM}/\\sqrt{2\\log(2)}`,
+        where :math:`\\tau_{FWHM}` is the Full-Width-Half-Maximum duration
+        of the intensity distribution of the pulse.
+
+    t_peak : float (in second)
+        The time at which the laser envelope reaches its maximum amplitude,
+        i.e. :math:`t_{peak}` in the above formula.
+
+    cep_phase : float (in radian), optional
+        The Carrier Enveloppe Phase (CEP), i.e. :math:`\\phi_{cep}`
+        in the above formula (i.e. the phase of the laser
+        oscillation, at the time where the laser envelope is maximum)
     """
 
     def __init__(self, wavelength, tau, t_peak, cep_phase=0):
-        """
-        Defines a longitudinally-Gaussian laser envelope.
-
-        More precisely, the longitudinal envelope
-        (to be used in the :class:CombinedLongitudinalTransverseProfile class)
-        corresponds to:
-
-        .. math::
-
-            \\mathcal{L}(t) = \\exp\\left( - \\frac{(t-t_{peak})^2}{\\tau^2}
-                            + i\\omega_0t_{peak} \\right)
-
-        Parameters
-        ----------
-        tau: float (in second)
-            The duration of the laser pulse, i.e. :math:`\\tau` in the above
-            formula. Note that :math:`\\tau = \\tau_{FWHM}/\\sqrt{2\\log(2)}`,
-            where :math:`\\tau_{FWHM}` is the Full-Width-Half-Maximum duration
-            of the intensity distribution of the pulse.
-
-        t_peak: float (in second)
-            The time at which the laser envelope reaches its maximum amplitude,
-            i.e. :math:`t_{peak}` in the above formula.
-
-        cep_phase: float (in radian), optional
-            The Carrier Enveloppe Phase (CEP), i.e. :math:`\\phi_{cep}`
-            in the above formula (i.e. the phase of the laser
-            oscillation, at the time where the laser envelope is maximum)
-        """
         super().__init__(wavelength)
         self.tau = tau
         self.t_peak = t_peak

@@ -11,9 +11,6 @@ class LongitudinalProfile(object):
     """
 
     def __init__(self, wavelength):
-        """
-        Initialize the longitudinal profile
-        """
         self.lambda0 = wavelength
         self.omega0 = 2 * scc.pi * scc.c / self.lambda0
 
@@ -23,7 +20,7 @@ class LongitudinalProfile(object):
 
         Parameters
         ----------
-        t: ndarrays of floats
+        t : ndarrays of floats
             Define points on which to evaluate the envelope
 
         Returns
