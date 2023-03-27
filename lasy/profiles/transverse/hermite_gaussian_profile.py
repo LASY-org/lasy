@@ -8,39 +8,36 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
     """
     Derived class for an analytic profile of a high-order Gaussian
     laser pulse expressed in the Hermite-Gaussian formalism.
+
+    More precisely, the transverse envelope
+    (to be used in the :class:CombinedLongitudinalTransverseLaser class)
+    corresponds to:
+
+    .. math::
+        \\mathcal{T}(x, y) =
+        H_{n_x}\\left ( \\frac{\\sqrt{2} x}{w_0}\\right )\\,
+        H_{n_y}\\left ( \\frac{\\sqrt{2} y}{w_0}\\right )\\,
+        \\exp\\left( -\\frac{x^2+y^2}{w_0^2} \\right)
+
+    where  :math:`H_{n}` is the Hermite polynomial of order :math:`n`.
+
+    Parameters
+    ----------
+    w0 : float (in meter)
+        The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
+    n_x : int (dimensionless)
+        The order of hermite polynomial in the x direction
+    n_y : int (dimensionless)
+        The order of hermite polynomial in the y direction
     """
 
     def __init__(self, w0, n_x, n_y):
-        """
-        Defines a Hermite-Gaussian transverse envelope
-
-        More precisely, the transverse envelope
-        (to be used in the :class:CombinedLongitudinalTransverseLaser class)
-        corresponds to:
-
-        .. math::
-            \\mathcal{T}(x, y) =
-            H_{n_x}\\left ( \\frac{\\sqrt{2} x}{w_0}\\right )\\,
-            H_{n_y}\\left ( \\frac{\\sqrt{2} y}{w_0}\\right )\\,
-            \\exp\\left( -\\frac{x^2+y^2}{w_0^2} \\right)
-
-        where  :math:`H_{n}` is the Hermite polynomial of order :math:`n`.
-
-        Parameters
-        ----------
-        w0: float (in meter)
-            The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
-        n_x: int (dimensionless)
-            The order of hermite polynomial in the x direction
-        n_y: int (dimensionless)
-            The order of hermite polynomial in the y direction
-        """
         super().__init__()
         self.w0 = w0
         self.n_x = n_x
         self.n_y = n_y
 
-    def evaluate(self, x, y):
+    def _evaluate(self, x, y):
         """
         Returns the transverse envelope
 

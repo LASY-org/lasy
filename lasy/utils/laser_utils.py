@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.constants as scc
+from scipy.constants import c, epsilon_0
 
 
 def compute_laser_energy(dim, grid):
@@ -35,11 +35,11 @@ def compute_laser_energy(dim, grid):
     envelope = grid.field
     box = grid.box
 
-    dz = box.dx[-1] * scc.c
+    dz = box.dx[-1] * c
 
     if dim == "xyt":
         dV = box.dx[0] * box.dx[1] * dz
-        energy = ((dV * scc.epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
+        energy = ((dV * epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
     elif dim == "rt":
         r = box.axes[0]
         dr = box.dx[0]
@@ -47,7 +47,7 @@ def compute_laser_energy(dim, grid):
         dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
         energy = (
             dV[np.newaxis, :, np.newaxis]
-            * scc.epsilon_0
+            * epsilon_0
             * 0.5
             * abs(envelope[:, :, :]) ** 2
         ).sum()
@@ -61,7 +61,7 @@ def normalize_energy(dim, energy, grid):
 
     Parameters
     -----------
-    dim: string
+    dim : string
         Dimensionality of the array. Options are:
 
         - 'xyt': The laser pulse is represented on a 3D grid:
@@ -69,7 +69,7 @@ def normalize_energy(dim, energy, grid):
         - 'rt' : The laser pulse is represented on a 2D grid:
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    energy: scalar (J)
+    energy : scalar (J)
         Energy of the laser pulse after normalization
 
     grid: a Grid object
@@ -90,10 +90,10 @@ def normalize_peak_field_amplitude(amplitude, grid):
 
     Parameters
     ----------
-    amplitude: scalar (V/m)
+    amplitude : scalar (V/m)
         Peak field amplitude of the laser pulse after normalization
 
-    grid: a Grid object
+    grid : a Grid object
         Contains value of the laser envelope and metadata
     """
 
@@ -108,16 +108,16 @@ def normalize_peak_intensity(peak_intensity, grid):
 
     Parameters
     ----------
-    peak_intensity: scalar (W/m^2)
+    peak_intensity : scalar (W/m^2)
         Peak field amplitude of the laser pulse after normalization
 
-    grid: a Grid object
+    grid : a Grid object
         Contains value of the laser envelope and metadata
     """
 
     if peak_intensity is None:
         return
-    intensity = np.abs(scc.epsilon_0 * grid.field**2 / 2 * scc.c)
+    intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
     input_peak_intensity = intensity.max()
 
     grid.field *= np.sqrt(peak_intensity / input_peak_intensity)

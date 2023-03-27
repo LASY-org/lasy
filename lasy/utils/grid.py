@@ -4,24 +4,22 @@ import numpy as np
 class Grid:
     """
     Contains data for fields (in position or Fourier space), including metadata
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    box : Box
+        Object containing metadata for the grid array
     """
 
     def __init__(self, dim, box):
-        """
-        Initialize a grid object.
-
-        Parameters
-        ----------
-        dim: string
-            Dimensionality of the array. Options are:
-            - 'xyt': The laser pulse is represented on a 3D grid:
-                     Cartesian (x,y) transversely, and temporal (t) longitudinally.
-            - 'rt' : The laser pulse is represented on a 2D grid:
-                     Cylindrical (r) transversely, and temporal (t) longitudinally.
-
-        box : Box
-            Object containing metadata for the grid array
-        """
         self.box = box
         if dim == "xyt":
             self.field = np.zeros(box.npoints, dtype="complex128")
