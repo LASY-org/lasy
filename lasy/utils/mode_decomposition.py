@@ -30,9 +30,9 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500)
     n_x_max, n_y_max : ints
         The maximum values of `n_x` and `n_y` out to which the expansion
         will be performed
-    
+
     N_pts : int
-        The number of grid points in x and y that will be used during the 
+        The number of grid points in x and y that will be used during the
         decomposition calculation
 
     Returns
@@ -74,12 +74,11 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500)
     x = np.linspace(lo[0], hi[0], N_pts)
     y = np.linspace(lo[1], hi[1], N_pts)
     X, Y = np.meshgrid(x, y)
-    dx = x[2]-x[1]
-    dy = y[2]-y[1]
+    dx = x[2] - x[1]
+    dy = y[2] - y[1]
 
     # Get the field on this grid
     field = laserProfile.evaluate(X, Y)
-    
 
     # Get estimate of w0
     w0 = estimate_best_HG_waist(x, y, field)
@@ -89,7 +88,7 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500)
     for i in range(n_x_max):
         for j in range(n_y_max):
             HGMode = HermiteGaussianTransverseProfile(w0, i, j)
-            coef = np.sum(field * HGMode.evaluate(X, Y))*dx*dy  # modalDecomposition
+            coef = np.sum(field * HGMode.evaluate(X, Y)) * dx * dy  # modalDecomposition
             if math.isnan(coef):
                 coef = 0
             weights[(i, j)] = coef
@@ -103,9 +102,9 @@ def estimate_best_HG_waist(x, y, field):
 
     Calculates a D4Sigma waist as a first estimate and then tests multiple
     gaussians with waists around this value to determine which has the best
-    overlap with the provided intensity profile. The aim here is to maximise 
-    the energy in the fundamental mode of the reconstruction and so to avoid 
-    a decomposition with significant higher-order modal content. 
+    overlap with the provided intensity profile. The aim here is to maximise
+    the energy in the fundamental mode of the reconstruction and so to avoid
+    a decomposition with significant higher-order modal content.
 
     Parameters
     ---------
@@ -140,5 +139,5 @@ def estimate_best_HG_waist(x, y, field):
         coeffTest[i] = np.sum(profile * field)
     w0 = waistTest[np.argmax(coeffTest)]
 
-    print("Estimated w0 = %.2f microns" %(w0Est*1e6))
+    print("Estimated w0 = %.2f microns" % (w0Est * 1e6))
     return w0
