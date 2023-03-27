@@ -36,6 +36,14 @@ def find_d4sigma(img):
 
     https://en.wikipedia.org/wiki/Beam_diameter#D4%CF%83_or_second-moment_width
 
+    Parameters
+    ----------
+    img : A numpy array containing the spatial intensity profile of a laser pulse.
+
+    Returns
+    -------
+    D4sigX : The D4sigma along the first (x) axis
+    D4sigY : The D4sigma along the second (y) axis
     """
 
     rows, cols = np.shape(img)

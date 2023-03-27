@@ -24,10 +24,10 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12):
 
     Parameters
     ----------
-    laserProfile: class instance
+    laserProfile : class instance
         An instance of a class or sub-class of TransverseLaserProfile
 
-    n_x_max, n_y_max: ints
+    n_x_max, n_y_max : ints
         The maximum values of `n_x` and `n_y` out to which the expansion
         will be performed
 
@@ -96,13 +96,12 @@ def estimate_best_HG_waist(x, y, field):
 
     Calculates a D4Sigma waist as a first estimate and then
 
-
     Parameters
     ---------
-    x,y: 1D numpy arrays
+    x,y : 1D numpy arrays
         representing the x and y axes on which the intensity profile is defined.
 
-    field: 2D numpy array
+    field : 2D numpy array representing the field (not the laser intensity).
         the laser field profile in a 2D slice.
 
     """
@@ -119,6 +118,9 @@ def estimate_best_HG_waist(x, y, field):
     print(D4SigY)
     w0Est = np.mean((D4SigX, D4SigY)) / 2 * dx  # convert this to a 1/e^2 width
 
+    # Scan around the waist obtained from the D4sigma calculation,
+    # and keep the waist for which this HG mode has the highest scalar
+    # product with the input profile.
     waistTest = np.linspace(w0Est / 2, w0Est * 1.5, 15)
     coeffTest = np.zeros_like(waistTest)
 
@@ -129,5 +131,5 @@ def estimate_best_HG_waist(x, y, field):
         coeffTest[i] = np.sum(profile * field)
     w0 = waistTest[np.argmax(coeffTest)]
 
-    print(f"Estimated w0 {w0Est*1e6}")
+    print(f"Estimated w0 {w0Est*1e6} microns")
     return w0
