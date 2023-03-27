@@ -88,6 +88,16 @@ repos:
 #    exclude: ^(docs/.*|tools/.*)$
 # Alternatively: use autopep8?
 
+# Docstring formatting according to numpy style
+- repo: https://github.com/PyCQA/docformatter
+  rev: v1.5.1
+  hooks:
+    - id: docformatter
+      args: [
+        --in-place,
+        --config=./pyproject.toml,
+      ]
+
 # Python Formatting
 - repo: https://github.com/psf/black
   rev: 23.1.0 # Keep in sync with blacken-docs

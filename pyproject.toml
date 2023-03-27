@@ -1,0 +1,6 @@
+[tool.docformatter]
+wrap-summaries = 79
+wrap-descriptions = 72
+non-strict = false
+syntax = "numpy"
+black = true
