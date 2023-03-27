@@ -4,8 +4,7 @@ from .transverse import GaussianTransverseProfile
 
 
 class GaussianProfile(CombinedLongitudinalTransverseProfile):
-    """
-    Derived class for the analytic profile of a Gaussian laser pulse.
+    """Derived class for the analytic profile of a Gaussian laser pulse.
 
     More precisely, the electric field corresponds to:
 

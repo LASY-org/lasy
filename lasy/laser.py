@@ -13,9 +13,8 @@ from lasy.utils.openpmd_output import write_to_openpmd_file
 
 
 class Laser:
-    """
-    Top-level class that can evaluate a laser profile on a grid,
-    propagate it, and write it to a file.
+    """Top-level class that can evaluate a laser profile on a grid, propagate
+    it, and write it to a file.
 
     Parameters
     ----------
@@ -116,8 +115,8 @@ class Laser:
             self.field.field[...] = np.fft.ifft(envelope, axis=0)
 
     def normalize(self, value, kind="energy"):
-        """
-        Normalize the pulse either to the energy, peak field amplitude or peak intensity
+        """Normalize the pulse either to the energy, peak field amplitude or
+        peak intensity.
 
         Parameters
         ----------
@@ -138,8 +137,7 @@ class Laser:
             raise ValueError(f'kind "{kind}" not recognized')
 
     def propagate(self, distance, nr_boundary=None, backend="NP"):
-        """
-        Propagate the laser pulse by the distance specified
+        """Propagate the laser pulse by the distance specified.
 
         Parameters
         ----------
@@ -247,8 +245,7 @@ class Laser:
         self.field.field *= np.exp(1j * self.profile.omega0 * distance / scc.c)
 
     def write_to_file(self, file_prefix="laser", file_format="h5"):
-        """
-        Write the laser profile + metadata to file.
+        """Write the laser profile + metadata to file.
 
         Parameters
         ----------
@@ -268,8 +265,8 @@ class Laser:
         )
 
     def get_full_field(self, theta=0, slice=0, slice_axis="x"):
-        """
-        Reconstruct the laser pulse with carrier frequency on the default grid
+        """Reconstruct the laser pulse with carrier frequency on the default
+        grid.
 
         Parameters
         ----------

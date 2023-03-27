@@ -4,8 +4,7 @@ from .transverse_profile import TransverseProfile
 
 
 class GaussianTransverseProfile(TransverseProfile):
-    """
-    Derived class for the analytic profile of a Gaussian laser pulse.
+    """Derived class for the analytic profile of a Gaussian laser pulse.
 
     More precisely, the transverse envelope
     (to be used in the :class:CombinedLongitudinalTransverseLaser class)
@@ -26,8 +25,7 @@ class GaussianTransverseProfile(TransverseProfile):
         self.w0 = w0
 
     def _evaluate(self, x, y):
-        """
-        Returns the transverse envelope
+        """Returns the transverse envelope.
 
         Parameters
         ----------

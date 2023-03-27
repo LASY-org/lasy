@@ -4,8 +4,8 @@ from .longitudinal_profile import LongitudinalProfile
 
 
 class GaussianLongitudinalProfile(LongitudinalProfile):
-    """
-    Derived class for the analytic profile of a longitudinally-Gaussian laser pulse.
+    """Derived class for the analytic profile of a longitudinally-Gaussian
+    laser pulse.
 
     More precisely, the longitudinal envelope
     (to be used in the :class:CombinedLongitudinalTransverseProfile class)
@@ -41,8 +41,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         self.cep_phase = cep_phase
 
     def evaluate(self, t):
-        """
-        Returns the longitudinal envelope
+        """Returns the longitudinal envelope.
 
         Parameters
         ----------

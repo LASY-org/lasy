@@ -3,9 +3,8 @@ from scipy.constants import c, epsilon_0
 
 
 def compute_laser_energy(dim, grid):
-    """
-    Computes the total laser energy that corresponds to the current
-    envelope data. This is used mainly for normalization purposes.
+    """Computes the total laser energy that corresponds to the current envelope
+    data. This is used mainly for normalization purposes.
 
     Parameters
     ----------
@@ -56,8 +55,7 @@ def compute_laser_energy(dim, grid):
 
 
 def normalize_energy(dim, energy, grid):
-    """
-    Normalize energy of the laser pulse contained in grid
+    """Normalize energy of the laser pulse contained in grid.
 
     Parameters
     -----------
@@ -85,8 +83,7 @@ def normalize_energy(dim, energy, grid):
 
 
 def normalize_peak_field_amplitude(amplitude, grid):
-    """
-    Normalize energy of the laser pulse contained in grid
+    """Normalize energy of the laser pulse contained in grid.
 
     Parameters
     ----------
@@ -103,8 +100,7 @@ def normalize_peak_field_amplitude(amplitude, grid):
 
 
 def normalize_peak_intensity(peak_intensity, grid):
-    """
-    Normalize energy of the laser pulse contained in grid
+    """Normalize energy of the laser pulse contained in grid.
 
     Parameters
     ----------

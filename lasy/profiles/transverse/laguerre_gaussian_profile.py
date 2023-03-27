@@ -5,9 +5,8 @@ from .transverse_profile import TransverseProfile
 
 
 class LaguerreGaussianTransverseProfile(TransverseProfile):
-    """
-    Derived class for an analytic profile of a high-order Gaussian
-    laser pulse expressed in the Laguerre-Gaussian formalism.
+    """Derived class for an analytic profile of a high-order Gaussian laser
+    pulse expressed in the Laguerre-Gaussian formalism.
 
     More precisely, the transverse envelope
     (to be used in the :class:CombinedLongitudinalTransverseLaser class)
@@ -41,8 +40,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         self.m = m
 
     def _evaluate(self, x, y):
-        """
-        Returns the transverse envelope
+        """Returns the transverse envelope.
 
         Parameters
         ----------

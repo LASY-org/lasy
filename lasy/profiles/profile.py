@@ -3,8 +3,7 @@ from scipy.constants import c
 
 
 class Profile(object):
-    """
-    Base class for all laser profiles.
+    """Base class for all laser profiles.
 
     Any new laser profile should inherit from this class, and define its own
     `evaluate` method, using the same signature as the method below.
@@ -24,7 +23,6 @@ class Profile(object):
         - Linear polarization in y: pol = (0,1)
         - Circular polarization: pol = (1,j)/sqrt(2) (j is the imaginary number)
         The polarization vector is normalized to have a unitary magnitude.
-
     """
 
     def __init__(self, wavelength, pol):
@@ -35,8 +33,7 @@ class Profile(object):
         self.omega0 = 2 * np.pi * c / self.lambda0
 
     def evaluate(self, x, y, t):
-        """
-        Returns the envelope field of the laser
+        """Returns the envelope field of the laser.
 
         Parameters
         ----------
@@ -68,8 +65,7 @@ class Profile(object):
 
 
 class SummedProfile(Profile):
-    """
-    Base class for profiles that are the sum of several other profiles.
+    """Base class for profiles that are the sum of several other profiles.
 
     Profile class that represents the sum of multiple profiles.
 
@@ -109,8 +105,7 @@ class SummedProfile(Profile):
 
 
 class ScaledProfile(Profile):
-    """
-    Base class for profiles that are scaled by a factor.
+    """Base class for profiles that are scaled by a factor.
 
     Profile class that represents scaled profiles.
 

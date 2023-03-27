@@ -2,8 +2,7 @@ import numpy as np
 
 
 def find_center_of_mass(img):
-    """
-    Finds the center of mass of an image.
+    """Finds the center of mass of an image.
 
     Parameters:
     -----------
@@ -15,7 +14,6 @@ def find_center_of_mass(img):
     x0 , y0: floats
         The center of mass of the image along the horizontal
         and the vertical. The units are in pixels.
-
     """
     rows, cols = np.shape(img)
     x_data = np.linspace(0, cols - 1, cols)

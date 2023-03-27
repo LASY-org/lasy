@@ -4,8 +4,7 @@ from .transverse_profile import TransverseProfile
 
 
 class SuperGaussianTransverseProfile(TransverseProfile):
-    """
-    Derived class for the analytic profile of a super-Gaussian laser pulse.
+    """Derived class for the analytic profile of a super-Gaussian laser pulse.
 
     More precisely, the transverse envelope corresponds to:
 
@@ -30,8 +29,7 @@ class SuperGaussianTransverseProfile(TransverseProfile):
         self.n_order = n_order
 
     def _evaluate(self, x, y):
-        """
-        Returns the transverse envelope
+        """Returns the transverse envelope.
 
         Parameters
         ----------

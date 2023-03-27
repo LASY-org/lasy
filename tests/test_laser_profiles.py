@@ -14,9 +14,7 @@ from lasy.profiles.transverse import (
 
 
 class MockProfile(Profile):
-    """
-    A mock Profile class that always returns a constant value.
-    """
+    """A mock Profile class that always returns a constant value."""
 
     def __init__(self, wavelength, pol, value):
         super().__init__(wavelength, pol)

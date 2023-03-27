@@ -2,8 +2,7 @@ from .profile import Profile
 
 
 class CombinedLongitudinalTransverseProfile(Profile):
-    """
-    Class that combines a longitudinal and transverse laser profile
+    """Class that combines a longitudinal and transverse laser profile.
 
     The combined profile is defined as the product of the longitudinal and transverse
     profile.
@@ -53,8 +52,7 @@ class CombinedLongitudinalTransverseProfile(Profile):
         self.trans_profile = trans_profile
 
     def evaluate(self, x, y, t):
-        """
-        Returns the envelope field of the laser
+        """Returns the envelope field of the laser.
 
         Parameters
         ----------

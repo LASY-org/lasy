@@ -3,11 +3,11 @@ import scipy.constants as scc
 
 
 class LongitudinalProfile(object):
-    """
-    Base class for longitudinal profiles of laser pulses.
+    """Base class for longitudinal profiles of laser pulses.
 
-    Any new longitudinal profile should inherit from this class, and define
-    its own `evaluate` method, using the same signature as the method below.
+    Any new longitudinal profile should inherit from this class, and
+    define its own `evaluate` method, using the same signature as the
+    method below.
     """
 
     def __init__(self, wavelength):
@@ -15,8 +15,7 @@ class LongitudinalProfile(object):
         self.omega0 = 2 * scc.pi * scc.c / self.lambda0
 
     def evaluate(self, t):
-        """
-        Returns the longitudinal envelope
+        """Returns the longitudinal envelope.
 
         Parameters
         ----------

@@ -2,9 +2,8 @@ import numpy as np
 
 
 class Box:
-    """
-    Contain metadata on index and physical space for an array,
-    as well as handy methods.
+    """Contain metadata on index and physical space for an array, as well as
+    handy methods.
 
     Parameters
     ----------

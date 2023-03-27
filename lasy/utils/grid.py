@@ -2,8 +2,8 @@ import numpy as np
 
 
 class Grid:
-    """
-    Contains data for fields (in position or Fourier space), including metadata
+    """Contains data for fields (in position or Fourier space), including
+    metadata.
 
     Parameters
     ----------

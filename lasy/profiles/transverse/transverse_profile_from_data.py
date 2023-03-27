@@ -5,16 +5,12 @@ from .transverse_profile import TransverseProfile
 
 
 class TransverseProfileFromData(TransverseProfile):
-    """
-    Derived class for transverse laser profile created using
-    data from an experimental measurement or from the output
-    of another code.
-    """
+    """Derived class for transverse laser profile created using data from an
+    experimental measurement or from the output of another code."""
 
     def __init__(self, intensity_data, lo, hi):
-        """
-        Uses user supplied data to define the transverse profile
-        of the laser pulse.
+        """Uses user supplied data to define the transverse profile of the
+        laser pulse.
 
         The data must be supplied as a 2D numpy array of intensity
         values (for example an imported cameran image from an
@@ -60,8 +56,7 @@ class TransverseProfileFromData(TransverseProfile):
         )
 
     def _evaluate(self, x, y):
-        """
-        Returns the transverse envelope
+        """Returns the transverse envelope.
 
         Parameters
         ----------

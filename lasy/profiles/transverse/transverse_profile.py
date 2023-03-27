@@ -2,11 +2,11 @@ import numpy as np
 
 
 class TransverseProfile(object):
-    """
-    Base class for all transverse profiles.
+    """Base class for all transverse profiles.
 
-    Any new transverse profile should inherit from this class, and define its own
-    `evaluate` method, using the same signature as the method below.
+    Any new transverse profile should inherit from this class, and
+    define its own `evaluate` method, using the same signature as the
+    method below.
     """
 
     def __init__(self):
@@ -15,8 +15,7 @@ class TransverseProfile(object):
         self.y_offset = 0
 
     def _evaluate(self, x, y):
-        """
-        Returns the transverse envelope
+        """Returns the transverse envelope.
 
         Parameters
         ----------
@@ -35,9 +34,9 @@ class TransverseProfile(object):
         return np.zeros(x.shape, dtype="complex128")
 
     def evaluate(self, x, y):
-        """
-        Returns the transverse envelope modified by any spatial offsets.
-        This is the public facing evaluate method, it calls the _evaluate function of the derived class.
+        """Returns the transverse envelope modified by any spatial offsets.
+        This is the public facing evaluate method, it calls the _evaluate
+        function of the derived class.
 
         Parameters
         ----------
@@ -55,19 +54,15 @@ class TransverseProfile(object):
         return self._evaluate(x + self.x_offset, y + self.y_offset)
 
     def set_offset(self, x_offset, y_offset):
-        """
-        Populates the x and y spatial offsets of the profile
-        The profile will be shifted by these according to
-        x+x_offset and y+y_offset prior to execution of
-        _evaluate
-
+        """Populates the x and y spatial offsets of the profile The profile
+        will be shifted by these according to x+x_offset and y+y_offset prior
+        to execution of _evaluate.
 
         Parameters
         ----------
         x_offset, y_offset: floats (m)
             Define spatial offsets to the beam. That is, how much
             to shift the beam by transversely
-
         """
 
         self.x_offset = x_offset
