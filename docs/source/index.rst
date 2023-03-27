@@ -28,11 +28,8 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
     **Getting Started**
     ^^^^^^^^^^^^^^
 
-<<<<<<< HEAD
+
     New to ``lasy``? Check this out for installation instructions and a first example.
-=======
-    New to :mod:`lasy`? Check this out for installation instructions and a first example.
->>>>>>> 3520659412e87dd3d7278db6c5fd8262a521017b
 
     +++
 
