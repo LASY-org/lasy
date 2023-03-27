@@ -133,6 +133,8 @@ def estimate_best_HG_waist(x, y, field):
 
     print(f"Estimated w0 {w0Est*1e6} microns")
     return w0
+
+
 from lasy.profiles.transverse.transverse_profile import TransverseProfile
 from lasy.profiles.transverse.transverse_profile_from_data import (
     TransverseProfileFromData,
