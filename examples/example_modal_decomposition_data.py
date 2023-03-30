@@ -16,26 +16,10 @@ import skimage
 
 
 # Define the transverse profile of the laser pulse
-
 img_url = "https://user-images.githubusercontent.com/27694869/228038930-d6ab03b1-a726-4b41-a378-5f4a83dc3778.png"
 intensityData = skimage.io.imread(img_url)
 rows, cols = intensityData.shape
 intensityData[intensityData < 2.1] = 0
-
-
-def get_COM(arr):
-    rows, cols = arr.shape
-    xCOM = np.sum(np.linspace(0, cols - 1, cols) * np.sum(arr, axis=0)) / np.sum(arr)
-    yCOM = np.sum(np.linspace(0, rows - 1, rows) * np.sum(arr, axis=1)) / np.sum(arr)
-    return xCOM, yCOM
-
-
-xCOM, yCOM = get_COM(intensityData)
-intensityData = np.roll(
-    np.roll(intensityData, -int(xCOM - cols / 2), axis=1), -int(yCOM - rows / 2), axis=0
-)
-
-
 pixel_calib = 0.186e-6
 lo = (
     -intensityData.shape[0] / 2 * pixel_calib,
@@ -45,12 +29,9 @@ hi = (
     intensityData.shape[0] / 2 * pixel_calib,
     intensityData.shape[0] / 2 * pixel_calib,
 )
-
-# w0 = 10e-6
 energy = 0.5
 pol = (1, 0)
 transProf = TransverseProfileFromData(intensityData, lo, hi)
-# transProf = HermiteGaussianTransverseProfile(w0,1,2)
 
 # Define longtiudinal profile of the laser pulse
 wavelength = 800e-9
@@ -63,14 +44,12 @@ profile = CombinedLongitudinalTransverseProfile(
     wavelength, pol, energy, longProfile, transProf
 )
 
-
 # Calculate the decomposition into hermite-gauss modes
 n_x_max = 20
 n_y_max = 20
 modeCoeffs, wasit = hermite_gauss_decomposition(
     transProf, n_x_max=n_x_max, n_y_max=n_y_max, N_pts=500
 )
-
 
 # Reconstruct the pulse using a series of hermite-gauss modes
 for i, mode_key in enumerate(list(modeCoeffs)):
