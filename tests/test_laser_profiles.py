@@ -10,6 +10,7 @@ from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import (
     LaguerreGaussianTransverseProfile,
     SuperGaussianTransverseProfile,
+    JincTransverseProfile,
 )
 
 
@@ -120,6 +121,36 @@ def test_profile_super_gauss():
     laser.write_to_file("superGaussianlaserRZ")
     laser.propagate(1)
     laser.write_to_file("superGaussianlaserRZ")
+
+    return profile
+
+
+def test_profile_jinc():
+    # Case with Jinc laser
+    wavelength = 0.8e-6
+    pol = (1, 0)
+    laser_energy = 1.0  # J
+    t_peak = 0.0e-15  # s
+    tau = 30.0e-15  # s
+    w0 = 5.0e-6  # m
+    profile = CombinedLongitudinalTransverseProfile(
+        wavelength,
+        pol,
+        laser_energy,
+        GaussianLongitudinalProfile(wavelength, tau, t_peak),
+        JincTransverseProfile(w0),
+    )
+
+    # - Cylindrical case
+    dim = "rt"
+    lo = (0e-6, -60e-15)
+    hi = (10e-6, +60e-15)
+    npoints = (50, 100)
+
+    laser = Laser(dim, lo, hi, npoints, profile, n_azimuthal_modes=2)
+    laser.write_to_file("JinclaserRZ")
+    laser.propagate(1)
+    laser.write_to_file("JinclaserRZ")
 
     return profile
 
