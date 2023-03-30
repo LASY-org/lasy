@@ -38,7 +38,7 @@ class TransverseProfileFromData(TransverseProfile):
 
         center_data : bool, optional
             If true, the intensity data will be rolled to put the
-            center of mass at the center of the image. It will 
+            center of mass at the center of the image. It will
             also shift the x and y data axes such that (x,y) = (0,0)
             is also located at the center of the image. Default is True
         """
@@ -52,20 +52,21 @@ class TransverseProfileFromData(TransverseProfile):
         dy = (hi[1] - lo[1]) / n_y
 
         if center_data:
-            x_range = np.abs(hi[0]-lo[0])
-            y_range = np.abs(hi[1]-lo[1])
-            x_data = np.linspace(-x_range/2, x_range/2, n_x)
-            y_data = np.linspace(-y_range/2, y_range/2, n_y)
+            x_range = np.abs(hi[0] - lo[0])
+            y_range = np.abs(hi[1] - lo[1])
+            x_data = np.linspace(-x_range / 2, x_range / 2, n_x)
+            y_data = np.linspace(-y_range / 2, y_range / 2, n_y)
 
             n_x0, n_y0 = find_center_of_mass(intensity_data)
             intensity_data = np.roll(
-            np.roll(intensity_data, -int(n_x0 - n_x / 2), axis=1), -int(n_y0 - n_y / 2), axis=0
+                np.roll(intensity_data, -int(n_x0 - n_x / 2), axis=1),
+                -int(n_y0 - n_y / 2),
+                axis=0,
             )
-            
+
         else:
             x_data = np.linspace(lo[0], hi[0], n_x)
             y_data = np.linspace(lo[1], hi[1], n_y)
-
 
         # Normalise the profile such that its squared integeral == 1
         intensity_data /= np.sum(intensity_data) * dx * dy
