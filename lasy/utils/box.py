@@ -1,10 +1,10 @@
+# -*- coding: UTF-8 -*-
+
 import numpy as np
 
 
 class Box:
-    """
-    Contain metadata on index and physical space for an array,
-    as well as handy methods.
+    """Contain metadata on index and physical space for an array, as well as handy methods.
 
     Parameters
     ----------
@@ -31,6 +31,7 @@ class Box:
     """
 
     def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes):
+        """Construct a Box."""
         ndims = 2 if dim == "rt" else 3
         assert dim in ["rt", "xyt"]
         assert len(lo) == ndims
