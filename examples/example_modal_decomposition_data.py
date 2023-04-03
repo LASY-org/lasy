@@ -57,7 +57,7 @@ for i, mode_key in enumerate(list(modeCoeffs)):
         reconstructedProfile = modeCoeffs[
             mode_key
         ] * CombinedLongitudinalTransverseProfile(
-            wavelength, pol, energy, longProfile, tmpTranProf
+            wavelength, pol, energy, longitudinal_profile, tmp_transverse_profile
         )
     else:
         reconstructedProfile += modeCoeffs[
