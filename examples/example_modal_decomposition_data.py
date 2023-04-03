@@ -52,7 +52,7 @@ modeCoeffs, waist = hermite_gauss_decomposition(
 
 # Reconstruct the pulse using a series of hermite-gauss modes
 for i, mode_key in enumerate(list(modeCoeffs)):
-    tmpTranProf = HermiteGaussianTransverseProfile(wasit, mode_key[0], mode_key[1])
+    tmp_transverse_profile = HermiteGaussianTransverseProfile(waist, mode_key[0], mode_key[1])
     if i == 0:
         reconstructedProfile = modeCoeffs[
             mode_key
