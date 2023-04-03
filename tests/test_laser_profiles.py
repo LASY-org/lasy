@@ -6,7 +6,7 @@ from scipy.special import gamma as gamma
 
 from lasy.laser import Laser
 from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import CombinedLongitudinalTransverseProfile, GaussianProfile
+from lasy.profiles import GaussianProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import (
     GaussianTransverseProfile,
@@ -84,7 +84,8 @@ def test_transverse_profiles_rt():
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
 
-    # JincLaserProfile
+    # JincTransverseProfile
+    print("JincTransverseProfile")
     profile = JincTransverseProfile(w0)
     std_th = 1.4 * w0  # Just measured from this test
     field = profile.evaluate(r, np.zeros_like(r))
