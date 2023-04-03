@@ -85,7 +85,7 @@ def test_transverse_profiles_rt():
 
     # JincLaserProfile
     profile = JincTransverseProfile(w0)
-    std_th =  1.4 * w0 # Just measured from this test
+    std_th = 1.4 * w0  # Just measured from this test
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=field**2))
     print("\nstd_th = ", std_th)
@@ -112,22 +112,22 @@ def test_transverse_profiles_3d():
     assert np.abs(std - std_th) / std_th < 0.01
 
     # TransverseProfileFromData
-    print('TransverseProfileFromData')
-    lo = (-20.e-6, -20.e-6)
-    hi = ( 40.e-6,  40.e-6)
+    print("TransverseProfileFromData")
+    lo = (-20.0e-6, -20.0e-6)
+    hi = (40.0e-6, 40.0e-6)
     x = np.linspace(lo[0], hi[0], 100)
     y = np.linspace(lo[1], hi[1], 200)
     dx = x[1] - x[0]
     dy = y[1] - y[0]
-    w0 = 10.e-6
-    x0 = 10.e-6
-    X, Y = np.meshgrid(x, y, indexing='ij')
-    intensity_data = np.exp(-((X-x0)**2+Y**2)/w0**2)
+    w0 = 10.0e-6
+    x0 = 10.0e-6
+    X, Y = np.meshgrid(x, y, indexing="ij")
+    intensity_data = np.exp(-((X - x0) ** 2 + Y**2) / w0**2)
     field = TransverseProfileFromData(intensity_data, lo, hi)
-    x0_test, _ = find_center_of_mass()*dx + lo[0]
+    x0_test, _ = find_center_of_mass() * dx + lo[0]
     print("beam center, theory: ", x0)
     print("beam center from profile ", x0_test)
-    assert((x0_test - x0) / x0 < .1)
+    assert (x0_test - x0) / x0 < 0.1
 
 
 def test_profile_gaussian_3d_cartesian(gaussian):
