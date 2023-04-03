@@ -46,7 +46,7 @@ profile = CombinedLongitudinalTransverseProfile(
 # Calculate the decomposition into hermite-gauss modes
 n_x_max = 20
 n_y_max = 20
-modeCoeffs, wasit = hermite_gauss_decomposition(
+modeCoeffs, waist = hermite_gauss_decomposition(
     transProf, n_x_max=n_x_max, n_y_max=n_y_max, N_pts=500
 )
 
