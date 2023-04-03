@@ -31,7 +31,7 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
         will be performed
 
     res : float
-        The resolution of grid points in x and y that will be used 
+        The resolution of grid points in x and y that will be used
         during the decomposition calculation
 
     Returns
@@ -67,8 +67,8 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
         hi[0] = laserProfile.w0 * 5 + laserProfile.x_offset
         hi[1] = laserProfile.w0 * 5 + laserProfile.x_offset
 
-    N_pts_x = int((hi[0]-lo[0])/res)
-    N_pts_y = int((hi[1]-lo[1])/res)
+    N_pts_x = int((hi[0] - lo[0]) / res)
+    N_pts_y = int((hi[1] - lo[1]) / res)
 
     # Define spatial arrays
     x = np.linspace(lo[0], hi[0], N_pts_x)
