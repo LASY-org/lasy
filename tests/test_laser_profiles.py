@@ -63,7 +63,7 @@ def test_transverse_profiles_rt():
     print("LaguerreGaussianLaserProfile")
     p = 2
     m = 0
-    std_th = 1.2969576587040524e-05 # WRONG, just measured
+    std_th = 1.2969576587040524e-05  # WRONG, just measured
     profile = LaguerreGaussianTransverseProfile(w0, p, m)
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=np.abs(field)))
@@ -73,7 +73,7 @@ def test_transverse_profiles_rt():
 
     # SuperGaussianLaserProfile
     print("SuperGaussianLaserProfile")
-    n_order = 100 # close to flat-top, compared with flat-top theory
+    n_order = 100  # close to flat-top, compared with flat-top theory
     std_th = w0 / np.sqrt(3)
     profile = SuperGaussianTransverseProfile(w0, n_order)
     field = profile.evaluate(r, np.zeros_like(r))
@@ -84,7 +84,7 @@ def test_transverse_profiles_rt():
 
     # JincLaserProfile
     profile = JincTransverseProfile(w0)
-    std_th = 2.
+    std_th = 2.0
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=field**2))
     print("\nstd_th = ", std_th)
