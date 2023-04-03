@@ -16,7 +16,7 @@ from lasy.profiles.transverse import (
     JincTransverseProfile,
     TransverseProfileFromData,
 )
-from lasy.utils.exp_data_utils import compute_laser_energy
+from lasy.utils.exp_data_utils import find_center_of_mass
 
 
 class MockProfile(Profile):
@@ -114,18 +114,18 @@ def test_transverse_profiles_3d():
 
     # TransverseProfileFromData
     print("TransverseProfileFromData")
-    lo = (-20.0e-6, -20.0e-6)
+    lo = (-40.0e-6, -40.0e-6)
     hi = (40.0e-6, 40.0e-6)
-    x = np.linspace(lo[0], hi[0], 100)
-    y = np.linspace(lo[1], hi[1], 200)
+    x = np.linspace(lo[0], hi[0], 200)
+    y = np.linspace(lo[1], hi[1], 100)
     dx = x[1] - x[0]
-    dy = y[1] - y[0]
     w0 = 10.0e-6
     x0 = 10.0e-6
     X, Y = np.meshgrid(x, y, indexing="ij")
     intensity_data = np.exp(-((X - x0) ** 2 + Y**2) / w0**2)
-    field = TransverseProfileFromData(intensity_data, lo, hi)
-    x0_test, _ = find_center_of_mass() * dx + lo[0]
+    profile = TransverseProfileFromData(intensity_data, lo, hi)
+    field = profile.evaluate(X, Y)
+    x0_test = find_center_of_mass(field**2)[0] * dx + lo[0]
     print("beam center, theory: ", x0)
     print("beam center from profile ", x0_test)
     assert (x0_test - x0) / x0 < 0.1
