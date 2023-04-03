@@ -23,11 +23,11 @@ intensityData[intensityData < 2.1] = 0
 pixel_calib = 0.186e-6
 lo = (
     -intensityData.shape[0] / 2 * pixel_calib,
-    -intensityData.shape[0] / 2 * pixel_calib,
+    -intensityData.shape[1] / 2 * pixel_calib,
 )
 hi = (
     intensityData.shape[0] / 2 * pixel_calib,
-    intensityData.shape[0] / 2 * pixel_calib,
+    intensityData.shape[1] / 2 * pixel_calib,
 )
 energy = 0.5
 pol = (1, 0)
