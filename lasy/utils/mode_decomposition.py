@@ -42,6 +42,8 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500)
         in the decomposition. The keys of the dictionary are tuples
         corresponding to (`n_x`,`n_y`)
 
+        waist : Beam waist for which the decomposition is calculated.
+            It is computed as the waist for which the weight of order 0 is maximum. 
     """
 
     # Check if the provided laserProfile is a full laser profile or a
