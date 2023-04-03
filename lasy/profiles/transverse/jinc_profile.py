@@ -42,7 +42,7 @@ class JincTransverseProfile(TransverseProfile):
         """
         r_over_w0 = np.sqrt(x**2 + y**2) / self.w0
         envelope = np.where(
-            r_over_w0 != 0, 2.0 * scispe.jv(1, r_over_w0) / r_over_w0, 1.0
+            r_over_w0 != 0., 2.0 * scispe.jv(1, r_over_w0) / r_over_w0, 1.0
         )
 
         return envelope
