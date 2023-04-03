@@ -31,7 +31,7 @@ class GaussianTransverseProfile(TransverseProfile):
     def __init__(self, w0, wavelength, z_init=0):
         super().__init__()
         self.w0 = w0
-        self.inv_zr = wavelength/(np.pi*w0**2)
+        self.inv_zr = wavelength / (np.pi * w0**2)
         self.z_init = z_init
 
     def _evaluate(self, x, y):
@@ -51,9 +51,9 @@ class GaussianTransverseProfile(TransverseProfile):
             This array has the same shape as the arrays x, y
         """
         # Term for wavefront curvature + Gouy phase
-        diffract_factor = 1. + 1j * prop_dir * (z - self.zf) * self.inv_zr
+        diffract_factor = 1.0 + 1j * prop_dir * (z - self.zf) * self.inv_zr
         # Calculate the argument of the complex exponential
-        exp_argument = - (x ** 2 + y ** 2) / (self.w0 ** 2 * diffract_factor)
+        exp_argument = -(x**2 + y**2) / (self.w0**2 * diffract_factor)
         # Get the transverse profile
         envelope = np.exp(exp_argument) / diffract_factor
 
