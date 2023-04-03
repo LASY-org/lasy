@@ -40,7 +40,7 @@ longitudinal_profile = GaussianLongitudinalProfile(wavelength, tau, t_peak)
 
 # Combine into full laser profile
 profile = CombinedLongitudinalTransverseProfile(
-    wavelength, pol, energy, longProfile, transProf
+    wavelength, pol, energy, longitudinal_profile, transverse_profile
 )
 
 # Calculate the decomposition into hermite-gauss modes
