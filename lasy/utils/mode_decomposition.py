@@ -11,7 +11,7 @@ import numpy as np
 import math
 
 
-def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500):
+def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     """
     Decomposes a laser profile into a set of hermite-gaussian modes.
 
@@ -30,9 +30,9 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500)
         The maximum values of `n_x` and `n_y` out to which the expansion
         will be performed
 
-    N_pts : int
-        The number of grid points in x and y that will be used during the
-        decomposition calculation
+    res : float
+        The resolution of grid points in x and y that will be used 
+        during the decomposition calculation
 
     Returns
     -------
@@ -52,10 +52,6 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500)
         laserProfile, TransverseProfile
     ), "laserProfile must be an instance of TransverseProfile"
 
-    # Here we need to define a grid size to use for the calculation
-    # By default we will use N x N grid where N_pts = 500
-    N_pts = 500
-
     # Get the field, sensible spatial bounds for the profile
     lo = [None, None]
     hi = [None, None]
@@ -71,9 +67,12 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500)
         hi[0] = laserProfile.w0 * 5 + laserProfile.x_offset
         hi[1] = laserProfile.w0 * 5 + laserProfile.x_offset
 
+    N_pts_x = int((hi[0]-lo[0])/res)
+    N_pts_y = int((hi[1]-lo[1])/res)
+
     # Define spatial arrays
-    x = np.linspace(lo[0], hi[0], N_pts)
-    y = np.linspace(lo[1], hi[1], N_pts)
+    x = np.linspace(lo[0], hi[0], N_pts_x)
+    y = np.linspace(lo[1], hi[1], N_pts_y)
     X, Y = np.meshgrid(x, y)
     dx = x[2] - x[1]
     dy = y[2] - y[1]
@@ -119,7 +118,8 @@ def estimate_best_HG_waist(x, y, field):
 
     dx = x[2] - x[1]
     dy = y[2] - y[1]
-
+    print(dx)
+    print(dy)
     assert dx == dy
 
     X, Y = np.meshgrid(x, y)

@@ -47,7 +47,7 @@ profile = CombinedLongitudinalTransverseProfile(
 n_x_max = 20
 n_y_max = 20
 modeCoeffs, waist = hermite_gauss_decomposition(
-    transverse_profile, n_x_max=n_x_max, n_y_max=n_y_max, N_pts=500
+    transverse_profile, n_x_max=n_x_max, n_y_max=n_y_max, res=0.5e-6
 )
 
 # Reconstruct the pulse using a series of hermite-gauss modes
