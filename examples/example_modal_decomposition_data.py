@@ -30,7 +30,7 @@ hi = (
 )
 energy = 0.5
 pol = (1, 0)
-transProf = TransverseProfileFromData(intensityData, lo, hi)
+transverse_profile = TransverseProfileFromData(intensityData, lo, hi)
 
 # Define longtiudinal profile of the laser pulse
 wavelength = 800e-9
