@@ -41,8 +41,9 @@ class JincTransverseProfile(TransverseProfile):
             This array has the same shape as the arrays x, y
         """
         r_over_w0 = np.sqrt(x**2 + y**2) / self.w0
-        envelope = np.where(
-            r_over_w0 != 0.0, 2.0 * scispe.jv(1, r_over_w0) / r_over_w0, 1.0
-        )
+
+        envelope = np.ones_like(r_over_w0)
+        # Avoid dividing by zero
+        np.divide(2.0 * scispe.jv(1, r_over_w0), r_over_w0, out=envelope, where=r_over_w0>0.)
 
         return envelope
