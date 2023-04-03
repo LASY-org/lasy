@@ -16,6 +16,7 @@ from lasy.profiles.transverse import (
     JincTransverseProfile,
     TransverseProfileFromData,
 )
+from lasy.utils.exp_data_utils import compute_laser_energy
 
 
 class MockProfile(Profile):
