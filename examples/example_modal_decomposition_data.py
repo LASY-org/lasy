@@ -67,7 +67,7 @@ for i, mode_key in enumerate(list(modeCoeffs)):
         )
 
 # Plotting the results
-x = np.linspace(-5 * wasit, 5 * wasit, 500)
+x = np.linspace(-5 * waist, 5 * waist, 500)
 X, Y = np.meshgrid(x, x)
 
 fig, ax = plt.subplots(1, 3, figsize=(12, 4), tight_layout=True)
