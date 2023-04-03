@@ -44,6 +44,11 @@ class JincTransverseProfile(TransverseProfile):
 
         envelope = np.ones_like(r_over_w0)
         # Avoid dividing by zero
-        np.divide(2.0 * scispe.jv(1, r_over_w0), r_over_w0, out=envelope, where=r_over_w0>0.)
+        np.divide(
+            2.0 * scispe.jv(1, r_over_w0),
+            r_over_w0,
+            out=envelope,
+            where=r_over_w0 > 0.0,
+        )
 
         return envelope
