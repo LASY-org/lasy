@@ -37,7 +37,7 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500)
 
     Returns
     -------
-    weights: dict of floats
+    weights : dict of floats
         A dictionary of floats corresponding to the weights of each mode
         in the decomposition. The keys of the dictionary are tuples
         corresponding to (`n_x`,`n_y`)
