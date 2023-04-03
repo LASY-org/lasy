@@ -7,7 +7,7 @@ class GaussianTransverseProfile(TransverseProfile):
     """
     Derived class for the analytic profile of a Gaussian laser pulse.
 
-    More precisely, the transverse envelope
+    More precisely, at focus (`z_init=0`), the transverse envelope
     (to be used in the :class:CombinedLongitudinalTransverseLaser class)
     corresponds to:
 
@@ -19,11 +19,20 @@ class GaussianTransverseProfile(TransverseProfile):
     ----------
     w0 : float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
+
+    wavelength : float (in meter)
+        The main laser wavelength :math:`\\lambda_0` of the laser.
+
+    z_init : float (in meter), optional
+        Position at which the pulse is initialized, relative to the position
+        of the focal plane. (The focal plane is at `z=0`.)
     """
 
-    def __init__(self, w0):
+    def __init__(self, w0, wavelength, z_init=0):
         super().__init__()
         self.w0 = w0
+        self.inv_zr = wavelength/(np.pi*w0**2)
+        self.z_init = z_init
 
     def _evaluate(self, x, y):
         """
@@ -41,6 +50,11 @@ class GaussianTransverseProfile(TransverseProfile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-        envelope = np.exp(-(x**2 + y**2) / self.w0**2)
+        # Term for wavefront curvature + Gouy phase
+        diffract_factor = 1. + 1j * prop_dir * (z - self.zf) * self.inv_zr
+        # Calculate the argument of the complex exponential
+        exp_argument = - (x ** 2 + y ** 2) / (self.w0 ** 2 * diffract_factor)
+        # Get the transverse profile
+        envelope = np.exp(exp_argument) / diffract_factor
 
         return envelope
