@@ -13,6 +13,7 @@ from lasy.profiles.transverse import (
     LaguerreGaussianTransverseProfile,
     SuperGaussianTransverseProfile,
     HermiteGaussianTransverseProfile,
+    JincTransverseProfile,
 )
 
 
@@ -46,12 +47,12 @@ def gaussian():
 def test_transverse_profiles_rt():
     npoints = 2000
     w0 = 10.0e-6
+    r = np.linspace(0, 6 * w0, npoints)
 
     # GaussianTransverseProfile
     print("GaussianTransverseProfile")
     std_th = w0 / np.sqrt(2)
     profile = GaussianTransverseProfile(w0)
-    r = np.linspace(0, 6 * w0, npoints)
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=np.abs(field)))
     print("\nstd_th = ", std_th)
@@ -62,9 +63,8 @@ def test_transverse_profiles_rt():
     print("LaguerreGaussianLaserProfile")
     p = 2
     m = 0
-    std_th = 1.2969576587040524e-05  # WRONG, just measured
+    std_th = 1.2969576587040524e-05 # WRONG, just measured
     profile = LaguerreGaussianTransverseProfile(w0, p, m)
-    r = np.linspace(0, 6 * w0, npoints)
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=np.abs(field)))
     print("std_th = ", std_th)
@@ -73,16 +73,23 @@ def test_transverse_profiles_rt():
 
     # SuperGaussianLaserProfile
     print("SuperGaussianLaserProfile")
-    # close to flat-top, compared with flat-top theory
-    n_order = 100
+    n_order = 100 # close to flat-top, compared with flat-top theory
     std_th = w0 / np.sqrt(3)
     profile = SuperGaussianTransverseProfile(w0, n_order)
-    r = np.linspace(0, 6 * w0, npoints)
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=np.abs(field)))
     print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
+
+    # JincLaserProfile
+    profile = JincTransverseProfile(w0)
+    std_th = 2.
+    field = profile.evaluate(r, np.zeros_like(r))
+    std = np.sqrt(np.average(r**2, weights=field**2))
+    print("\nstd_th = ", std_th)
+    print("std = ", std)
+    assert np.abs(std - std_th) / std_th < 0.1
 
 
 def test_transverse_profiles_3d():
