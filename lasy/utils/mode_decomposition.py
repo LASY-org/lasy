@@ -13,8 +13,7 @@ import math
 
 def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, N_pts=500):
     """
-    Decomposes a `lasy` laser profile into a set of hermite-gaussian
-    modes.
+    Decomposes a laser profile into a set of hermite-gaussian modes.
 
     The function takes either an instance of `TransverseProfile` or an
     instance of `Laser` (that is, either a transverse profile or the
