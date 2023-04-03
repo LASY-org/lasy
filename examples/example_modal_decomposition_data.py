@@ -36,7 +36,7 @@ transverse_profile = TransverseProfileFromData(intensityData, lo, hi)
 wavelength = 800e-9
 tau = 30e-15
 t_peak = 0.0
-longProfile = GaussianLongitudinalProfile(wavelength, tau, t_peak)
+longitudinal_profile = GaussianLongitudinalProfile(wavelength, tau, t_peak)
 
 # Combine into full laser profile
 profile = CombinedLongitudinalTransverseProfile(
