@@ -18,7 +18,6 @@ import skimage
 # Define the transverse profile of the laser pulse
 img_url = "https://user-images.githubusercontent.com/27694869/228038930-d6ab03b1-a726-4b41-a378-5f4a83dc3778.png"
 intensityData = skimage.io.imread(img_url)
-rows, cols = intensityData.shape
 intensityData[intensityData < 2.1] = 0
 pixel_calib = 0.186e-6
 lo = (
