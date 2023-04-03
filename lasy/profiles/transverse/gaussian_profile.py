@@ -26,6 +26,15 @@ class GaussianTransverseProfile(TransverseProfile):
     z_init : float (in meter), optional
         Position at which the pulse is initialized, relative to the position
         of the focal plane. (The focal plane is at `z=0`.)
+
+    .. warning::
+
+        In order to initialize the pulse out of focus, you can either:
+            - Use a non-zero `z_init`
+            - Use `z_init=0` and then call `laser.propagate(z_init)`
+        Both methods are in principle equivalent, but note that the first
+        method uses the paraxial approximation, while the second method does
+        not make this approximation.
     """
 
     def __init__(self, w0, wavelength, z_init=0):
