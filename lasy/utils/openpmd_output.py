@@ -50,7 +50,7 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
         (hi - lo) / (npoints - 1)
         for hi, lo, npoints in zip(box.hi, box.lo, box.npoints)
     ][::-1]
-    m.grid_global_offset = box.lo
+    m.grid_global_offset = box.lo[::-1]
     m.unit_dimension = {
         io.Unit_Dimension.M: 1,
         io.Unit_Dimension.L: 1,
