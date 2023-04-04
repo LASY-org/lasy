@@ -32,7 +32,7 @@ energy = 0.5
 pol = (1, 0)
 transverse_profile = TransverseProfileFromData(intensityData, lo, hi)
 
-# Define longtiudinal profile of the laser pulse
+# Define longitudinal profile of the laser pulse
 wavelength = 800e-9
 tau = 30e-15
 t_peak = 0.0
