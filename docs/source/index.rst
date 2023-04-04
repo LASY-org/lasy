@@ -26,7 +26,9 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
     ---
 
     **Getting Started**
+    **Getting Started**
     ^^^^^^^^^^^^^^
+
 
     New to ``lasy``? Check this out for installation instructions and a first example.
 
@@ -70,6 +72,7 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
     **Tutorials**
     ^^^^^^^^^^^^^
 
+    Some step-by-step guides to using the code and some common examples which you might find useful.
     Some step-by-step guides to using the code and some common examples which you might find useful.
 
     +++
