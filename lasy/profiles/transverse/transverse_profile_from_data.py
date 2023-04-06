@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
-
+from lasy.utils.exp_data_utils import find_center_of_mass
 from .transverse_profile import TransverseProfile
 
 
@@ -11,7 +11,7 @@ class TransverseProfileFromData(TransverseProfile):
     of another code.
     """
 
-    def __init__(self, intensity_data, lo, hi):
+    def __init__(self, intensity_data, lo, hi, center_data=True):
         """
         Uses user supplied data to define the transverse profile
         of the laser pulse.
@@ -35,6 +35,12 @@ class TransverseProfileFromData(TransverseProfile):
         lo, hi : list of scalars (in meters)
             Lower and higher end of the physical domain of the data.
             One element per direction (in this case 2)
+
+        center_data : bool, optional
+            If true, the intensity data will be rolled to put the
+            center of mass at the center of the image. It will
+            also shift the x and y data axes such that (x,y) = (0,0)
+            is also located at the center of the image. Default is True
         """
         super().__init__()
 
@@ -45,8 +51,22 @@ class TransverseProfileFromData(TransverseProfile):
         dx = (hi[0] - lo[0]) / n_x
         dy = (hi[1] - lo[1]) / n_y
 
-        x_data = np.linspace(lo[0], hi[0], n_x)
-        y_data = np.linspace(lo[1], hi[1], n_y)
+        if center_data:
+            x_range = np.abs(hi[0] - lo[0])
+            y_range = np.abs(hi[1] - lo[1])
+            x_data = np.linspace(-x_range / 2, x_range / 2, n_x)
+            y_data = np.linspace(-y_range / 2, y_range / 2, n_y)
+
+            n_x0, n_y0 = find_center_of_mass(intensity_data)
+            intensity_data = np.roll(
+                np.roll(intensity_data, -int(n_x0 - n_x / 2), axis=1),
+                -int(n_y0 - n_y / 2),
+                axis=0,
+            )
+
+        else:
+            x_data = np.linspace(lo[0], hi[0], n_x)
+            y_data = np.linspace(lo[1], hi[1], n_y)
 
         # Normalise the profile such that its squared integeral == 1
         intensity_data /= np.sum(intensity_data) * dx * dy
