@@ -190,17 +190,11 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 
     if laser.dim == "rt":
         ext = np.array(
-            [
-                laser.box.lo[-1], laser.box.hi[-1],
-                -laser.box.hi[0], laser.box.hi[0]
-            ]
+            [laser.box.lo[-1], laser.box.hi[-1], -laser.box.hi[0], laser.box.hi[0]]
         )
     else:
         ext = np.array(
-            [
-                laser.box.lo[-1], laser.box.hi[-1],
-                laser.box.lo[0], laser.box.hi[0]
-            ]
+            [laser.box.lo[-1], laser.box.hi[-1], laser.box.lo[0], laser.box.hi[0]]
         )
 
     return field, ext
