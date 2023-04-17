@@ -14,8 +14,9 @@ from lasy.utils.openpmd_output import write_to_openpmd_file
 
 class Laser:
     """
-    Top-level class that can evaluate a laser profile on a grid,
-    propagate it, and write it to a file.
+    Evaluate a laser profile on a grid, propagate it, and write it to a file.
+
+    This is a top-level class.
 
     Parameters
     ----------
@@ -45,7 +46,6 @@ class Laser:
 
     Examples
     --------
-
     >>> import matplotlib.pyplot as plt
     >>> from lasy.laser import Laser
     >>> from lasy.profiles.gaussian_profile import GaussianProfile
@@ -117,7 +117,7 @@ class Laser:
 
     def normalize(self, value, kind="energy"):
         """
-        Normalize the pulse either to the energy, peak field amplitude or peak intensity
+        Normalize the pulse either to the energy, peak field amplitude or peak intensity.
 
         Parameters
         ----------
@@ -127,7 +127,6 @@ class Laser:
             Distance by which the laser pulse should be propagated
             Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
-
         if kind == "energy":
             normalize_energy(self.dim, value, self.field)
         elif kind == "field":
@@ -139,7 +138,7 @@ class Laser:
 
     def propagate(self, distance, nr_boundary=None, backend="NP"):
         """
-        Propagate the laser pulse by the distance specified
+        Propagate the laser pulse by the distance specified.
 
         Parameters
         ----------
