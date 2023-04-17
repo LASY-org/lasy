@@ -4,7 +4,7 @@ from .transverse_profile import TransverseProfile
 
 
 class SuperGaussianTransverseProfile(TransverseProfile):
-    """
+    r"""
     Derived class for the analytic profile of a super-Gaussian laser pulse.
 
     More precisely, the transverse envelope corresponds to:
@@ -31,7 +31,7 @@ class SuperGaussianTransverseProfile(TransverseProfile):
 
     def _evaluate(self, x, y):
         """
-        Returns the transverse envelope
+        Return the transverse envelope.
 
         Parameters
         ----------
@@ -39,8 +39,8 @@ class SuperGaussianTransverseProfile(TransverseProfile):
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
-        Returns
-        -------
+        Return
+        ------
         envelope: ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
