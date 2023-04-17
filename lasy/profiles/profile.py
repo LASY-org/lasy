@@ -36,7 +36,7 @@ class Profile(object):
 
     def evaluate(self, x, y, t):
         """
-        Returns the envelope field of the laser
+        Return the envelope field of the laser.
 
         Parameters
         ----------
@@ -44,8 +44,8 @@ class Profile(object):
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
-        Returns
-        -------
+        Return
+        ------
         envelope: ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
