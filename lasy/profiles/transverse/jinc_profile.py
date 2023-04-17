@@ -4,7 +4,7 @@ from .transverse_profile import TransverseProfile
 
 
 class JincTransverseProfile(TransverseProfile):
-    """
+    r"""
     Derived class for the analytic profile of a Jinc laser pulse.
 
     The transverse envelope corresponds to:
@@ -27,7 +27,7 @@ class JincTransverseProfile(TransverseProfile):
 
     def _evaluate(self, x, y):
         """
-        Returns the transverse envelope
+        Return the transverse envelope.
 
         Parameters
         ----------
@@ -35,8 +35,8 @@ class JincTransverseProfile(TransverseProfile):
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
-        Returns
-        -------
+        Return
+        ------
         envelope : ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
