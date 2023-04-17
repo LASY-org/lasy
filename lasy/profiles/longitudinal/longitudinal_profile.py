@@ -16,15 +16,15 @@ class LongitudinalProfile(object):
 
     def evaluate(self, t):
         """
-        Returns the longitudinal envelope
+        Return the longitudinal envelope.
 
         Parameters
         ----------
         t : ndarrays of floats
             Define points on which to evaluate the envelope
 
-        Returns
-        -------
+        Return
+        ------
         envelope: ndarray of complex numbers
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
