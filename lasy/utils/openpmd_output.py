@@ -5,7 +5,7 @@ from scipy.constants import c
 
 def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     """
-    Write the laser field into an openPMD file
+    Write the laser field into an openPMD file.
 
     Parameters
     ----------
