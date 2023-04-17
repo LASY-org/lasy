@@ -4,7 +4,7 @@ from .transverse import GaussianTransverseProfile
 
 
 class GaussianProfile(CombinedLongitudinalTransverseProfile):
-    """
+    r"""
     Derived class for the analytic profile of a Gaussian laser pulse.
 
     More precisely, the electric field corresponds to:
@@ -60,7 +60,6 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
 
     Examples
     --------
-
     >>> import matplotlib.pyplot as plt
     >>> from lasy.laser import Laser
     >>> from lasy.profiles.gaussian_profile import GaussianProfile
