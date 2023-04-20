@@ -178,17 +178,17 @@ class Laser:
                 ]
 
         # Transform the field from temporal to frequency domain
-        field_fft = np.fft.fft(self.field.field, axis=time_axis_indx, norm="forward")
+        field_fft = np.fft.ifft(self.field.field, axis=time_axis_indx, norm="backward")
 
         # Create the frequency axis
         dt = self.box.dx[time_axis_indx]
         omega0 = self.profile.omega0
         Nt = self.field.field.shape[time_axis_indx]
         omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+        # make 3D shape for the frequency axis
+        omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
 
         if self.dim == "rt":
-            # make 3D shape for the frequency axis
-            omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
                 spatial_axes = (self.box.axes[0],)
@@ -209,8 +209,6 @@ class Laser:
                 self.prop[i_m].step(transform_data, distance, overwrite=True)
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
         else:
-            # make 3D shape for the frequency axis
-            omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
                 Nx, Ny, Nt = self.field.field.shape
@@ -239,12 +237,201 @@ class Laser:
         field_fft *= np.exp(-1j * translate_time * omega.reshape(omega_shape))
 
         # Transform field from frequency to temporal domain
-        self.field.field[:, :, :] = np.fft.ifft(
-            field_fft, axis=time_axis_indx, norm="forward"
+        self.field.field[:, :, :] = np.fft.fft(
+            field_fft, axis=time_axis_indx, norm="backward"
         )
 
         # Translate phase of the retrieved envelope by the distance
-        self.field.field *= np.exp(1j * self.profile.omega0 * distance / scc.c)
+        self.field.field *= np.exp(1j * omega0 * distance / scc.c)
+
+    def t2z(self, z_axis=None, z0=0.0, t0=0.0, nr_boundary=None, backend="NP"):
+        """
+        Propagate the laser pulse by the distance specified
+
+        Parameters
+        ----------
+        distance : scalar
+            Distance by which the laser pulse should be propagated
+
+        nr_boundary : integer (optional)
+            Number of cells at the end of radial axis, where the field
+            will be attenuated (to assert proper Hankel transform).
+            Only used for ``'rt'``.
+        """
+        time_axis_indx = -1
+
+        t_axis = self.field.box.axes[time_axis_indx]
+        if z_axis is None:
+            z_axis = t_axis * scc.c
+
+        # apply boundary "absorption" if required
+        if nr_boundary is not None:
+            assert type(nr_boundary) is int and nr_boundary > 0
+            absorb_layer_axis = np.linspace(0, np.pi / 2, nr_boundary)
+            absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
+            absorb_layer_shape[-1] = 0.0
+            if self.dim == "rt":
+                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
+                    None, :, None
+                ]
+            else:
+                self.field.field[-nr_boundary:, :, :] *= absorb_layer_shape[
+                    :, None, None
+                ]
+                self.field.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
+                    :, None, None
+                ]
+                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
+                    None, :, None
+                ]
+                self.field.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
+                    None, :, None
+                ]
+
+        # Transform the field from temporal to frequency domain
+        field_fft = np.fft.ifft(self.field.field, axis=time_axis_indx, norm="backward")
+
+        # Create the frequency axis
+        dt = self.box.dx[time_axis_indx]
+        omega0 = self.profile.omega0
+        Nt = self.field.field.shape[time_axis_indx]
+        omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+
+        if self.dim == "rt":
+            # Construct the propagator (check if exists)
+            if not hasattr(self, "prop"):
+                spatial_axes = (self.box.axes[0],)
+                self.prop = []
+                for m in self.box.azimuthal_modes:
+                    self.prop.append(
+                        PropagatorResampling(
+                            *spatial_axes,
+                            omega / scc.c,
+                            mode=m,
+                            backend=backend,
+                            verbose=False,
+                        )
+                    )
+            field_z = np.zeros((field_fft.shape[0], field_fft.shape[1], z_axis.size), dtype=field_fft.dtype)
+            # Propagate the spectral image
+            for i_m in range(self.box.azimuthal_modes.size):
+                transform_data = np.transpose(field_fft[i_m]).copy()
+                transform_data *= np.exp(1j * t_axis[0] * omega[:,None])
+                fld = self.prop[i_m].t2z(transform_data, z_axis, z0=z0, t0=t0)
+                field_z[i_m] = np.transpose(fld).copy()
+        else:
+            # Construct the propagator (check if exists)
+            if not hasattr(self, "prop"):
+                Nx, Ny, Nt = self.field.field.shape
+                Lx = self.box.hi[0] - self.box.lo[0]
+                Ly = self.box.hi[1] - self.box.lo[1]
+                spatial_axes = ((Lx, Nx), (Ly, Ny))
+                self.prop = PropagatorFFT2(
+                    *spatial_axes,
+                    omega / scc.c,
+                    backend=backend,
+                    verbose=False,
+                )
+            # Propagate the spectral image
+            transform_data = np.transpose(field_fft).copy()
+            transform_data *= np.exp(1j * t_axis[0] * omega[:,None,None])
+            field_z = self.prop.t2z(transform_data, z_axis, z0=z0, t0=t0).T
+
+        return field_z
+
+    def z2t(self, t_axis=None, z0=0.0, t0=0.0, nr_boundary=None, backend="NP"):
+        """
+        Propagate the laser pulse by the distance specified
+
+        Parameters
+        ----------
+        distance : scalar
+            Distance by which the laser pulse should be propagated
+
+        nr_boundary : integer (optional)
+            Number of cells at the end of radial axis, where the field
+            will be attenuated (to assert proper Hankel transform).
+            Only used for ``'rt'``.
+        """
+        z_axis_indx = -1
+
+        if t_axis is None:
+            t_axis = self.field.box.axes[z_axis_indx]
+
+        # apply boundary "absorption" if required
+        if nr_boundary is not None:
+            assert type(nr_boundary) is int and nr_boundary > 0
+            absorb_layer_axis = np.linspace(0, np.pi / 2, nr_boundary)
+            absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
+            absorb_layer_shape[-1] = 0.0
+            if self.dim == "rt":
+                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
+                    None, :, None
+                ]
+            else:
+                self.field.field[-nr_boundary:, :, :] *= absorb_layer_shape[
+                    :, None, None
+                ]
+                self.field.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
+                    :, None, None
+                ]
+                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
+                    None, :, None
+                ]
+                self.field.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
+                    None, :, None
+                ]
+
+        # Transform the field from temporal to frequency domain
+        field_fft = np.fft.fft(self.field.field, axis=z_axis_indx, norm="forward")
+
+        # Create the frequency axis
+        dt = self.box.dx[z_axis_indx]
+        omega0 = self.profile.omega0
+        Nz = self.field.field.shape[z_axis_indx]
+        omega = 2 * np.pi * np.fft.fftfreq(Nz, dt) + omega0
+
+        if self.dim == "rt":
+            # Construct the propagator (check if exists)
+            if not hasattr(self, "prop"):
+                spatial_axes = (self.box.axes[0],)
+                self.prop = []
+                for m in self.box.azimuthal_modes:
+                    self.prop.append(
+                        PropagatorResampling(
+                            *spatial_axes,
+                            omega / scc.c,
+                            mode=m,
+                            backend=backend,
+                            verbose=False,
+                        )
+                    )
+            field_t = np.zeros((field_fft.shape[0], field_fft.shape[1], t_axis.size), dtype=field_fft.dtype)
+            # Propagate the spectral image
+            for i_m in range(self.box.azimuthal_modes.size):
+                transform_data = np.transpose(field_fft[i_m]).copy()
+                transform_data *= np.exp(-1j * t_axis[0] * omega[:,None])
+                fld = self.prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0)
+                field_t[i_m] = np.transpose(fld).copy()
+        else:
+            # Construct the propagator (check if exists)
+            if not hasattr(self, "prop"):
+                Nx, Ny, Nt = self.field.field.shape
+                Lx = self.box.hi[0] - self.box.lo[0]
+                Ly = self.box.hi[1] - self.box.lo[1]
+                spatial_axes = ((Lx, Nx), (Ly, Ny))
+                self.prop = PropagatorFFT2(
+                    *spatial_axes,
+                    omega / scc.c,
+                    backend=backend,
+                    verbose=False,
+                )
+            # Propagate the spectral image
+            transform_data = np.transpose(field_fft).copy()
+            transform_data *= np.exp(-1j * t_axis[0] * omega[:,None,None])
+            field_t = self.prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
+
+        return field_t
 
     def write_to_file(self, file_prefix="laser", file_format="h5"):
         """
