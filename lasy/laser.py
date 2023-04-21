@@ -247,7 +247,7 @@ class Laser:
         # Translate phase of the retrieved envelope by the distance
         self.field.field *= np.exp(1j * omega0 * distance / c)
 
-    def export_to_z( self, z_axis=None, z0=0.0, t0=0.0, backend="NP" ):
+    def export_to_z(self, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
         """
         Convert laser pulse defined in the temporal domain to the spatial domain
 
@@ -296,14 +296,17 @@ class Laser:
                             verbose=False,
                         )
                     )
-            field_z = np.zeros((field_fft.shape[0], field_fft.shape[1], z_axis.size), dtype=field_fft.dtype)
+            field_z = np.zeros(
+                (field_fft.shape[0], field_fft.shape[1], z_axis.size),
+                dtype=field_fft.dtype,
+            )
             # Propagate the spectral image
             for i_m in range(self.box.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
-                transform_data *= np.exp(1j * t_axis[0] * omega[:,None])
+                transform_data *= np.exp(1j * t_axis[0] * omega[:, None])
                 fld = self.prop[i_m].t2z(transform_data, z_axis, z0=z0, t0=t0)
                 field_z[i_m] = np.transpose(fld).copy()
-                field_z[i_m] *= np.exp(-1j * (z_axis/c + t0) * omega0)
+                field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
         else:
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
@@ -319,9 +322,9 @@ class Laser:
                 )
             # Propagate the spectral image
             transform_data = np.transpose(field_fft).copy()
-            transform_data *= np.exp(1j * t_axis[0] * omega[:,None,None])
+            transform_data *= np.exp(1j * t_axis[0] * omega[:, None, None])
             field_z = self.prop.t2z(transform_data, z_axis, z0=z0, t0=t0).T
-            field_z *= np.exp(-1j * (z_axis/c + t0) * omega0)
+            field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
 
         return field_z
 
@@ -345,7 +348,7 @@ class Laser:
         """
         z_axis_indx = -1
         t_axis = self.field.box.axes[z_axis_indx]
-        dz = z_axis[1]-z_axis[0]
+        dz = z_axis[1] - z_axis[0]
         Nz = z_axis.size
 
         # Transform the field from temporal to frequency domain
@@ -371,14 +374,14 @@ class Laser:
                             verbose=False,
                         )
                     )
-            #field_t = np.zeros((field_fft.shape[0], field_fft.shape[1], t_axis.size), dtype=field_fft.dtype)
+            # field_t = np.zeros((field_fft.shape[0], field_fft.shape[1], t_axis.size), dtype=field_fft.dtype)
             # Propagate the spectral image
             for i_m in range(self.box.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
-                transform_data *= np.exp(-1j * z_axis[0] * k_z[:,None])
+                transform_data *= np.exp(-1j * z_axis[0] * k_z[:, None])
                 fld = self.prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0)
                 self.field.field[i_m] = np.transpose(fld).copy()
-                self.field.field[i_m] *= np.exp(1j * (z0/c + t_axis) * omega0)
+                self.field.field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
         else:
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
@@ -394,10 +397,9 @@ class Laser:
                 )
             # Propagate the spectral image
             transform_data = np.transpose(field_fft).copy()
-            transform_data *= np.exp(-1j * z_axis[0] * k_z[:,None,None])
-            self.field.field = self.prop.z2t(
-                transform_data, t_axis, z0=z0, t0=t0).T
-            self.field.field *= np.exp(1j * (z0/c + t_axis) * omega0)
+            transform_data *= np.exp(-1j * z_axis[0] * k_z[:, None, None])
+            self.field.field = self.prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
+            self.field.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
 
     def write_to_file(self, file_prefix="laser", file_format="h5"):
         """
