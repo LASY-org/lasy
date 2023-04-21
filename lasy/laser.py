@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.constants as scc
+from scipy.constants import c
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 
 from lasy.utils.box import Box
@@ -150,6 +151,8 @@ class Laser:
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
             Only used for ``'rt'``.
+        backend : string (optional)
+            Backend used by axiprop (see axiprop documentation).
         """
         time_axis_indx = -1
 
@@ -197,7 +200,7 @@ class Laser:
                     self.prop.append(
                         PropagatorResampling(
                             *spatial_axes,
-                            omega / scc.c,
+                            omega / c,
                             mode=m,
                             backend=backend,
                             verbose=False,
@@ -217,7 +220,7 @@ class Laser:
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
                 self.prop = PropagatorFFT2(
                     *spatial_axes,
-                    omega / scc.c,
+                    omega / c,
                     backend=backend,
                     verbose=False,
                 )
@@ -227,7 +230,7 @@ class Laser:
             field_fft[:, :, :] = np.transpose(transform_data).copy()
 
         # Choose the time translation assuming propagation at v=c
-        translate_time = distance / scc.c
+        translate_time = distance / c
         # Translate the box
         self.box.lo[time_axis_indx] += translate_time
         self.box.hi[time_axis_indx] += translate_time
@@ -242,51 +245,32 @@ class Laser:
         )
 
         # Translate phase of the retrieved envelope by the distance
-        self.field.field *= np.exp(1j * omega0 * distance / scc.c)
+        self.field.field *= np.exp(1j * omega0 * distance / c)
 
-    def t2z(self, z_axis=None, z0=0.0, t0=0.0, nr_boundary=None, backend="NP"):
+    def export_to_z( self, z_axis=None, z0=0.0, t0=0.0, backend="NP" ):
         """
-        Propagate the laser pulse by the distance specified
+        Convert laser pulse defined in the temporal domain to the spatial domain
 
         Parameters
         ----------
-        distance : scalar
-            Distance by which the laser pulse should be propagated
+        z_axis : 1D ndarray of doubles (optional)
+            Spatial `z` axis along which the field should be reconstructed.
+            If not provided, `z_axis = c * t_axis` is considered.
 
-        nr_boundary : integer (optional)
-            Number of cells at the end of radial axis, where the field
-            will be attenuated (to assert proper Hankel transform).
-            Only used for ``'rt'``.
+        z0: scalar (optional)
+            Position from which the field is produced (emitted)
+
+        t0: scalar (optional)
+            Moment of time at which the field is produced
+
+        backend : string (optional)
+            Backend used by axiprop (see axiprop documentation).
         """
         time_axis_indx = -1
 
         t_axis = self.field.box.axes[time_axis_indx]
         if z_axis is None:
-            z_axis = t_axis * scc.c
-
-        # apply boundary "absorption" if required
-        if nr_boundary is not None:
-            assert type(nr_boundary) is int and nr_boundary > 0
-            absorb_layer_axis = np.linspace(0, np.pi / 2, nr_boundary)
-            absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
-            absorb_layer_shape[-1] = 0.0
-            if self.dim == "rt":
-                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
-                    None, :, None
-                ]
-            else:
-                self.field.field[-nr_boundary:, :, :] *= absorb_layer_shape[
-                    :, None, None
-                ]
-                self.field.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
-                    :, None, None
-                ]
-                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
-                    None, :, None
-                ]
-                self.field.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
-                    None, :, None
-                ]
+            z_axis = t_axis * c
 
         # Transform the field from temporal to frequency domain
         field_fft = np.fft.ifft(self.field.field, axis=time_axis_indx, norm="backward")
@@ -306,7 +290,7 @@ class Laser:
                     self.prop.append(
                         PropagatorResampling(
                             *spatial_axes,
-                            omega / scc.c,
+                            omega / c,
                             mode=m,
                             backend=backend,
                             verbose=False,
@@ -319,6 +303,7 @@ class Laser:
                 transform_data *= np.exp(1j * t_axis[0] * omega[:,None])
                 fld = self.prop[i_m].t2z(transform_data, z_axis, z0=z0, t0=t0)
                 field_z[i_m] = np.transpose(fld).copy()
+                field_z[i_m] *= np.exp(-1j * (z_axis/c + t0) * omega0)
         else:
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
@@ -328,7 +313,7 @@ class Laser:
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
                 self.prop = PropagatorFFT2(
                     *spatial_axes,
-                    omega / scc.c,
+                    omega / c,
                     backend=backend,
                     verbose=False,
                 )
@@ -336,60 +321,40 @@ class Laser:
             transform_data = np.transpose(field_fft).copy()
             transform_data *= np.exp(1j * t_axis[0] * omega[:,None,None])
             field_z = self.prop.t2z(transform_data, z_axis, z0=z0, t0=t0).T
+            field_z *= np.exp(-1j * (z_axis/c + t0) * omega0)
 
         return field_z
 
-    def z2t(self, t_axis=None, z0=0.0, t0=0.0, nr_boundary=None, backend="NP"):
+    def import_from_z(self, field_z, z_axis, z0=0.0, t0=0.0, backend="NP"):
         """
-        Propagate the laser pulse by the distance specified
+        Export laser pulse from the field map in the spatial domain
 
         Parameters
         ----------
-        distance : scalar
-            Distance by which the laser pulse should be propagated
+        z_axis : 1D ndarray of doubles
+            Spatial `z` axis along which the field should be reconstructed.
 
-        nr_boundary : integer (optional)
-            Number of cells at the end of radial axis, where the field
-            will be attenuated (to assert proper Hankel transform).
-            Only used for ``'rt'``.
+        z0: scalar (optional)
+            Position at which the field should be recorded
+
+        t0: scalar (optional)
+            Moment of time at which the field should be recorded
+
+        backend : string (optional)
+            Backend used by axiprop (see axiprop documentation).
         """
         z_axis_indx = -1
-
-        if t_axis is None:
-            t_axis = self.field.box.axes[z_axis_indx]
-
-        # apply boundary "absorption" if required
-        if nr_boundary is not None:
-            assert type(nr_boundary) is int and nr_boundary > 0
-            absorb_layer_axis = np.linspace(0, np.pi / 2, nr_boundary)
-            absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
-            absorb_layer_shape[-1] = 0.0
-            if self.dim == "rt":
-                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
-                    None, :, None
-                ]
-            else:
-                self.field.field[-nr_boundary:, :, :] *= absorb_layer_shape[
-                    :, None, None
-                ]
-                self.field.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
-                    :, None, None
-                ]
-                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
-                    None, :, None
-                ]
-                self.field.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
-                    None, :, None
-                ]
+        t_axis = self.field.box.axes[z_axis_indx]
+        dz = z_axis[1]-z_axis[0]
+        Nz = z_axis.size
 
         # Transform the field from temporal to frequency domain
-        field_fft = np.fft.fft(self.field.field, axis=z_axis_indx, norm="forward")
+        field_fft = np.fft.fft(field_z, axis=z_axis_indx, norm="forward")
 
         # Create the frequency axis
-        dt = self.box.dx[z_axis_indx]
         omega0 = self.profile.omega0
-        Nz = self.field.field.shape[z_axis_indx]
-        omega = 2 * np.pi * np.fft.fftfreq(Nz, dt) + omega0
+        omega = 2 * np.pi * np.fft.fftfreq(Nz, dz / c) + omega0
+        k_z = omega / c
 
         if self.dim == "rt":
             # Construct the propagator (check if exists)
@@ -400,19 +365,20 @@ class Laser:
                     self.prop.append(
                         PropagatorResampling(
                             *spatial_axes,
-                            omega / scc.c,
+                            omega / c,
                             mode=m,
                             backend=backend,
                             verbose=False,
                         )
                     )
-            field_t = np.zeros((field_fft.shape[0], field_fft.shape[1], t_axis.size), dtype=field_fft.dtype)
+            #field_t = np.zeros((field_fft.shape[0], field_fft.shape[1], t_axis.size), dtype=field_fft.dtype)
             # Propagate the spectral image
             for i_m in range(self.box.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
-                transform_data *= np.exp(-1j * t_axis[0] * omega[:,None])
+                transform_data *= np.exp(-1j * z_axis[0] * k_z[:,None])
                 fld = self.prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0)
-                field_t[i_m] = np.transpose(fld).copy()
+                self.field.field[i_m] = np.transpose(fld).copy()
+                self.field.field[i_m] *= np.exp(1j * (z0/c + t_axis) * omega0)
         else:
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
@@ -422,16 +388,16 @@ class Laser:
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
                 self.prop = PropagatorFFT2(
                     *spatial_axes,
-                    omega / scc.c,
+                    omega / c,
                     backend=backend,
                     verbose=False,
                 )
             # Propagate the spectral image
             transform_data = np.transpose(field_fft).copy()
-            transform_data *= np.exp(-1j * t_axis[0] * omega[:,None,None])
-            field_t = self.prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
-
-        return field_t
+            transform_data *= np.exp(-1j * z_axis[0] * k_z[:,None,None])
+            self.field.field = self.prop.z2t(
+                transform_data, t_axis, z0=z0, t0=t0).T
+            self.field.field *= np.exp(1j * (z0/c + t_axis) * omega0)
 
     def write_to_file(self, file_prefix="laser", file_format="h5"):
         """
