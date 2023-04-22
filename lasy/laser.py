@@ -1,5 +1,4 @@
 import numpy as np
-import scipy.constants as scc
 from scipy.constants import c
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 
