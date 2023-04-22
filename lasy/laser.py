@@ -374,7 +374,9 @@ class Laser:
             for i_m in range(self.box.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
                 transform_data *= np.exp(-1j * z_axis[0] * k_z[:, None])
-                self.field.field[i_m] = prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
+                self.field.field[i_m] = (
+                    prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
+                )
                 self.field.field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
         else:
             # Construct the propagator
