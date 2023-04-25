@@ -15,7 +15,7 @@ class TransverseProfileFromData(TransverseProfile):
     of the laser pulse.
 
     The data must be supplied as a 2D numpy array of intensity
-    values (for example an imported cameran image from an
+    values (for example an imported camera image from an
     experimental measurement).
 
     In the case of experimental measurements, this data
