@@ -9,8 +9,8 @@ class TransverseProfileFromData(TransverseProfile):
     Derived class for transverse laser profile created using
     data from an experimental measurement or from the output
     of another code.
-    
-    
+
+
     Uses user supplied data to define the transverse profile
     of the laser pulse.
 
