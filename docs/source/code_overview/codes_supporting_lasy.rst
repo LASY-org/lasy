@@ -10,7 +10,7 @@ A list of codes currently in the process of adding support:
 * `FBPIC <https://github.com/fbpic/fbpic>`_
 * `Wake-T <https://github.com/AngelFP/Wake-T>`_
 * `WarpX <https://github.com/ECP-WarpX/WarpX>`_
-
+* `HiPACE++ <https://github.com/Hi-PACE/hipace>`_
 
 A list of standard output formats supported by ``lasy``:
 

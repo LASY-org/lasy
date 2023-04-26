@@ -5,7 +5,7 @@ Overview of the Code
 It can be used to define the 3D profile of a laser pulse.
 The user can define seperately the transverse and longitudinal profile of the laser pulse either from a range common analytic profiles or using experimental measurements.
 Once defined the laser pulse may be propagated to a user defined location.
-Finally the laser profile may outputed to file for use as an input to a variety of different simulation tools.
+Finally the laser profile may be outputted to file for use as an input to a variety of different simulation tools.
 
 Structure
 #########
