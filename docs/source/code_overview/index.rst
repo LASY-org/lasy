@@ -9,6 +9,7 @@ Finally the laser profile may be outputted to file for use as an input to a vari
 
 Structure
 #########
+
 All information pertaining to the representation of the laser pulse in the code is stored in the :doc:`laser <../api/laser>` object.
 This contains both the physical and computational parameters.
 
