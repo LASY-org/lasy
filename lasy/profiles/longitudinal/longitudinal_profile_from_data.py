@@ -18,36 +18,42 @@ class LongitudinalProfileFromData(LongitudinalProfile):
     below). If spectral data is passed, it will be converted to
     the temporal domain.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     data : structure
         The data structure comprises several items indexed by
-        a series of keys.
+        a series of keys
+        
         datatype : string
             The domain in which the data has been passed. Options
             are 'spectral' and 'temporal'
+        
         abscissa : ndarrays of floats
             The horizontal axis of the pulse duration measurement
             When datatype is 'spectral' abscissa is wavelength in 
             meters
             When datatype is 'temporal' abscissa is time in seconds
+        
         intensity : ndarrays of floats
             The vertical axis of the pulse duration measurement
             When datatype is 'spectral' intensity is spectral
             intensity. This will be noramlized
             When datatype is 'temporal' intensity is temporal
             intensity. This will be normalized
+        
         phase : ndarrays of floats
             If provided, this phase will be added to the pulse.
             When datatype is 'spectral' phase is spectral
             phase. 
             When datatype is 'temporal' phase is temporal
             phase
+        
         dt : float
             Only required when datatype is 'spectral'. In this 
             case this defines the user requested resolution in 
             the conversrion from the spectral to the temporal 
             domain.
+        
         wavelength : float
             Only required when datatype is 'temporal'. Then,
             this is the central wavelength of the pulse
@@ -55,7 +61,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
     lo, hi : floats (seconds)
         Lower and higher end of the required domain of the data.
         The data imported will be cut to this range prior to 
-        being incorporated into the ```lasy``` pulse.
+        being incorporated into the ``lasy`` pulse.
     """
     def __init__(self, data, lo, hi):
 

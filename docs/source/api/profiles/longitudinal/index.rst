@@ -9,3 +9,4 @@ Longitudinal Profiles
    :hidden:
 
    gaussian
+   longitudinal_profile_from_data
