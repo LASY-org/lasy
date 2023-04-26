@@ -1,5 +1,5 @@
 from setuptools import find_packages, setup
-import lasy # In order to extract the version number
+import lasy  # In order to extract the version number
 
 # Get the package requirements from the requirements.txt files
 install_requires = []
