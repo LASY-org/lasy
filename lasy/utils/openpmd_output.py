@@ -42,7 +42,8 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
 
     # Store metadata needed to reconstruct the field
     i.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
-    i.set_attribute("pol", pol)
+    i.set_attribute("polarization", pol)
+    i.set_attribute("isLaserEnvelope", True)
 
     # Define the mesh
     m = i.meshes["laserEnvelope"]
