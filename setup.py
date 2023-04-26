@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+import lasy # In order to extract the version number
 
 # Get the package requirements from the requirements.txt files
 install_requires = []
@@ -10,6 +11,7 @@ with open("./tests/requirements.txt") as f:
 
 setup(
     name="lasy",
+    version=lasy.__version__,
     packages=find_packages("."),
     description="LAser pulse manipulation made eaSY",
     install_requires=install_requires,
