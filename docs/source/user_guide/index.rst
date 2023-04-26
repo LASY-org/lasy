@@ -19,6 +19,7 @@ More installation options and further instructions will be added in due course.
 
 First Example
 #############
+
 We will try a simple example to get familiar with the code structure and to verify the installation was successful.
 Lets generate a Gaussian pulse at focus, propagate it backwards by one Rayeligh Length and then output it to file.
 
