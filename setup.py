@@ -1,6 +1,10 @@
 from setuptools import find_packages, setup
 import lasy  # In order to extract the version number
 
+# README file is long description
+with open("./README.md", encoding="utf-8") as f:
+    long_description = f.read()
+
 # Get the package requirements from the requirements.txt files
 install_requires = []
 with open("./requirements.txt") as f:
@@ -14,6 +18,12 @@ setup(
     version=lasy.__version__,
     packages=find_packages("."),
     description="LAser pulse manipulation made eaSY",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    author="Rob Shalloo, Maxence Thevenet, Remi Lehe, Axel Huebl, Igor Adriyash, Soeren Jalas, Angel Ferran Pousa, Luca Fedeli",
+    # author_email='',
+    maintainer="Maxence Thevenet, Remi Lehe, Axel Huebl",
+    maintainer_email="maxence.thevenet@desy.de, rlehe@lbl.gov, axelhuebl@lbl.gov",
     python_requires=">=3.7",
     install_requires=install_requires,
     tests_require=tests_require,
