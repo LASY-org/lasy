@@ -24,8 +24,8 @@ def compute_laser_energy(dim, grid):
         the value of the envelope field and an object of type
         lasy.utils.Box that defines the points at which evaluate the laser
 
-    Return
-    ------
+    Returns
+    -------
     energy: float (in Joules)
     """
     # This uses the following volume integral:
@@ -137,8 +137,8 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
         the orignal time grid is used, otherwise field is interpolated on a
         new grid.
 
-    Return
-    ------
+    Returns
+    -------
         Et : ndarray (V/m)
             The reconstructed field, with shape (Nr, Nt) (for `rt`)
             or (Nx, Nt) (for `xyt`)

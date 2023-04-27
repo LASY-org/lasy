@@ -44,8 +44,8 @@ class Profile(object):
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
-        Return
-        ------
+        Returns
+        -------
         envelope: ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t

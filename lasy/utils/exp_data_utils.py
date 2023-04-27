@@ -10,8 +10,8 @@ def find_center_of_mass(img):
     img: 2Darray of floats
         The image on which to calculate the COM
 
-    Return
-    ------
+    Returns
+    -------
     x0 , y0: floats
         The center of mass of the image along the horizontal
         and the vertical. The units are in pixels.
@@ -39,8 +39,8 @@ def find_d4sigma(img):
     ----------
     img : A numpy array containing the spatial intensity profile of a laser pulse.
 
-    Return
-    ------
+    Returns
+    -------
     D4sigX : The D4sigma along the first (x) axis
     D4sigY : The D4sigma along the second (y) axis
     """

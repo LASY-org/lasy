@@ -34,8 +34,8 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
         The resolution of grid points in x and y that will be used
         during the decomposition calculation
 
-    Return
-    ------
+    Returns
+    -------
     weights : dict of floats
         A dictionary of floats corresponding to the weights of each mode
         in the decomposition. The keys of the dictionary are tuples
@@ -113,8 +113,8 @@ def estimate_best_HG_waist(x, y, field):
     field : 2D numpy array representing the field (not the laser intensity).
         the laser field profile in a 2D slice.
 
-    Return
-    ------
+    Returns
+    -------
     w0 : scalar
         The calculated waist.
     """

@@ -49,8 +49,8 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         t: ndarrays of floats
             Define points on which to evaluate the envelope
 
-        Return
-        ------
+        Returns
+        -------
         envelope: ndarray of complex numbers
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
