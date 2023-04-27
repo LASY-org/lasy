@@ -5,8 +5,9 @@ from scipy.interpolate import interp1d
 
 def compute_laser_energy(dim, grid):
     """
-    Computes the total laser energy that corresponds to the current
-    envelope data. This is used mainly for normalization purposes.
+    Compute the total laser energy that corresponds to the current envelope data.
+
+    This is used mainly for normalization purposes.
 
     Parameters
     ----------
@@ -58,10 +59,10 @@ def compute_laser_energy(dim, grid):
 
 def normalize_energy(dim, energy, grid):
     """
-    Normalize energy of the laser pulse contained in grid
+    Normalize energy of the laser pulse contained in grid.
 
     Parameters
-    -----------
+    ----------
     dim : string
         Dimensionality of the array. Options are:
 
@@ -76,7 +77,6 @@ def normalize_energy(dim, energy, grid):
     grid: a Grid object
         Contains value of the laser envelope and metadata
     """
-
     if energy is None:
         return
 
@@ -87,7 +87,7 @@ def normalize_energy(dim, energy, grid):
 
 def normalize_peak_field_amplitude(amplitude, grid):
     """
-    Normalize energy of the laser pulse contained in grid
+    Normalize energy of the laser pulse contained in grid.
 
     Parameters
     ----------
@@ -97,7 +97,6 @@ def normalize_peak_field_amplitude(amplitude, grid):
     grid : a Grid object
         Contains value of the laser envelope and metadata
     """
-
     if amplitude is None:
         return
     grid.field = grid.field / np.abs(grid.field).max() * amplitude
@@ -105,7 +104,7 @@ def normalize_peak_field_amplitude(amplitude, grid):
 
 def normalize_peak_intensity(peak_intensity, grid):
     """
-    Normalize energy of the laser pulse contained in grid
+    Normalize energy of the laser pulse contained in grid.
 
     Parameters
     ----------
@@ -115,7 +114,6 @@ def normalize_peak_intensity(peak_intensity, grid):
     grid : a Grid object
         Contains value of the laser envelope and metadata
     """
-
     if peak_intensity is None:
         return
     intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
@@ -126,7 +124,7 @@ def normalize_peak_intensity(peak_intensity, grid):
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     """
-    Reconstruct the laser pulse with carrier frequency on the default grid
+    Reconstruct the laser pulse with carrier frequency on the default grid.
 
     Parameters
     ----------
