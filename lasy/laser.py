@@ -256,10 +256,10 @@ class Laser:
             Spatial `z` axis along which the field should be reconstructed.
             If not provided, `z_axis = c * t_axis` is considered.
 
-        z0: scalar (optional)
+        z0 : scalar (optional)
             Position from which the field is produced (emitted)
 
-        t0: scalar (optional)
+        t0 : scalar (optional)
             Moment of time at which the field is produced
 
         backend : string (optional)
@@ -333,10 +333,10 @@ class Laser:
         z_axis : 1D ndarray of doubles
             Spatial `z` axis along which the field should be reconstructed.
 
-        z0: scalar (optional)
+        z0 : scalar (optional)
             Position at which the field should be recorded
 
-        t0: scalar (optional)
+        t0 : scalar (optional)
             Moment of time at which the field should be recorded
 
         backend : string (optional)
