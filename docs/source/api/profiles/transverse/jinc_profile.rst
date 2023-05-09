@@ -1,7 +1,7 @@
 Jinc Transverse Profile
 =================================
 
-Used to define a Jinc transverse laser profile (i.e., a profile described by the function :math:`2\\frac{J_1(r/w_0)}{r/w_0}`,
+Used to define a Jinc transverse laser profile (i.e., a profile described by the function :math:`2 \frac{J_1(r/w_0)}{r/w_0}`,
 where :math:`r` is the radius and :math:`J_1` is the Bessel function of the first kind of order 1).
 
 The shape of the profile is characterised by the waist :math:`w_0`.

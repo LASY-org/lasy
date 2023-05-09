@@ -5,18 +5,18 @@ from .transverse_profile import TransverseProfile
 
 
 class HermiteGaussianTransverseProfile(TransverseProfile):
-    """
-    Derived class for an analytic profile of a high-order Gaussian
-    laser pulse expressed in the Hermite-Gaussian formalism.
+    r"""
+    A high-order Gaussian laser pulse expressed in the Hermite-Gaussian formalism.
 
-    More precisely, the transverse envelope
-    (to be used in the :class:CombinedLongitudinalTransverseLaser class)
-    corresponds to:
+    Derived class for an analytic profile.
+    More precisely, the transverse envelope (to be used in the
+    :class:CombinedLongitudinalTransverseLaser class) corresponds to:
 
     .. math::
-        \\mathcal{T}(x, y) =
-        \\sqrt{\frac{2}{\\pi}} \\sqrt{\frac{1}{2^{n} n! w_0}}\\,
-        \\sqrt{\frac{1}{2^{n} n! w_0}}\\,
+
+        \\mathcal{T}(x, y) = \\,
+        \\sqrt{\\frac{2}{\\pi}} \\sqrt{\\frac{1}{2^{n} n! w_0}}\\,
+        \\sqrt{\\frac{1}{2^{n} n! w_0}}\\,
         H_{n_x}\\left ( \\frac{\\sqrt{2} x}{w_0}\\right )\\,
         H_{n_y}\\left ( \\frac{\\sqrt{2} y}{w_0}\\right )\\,
         \\exp\\left( -\\frac{x^2+y^2}{w_0^2} \\right)
@@ -41,7 +41,7 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
 
     def _evaluate(self, x, y):
         """
-        Returns the transverse envelope
+        Return the transverse envelope.
 
         Parameters
         ----------
