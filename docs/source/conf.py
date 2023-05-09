@@ -13,6 +13,7 @@
 import os
 import sys
 from datetime import date
+from lasy import __version__
 
 sys.path.insert(0, os.path.abspath("../.."))
 
@@ -24,7 +25,7 @@ copyright = "%s, LASY-org" % date.today().year
 author = "LASY-org"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.0"
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
