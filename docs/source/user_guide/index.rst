@@ -27,6 +27,7 @@ Lets generate a Gaussian pulse at focus, propagate it backwards by one Rayeligh 
    :caption: First lets load in the required functions from the library.
 
    from lasy.profiles.gaussian_profile import GaussianProfile
+   from lasy.laser import Laser
 
 
 ..  code-block:: python
@@ -63,6 +64,6 @@ Lets generate a Gaussian pulse at focus, propagate it backwards by one Rayeligh 
    file_prefix    = 'test_output' # The file name will start with this prefix
    file_format    = 'h5'          # Format to be used for the output file
 
-   write_to_openpmd_file(dimensions, file_prefix, file_format, laser.field, wavelength, polarization)
+   laser.write_to_file(file_prefix, file_format)
 
 This file may now be viewed, copied, shared or used as an input to a variety of other simulation tools.
