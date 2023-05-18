@@ -151,7 +151,7 @@ im6 = ax[0, 4].imshow(
     vmax=maxPhaseRes,
 )
 addColorbar(im6, ax[0, 4], "Phase (rad.)")
-ax[0, 4].set_title("Phase z = %.1f mm" % (-propDist * 1e3))
+ax[0, 4].set_title("Phase Res. z = %.1f mm" % (-propDist * 1e3))
 ax[0, 4].set_xlabel("x ($\mu m$)")
 ax[0, 4].set_ylabel("y ($\mu m$)")
 
@@ -183,7 +183,7 @@ im9 = ax[1, 4].imshow(
     vmax=maxPhaseRes,
 )
 addColorbar(im9, ax[1, 4], "Phase (rad.)")
-ax[1, 4].set_title("Phase z = %.1f mm" % (propDist * 1e3))
+ax[1, 4].set_title("Phase Res. z = %.1f mm" % (propDist * 1e3))
 ax[1, 4].set_xlabel("x ($\mu m$)")
 ax[1, 4].set_ylabel("y ($\mu m$)")
 plt.show()
