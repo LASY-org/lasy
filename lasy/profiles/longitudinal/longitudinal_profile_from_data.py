@@ -69,7 +69,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             cfreq = c / cwl
             # Determine required sampling frequency for desired dt
             sample_freq = 1 / dt
-            # Determine number of points in temporal domain. This is the number of 
+            # Determine number of points in temporal domain. This is the number of
             # points required to maintain the input spectral resolution while spanning
             # enough spectrum to achieve the desired temporal resolution.
             indx = np.argmin(np.abs(wavelength - cwl))
