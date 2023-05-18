@@ -27,11 +27,11 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             The domain in which the data has been passed. Options
             are 'spectral' and 'temporal'
 
-        abscissa : ndarrays of floats
+        axis : ndarrays of floats
             The horizontal axis of the pulse duration measurement
-            When datatype is 'spectral' abscissa is wavelength in
+            When datatype is 'spectral' axis is wavelength in
             meters
-            When datatype is 'temporal' abscissa is time in seconds
+            When datatype is 'temporal' axis is time in seconds
 
         intensity : ndarrays of floats
             The vertical axis of the pulse duration measurement.
@@ -61,7 +61,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
     def __init__(self, data, lo, hi):
         if data["datatype"] == "spectral":
             # First find central frequency
-            wavelength = data["abscissa"]
+            wavelength = data["axis"]
             spectral_intensity = data["intensity"]
             spectral_phase = data["phase"]
             dt = data["dt"]
@@ -102,7 +102,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             temporal_phase -= temporal_phase[np.argmin(np.abs(time))]
 
         elif data["datatype"] == "temporal":
-            time = data["abscissa"]
+            time = data["axis"]
             temporal_intensity = data["intensity"]
             temporal_phase = data["phase"]
             cwl = data["wavelength"]
