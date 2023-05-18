@@ -124,7 +124,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
     def evaluate(self, t):
         """
-        Returns the longitudinal field envelope
+        Return the longitudinal field envelope.
 
         Parameters
         ----------
