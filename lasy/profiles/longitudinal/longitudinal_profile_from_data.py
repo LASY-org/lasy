@@ -6,12 +6,11 @@ from .longitudinal_profile import LongitudinalProfile
 
 class LongitudinalProfileFromData(LongitudinalProfile):
     """
-    Derived class for longitudinal laser profile created using
-    data from an experimental measurement or from the output
-    of another code.
-
-    Uses user supplied data to define the longitudinal profile
-    of the laser pulse.
+    Derived class for longitudinal laser profile created using data. 
+    
+    The data used can either come from an experimental measurement 
+    or from the output of another code. This data is then used to 
+    define the longitudinal profile of the laser pulse.
 
     The data may be supplied in either the spectral or temporal
     domain. The data should be passed as a structure (defined
