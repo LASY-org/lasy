@@ -64,7 +64,7 @@ extent = (lo[0] * 1e6, hi[0] * 1e6, lo[1] * 1e6, hi[1] * 1e6)
 
 
 def addColorbar(im, ax, label=None):
-    "Create a colorbar and add it to the plot."
+    """Create a colorbar and add it to the plot."""
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
     plt.colorbar(im, cax=cax)

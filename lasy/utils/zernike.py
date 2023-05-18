@@ -1,4 +1,3 @@
-from scipy.special import genlaguerre
 import numpy as np
 import math
 
