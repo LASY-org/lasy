@@ -5,6 +5,8 @@ import math
 
 def get_zernike_nm(j):
     """
+    Converts between different Zernike index schemes.
+
     Convert the OSA/ANSI Zernike Polynomial Index to the
     standard n,m indexing
 
@@ -18,7 +20,6 @@ def get_zernike_nm(j):
     n,m : tuple of ints
         The standard Zernike Polynomial Indexes
     """
-
     n = int(np.ceil((-3 + np.sqrt(9 + 8 * j)) / 2))
     m = 2 * j - n * (n + 2)
     return int(m), int(n)
@@ -46,7 +47,6 @@ def zernike(x, y, pupilCoords, j):
     Z : ndarray (rad)
         The Zernike mode
     """
-
     # Setup
     (cgx, cgy, r) = pupilCoords
     rho = np.sqrt((x - cgx) ** 2 + (y - cgy) ** 2) / r
@@ -78,7 +78,7 @@ def zernike(x, y, pupilCoords, j):
 
 def RmnGenerator(n, m, rho):
     """
-    Generate the Radial component of the Zernike Polynomials
+    Generate the Radial component of the Zernike Polynomials.
 
     Parameters
     ----------
@@ -93,7 +93,6 @@ def RmnGenerator(n, m, rho):
     Rmn : ndarray (rad)
         The radial component of the Zernike mode
     """
-
     if n == 0:
         try:
             (r,) = rho.shape

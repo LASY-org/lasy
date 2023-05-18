@@ -12,9 +12,12 @@ def gerchberg_saxton_algo(
     debug=False,
 ):
     """
+    Implementation of the Gerchberg-Saxton Algorithm.
+
     Given two laser profiles and a distance betweent them, calculate
     the spatial phase profile of the laser in both planes using the
-    Gerchberg-Saxton algorithm.
+    Gerchberg-Saxton algorithm. Returns the phase of the laser in both 
+    planes.
 
     Parameters
     ----------
