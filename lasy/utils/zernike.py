@@ -5,7 +5,7 @@ import math
 
 def get_zernike_nm(j):
     """
-    Converts between different Zernike index schemes.
+    Convert between different Zernike index schemes.
 
     Convert the OSA/ANSI Zernike Polynomial Index to the
     standard n,m indexing
@@ -24,10 +24,10 @@ def get_zernike_nm(j):
     m = 2 * j - n * (n + 2)
     return int(m), int(n)
 
-
 def zernike(x, y, pupilCoords, j):
     """
     Calculate the Zernike Polynomials to arbitrary order.
+    
     Makes use of consructor formula on https://en.wikipedia.org/wiki/Zernike_polynomials
 
     Parameters
