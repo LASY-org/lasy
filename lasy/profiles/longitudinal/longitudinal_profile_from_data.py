@@ -35,23 +35,18 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             When datatype is 'temporal' abscissa is time in seconds
 
         intensity : ndarrays of floats
-            The vertical axis of the pulse duration measurement
-            When datatype is 'spectral' intensity is spectral
-            intensity. This will be noramlized
-            When datatype is 'temporal' intensity is temporal
-            intensity. This will be normalized
+            The vertical axis of the pulse duration measurement.
+            Spectral (resp. temporal) intensity when datatype is 'spectral' (resp 'temporal').
 
-        phase : ndarrays of floats
+        phase : ndarray of floats
             If provided, this phase will be added to the pulse.
-            When datatype is 'spectral' phase is spectral
-            phase.
-            When datatype is 'temporal' phase is temporal
-            phase
+            When datatype is 'spectral' phase is spectral phase.
+            When datatype is 'temporal' phase is temporal phase.
 
         dt : float
             Only required when datatype is 'spectral'. In this
             case this defines the user requested resolution in
-            the conversrion from the spectral to the temporal
+            the conversion from the spectral to the temporal
             domain.
 
         wavelength : float
@@ -59,7 +54,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             this is the central wavelength of the pulse
 
     lo, hi : floats (seconds)
-        Lower and higher end of the required domain of the data.
+        Lower and higher ends of the required domain of the data.
         The data imported will be cut to this range prior to
         being incorporated into the ``lasy`` pulse.
     """
@@ -78,7 +73,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             # Determine number of points in temporal domain
             indx = np.argmin(np.abs(wavelength - cwl))
             dfreq = np.abs(c / wavelength[indx] - c / wavelength[indx + 1])
-            N = int((sample_freq) / dfreq)
+            N = int(sample_freq / dfreq)
             freq = np.linspace(cfreq - sample_freq / 2, cfreq + sample_freq / 2, N)
             # interpolate the spectrum onto this new array
             freq_intensity = np.interp(
@@ -134,12 +129,12 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
         Parameters
         ----------
-        t: ndarrays of floats
+        t : ndarray of floats
             Define points on which to evaluate the envelope
 
-        Returns:
-        --------
-        envelope: ndarray of complex numbers
+        Returns
+        -------
+        envelope : ndarray of complex numbers
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
         """
