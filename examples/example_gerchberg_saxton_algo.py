@@ -107,7 +107,7 @@ phaseResidual -= phaseResidual[int(npoints[1]/2),int(npoints[0]/2)]
 maxPhaseRes = np.max(np.abs(phaseResidual)*phaseMask)
 im6 = ax[0,4].imshow(phaseResidual*phaseMask,extent=extent,cmap='coolwarm',vmin=-maxPhaseRes,vmax=maxPhaseRes)
 addColorbar(im6,ax[0,4],'Phase (rad.)')
-ax[0,4].set_title('Phase z = %.1f mm' %(-propDist*1e3))
+ax[0,4].set_title('Phase Res. z = %.1f mm' %(-propDist*1e3))
 ax[0,4].set_xlabel('x ($\mu m$)');ax[0,4].set_ylabel('y ($\mu m$)')
 
 im7 = ax[1,2].imshow(np.abs(laserForward.field.field[:,:,tIndx])**2,extent=extent,cmap='PuRd')
@@ -124,6 +124,6 @@ phaseResidual -= phaseResidual[int(npoints[1]/2),int(npoints[0]/2)]
 maxPhaseRes = np.max(np.abs(phaseResidual)*phaseMask)
 im9 = ax[1,4].imshow(phaseResidual*phaseMask,extent=extent,cmap='coolwarm',vmin=-maxPhaseRes,vmax=maxPhaseRes)
 addColorbar(im9,ax[1,4],'Phase (rad.)')
-ax[1,4].set_title('Phase z = %.1f mm' %(propDist*1e3))
+ax[1,4].set_title('Phase Res. z = %.1f mm' %(propDist*1e3))
 ax[1,4].set_xlabel('x ($\mu m$)');ax[1,4].set_ylabel('y ($\mu m$)')
 plt.show()
