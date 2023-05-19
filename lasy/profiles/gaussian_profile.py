@@ -105,5 +105,5 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
             pol,
             laser_energy,
             GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase),
-            GaussianTransverseProfile(w0),
+            GaussianTransverseProfile(w0, wavelength),
         )
