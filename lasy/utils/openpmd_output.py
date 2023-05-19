@@ -40,11 +40,6 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
     i = series.iterations[0]
 
-    # Store metadata needed to reconstruct the field
-    i.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
-    i.set_attribute("polarization", pol)
-    i.set_attribute("isLaserEnvelope", True)
-
     # Define the mesh
     m = i.meshes["laserEnvelope"]
     m.grid_spacing = [
@@ -64,6 +59,11 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     elif dim == "rt":
         m.geometry = io.Geometry.thetaMode
         m.axis_labels = ["t", "r"]
+
+    # Store metadata needed to reconstruct the field
+    m.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
+    m.set_attribute("polarization", pol)
+    m.set_attribute("isLaserEnvelope", True)
 
     # Pick the correct field
     if dim == "xyt":
