@@ -1,4 +1,3 @@
-import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 from .profile import Profile
 
@@ -28,7 +27,7 @@ class FromArrayProfile(Profile):
         array.shape = (axes['x'].size, axes['y'].size, axes['t'].size) in 3D,
         and similar in cylindrical geometry.
 
-    dim : Dimension of the data, 'xyt' or 'rt'.
+    dim : Dimension of the data, 'xyt' or 'rt'
     """
 
     def __init__(self, wavelength, pol, array, axes, dim):
