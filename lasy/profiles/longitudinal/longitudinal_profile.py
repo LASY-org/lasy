@@ -16,7 +16,7 @@ class LongitudinalProfile(object):
 
     def evaluate(self, t):
         """
-        Returns the longitudinal envelope
+        Return the longitudinal envelope.
 
         Parameters
         ----------

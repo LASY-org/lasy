@@ -14,8 +14,9 @@ from lasy.utils.openpmd_output import write_to_openpmd_file
 
 class Laser:
     """
-    Top-level class that can evaluate a laser profile on a grid,
-    propagate it, and write it to a file.
+    Evaluate a laser profile on a grid, propagate it, and write it to a file.
+
+    This is a top-level class.
 
     Parameters
     ----------
@@ -45,7 +46,6 @@ class Laser:
 
     Examples
     --------
-
     >>> import matplotlib.pyplot as plt
     >>> from lasy.laser import Laser
     >>> from lasy.profiles.gaussian_profile import GaussianProfile
@@ -117,7 +117,7 @@ class Laser:
 
     def normalize(self, value, kind="energy"):
         """
-        Normalize the pulse either to the energy, peak field amplitude or peak intensity
+        Normalize the pulse either to the energy, peak field amplitude or peak intensity.
 
         Parameters
         ----------
@@ -127,7 +127,6 @@ class Laser:
             Distance by which the laser pulse should be propagated
             Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
-
         if kind == "energy":
             normalize_energy(self.dim, value, self.field)
         elif kind == "field":
@@ -139,7 +138,7 @@ class Laser:
 
     def propagate(self, distance, nr_boundary=None, backend="NP"):
         """
-        Propagate the laser pulse by the distance specified
+        Propagate the laser pulse by the distance specified.
 
         Parameters
         ----------
@@ -266,49 +265,3 @@ class Laser:
             self.profile.lambda0,
             self.profile.pol,
         )
-
-    def get_full_field(self, theta=0, slice=0, slice_axis="x"):
-        """
-        Reconstruct the laser pulse with carrier frequency on the default grid
-
-        Parameters
-        ----------
-        theta : float (rad) (optional)
-            Azimuthal angle
-        slice : float (optional)
-            Normalised position of the slice from -0.5 to 0.5
-
-        Returns
-        -------
-            Et : ndarray (V/m)
-                The reconstructed field, with shape (Nr, Nt_new) (for `rt`)
-                or (Nx, Nt_new) (for `xyt`)
-            extent : ndarray (Xmin, Xmax, Tmin, Tmax)
-                Physical extent of the reconstructed field
-        """
-        omega0 = self.profile.omega0
-        field = self.field.field.copy()
-        time_axis = self.box.axes[-1][None, :]
-
-        if self.dim == "rt":
-            azimuthal_phase = np.exp(-1j * self.box.azimuthal_modes * theta)
-            field *= azimuthal_phase[:, None, None]
-            field = field.sum(0)
-        elif slice_axis == "x":
-            Nx_middle = field.shape[0] // 2 - 1
-            Nx_slice = int((1 + slice) * Nx_middle)
-            field = field[Nx_slice, :]
-        elif slice_axis == "y":
-            Ny_middle = field.shape[1] // 2 - 1
-            Ny_slice = int((1 + slice) * Ny_middle)
-            field = field[:, Ny_slice, :]
-        else:
-            return None
-
-        field *= np.exp(-1j * omega0 * time_axis)
-        field = np.real(field)
-        ext = np.array(
-            [self.box.lo[-1], self.box.hi[-1], self.box.lo[0], self.box.hi[0]]
-        )
-
-        return field, ext

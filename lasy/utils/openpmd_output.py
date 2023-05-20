@@ -5,7 +5,7 @@ from scipy.constants import c
 
 def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     """
-    Write the laser field into an openPMD file
+    Write the laser field into an openPMD file.
 
     Parameters
     ----------
@@ -40,17 +40,13 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
     i = series.iterations[0]
 
-    # Store metadata needed to reconstruct the field
-    i.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
-    i.set_attribute("pol", pol)
-
     # Define the mesh
     m = i.meshes["laserEnvelope"]
     m.grid_spacing = [
         (hi - lo) / (npoints - 1)
         for hi, lo, npoints in zip(box.hi, box.lo, box.npoints)
     ][::-1]
-    m.grid_global_offset = box.lo
+    m.grid_global_offset = box.lo[::-1]
     m.unit_dimension = {
         io.Unit_Dimension.M: 1,
         io.Unit_Dimension.L: 1,
@@ -63,6 +59,11 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     elif dim == "rt":
         m.geometry = io.Geometry.thetaMode
         m.axis_labels = ["t", "r"]
+
+    # Store metadata needed to reconstruct the field
+    m.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
+    m.set_attribute("polarization", pol)
+    m.set_attribute("isLaserEnvelope", True)
 
     # Pick the correct field
     if dim == "xyt":

@@ -1,4 +1,6 @@
--r ../requirements.txt
+# install this from the source root (!) directory like this:
+#   python -m pip install --upgrade -r docs/requirements.txt
+-e .
 matplotlib
 numpydoc
 pydata-sphinx-theme
