@@ -80,7 +80,7 @@ def test_profile_laguerre_gauss():
         pol,
         laser_energy,
         GaussianLongitudinalProfile(wavelength, tau, t_peak),
-        LaguerreGaussianTransverseProfile(w0, p=0, m=1, wavelength),
+        LaguerreGaussianTransverseProfile(w0, p=0, m=1, wavelength=wavelength),
     )
 
     # - Cylindrical case

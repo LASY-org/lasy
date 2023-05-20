@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.special.orthogonal import hermite
+from scipy.special import hermite
 from math import factorial
 from .transverse_profile import TransverseProfile
 
