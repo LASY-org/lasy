@@ -85,13 +85,13 @@ class TransverseProfileFromData(TransverseProfile):
 
         Parameters
         ----------
-        x, y: ndarrays of floats
+        x, y : ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
         Returns
         -------
-        envelope: ndarray of floats
+        envelope : ndarray of floats
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
