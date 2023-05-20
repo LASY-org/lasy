@@ -34,7 +34,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
     wavelength : float (in meter)
         The main laser wavelength :math:`\\lambda_0` of the laser.
     z_foc : float (in meter), optional
-        Position of the focal plane. (The laser pulse is initialized at `z=0`.)        
+        Position of the focal plane. (The laser pulse is initialized at `z=0`.)
     """
 
     def __init__(self, w0, p, m, wavelength, z_foc=0):
@@ -62,8 +62,8 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         """
         # Term for wavefront curvature, waist and Gouy phase
         diffract_factor = 1.0 - 1j * self.z_foc_over_zr
-        w = self.w0 * abs( diffract_factor )
-        psi = np.angle( diffract_factor )
+        w = self.w0 * abs(diffract_factor)
+        psi = np.angle(diffract_factor)
         # complex_position corresponds to r e^{+/-i\theta}
         if self.m > 0:
             complex_position = x - 1j * y
@@ -73,9 +73,11 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         envelope = (
             complex_position ** abs(self.m)
             * genlaguerre(self.p, abs(self.m))(2 * radius**2 / w**2)
-            * np.exp( -radius**2/(self.w0**2 * diffract_factor)
-                      - 1.j*(2*self.p + self.m)*psi ) # Additional Gouy phase
-            * (1./diffract_factor)
+            * np.exp(
+                -(radius**2) / (self.w0**2 * diffract_factor)
+                - 1.0j * (2 * self.p + self.m) * psi
+            )  # Additional Gouy phase
+            * (1.0 / diffract_factor)
         )
 
         return envelope
