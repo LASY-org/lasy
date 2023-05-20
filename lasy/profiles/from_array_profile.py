@@ -31,22 +31,19 @@ class FromArrayProfile(Profile):
     """
 
     def __init__(self, wavelength, pol, array, axes, dim):
-        super().__init__(
-            wavelength,
-            pol
-        )
+        super().__init__(wavelength, pol)
 
-        assert dim == 'xyt' or dim == 'rt', "dim must be 'xyt' or 'rt'"
+        assert dim == "xyt" or dim == "rt", "dim must be 'xyt' or 'rt'"
 
-        assert dim == 'xyt', "Only dim='xyt' currently implemented"
+        assert dim == "xyt", "Only dim='xyt' currently implemented"
 
         self.array = array
         self.axes = axes
         self.dim = dim
 
-        if dim == 'xyt':
+        if dim == "xyt":
             self.field_interp = RegularGridInterpolator(
-                (axes['x'], axes['y'], axes['t']),
+                (axes["x"], axes["y"], axes["t"]),
                 array,
                 bounds_error=False,
                 fill_value=0.0,
