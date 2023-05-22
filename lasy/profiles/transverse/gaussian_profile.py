@@ -20,11 +20,12 @@ class GaussianTransverseProfile(TransverseProfile):
     w0 : float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
 
-    wavelength : float (in meter)
-        The main laser wavelength :math:`\\lambda_0` of the laser.
-
     z_foc : float (in meter), optional
         Position of the focal plane. (The laser pulse is initialized at `z=0`.)
+
+    wavelength : float (in meter), optional
+        The main laser wavelength :math:`\\lambda_0` of the laser.
+        (Only needed if `z_foc` is different than 0.)
 
     .. warning::
 
