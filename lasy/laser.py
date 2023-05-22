@@ -139,7 +139,7 @@ class Laser:
 
     def propagate(self, distance, nr_boundary=None, backend="NP"):
         """
-        Propagate the laser pulse by the distance specified
+        Propagate the laser pulse by the distance specified.
 
         Parameters
         ----------
@@ -248,7 +248,7 @@ class Laser:
 
     def export_to_z(self, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
         """
-        Convert laser pulse defined in the temporal domain to the spatial domain
+        Convert laser pulse defined in the temporal domain to the spatial domain.
 
         Parameters
         ----------
@@ -326,7 +326,7 @@ class Laser:
 
     def import_from_z(self, field_z, z_axis, z0=0.0, t0=0.0, backend="NP"):
         """
-        Export laser pulse from the field map in the spatial domain
+        Export laser pulse from the field map in the spatial domain.
 
         Parameters
         ----------
