@@ -103,7 +103,7 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     """
 
     def __init__(self, wavelength, pol, laser_energy, w0, tau, t_peak,
-                 cep_phase=0, z_foc=0:
+                 cep_phase=0, z_foc=0):
         super().__init__(
             wavelength,
             pol,
