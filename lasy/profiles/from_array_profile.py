@@ -51,6 +51,5 @@ class FromArrayProfile(Profile):
 
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
-
         envelope = self.field_interp((x, y, t))
         return envelope
