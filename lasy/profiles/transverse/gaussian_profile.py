@@ -32,6 +32,7 @@ class GaussianTransverseProfile(TransverseProfile):
             - Use a non-zero `z_foc`
             - Use `z_foc=0` (i.e. initialize the pulse at focus) and then
               call `laser.propagate(-z_foc)`
+
         Both methods are in principle equivalent, but note that the first
         method uses the paraxial approximation, while the second method does
         not make this approximation.
