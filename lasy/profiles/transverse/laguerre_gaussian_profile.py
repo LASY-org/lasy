@@ -5,7 +5,7 @@ from .transverse_profile import TransverseProfile
 
 
 class LaguerreGaussianTransverseProfile(TransverseProfile):
-    """
+    r"""
     High-order Gaussian laser pulse expressed in the Laguerre-Gaussian formalism.
 
     Derived class for an analytic profile.
@@ -14,12 +14,12 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
 
     .. math::
 
-        \\mathcal{T}(x, y) = r^{|m|}e^{-im\\theta} \\,
-        L_p^{|m|}\\left( \\frac{2 r^2 }{w_0^2}\\right )\\,
-        \\exp\\left( -\\frac{r^2}{w_0^2} \\right)
+        \mathcal{T}(x, y) = r^{|m|}e^{-im\theta} \,
+        L_p^{|m|}\left( \frac{2 r^2 }{w_0^2}\right )\,
+        \exp\left( -\frac{r^2}{w_0^2} \right)
 
-    where :math:`x = r \\cos{\\theta}`,
-    :math:`y = r \\sin{\\theta}`, :math:`L_p^{|m|}` is the
+    where :math:`x = r \cos{\theta}`,
+    :math:`y = r \sin{\theta}`, :math:`L_p^{|m|}` is the
     Generalised Laguerre polynomial of radial order :math:`p` and
     azimuthal order :math:`|m|`
 

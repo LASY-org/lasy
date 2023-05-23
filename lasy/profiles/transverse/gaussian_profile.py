@@ -4,7 +4,7 @@ from .transverse_profile import TransverseProfile
 
 
 class GaussianTransverseProfile(TransverseProfile):
-    """
+    r"""
     Derived class for the analytic profile of a Gaussian laser pulse.
 
     More precisely, at focus (``z_foc=0``), the transverse envelope
@@ -13,7 +13,7 @@ class GaussianTransverseProfile(TransverseProfile):
 
     .. math::
 
-        \\mathcal{T}(x, y) = \\exp\\left( -\\frac{x^2 + y^2}{w_0^2} \\right)
+        \mathcal{T}(x, y) = \exp\left( -\frac{x^2 + y^2}{w_0^2} \right)
 
     Parameters
     ----------
@@ -21,7 +21,7 @@ class GaussianTransverseProfile(TransverseProfile):
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
 
     wavelength : float (in meter)
-        The main laser wavelength :math:`\\lambda_0` of the laser.
+        The main laser wavelength :math:`\lambda_0` of the laser.
 
     z_foc : float (in meter), optional
         Position of the focal plane. (The laser pulse is initialized at

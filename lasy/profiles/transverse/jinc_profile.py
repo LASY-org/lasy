@@ -4,14 +4,14 @@ from .transverse_profile import TransverseProfile
 
 
 class JincTransverseProfile(TransverseProfile):
-    """
+    r"""
     Derived class for the analytic profile of a Jinc laser pulse.
 
     The transverse envelope corresponds to:
 
     .. math::
 
-        \\mathcal{T}(x, y) = 2\\frac{J_1(r/w_0)}{r/w_0} \\textrm{, with } r=\\sqrt{x^2+y^2}
+        \mathcal{T}(x, y) = 2\frac{J_1(r/w_0)}{r/w_0} \textrm{, with } r=\sqrt{x^2+y^2}
 
     where :math:`J_1` is the Bessel function of the first kind of order one
 
