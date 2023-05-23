@@ -7,7 +7,7 @@ class GaussianTransverseProfile(TransverseProfile):
     """
     Derived class for the analytic profile of a Gaussian laser pulse.
 
-    More precisely, at focus (`z_foc=0`), the transverse envelope
+    More precisely, at focus (``z_foc=0``), the transverse envelope
     (to be used in the :class:CombinedLongitudinalTransverseLaser class)
     corresponds to:
 
@@ -24,7 +24,8 @@ class GaussianTransverseProfile(TransverseProfile):
         The main laser wavelength :math:`\\lambda_0` of the laser.
 
     z_foc : float (in meter), optional
-        Position of the focal plane. (The laser pulse is initialized at `z=0`.)
+        Position of the focal plane. (The laser pulse is initialized at
+        ``z=0``.)
 
     Warnings
     --------
