@@ -16,7 +16,7 @@ class TransverseProfile(object):
 
     def _evaluate(self, x, y):
         """
-        Returns the transverse envelope
+        Return the transverse envelope.
 
         Parameters
         ----------
@@ -36,7 +36,8 @@ class TransverseProfile(object):
 
     def evaluate(self, x, y):
         """
-        Returns the transverse envelope modified by any spatial offsets.
+        Return the transverse envelope modified by any spatial offsets.
+
         This is the public facing evaluate method, it calls the _evaluate function of the derived class.
 
         Parameters
@@ -51,25 +52,22 @@ class TransverseProfile(object):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-
         return self._evaluate(x + self.x_offset, y + self.y_offset)
 
     def set_offset(self, x_offset, y_offset):
         """
-        Populates the x and y spatial offsets of the profile
+        Populate the x and y spatial offsets of the profile.
+
         The profile will be shifted by these according to
         x+x_offset and y+y_offset prior to execution of
-        _evaluate
-
+        _evaluate.
 
         Parameters
         ----------
         x_offset, y_offset: floats (m)
             Define spatial offsets to the beam. That is, how much
             to shift the beam by transversely
-
         """
-
         self.x_offset = x_offset
         self.y_offset = y_offset
 
