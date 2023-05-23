@@ -4,7 +4,7 @@ from .transverse_profile import TransverseProfile
 
 
 class JincTransverseProfile(TransverseProfile):
-    r"""
+    """
     Derived class for the analytic profile of a Jinc laser pulse.
 
     The transverse envelope corresponds to:

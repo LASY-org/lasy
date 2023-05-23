@@ -4,7 +4,7 @@ from .longitudinal_profile import LongitudinalProfile
 
 
 class GaussianLongitudinalProfile(LongitudinalProfile):
-    r"""
+    """
     Derived class for the analytic profile of a longitudinally-Gaussian laser pulse.
 
     More precisely, the longitudinal envelope

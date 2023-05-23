@@ -5,7 +5,7 @@ from .transverse_profile import TransverseProfile
 
 
 class HermiteGaussianTransverseProfile(TransverseProfile):
-    r"""
+    """
     A high-order Gaussian laser pulse expressed in the Hermite-Gaussian formalism.
 
     Derived class for an analytic profile.

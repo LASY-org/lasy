@@ -5,7 +5,7 @@ from .transverse_profile import TransverseProfile
 
 
 class LaguerreGaussianTransverseProfile(TransverseProfile):
-    r"""
+    """
     High-order Gaussian laser pulse expressed in the Laguerre-Gaussian formalism.
 
     Derived class for an analytic profile.

@@ -2,7 +2,7 @@ from .profile import Profile
 
 
 class CombinedLongitudinalTransverseProfile(Profile):
-    r"""
+    """
     Class that combines a longitudinal and transverse laser profile.
 
     The combined profile is defined as the product of the longitudinal and transverse
