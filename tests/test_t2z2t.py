@@ -38,9 +38,9 @@ def check_correctness(laser_t_in, laser_t_out):
     assert np.allclose(
             laser_t_in.field.field[ind0],
             laser_t_out.field.field[ind0],
-            atol=1e-6
+            atol=1e-8
             )
-    assert np.allclose(Field_approx, Field_orig, atol=4e-2)
+    assert np.allclose(Field_approx, Field_orig, atol=2e-3)
 
 def test_RT_case(gaussian):
     dim = 'rt'
@@ -48,7 +48,7 @@ def test_RT_case(gaussian):
     tau = gaussian.long_profile.tau
     lo = (0, -3.5 * tau)
     hi = (3 * w0, 3.5 * tau)
-    npoints = (128, 256)
+    npoints = (128, 64)
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
@@ -59,9 +59,9 @@ def test_3D_case(gaussian):
     dim = "xyt"
     w0 = gaussian.trans_profile.w0
     tau = gaussian.long_profile.tau
-    lo = (0, 0, -3.5 * tau)
+    lo = (-3 * w0, -3 * w0, -3.5 * tau)
     hi = (3 * w0, 3 * w0, 3.5 * tau)
-    npoints = (100, 100, 100)
+    npoints = (128, 128, 64)
     laser = Laser(dim, lo, hi, npoints, gaussian)
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)

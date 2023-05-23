@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.constants import c
+
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
+from axiprop.containers import ScalarFieldEnvelope
 
 from lasy.utils.box import Box
 from lasy.utils.grid import Grid
@@ -270,61 +272,55 @@ class Laser:
         if z_axis is None:
             z_axis = t_axis * c
 
-        # Transform the field from temporal to frequency domain
-        field_fft = np.fft.ifft(
-            self.field.field, axis=time_axis_indx, norm="backward"
-        )
-
-        # Create the frequency axis
-        dt = self.box.dx[time_axis_indx]
         omega0 = self.profile.omega0
-        Nt = self.field.field.shape[time_axis_indx]
-        omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+        FieldAxprp = ScalarFieldEnvelope( omega0 / c, t_axis )
 
         if self.dim == "rt":
             # Construct the propagator
-            spatial_axes = (self.box.axes[0],)
             prop = []
             for m in self.box.azimuthal_modes:
                 prop.append(
                     PropagatorResampling(
-                        *spatial_axes,
-                        omega / c,
+                        self.box.axes[0],
+                        FieldAxprp.k_freq,
                         mode=m,
                         backend=backend,
                         verbose=False,
                     )
                 )
+
             field_z = np.zeros(
-                (field_fft.shape[0], field_fft.shape[1], z_axis.size),
-                dtype=field_fft.dtype,
+                (
+                    self.field.field.shape[0],
+                    self.field.field.shape[1],
+                    z_axis.size
+                ),
+                dtype=self.field.field.dtype,
             )
+
             # Convert the spectral image to the spatial field representation
             for i_m in range(self.box.azimuthal_modes.size):
-                transform_data = np.transpose(field_fft[i_m]).copy()
-                transform_data *= np.exp(1j * t_axis[0] * \
-                    (omega[:, None] - omega0) )
+                FieldAxprp.import_field(
+                    np.transpose(self.field.field[i_m]).copy() )
+
                 field_z[i_m] = prop[i_m].t2z(
-                    transform_data, z_axis, z0=z0, t0=t0
-                ).T
+                    FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0 ).T
+
                 field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
         else:
             # Construct the propagator
             Nx, Ny, Nt = self.field.field.shape
             Lx = self.box.hi[0] - self.box.lo[0]
             Ly = self.box.hi[1] - self.box.lo[1]
-            spatial_axes = ((Lx, Nx), (Ly, Ny))
             prop = PropagatorFFT2(
-                *spatial_axes,
-                omega / c,
+                (Lx, Nx), (Ly, Ny),
+                FieldAxprp.k_freq,
                 backend=backend,
                 verbose=False,
             )
             # Convert the spectral image to the spatial field representation
-            transform_data = np.transpose(field_fft).copy()
-            transform_data *= np.exp( 1j * t_axis[0] * \
-                ( omega[:, None, None] - omega0 ) )
-            field_z = prop.t2z(transform_data, z_axis, z0=z0, t0=t0).T
+            FieldAxprp.import_field( np.transpose(self.field.field).copy() )
+            field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
             field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
 
         return field_z
@@ -362,12 +358,11 @@ class Laser:
 
         if self.dim == "rt":
             # Construct the propagator
-            spatial_axes = (self.box.axes[0],)
             prop = []
             for m in self.box.azimuthal_modes:
                 prop.append(
                     PropagatorResampling(
-                        *spatial_axes,
+                        self.box.axes[0],
                         omega / c,
                         mode=m,
                         backend=backend,
@@ -389,9 +384,8 @@ class Laser:
             Nx, Ny, Nt = self.field.field.shape
             Lx = self.box.hi[0] - self.box.lo[0]
             Ly = self.box.hi[1] - self.box.lo[1]
-            spatial_axes = ((Lx, Nx), (Ly, Ny))
             prop = PropagatorFFT2(
-                *spatial_axes,
+                (Lx, Nx), (Ly, Ny),
                 omega / c,
                 backend=backend,
                 verbose=False,
