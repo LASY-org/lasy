@@ -273,7 +273,7 @@ class Laser:
             z_axis = t_axis * c
 
         omega0 = self.profile.omega0
-        FieldAxprp = ScalarFieldEnvelope( omega0 / c, t_axis )
+        FieldAxprp = ScalarFieldEnvelope(omega0 / c, t_axis)
 
         if self.dim == "rt":
             # Construct the propagator
@@ -290,21 +290,17 @@ class Laser:
                 )
 
             field_z = np.zeros(
-                (
-                    self.field.field.shape[0],
-                    self.field.field.shape[1],
-                    z_axis.size
-                ),
+                (self.field.field.shape[0], self.field.field.shape[1], z_axis.size),
                 dtype=self.field.field.dtype,
             )
 
             # Convert the spectral image to the spatial field representation
             for i_m in range(self.box.azimuthal_modes.size):
-                FieldAxprp.import_field(
-                    np.transpose(self.field.field[i_m]).copy() )
+                FieldAxprp.import_field(np.transpose(self.field.field[i_m]).copy())
 
-                field_z[i_m] = prop[i_m].t2z(
-                    FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0 ).T
+                field_z[i_m] = (
+                    prop[i_m].t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
+                )
 
                 field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
         else:
@@ -313,13 +309,14 @@ class Laser:
             Lx = self.box.hi[0] - self.box.lo[0]
             Ly = self.box.hi[1] - self.box.lo[1]
             prop = PropagatorFFT2(
-                (Lx, Nx), (Ly, Ny),
+                (Lx, Nx),
+                (Ly, Ny),
                 FieldAxprp.k_freq,
                 backend=backend,
                 verbose=False,
             )
             # Convert the spectral image to the spatial field representation
-            FieldAxprp.import_field( np.transpose(self.field.field).copy() )
+            FieldAxprp.import_field(np.transpose(self.field.field).copy())
             field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
             field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
 
@@ -373,8 +370,7 @@ class Laser:
             # Convert the spectral image to the spatial field representation
             for i_m in range(self.box.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
-                transform_data *= np.exp(
-                    -1j * z_axis[0] * (k_z[:, None] - omega0 / c) )
+                transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None] - omega0 / c))
                 self.field.field[i_m] = (
                     prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
                 )
@@ -385,15 +381,17 @@ class Laser:
             Lx = self.box.hi[0] - self.box.lo[0]
             Ly = self.box.hi[1] - self.box.lo[1]
             prop = PropagatorFFT2(
-                (Lx, Nx), (Ly, Ny),
+                (Lx, Nx),
+                (Ly, Ny),
                 omega / c,
                 backend=backend,
                 verbose=False,
             )
             # Convert the spectral image to the spatial field representation
             transform_data = np.transpose(field_fft).copy()
-            transform_data *= np.exp(-1j * z_axis[0] * \
-                ( k_z[:, None, None] - omega0 / c) )
+            transform_data *= np.exp(
+                -1j * z_axis[0] * (k_z[:, None, None] - omega0 / c)
+            )
             self.field.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
             self.field.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
 
