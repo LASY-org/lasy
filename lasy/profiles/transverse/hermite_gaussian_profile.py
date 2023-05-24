@@ -14,12 +14,12 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
 
     .. math::
 
-        \\mathcal{T}(x, y) = \\,
-        \\sqrt{\\frac{2}{\\pi}} \\sqrt{\\frac{1}{2^{n} n! w_0}}\\,
-        \\sqrt{\\frac{1}{2^{n} n! w_0}}\\,
-        H_{n_x}\\left ( \\frac{\\sqrt{2} x}{w_0}\\right )\\,
-        H_{n_y}\\left ( \\frac{\\sqrt{2} y}{w_0}\\right )\\,
-        \\exp\\left( -\\frac{x^2+y^2}{w_0^2} \\right)
+        \mathcal{T}(x, y) = \,
+        \sqrt{\frac{2}{\pi}} \sqrt{\frac{1}{2^{n} n! w_0}}\,
+        \sqrt{\frac{1}{2^{n} n! w_0}}\,
+        H_{n_x}\left ( \frac{\sqrt{2} x}{w_0}\right )\,
+        H_{n_y}\left ( \frac{\sqrt{2} y}{w_0}\right )\,
+        \exp\left( -\frac{x^2+y^2}{w_0^2} \right)
 
     where  :math:`H_{n}` is the Hermite polynomial of order :math:`n`.
 

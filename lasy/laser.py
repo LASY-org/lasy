@@ -49,6 +49,7 @@ class Laser:
     >>> import matplotlib.pyplot as plt
     >>> from lasy.laser import Laser
     >>> from lasy.profiles.gaussian_profile import GaussianProfile
+    >>> from lasy.utils.laser_utils import get_full_field
     >>> # Create profile.
     >>> profile = GaussianProfile(
     ...     wavelength=0.6e-6,  # m
@@ -72,10 +73,10 @@ class Laser:
     >>> fig, axes = plt.subplots(1, n_steps, sharey=True)
     >>> for step in range(n_steps):
     >>>     laser.propagate(propagate_step)
-    >>>     E_rt, extent = laser.get_full_field()
-    >>>     extent[:2] *= 1e6
-    >>>     extent[2:] *= 1e12
-    >>>     rmin, rmax, tmin, tmax = extent
+    >>>     E_rt, extent = get_full_field(laser)
+    >>>     extent[2:] *= 1e6
+    >>>     extent[:2] *= 1e12
+    >>>     tmin, tmax, rmin, rmax = extent
     >>>     vmax = np.abs(E_rt).max()
     >>>     axes[step].imshow(
     ...         E_rt,
