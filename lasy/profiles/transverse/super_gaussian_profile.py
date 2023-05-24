@@ -11,7 +11,7 @@ class SuperGaussianTransverseProfile(TransverseProfile):
 
     .. math::
 
-        \\mathcal{T}(x, y) = \\exp\\left( -\\left({\\frac{{x^2 + y^2}}{w_0^2}}\\right)^{\\dfrac{n}{2}} \\right)
+        \mathcal{T}(x, y) = \exp\left( -\left({\frac{{x^2 + y^2}}{w_0^2}}\right)^{\dfrac{n}{2}} \right)
 
     Parameters
     ----------
