@@ -62,7 +62,6 @@ def test_3D_case(gaussian):
     lo = (-3 * w0, -3 * w0, -3.5 * tau)
     hi = (3 * w0, 3 * w0, 3.5 * tau)
     npoints = (128, 128, 64)
-    laser = Laser(dim, lo, hi, npoints, gaussian)
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
