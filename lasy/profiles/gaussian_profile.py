@@ -58,6 +58,9 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
         in the above formula (i.e. the phase of the laser
         oscillation, at the time where the laser envelope is maximum)
 
+    z_foc : float (in meter), optional
+        Position of the focal plane. (The laser pulse is initialized at `z=0`.)
+
     Examples
     --------
     >>> import matplotlib.pyplot as plt
@@ -100,11 +103,13 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     >>> plt.ylabel('r (µm)')
     """
 
-    def __init__(self, wavelength, pol, laser_energy, w0, tau, t_peak, cep_phase=0):
+    def __init__(
+        self, wavelength, pol, laser_energy, w0, tau, t_peak, cep_phase=0, z_foc=0
+    ):
         super().__init__(
             wavelength,
             pol,
             laser_energy,
             GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase),
-            GaussianTransverseProfile(w0, wavelength),
+            GaussianTransverseProfile(w0, z_foc, wavelength),
         )
