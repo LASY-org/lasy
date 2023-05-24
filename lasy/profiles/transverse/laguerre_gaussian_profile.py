@@ -47,7 +47,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
 
     Both methods are in principle equivalent, but note that the first
     method uses the paraxial approximation, while the second method does
-    not make this approximation.        
+    not make this approximation.
     """
 
     def __init__(self, w0, p, m, wavelength=None, z_foc=0):
@@ -61,7 +61,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
             assert (
                 wavelength is not None
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
-            self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)        
+            self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
 
     def _evaluate(self, x, y):
         """
