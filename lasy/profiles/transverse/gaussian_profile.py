@@ -20,7 +20,7 @@ class GaussianTransverseProfile(TransverseProfile):
     w0 : float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
 
-    wavelength : float (in meter)
+    wavelength : float (in meter), optional
         The main laser wavelength :math:`\lambda_0` of the laser.
         (Only needed if ``z_foc`` is different than 0.)
 
