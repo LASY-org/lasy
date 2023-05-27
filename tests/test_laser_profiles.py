@@ -103,12 +103,12 @@ def test_transverse_profiles_3d():
     print("HermiteGaussianTransverseProfile")
     n_x = 2
     n_y = 2
-    std_th = 1.2151311989441392e-05  # WRONG, just measured here
+    std_th = np.sqrt(5./4) * w0
     profile = HermiteGaussianTransverseProfile(w0, n_x, n_y)
     x = np.linspace(-4 * w0, 4 * w0, npoints)
     y = np.zeros_like(x)
     field = profile.evaluate(x, y)
-    std = np.sqrt(np.average(x**2, weights=np.abs(field)))
+    std = np.sqrt(np.average(x**2, weights=np.abs(field)**2))
     print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
