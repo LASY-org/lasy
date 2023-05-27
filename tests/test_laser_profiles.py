@@ -2,16 +2,21 @@
 
 import pytest
 import numpy as np
+from scipy.special import gamma as gamma
 
 from lasy.laser import Laser
 from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import CombinedLongitudinalTransverseProfile, GaussianProfile
+from lasy.profiles import GaussianProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import (
+    GaussianTransverseProfile,
     LaguerreGaussianTransverseProfile,
     SuperGaussianTransverseProfile,
+    HermiteGaussianTransverseProfile,
     JincTransverseProfile,
+    TransverseProfileFromData,
 )
+from lasy.utils.exp_data_utils import find_center_of_mass
 
 
 class MockProfile(Profile):
@@ -41,6 +46,92 @@ def gaussian():
     return profile
 
 
+def test_transverse_profiles_rt():
+    npoints = 4000
+    w0 = 10.0e-6
+    r = np.linspace(0, 12 * w0, npoints)
+
+    # GaussianTransverseProfile
+    print("GaussianTransverseProfile")
+    std_th = w0 / np.sqrt(2)
+    profile = GaussianTransverseProfile(w0)
+    field = profile.evaluate(r, np.zeros_like(r))
+    std = np.sqrt(np.average(r**2, weights=np.abs(field)))
+    print("std_th = ", std_th)
+    print("std = ", std)
+    assert np.abs(std - std_th) / std_th < 0.01
+
+    # LaguerreGaussianTransverseProfile
+    print("LaguerreGaussianTransverseProfile")
+    p = 2
+    m = 0
+    std_th = np.sqrt(5 / 2) * w0
+    profile = LaguerreGaussianTransverseProfile(w0, p, m)
+    field = profile.evaluate(r, np.zeros_like(r))
+    std = np.sqrt(np.average(r**2, weights=r * np.abs(field) ** 2))
+    print("std_th = ", std_th)
+    print("std = ", std)
+    assert np.abs(std - std_th) / std_th < 0.01
+
+    # SuperGaussianTransverseProfile
+    print("SuperGaussianTransverseProfile")
+    n_order = 100  # close to flat-top, compared with flat-top theory
+    std_th = w0 / np.sqrt(3)
+    profile = SuperGaussianTransverseProfile(w0, n_order)
+    field = profile.evaluate(r, np.zeros_like(r))
+    std = np.sqrt(np.average(r**2, weights=np.abs(field)))
+    print("std_th = ", std_th)
+    print("std = ", std)
+    assert np.abs(std - std_th) / std_th < 0.01
+
+    # JincTransverseProfile
+    print("JincTransverseProfile")
+    profile = JincTransverseProfile(w0)
+    std_th = 1.5 * w0  # Just measured from this test
+    field = profile.evaluate(r, np.zeros_like(r))
+    std = np.sqrt(np.average(r**2, weights=abs(field) ** 2))
+    print("std_th = ", std_th)
+    print("std = ", std)
+    assert np.abs(std - std_th) / std_th < 0.1
+
+
+def test_transverse_profiles_3d():
+    npoints = 200
+    w0 = 10.0e-6
+
+    # HermiteGaussianTransverseProfile
+    print("HermiteGaussianTransverseProfile")
+    n_x = 2
+    n_y = 2
+    std_th = np.sqrt(5.0 / 4) * w0
+    profile = HermiteGaussianTransverseProfile(w0, n_x, n_y)
+    x = np.linspace(-4 * w0, 4 * w0, npoints)
+    y = np.zeros_like(x)
+    field = profile.evaluate(x, y)
+    std = np.sqrt(np.average(x**2, weights=np.abs(field) ** 2))
+    print("std_th = ", std_th)
+    print("std = ", std)
+    assert np.abs(std - std_th) / std_th < 0.01
+
+    # TransverseProfileFromData
+    print("TransverseProfileFromData")
+    lo = (-40.0e-6, -40.0e-6)
+    hi = (40.0e-6, 40.0e-6)
+    x = np.linspace(lo[0], hi[0], 200)
+    y = np.linspace(lo[1], hi[1], 100)
+    dx = x[1] - x[0]
+    w0 = 10.0e-6
+    x0 = 10.0e-6
+    X, Y = np.meshgrid(x, y, indexing="ij")
+    intensity_data = np.exp(-((X - x0) ** 2 + Y**2) / w0**2)
+    profile = TransverseProfileFromData(intensity_data, lo, hi)
+    field = profile.evaluate(X, Y)
+    x0_test = find_center_of_mass(field**2)[0] * dx + lo[0]
+    print("beam center, theory: ", x0)
+    print("beam center from profile ", x0_test)
+    assert (x0_test - x0) / x0 < 0.1
+
+
 def test_profile_gaussian_3d_cartesian(gaussian):
     # - 3D Cartesian case
     dim = "xyt"
@@ -65,94 +156,6 @@ def test_profile_gaussian_cylindrical(gaussian):
     laser.write_to_file("gaussianlaserRZ")
     laser.propagate(1e-6)
     laser.write_to_file("gaussianlaserRZ")
-
-
-def test_profile_laguerre_gauss():
-    # Case with Laguerre-Gauss laser
-    wavelength = 0.8e-6
-    pol = (1, 0)
-    laser_energy = 1.0  # J
-    t_peak = 0.0e-15  # s
-    tau = 30.0e-15  # s
-    w0 = 5.0e-6  # m
-    profile = CombinedLongitudinalTransverseProfile(
-        wavelength,
-        pol,
-        laser_energy,
-        GaussianLongitudinalProfile(wavelength, tau, t_peak),
-        LaguerreGaussianTransverseProfile(w0, p=0, m=1),
-    )
-
-    # - Cylindrical case
-    dim = "rt"
-    lo = (0e-6, -60e-15)
-    hi = (10e-6, +60e-15)
-    npoints = (50, 100)
-
-    laser = Laser(dim, lo, hi, npoints, profile, n_azimuthal_modes=2)
-    laser.write_to_file("laguerrelaserRZ")
-    laser.propagate(1e-6)
-    laser.write_to_file("laguerrelaserRZ")
-
-
-def test_profile_super_gauss():
-    # Case with super-Gaussian laser
-    wavelength = 0.8e-6
-    pol = (1, 0)
-    laser_energy = 1.0  # J
-    t_peak = 0.0e-15  # s
-    tau = 30.0e-15  # s
-    w0 = 5.0e-6  # m
-    profile = CombinedLongitudinalTransverseProfile(
-        wavelength,
-        pol,
-        laser_energy,
-        GaussianLongitudinalProfile(wavelength, tau, t_peak),
-        SuperGaussianTransverseProfile(w0, n_order=10),
-    )
-
-    # - Cylindrical case
-    dim = "rt"
-    lo = (0e-6, -60e-15)
-    hi = (10e-6, +60e-15)
-    npoints = (50, 100)
-
-    laser = Laser(dim, lo, hi, npoints, profile, n_azimuthal_modes=2)
-    laser.write_to_file("superGaussianlaserRZ")
-    laser.propagate(1)
-    laser.write_to_file("superGaussianlaserRZ")
-
-    return profile
-
-
-def test_profile_jinc():
-    # Case with Jinc laser
-    wavelength = 0.8e-6
-    pol = (1, 0)
-    laser_energy = 1.0  # J
-    t_peak = 0.0e-15  # s
-    tau = 30.0e-15  # s
-    w0 = 5.0e-6  # m
-    profile = CombinedLongitudinalTransverseProfile(
-        wavelength,
-        pol,
-        laser_energy,
-        GaussianLongitudinalProfile(wavelength, tau, t_peak),
-        JincTransverseProfile(w0),
-    )
-
-    # - Cylindrical case
-    dim = "rt"
-    lo = (0e-6, -60e-15)
-    hi = (10e-6, +60e-15)
-    npoints = (50, 100)
-
-    laser = Laser(dim, lo, hi, npoints, profile, n_azimuthal_modes=2)
-    laser.write_to_file("JinclaserRZ")
-    laser.propagate(1)
-    laser.write_to_file("JinclaserRZ")
-
-    return profile
 
 
 def test_add_profiles():
