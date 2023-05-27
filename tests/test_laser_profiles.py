@@ -65,10 +65,10 @@ def test_transverse_profiles_rt():
     print("LaguerreGaussianTransverseProfile")
     p = 2
     m = 0
-    std_th = np.sqrt( 5/2 ) * w0
+    std_th = np.sqrt(5 / 2) * w0
     profile = LaguerreGaussianTransverseProfile(w0, p, m)
     field = profile.evaluate(r, np.zeros_like(r))
-    std = np.sqrt(np.average(r**2, weights=r*np.abs(field)**2))
+    std = np.sqrt(np.average(r**2, weights=r * np.abs(field) ** 2))
     print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
@@ -89,7 +89,7 @@ def test_transverse_profiles_rt():
     profile = JincTransverseProfile(w0)
     std_th = 1.5 * w0  # Just measured from this test
     field = profile.evaluate(r, np.zeros_like(r))
-    std = np.sqrt(np.average(r**2, weights=abs(field)**2))
+    std = np.sqrt(np.average(r**2, weights=abs(field) ** 2))
     print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.1
