@@ -47,9 +47,9 @@ def gaussian():
 
 
 def test_transverse_profiles_rt():
-    npoints = 2000
+    npoints = 4000
     w0 = 10.0e-6
-    r = np.linspace(0, 6 * w0, npoints)
+    r = np.linspace(0, 12 * w0, npoints)
 
     # GaussianTransverseProfile
     print("GaussianTransverseProfile")
@@ -57,7 +57,7 @@ def test_transverse_profiles_rt():
     profile = GaussianTransverseProfile(w0)
     field = profile.evaluate(r, np.zeros_like(r))
     std = np.sqrt(np.average(r**2, weights=np.abs(field)))
-    print("\nstd_th = ", std_th)
+    print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
 
@@ -65,10 +65,10 @@ def test_transverse_profiles_rt():
     print("LaguerreGaussianTransverseProfile")
     p = 2
     m = 0
-    std_th = 1.2969576587040524e-05  # WRONG, just measured
+    std_th = np.sqrt( 5/2 ) * w0
     profile = LaguerreGaussianTransverseProfile(w0, p, m)
     field = profile.evaluate(r, np.zeros_like(r))
-    std = np.sqrt(np.average(r**2, weights=np.abs(field)))
+    std = np.sqrt(np.average(r**2, weights=r*np.abs(field)**2))
     print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
@@ -87,10 +87,10 @@ def test_transverse_profiles_rt():
     # JincTransverseProfile
     print("JincTransverseProfile")
     profile = JincTransverseProfile(w0)
-    std_th = 1.4 * w0  # Just measured from this test
+    std_th = 1.5 * w0  # Just measured from this test
     field = profile.evaluate(r, np.zeros_like(r))
-    std = np.sqrt(np.average(r**2, weights=field**2))
-    print("\nstd_th = ", std_th)
+    std = np.sqrt(np.average(r**2, weights=abs(field)**2))
+    print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.1
 
