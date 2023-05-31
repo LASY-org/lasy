@@ -116,6 +116,10 @@ class Laser:
             # Perform the azimuthal decomposition
             self.field.field[...] = np.fft.ifft(envelope, axis=0)
 
+        # For profiles that define the energy, normalize the amplitude
+        if hasattr(profile, "laser_energy"):
+            self.normalize(profile.laser_energy, kind="energy")
+
     def normalize(self, value, kind="energy"):
         """
         Normalize the pulse either to the energy, peak field amplitude or peak intensity.
