@@ -183,7 +183,7 @@ def test_from_array_profile():
     laser.write_to_file('fromArray')
 
     F = profile.evaluate(X, Y, T)
-    width = np.sqrt(np.sum(np.abs(F)**2*m.x.reshape((m.x.size,1,1))**2)/np.sum(np.abs(F)**2))*2
+    width = np.sqrt(np.sum(np.abs(F)**2*x.reshape((x.size,1,1))**2)/np.sum(np.abs(F)**2))*2
     print("theory width  : ", wx)
     print("Measured width: ", width)
     assert np.abs((width - wx) / wx) < 1.e-5
