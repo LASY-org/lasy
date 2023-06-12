@@ -5,8 +5,8 @@ import numpy as np
 from scipy.special import gamma as gamma
 
 from lasy.laser import Laser
-from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile, FromArrayProfile
-from lasy.profiles import GaussianProfile
+from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
+from lasy.profiles import GaussianProfile, FromArrayProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import (
     GaussianTransverseProfile,
