@@ -163,30 +163,38 @@ def test_from_array_profile():
     # and check that the resulting profile has the correct width
     lo = (-10e-6, -20e-6, -30e-15)
     hi = (+10e-6, +20e-6, +30e-15)
-    npoints=(16, 32, 64)
+    npoints = (16, 32, 64)
     x = np.linspace(lo[0], hi[0], npoints[0])
     y = np.linspace(lo[1], hi[1], npoints[1])
     t = np.linspace(lo[2], hi[2], npoints[2])
-    X, Y, T = np.meshgrid(x, y, t, indexing='ij')
-    e0 = 4.e12 # Approx a0 = 1 for wavelength = 800 nm
-    wx = 3.e-6
-    wy = 5.e-6
-    tau = 5.e-15
-    E = 1j * e0 * np.exp(-X**2/wx**2-Y**2/wy**2-t**2/tau**2)
+    X, Y, T = np.meshgrid(x, y, t, indexing="ij")
+    e0 = 4.0e12  # Approx a0 = 1 for wavelength = 800 nm
+    wx = 3.0e-6
+    wy = 5.0e-6
+    tau = 5.0e-15
+    E = 1j * e0 * np.exp(-(X**2) / wx**2 - Y**2 / wy**2 - t**2 / tau**2)
     wavelength = 0.8e-6
-    pol = (1,0)
-    axes = {'x':x, 'y':y, 't':t}
-    dim = 'xyt'
+    pol = (1, 0)
+    axes = {"x": x, "y": y, "t": t}
+    dim = "xyt"
 
-    profile = FromArrayProfile(wavelength=wavelength, pol=pol, array=E, axes=axes, dim=dim)
+    profile = FromArrayProfile(
+        wavelength=wavelength, pol=pol, array=E, axes=axes, dim=dim
+    )
     laser = Laser(dim, lo, hi, npoints, profile)
-    laser.write_to_file('fromArray')
+    laser.write_to_file("fromArray")
 
     F = profile.evaluate(X, Y, T)
-    width = np.sqrt(np.sum(np.abs(F)**2*x.reshape((x.size,1,1))**2)/np.sum(np.abs(F)**2))*2
+    width = (
+        np.sqrt(
+            np.sum(np.abs(F) ** 2 * x.reshape((x.size, 1, 1)) ** 2)
+            / np.sum(np.abs(F) ** 2)
+        )
+        * 2
+    )
     print("theory width  : ", wx)
     print("Measured width: ", width)
-    assert np.abs((width - wx) / wx) < 1.e-5
+    assert np.abs((width - wx) / wx) < 1.0e-5
 
 
 def test_add_profiles():
