@@ -1,8 +1,8 @@
-import  numpy as np
+import numpy as np
+
 
 class Field:
     def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes):
-
         # Metadata
         ndims = 2 if dim == "rt" else 3
         assert dim in ["rt", "xyt"]
