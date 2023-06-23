@@ -3,7 +3,7 @@ from scipy.constants import c, epsilon_0
 from scipy.interpolate import interp1d
 
 
-def compute_laser_energy(dim, grid):
+def compute_laser_energy(dim, field):
     """
     Compute the total laser energy that corresponds to the current envelope data.
 
@@ -34,17 +34,16 @@ def compute_laser_energy(dim, grid):
     # specified laser wavelength.
     # This probably needs to be generalized for few-cycle laser pulses.
 
-    envelope = grid.field
-    box = grid.box
+    envelope = field.array
 
-    dz = box.dx[-1] * c
+    dz = field.dx[-1] * c
 
     if dim == "xyt":
-        dV = box.dx[0] * box.dx[1] * dz
+        dV = field.dx[0] * field.dx[1] * dz
         energy = ((dV * epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
     elif dim == "rt":
-        r = box.axes[0]
-        dr = box.dx[0]
+        r = field.axes[0]
+        dr = field.dx[0]
         # 1D array that computes the volume of radial cells
         dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
         energy = (
@@ -57,7 +56,7 @@ def compute_laser_energy(dim, grid):
     return energy
 
 
-def normalize_energy(dim, energy, grid):
+def normalize_energy(dim, energy, field):
     """
     Normalize energy of the laser pulse contained in grid.
 
@@ -80,12 +79,12 @@ def normalize_energy(dim, energy, grid):
     if energy is None:
         return
 
-    current_energy = compute_laser_energy(dim, grid)
+    current_energy = compute_laser_energy(dim, field)
     norm_factor = (energy / current_energy) ** 0.5
-    grid.field *= norm_factor
+    field.array *= norm_factor
 
 
-def normalize_peak_field_amplitude(amplitude, grid):
+def normalize_peak_field_amplitude(amplitude, field):
     """
     Normalize energy of the laser pulse contained in grid.
 
@@ -99,10 +98,10 @@ def normalize_peak_field_amplitude(amplitude, grid):
     """
     if amplitude is None:
         return
-    grid.field = grid.field / np.abs(grid.field).max() * amplitude
+    field.array *= amplitude / np.abs(field.array).max()
 
 
-def normalize_peak_intensity(peak_intensity, grid):
+def normalize_peak_intensity(peak_intensity, field):
     """
     Normalize energy of the laser pulse contained in grid.
 
@@ -116,10 +115,10 @@ def normalize_peak_intensity(peak_intensity, grid):
     """
     if peak_intensity is None:
         return
-    intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
+    intensity = np.abs(epsilon_0 * field.array**2 / 2 * c)
     input_peak_intensity = intensity.max()
 
-    grid.field *= np.sqrt(peak_intensity / input_peak_intensity)
+    field.array *= np.sqrt(peak_intensity / input_peak_intensity)
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
@@ -146,53 +145,53 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
             Physical extent of the reconstructed field
     """
     omega0 = laser.profile.omega0
-    field = laser.field.field.copy()
-    time_axis = laser.box.axes[-1]
+    env = laser.field.array.copy()
+    time_axis = laser.field.axes[-1]
 
     if laser.dim == "rt":
-        azimuthal_phase = np.exp(-1j * laser.box.azimuthal_modes * theta)
-        field_upper = field * azimuthal_phase[:, None, None]
-        field_upper = field_upper.sum(0)
-        azimuthal_phase = np.exp(1j * laser.box.azimuthal_modes * theta)
-        field_lower = field * azimuthal_phase[:, None, None]
-        field_lower = field_lower.sum(0)
-        field = np.vstack((field_lower[::-1][:-1], field_upper))
+        azimuthal_phase = np.exp(-1j * laser.field.azimuthal_modes * theta)
+        env_upper = env * azimuthal_phase[:, None, None]
+        env_upper = env_upper.sum(0)
+        azimuthal_phase = np.exp(1j * laser.field.azimuthal_modes * theta)
+        env_lower = env * azimuthal_phase[:, None, None]
+        env_lower = env_lower.sum(0)
+        env = np.vstack((env_lower[::-1][:-1], env_upper))
     elif slice_axis == "x":
-        Nx_middle = field.shape[0] // 2 - 1
+        Nx_middle = env.shape[0] // 2 - 1
         Nx_slice = int((1 + slice) * Nx_middle)
-        field = field[Nx_slice, :]
+        env = env[Nx_slice, :]
     elif slice_axis == "y":
-        Ny_middle = field.shape[1] // 2 - 1
+        Ny_middle = env.shape[1] // 2 - 1
         Ny_slice = int((1 + slice) * Ny_middle)
-        field = field[:, Ny_slice, :]
+        env = env[:, Ny_slice, :]
     else:
         return None
 
     if Nt is not None:
-        Nr = field.shape[0]
-        time_axis_new = np.linspace(laser.box.lo[-1], laser.box.hi[-1], Nt)
-        field_new = np.zeros((Nr, Nt), dtype=field.dtype)
+        Nr = env.shape[0]
+        time_axis_new = np.linspace(laser.field.lo[-1], laser.field.hi[-1], Nt)
+        env_new = np.zeros((Nr, Nt), dtype=env.dtype)
 
         for ir in range(Nr):
-            interp_fu_abs = interp1d(time_axis, np.abs(field[ir]))
+            interp_fu_abs = interp1d(time_axis, np.abs(env[ir]))
             slice_abs = interp_fu_abs(time_axis_new)
-            interp_fu_angl = interp1d(time_axis, np.unwrap(np.angle(field[ir])))
+            interp_fu_angl = interp1d(time_axis, np.unwrap(np.angle(env[ir])))
             slice_angl = interp_fu_angl(time_axis_new)
-            field_new[ir] = slice_abs * np.exp(1j * slice_angl)
+            env_new[ir] = slice_abs * np.exp(1j * slice_angl)
 
         time_axis = time_axis_new
-        field = field_new
+        env = env_new
 
-    field *= np.exp(-1j * omega0 * time_axis[None, :])
-    field = np.real(field)
+    env *= np.exp(-1j * omega0 * time_axis[None, :])
+    env = np.real(env)
 
     if laser.dim == "rt":
         ext = np.array(
-            [laser.box.lo[-1], laser.box.hi[-1], -laser.box.hi[0], laser.box.hi[0]]
+            [laser.field.lo[-1], laser.field.hi[-1], -laser.field.hi[0], laser.field.hi[0]]
         )
     else:
         ext = np.array(
-            [laser.box.lo[-1], laser.box.hi[-1], laser.box.lo[0], laser.box.hi[0]]
+            [laser.field.lo[-1], laser.field.hi[-1], laser.field.lo[0], laser.field.hi[0]]
         )
 
-    return field, ext
+    return env, ext
