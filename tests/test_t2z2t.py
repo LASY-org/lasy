@@ -7,6 +7,7 @@ from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
 from scipy.constants import c
 
+
 @pytest.fixture(scope="function")
 def gaussian():
     # Cases with Gaussian laser
@@ -20,6 +21,7 @@ def gaussian():
 
     return profile
 
+
 def get_laser_z_analytic(profile, z_axis, r_axis):
     w0 = profile.trans_profile.w0
     tau = profile.long_profile.tau
@@ -30,16 +32,20 @@ def get_laser_z_analytic(profile, z_axis, r_axis):
     L_Ray = np.pi * w0**2 / lambda0
     z_axis_2d = z_axis[None, :]
     r_axis_2d = r_axis[:, None]
-    w0_z = w0 * np.sqrt( 1 + ( z_axis_2d / L_Ray )**2 )
-    R_z_inv = z_axis_2d / ( z_axis_2d**2 + L_Ray**2 )
-    phi_goy = np.arctan2( z_axis_2d, L_Ray )
+    w0_z = w0 * np.sqrt(1 + (z_axis_2d / L_Ray) ** 2)
+    R_z_inv = z_axis_2d / (z_axis_2d**2 + L_Ray**2)
+    phi_goy = np.arctan2(z_axis_2d, L_Ray)
 
-    Field = w0 / w0_z * \
-        np.exp(- r_axis_2d**2 / w0_z**2 ) * \
-        np.exp(- z_axis_2d**2 / (c*tau)**2 ) * \
-        np.exp(1j * ( k0 * r_axis_2d**2 * R_z_inv / 2 - phi_goy ) )
+    Field = (
+        w0
+        / w0_z
+        * np.exp(-(r_axis_2d**2) / w0_z**2)
+        * np.exp(-(z_axis_2d**2) / (c * tau) ** 2)
+        * np.exp(1j * (k0 * r_axis_2d**2 * R_z_inv / 2 - phi_goy))
+    )
 
     return Field
+
 
 def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
     laser_z = laser_t_in.export_to_z()
@@ -51,13 +57,10 @@ def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
     laser_t_out_2d = laser_t_out.field.field[ind0]
     laser_z_2d = laser_z[ind0]
 
-    assert np.allclose(
-        laser_t_in_2d, laser_t_out_2d, atol=3e-9
-    )
+    assert np.allclose(laser_t_in_2d, laser_t_out_2d, atol=3e-9)
 
-    assert np.allclose(
-        laser_z_2d, laser_z_analytic, atol=6e-4
-    )
+    assert np.allclose(laser_z_2d, laser_z_analytic, atol=6e-4)
+
 
 def test_RT_case(gaussian):
     dim = "rt"
@@ -78,6 +81,7 @@ def test_RT_case(gaussian):
 
     check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis)
 
+
 def test_3D_case(gaussian):
     # - 3D case
     dim = "xyt"
@@ -86,7 +90,6 @@ def test_3D_case(gaussian):
     lo = (-3 * w0, -3 * w0, -3.5 * tau)
     hi = (3 * w0, 3 * w0, 3.5 * tau)
     npoints = (128, 128, 64)
-
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
