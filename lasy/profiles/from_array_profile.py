@@ -1,4 +1,5 @@
 from scipy.interpolate import RegularGridInterpolator
+import numpy as np
 from .profile import Profile
 
 
