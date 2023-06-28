@@ -6,7 +6,7 @@ import numpy as np
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
 from scipy.constants import c
-
+from warnings import warn
 
 @pytest.fixture(scope="function")
 def gaussian():
@@ -68,10 +68,14 @@ def test_RT_case(gaussian):
     tau = gaussian.long_profile.tau
     lo = (0, -3.5 * tau)
     hi = (3 * w0, 3.5 * tau)
-    npoints = (128, 64)
+    npoints = (128, 65)
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
+    laser_t_in.normalize( 1.0, 'field' )
+    laser_t_out.normalize( 1.0, 'field' )
+    #warn(f'{np.abs(laser_t_in.field.field).max()}')
+    #warn(f'{np.abs(laser_t_out.field.field).max()}')
 
     t_axis = laser_t_in.box.axes[-1]
     r_axis = laser_t_in.box.axes[0]
@@ -89,10 +93,12 @@ def test_3D_case(gaussian):
     tau = gaussian.long_profile.tau
     lo = (-3 * w0, -3 * w0, -3.5 * tau)
     hi = (3 * w0, 3 * w0, 3.5 * tau)
-    npoints = (128, 128, 64)
+    npoints = (128, 128, 65)
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
+    laser_t_in.normalize( 1.0, 'field' )
+    laser_t_out.normalize( 1.0, 'field' )
 
     t_axis = laser_t_in.box.axes[-1]
     r_axis = np.abs(laser_t_in.box.axes[1])
