@@ -23,42 +23,33 @@ class FromArrayProfile(Profile):
     array : Array of the electric field of the laser pulse.
 
     axes : Python dictionary containing the axes vectors.
-        Keys are 'x', 'y', 't' if dim=xyt and 'r', 't' if dim=rt, respectively.
+        Keys are 'x', 'y', 't'.
         Values are the 1D arrays of each axis.
         array.shape = (axes['x'].size, axes['y'].size, axes['t'].size) in 3D,
         and similar in cylindrical geometry.
 
-    dim : Dimension of the data, 'xyt' or 'rt'
-
     axes_order : List of strings, giving the name and ordering of the axes in the array.
         Currently, only implemented for 3D, and supported values are
-        ['x', 'y', 'z'] and ['z', 'y', 'x'].
+        ['x', 'y', 't'] and ['t', 'y', 'x'].
     """
 
-    def __init__(self, wavelength, pol, array, axes, dim, axes_order=["x", "y", "z"]):
+    def __init__(self, wavelength, pol, array, axes, axes_order=["x", "y", "t"]):
         super().__init__(wavelength, pol)
 
-        assert dim == "xyt" or dim == "rt", "dim must be 'xyt' or 'rt'"
-
-        assert dim == "xyt", "Only dim='xyt' currently implemented"
-
-        self.dim = dim
         self.axes = axes
-        if dim == "xyt":
-            assert axes_order in [["x", "y", "z"], ["z", "y", "x"]]
+        assert axes_order in [["x", "y", "t"], ["t", "y", "x"]]
 
-            if axes_order == ["z", "y", "x"]:
-                self.array = np.swapaxes(array, 0, 2)
-            else:
-                self.array = array
+        if axes_order == ["t", "y", "x"]:
+            self.array = np.swapaxes(array, 0, 2)
+        else:
+            self.array = array
 
-        if dim == "xyt":
-            self.field_interp = RegularGridInterpolator(
-                (axes["x"], axes["y"], axes["t"]),
-                array,
-                bounds_error=False,
-                fill_value=0.0,
-            )
+        self.field_interp = RegularGridInterpolator(
+            (axes["x"], axes["y"], axes["t"]),
+            array,
+            bounds_error=False,
+            fill_value=0.0,
+        )
 
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
