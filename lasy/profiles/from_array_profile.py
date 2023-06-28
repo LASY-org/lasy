@@ -28,18 +28,29 @@ class FromArrayProfile(Profile):
         and similar in cylindrical geometry.
 
     dim : Dimension of the data, 'xyt' or 'rt'
+
+    axes_order : List of strings, giving the name and ordering of the axes in the array.
+        Currently, only implemented for 3D, and supported values are
+        ['x', 'y', 'z'] and ['z', 'y', 'x'].
     """
 
-    def __init__(self, wavelength, pol, array, axes, dim):
+    def __init__(self, wavelength, pol, array, axes, dim, axes_order=['x', 'y', 'z']):
         super().__init__(wavelength, pol)
 
         assert dim == "xyt" or dim == "rt", "dim must be 'xyt' or 'rt'"
 
         assert dim == "xyt", "Only dim='xyt' currently implemented"
 
-        self.array = array
-        self.axes = axes
         self.dim = dim
+        self.axes = axes
+        if dim == "xyt":
+
+            assert axes_order in [['x', 'y', 'z'], ['z', 'y', 'x']]
+
+            if axes_order == ['z', 'y', 'x']:
+                self.array = np.swapaxes(array, 0, 2)
+            else:
+                self.array = array
 
         if dim == "xyt":
             self.field_interp = RegularGridInterpolator(
