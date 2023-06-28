@@ -75,8 +75,8 @@ def test_RT_case(gaussian):
     laser_t_in.normalize(1.0, "field")
     laser_t_out.normalize(1.0, "field")
 
-    t_axis = laser_t_in.box.axes[-1]
-    r_axis = laser_t_in.box.axes[0]
+    t_axis = laser_t_in.field.axes[-1]
+    r_axis = laser_t_in.field.axes[0]
     z_axis = t_axis * c
 
     laser_z_analytic = get_laser_z_analytic(gaussian, z_axis, r_axis)
@@ -98,8 +98,8 @@ def test_3D_case(gaussian):
     laser_t_in.normalize(1.0, "field")
     laser_t_out.normalize(1.0, "field")
 
-    t_axis = laser_t_in.box.axes[-1]
-    r_axis = np.abs(laser_t_in.box.axes[1])
+    t_axis = laser_t_in.field.axes[-1]
+    r_axis = np.abs(laser_t_in.field.axes[1])
     z_axis = t_axis * c
 
     laser_z_analytic = get_laser_z_analytic(gaussian, z_axis, r_axis)
