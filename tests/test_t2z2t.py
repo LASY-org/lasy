@@ -51,10 +51,10 @@ def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
     laser_z = laser_t_in.export_to_z()
     laser_t_out.import_from_z(laser_z, z_axis)
 
-    ind0 = laser_t_in.field.field.shape[0] // 2 - 1
+    ind0 = laser_t_in.field.array.shape[0] // 2 - 1
 
-    laser_t_in_2d = laser_t_in.field.field[ind0]
-    laser_t_out_2d = laser_t_out.field.field[ind0]
+    laser_t_in_2d = laser_t_in.field.array[ind0]
+    laser_t_out_2d = laser_t_out.field.array[ind0]
     laser_z_2d = laser_z[ind0]
 
     assert np.allclose(laser_t_in_2d, laser_t_out_2d, atol=2e-7, rtol=0)
