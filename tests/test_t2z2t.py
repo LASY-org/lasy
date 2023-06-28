@@ -34,14 +34,14 @@ def get_laser_z_analytic(profile, z_axis, r_axis):
     r_axis_2d = r_axis[:, None]
     w0_z = w0 * np.sqrt(1 + (z_axis_2d / L_Ray) ** 2)
     R_z_inv = z_axis_2d / (z_axis_2d**2 + L_Ray**2)
-    phi_goy = np.arctan2(z_axis_2d, L_Ray)
+    phi_gouy = np.arctan2(z_axis_2d, L_Ray)
 
     Field = (
         w0
         / w0_z
         * np.exp(-(r_axis_2d**2) / w0_z**2)
         * np.exp(-(z_axis_2d**2) / (c * tau) ** 2)
-        * np.exp(1j * (k0 * r_axis_2d**2 * R_z_inv / 2 - phi_goy))
+        * np.exp(1j * (k0 * r_axis_2d**2 * R_z_inv / 2 - phi_gouy))
     )
 
     return Field
