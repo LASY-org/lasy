@@ -34,7 +34,7 @@ class FromArrayProfile(Profile):
         ['x', 'y', 'z'] and ['z', 'y', 'x'].
     """
 
-    def __init__(self, wavelength, pol, array, axes, dim, axes_order=['x', 'y', 'z']):
+    def __init__(self, wavelength, pol, array, axes, dim, axes_order=["x", "y", "z"]):
         super().__init__(wavelength, pol)
 
         assert dim == "xyt" or dim == "rt", "dim must be 'xyt' or 'rt'"
@@ -44,10 +44,9 @@ class FromArrayProfile(Profile):
         self.dim = dim
         self.axes = axes
         if dim == "xyt":
+            assert axes_order in [["x", "y", "z"], ["z", "y", "x"]]
 
-            assert axes_order in [['x', 'y', 'z'], ['z', 'y', 'x']]
-
-            if axes_order == ['z', 'y', 'x']:
+            if axes_order == ["z", "y", "x"]:
                 self.array = np.swapaxes(array, 0, 2)
             else:
                 self.array = array
