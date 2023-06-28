@@ -7,6 +7,7 @@ from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
 from scipy.constants import c
 
+
 @pytest.fixture(scope="function")
 def gaussian():
     # Cases with Gaussian laser
@@ -19,6 +20,7 @@ def gaussian():
     profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
     return profile
+
 
 def get_laser_z_analytic(profile, z_axis, r_axis):
     w0 = profile.trans_profile.w0
@@ -44,6 +46,7 @@ def get_laser_z_analytic(profile, z_axis, r_axis):
 
     return Field
 
+
 def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
     laser_z = laser_t_in.export_to_z()
     laser_t_out.import_from_z(laser_z, z_axis)
@@ -58,6 +61,7 @@ def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
 
     assert np.allclose(laser_z_2d, laser_z_analytic, atol=1e-3, rtol=0)
 
+
 def test_RT_case(gaussian):
     dim = "rt"
     w0 = gaussian.trans_profile.w0
@@ -68,8 +72,8 @@ def test_RT_case(gaussian):
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
-    laser_t_in.normalize( 1.0, 'field' )
-    laser_t_out.normalize( 1.0, 'field' )
+    laser_t_in.normalize(1.0, "field")
+    laser_t_out.normalize(1.0, "field")
 
     t_axis = laser_t_in.box.axes[-1]
     r_axis = laser_t_in.box.axes[0]
@@ -91,8 +95,8 @@ def test_3D_case(gaussian):
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
-    laser_t_in.normalize( 1.0, 'field' )
-    laser_t_out.normalize( 1.0, 'field' )
+    laser_t_in.normalize(1.0, "field")
+    laser_t_out.normalize(1.0, "field")
 
     t_axis = laser_t_in.box.axes[-1]
     r_axis = np.abs(laser_t_in.box.axes[1])
@@ -101,4 +105,3 @@ def test_3D_case(gaussian):
     laser_z_analytic = get_laser_z_analytic(gaussian, z_axis, r_axis)
 
     check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis)
-
