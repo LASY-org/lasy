@@ -254,8 +254,7 @@ class Laser:
 
     def export_to_z(self, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
         """
-        Export laser pulse defined in the temporal domain
-        (internal LASY representation) to the spatial domain.
+        Export laser pulse to spatial domain from temporal domain (internal LASY representation).
 
         Parameters
         ----------
@@ -330,8 +329,7 @@ class Laser:
 
     def import_from_z(self, field_z, z_axis, z0=0.0, t0=0.0, backend="NP"):
         """
-        Import laser pulse defined in the spatial domain to the
-        temporal domain (internal LASY representation).
+        Import laser pulse from spatial domain to temporal domain (internal LASY representation).
 
         Parameters
         ----------
