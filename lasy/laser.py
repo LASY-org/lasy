@@ -396,7 +396,6 @@ class Laser:
             )
             self.field.array = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
             self.field.array *= np.exp(1j * (z0 / c + t_axis) * omega0)
->>>>>>> development
 
     def write_to_file(self, file_prefix="laser", file_format="h5"):
         """
