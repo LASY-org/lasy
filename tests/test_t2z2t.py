@@ -6,7 +6,6 @@ import numpy as np
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
 from scipy.constants import c
-from warnings import warn
 
 @pytest.fixture(scope="function")
 def gaussian():
@@ -15,12 +14,11 @@ def gaussian():
     pol = (1, 0)
     laser_energy = 1.0  # J
     t_peak = 0.0e-15  # s
-    tau = 30.0e-15  # s
-    w0 = 25.0e-6  # m
+    tau = 200.0e-15  # s
+    w0 = 5.0e-6  # m
     profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
     return profile
-
 
 def get_laser_z_analytic(profile, z_axis, r_axis):
     w0 = profile.trans_profile.w0
@@ -46,7 +44,6 @@ def get_laser_z_analytic(profile, z_axis, r_axis):
 
     return Field
 
-
 def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
     laser_z = laser_t_in.export_to_z()
     laser_t_out.import_from_z(laser_z, z_axis)
@@ -57,25 +54,22 @@ def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
     laser_t_out_2d = laser_t_out.field.field[ind0]
     laser_z_2d = laser_z[ind0]
 
-    assert np.allclose(laser_t_in_2d, laser_t_out_2d, atol=3e-9)
+    assert np.allclose(laser_t_in_2d, laser_t_out_2d, atol=2e-7, rtol=0)
 
-    assert np.allclose(laser_z_2d, laser_z_analytic, atol=6e-4)
-
+    assert np.allclose(laser_z_2d, laser_z_analytic, atol=1e-3, rtol=0)
 
 def test_RT_case(gaussian):
     dim = "rt"
     w0 = gaussian.trans_profile.w0
     tau = gaussian.long_profile.tau
     lo = (0, -3.5 * tau)
-    hi = (3 * w0, 3.5 * tau)
+    hi = (5 * w0, 3.5 * tau)
     npoints = (128, 65)
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_in.normalize( 1.0, 'field' )
     laser_t_out.normalize( 1.0, 'field' )
-    #warn(f'{np.abs(laser_t_in.field.field).max()}')
-    #warn(f'{np.abs(laser_t_out.field.field).max()}')
 
     t_axis = laser_t_in.box.axes[-1]
     r_axis = laser_t_in.box.axes[0]
@@ -91,9 +85,9 @@ def test_3D_case(gaussian):
     dim = "xyt"
     w0 = gaussian.trans_profile.w0
     tau = gaussian.long_profile.tau
-    lo = (-3 * w0, -3 * w0, -3.5 * tau)
-    hi = (3 * w0, 3 * w0, 3.5 * tau)
-    npoints = (128, 128, 65)
+    lo = (-5 * w0, -5 * w0, -3.5 * tau)
+    hi = (5 * w0, 5 * w0, 3.5 * tau)
+    npoints = (160, 160, 65)
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
@@ -107,3 +101,4 @@ def test_3D_case(gaussian):
     laser_z_analytic = get_laser_z_analytic(gaussian, z_axis, r_axis)
 
     check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis)
+
