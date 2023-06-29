@@ -6,42 +6,42 @@ from .transverse_profile import TransverseProfile
 
 class TransverseProfileFromData(TransverseProfile):
     """
-    Derived class for transverse laser profile created using
-    data from an experimental measurement or from the output
-    of another code.
+    Derived class for transverse laser profile.
+
+    Created using data from an experimental measurement or from
+    the output of another code.
+
+    Uses user supplied data to define the transverse profile
+    of the laser pulse.
+
+    The data must be supplied as a 2D numpy array of intensity
+    values (for example an imported camera image from an
+    experimental measurement).
+
+    In the case of experimental measurements, this data
+    should already have some undergone some preprocessing
+    such as background subtraction and noise removal.
+
+    The beam will be imported and automatically centered unless
+    otherwise specified.
+
+    Parameters
+    ----------
+    intensity_data : 2Darray of floats
+        The 2D transverse intensity profile of the laser pulse.
+
+    lo, hi : list of scalars (in meters)
+        Lower and higher end of the physical domain of the data.
+        One element per direction (in this case 2)
+
+    center_data : bool, optional
+        If true, the intensity data will be rolled to put the
+        center of mass at the center of the image. It will
+        also shift the x and y data axes such that (x,y) = (0,0)
+        is also located at the center of the image. Default is True
     """
 
     def __init__(self, intensity_data, lo, hi, center_data=True):
-        """
-        Uses user supplied data to define the transverse profile
-        of the laser pulse.
-
-        The data must be supplied as a 2D numpy array of intensity
-        values (for example an imported cameran image from an
-        experimental measurement).
-
-        In the case of experimental measurements, this data
-        should already have some undergone some preprocessing
-        such as background subtraction and noise removal.
-
-        The beam will be imported and automatically centered unless
-        otherwise specified.
-
-        Parameters:
-        -----------
-        intensity_data: 2Darray of floats
-            The 2D transverse intensity profile of the laser pulse.
-
-        lo, hi : list of scalars (in meters)
-            Lower and higher end of the physical domain of the data.
-            One element per direction (in this case 2)
-
-        center_data : bool, optional
-            If true, the intensity data will be rolled to put the
-            center of mass at the center of the image. It will
-            also shift the x and y data axes such that (x,y) = (0,0)
-            is also located at the center of the image. Default is True
-        """
         super().__init__()
 
         intensity_data = intensity_data.astype("float64")
@@ -81,21 +81,20 @@ class TransverseProfileFromData(TransverseProfile):
 
     def _evaluate(self, x, y):
         """
-        Returns the transverse envelope
+        Return the transverse envelope.
 
         Parameters
         ----------
-        x, y: ndarrays of floats
+        x, y : ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
         Returns
         -------
-        envelope: ndarray of floats
+        envelope : ndarray of floats
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-
         envelope = self.field_interp((y, x))
 
         return envelope

@@ -4,14 +4,14 @@ from .transverse_profile import TransverseProfile
 
 
 class SuperGaussianTransverseProfile(TransverseProfile):
-    """
+    r"""
     Derived class for the analytic profile of a super-Gaussian laser pulse.
 
     More precisely, the transverse envelope corresponds to:
 
     .. math::
 
-        \\mathcal{T}(x, y) = \\exp\\left( -\\left({\\frac{{x^2 + y^2}}{w_0^2}}\\right)^{\\dfrac{n}{2}} \\right)
+        \mathcal{T}(x, y) = \exp\left( -\left({\frac{{x^2 + y^2}}{w_0^2}}\right)^{\dfrac{n}{2}} \right)
 
     Parameters
     ----------
@@ -31,7 +31,7 @@ class SuperGaussianTransverseProfile(TransverseProfile):
 
     def _evaluate(self, x, y):
         """
-        Returns the transverse envelope
+        Return the transverse envelope.
 
         Parameters
         ----------

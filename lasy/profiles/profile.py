@@ -36,7 +36,7 @@ class Profile(object):
 
     def evaluate(self, x, y, t):
         """
-        Returns the envelope field of the laser
+        Return the envelope field of the laser.
 
         Parameters
         ----------

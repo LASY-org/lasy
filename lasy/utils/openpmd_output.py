@@ -5,7 +5,7 @@ from scipy.constants import c
 
 def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     """
-    Write the laser field into an openPMD file
+    Write the laser field into an openPMD file.
 
     Parameters
     ----------
@@ -34,23 +34,18 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
         Polarization vector that multiplies array to get the Ex and Ey arrays.
     """
     array = grid.field
-    box = grid.box
 
     # Create file
     series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
     i = series.iterations[0]
 
-    # Store metadata needed to reconstruct the field
-    i.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
-    i.set_attribute("pol", pol)
-
     # Define the mesh
     m = i.meshes["laserEnvelope"]
     m.grid_spacing = [
         (hi - lo) / (npoints - 1)
-        for hi, lo, npoints in zip(box.hi, box.lo, box.npoints)
+        for hi, lo, npoints in zip(grid.hi, grid.lo, grid.npoints)
     ][::-1]
-    m.grid_global_offset = box.lo[::-1]
+    m.grid_global_offset = grid.lo[::-1]
     m.unit_dimension = {
         io.Unit_Dimension.M: 1,
         io.Unit_Dimension.L: 1,
@@ -64,6 +59,11 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
         m.geometry = io.Geometry.thetaMode
         m.axis_labels = ["t", "r"]
 
+    # Store metadata needed to reconstruct the field
+    m.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
+    m.set_attribute("polarization", pol)
+    m.set_attribute("isLaserEnvelope", True)
+
     # Pick the correct field
     if dim == "xyt":
         # Switch from x,y,t (internal to lasy) to t,y,x (in openPMD file)
@@ -74,10 +74,10 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
         # (see https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record)
         # is different than the representation of modes internal to lasy.
         # Thus, there is a non-trivial conversion here
-        ncomp = 2 * box.n_azimuthal_modes - 1
-        data = np.zeros((ncomp, box.npoints[0], box.npoints[1]), dtype=array.dtype)
+        ncomp = 2 * grid.n_azimuthal_modes - 1
+        data = np.zeros((ncomp, grid.npoints[0], grid.npoints[1]), dtype=array.dtype)
         data[0, :, :] = array[0, :, :]
-        for mode in range(1, box.n_azimuthal_modes):
+        for mode in range(1, grid.n_azimuthal_modes):
             # cos(m*theta) part of the mode
             data[2 * mode - 1, :, :] = array[mode, :, :] + array[-mode, :, :]
             # sin(m*theta) part of the mode

@@ -2,8 +2,8 @@ from .profile import Profile
 
 
 class CombinedLongitudinalTransverseProfile(Profile):
-    """
-    Class that combines a longitudinal and transverse laser profile
+    r"""
+    Class that combines a longitudinal and transverse laser profile.
 
     The combined profile is defined as the product of the longitudinal and transverse
     profile.
@@ -12,8 +12,8 @@ class CombinedLongitudinalTransverseProfile(Profile):
 
     .. math::
 
-        E_u(\\boldsymbol{x}_\\perp,t) = Re\\left[ E_0\\, \\mathcal{T}(x, y)
-        \\times \\mathcal{L}(t) e^{-i\\omega_0 t} \\times p_u \\right]
+        E_u(\boldsymbol{x}_\perp,t) = Re\left[ E_0\, \mathcal{T}(x, y)
+        \times \mathcal{L}(t) e^{-i\omega_0 t} \times p_u \right]
 
     where :math:`u` is either :math:`x` or :math:`y`, :math:`p_u` is
     the polarization vector, :math:`Re` represent the real part.
@@ -22,9 +22,9 @@ class CombinedLongitudinalTransverseProfile(Profile):
     Parameters
     ----------
     wavelength : float (in meter)
-        The main laser wavelength :math:`\\lambda_0` of the laser, which
-        defines :math:`\\omega_0` in the above formula, according to
-        :math:`\\omega_0 = 2\\pi c/\\lambda_0`.
+        The main laser wavelength :math:`\lambda_0` of the laser, which
+        defines :math:`\omega_0` in the above formula, according to
+        :math:`\omega_0 = 2\pi c/\lambda_0`.
 
     pol : list of 2 complex numbers (dimensionless)
         Polarization vector. It corresponds to :math:`p_u` in the above
@@ -39,11 +39,11 @@ class CombinedLongitudinalTransverseProfile(Profile):
 
     long_profile : an instance of `lasy`'s :class:LongitudinalProfile
         Defines the longitudinal envelope of the laser, i.e. the
-        function :math:`\\mathcal{L}(t)` in the above formula.
+        function :math:`\mathcal{L}(t)` in the above formula.
 
     transverse_profile : an instance of `lasy`'s :class:TransverseProfile
         Defines the transverse envelope of the laser, i.e. the
-        function :math:`\\mathcal{T}(x, y)` in the above formula.
+        function :math:`\mathcal{T}(x, y)` in the above formula.
     """
 
     def __init__(self, wavelength, pol, laser_energy, long_profile, trans_profile):
@@ -54,7 +54,7 @@ class CombinedLongitudinalTransverseProfile(Profile):
 
     def evaluate(self, x, y, t):
         """
-        Returns the envelope field of the laser
+        Return the envelope field of the laser.
 
         Parameters
         ----------

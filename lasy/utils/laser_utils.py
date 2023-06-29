@@ -1,11 +1,13 @@
 import numpy as np
 from scipy.constants import c, epsilon_0
+from scipy.interpolate import interp1d
 
 
 def compute_laser_energy(dim, grid):
     """
-    Computes the total laser energy that corresponds to the current
-    envelope data. This is used mainly for normalization purposes.
+    Compute the total laser energy that corresponds to the current envelope data.
+
+    This is used mainly for normalization purposes.
 
     Parameters
     ----------
@@ -19,8 +21,8 @@ def compute_laser_energy(dim, grid):
 
     grid : a Grid object.
         It contains a ndarrays (V/m) with
-        the value of the envelope field and an object of type
-        lasy.utils.Box that defines the points at which evaluate the laser
+        the value of the envelope field and the associated metadata
+        that defines the points at which evaluate the laser
 
     Returns
     -------
@@ -33,16 +35,15 @@ def compute_laser_energy(dim, grid):
     # This probably needs to be generalized for few-cycle laser pulses.
 
     envelope = grid.field
-    box = grid.box
 
-    dz = box.dx[-1] * c
+    dz = grid.dx[-1] * c
 
     if dim == "xyt":
-        dV = box.dx[0] * box.dx[1] * dz
+        dV = grid.dx[0] * grid.dx[1] * dz
         energy = ((dV * epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
     elif dim == "rt":
-        r = box.axes[0]
-        dr = box.dx[0]
+        r = grid.axes[0]
+        dr = grid.dx[0]
         # 1D array that computes the volume of radial cells
         dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
         energy = (
@@ -57,10 +58,10 @@ def compute_laser_energy(dim, grid):
 
 def normalize_energy(dim, energy, grid):
     """
-    Normalize energy of the laser pulse contained in grid
+    Normalize energy of the laser pulse contained in grid.
 
     Parameters
-    -----------
+    ----------
     dim : string
         Dimensionality of the array. Options are:
 
@@ -75,7 +76,6 @@ def normalize_energy(dim, energy, grid):
     grid: a Grid object
         Contains value of the laser envelope and metadata
     """
-
     if energy is None:
         return
 
@@ -86,7 +86,7 @@ def normalize_energy(dim, energy, grid):
 
 def normalize_peak_field_amplitude(amplitude, grid):
     """
-    Normalize energy of the laser pulse contained in grid
+    Normalize energy of the laser pulse contained in grid.
 
     Parameters
     ----------
@@ -96,15 +96,14 @@ def normalize_peak_field_amplitude(amplitude, grid):
     grid : a Grid object
         Contains value of the laser envelope and metadata
     """
-
     if amplitude is None:
         return
-    grid.field = grid.field / np.abs(grid.field).max() * amplitude
+    grid.field *= amplitude / np.abs(grid.field).max()
 
 
 def normalize_peak_intensity(peak_intensity, grid):
     """
-    Normalize energy of the laser pulse contained in grid
+    Normalize energy of the laser pulse contained in grid.
 
     Parameters
     ----------
@@ -114,10 +113,95 @@ def normalize_peak_intensity(peak_intensity, grid):
     grid : a Grid object
         Contains value of the laser envelope and metadata
     """
-
     if peak_intensity is None:
         return
     intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
     input_peak_intensity = intensity.max()
 
     grid.field *= np.sqrt(peak_intensity / input_peak_intensity)
+
+
+def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
+    """
+    Reconstruct the laser pulse with carrier frequency on the default grid.
+
+    Parameters
+    ----------
+    theta : float (rad) (optional)
+        Azimuthal angle
+    slice : float (optional)
+        Normalised position of the slice from -0.5 to 0.5
+    Nt: int (optional)
+        Number of time points on which field should be sampled. If is None,
+        the orignal time grid is used, otherwise field is interpolated on a
+        new grid.
+
+    Returns
+    -------
+        Et : ndarray (V/m)
+            The reconstructed field, with shape (Nr, Nt) (for `rt`)
+            or (Nx, Nt) (for `xyt`)
+        extent : ndarray (Tmin, Tmax, Xmin, Xmax)
+            Physical extent of the reconstructed field
+    """
+    omega0 = laser.profile.omega0
+    env = laser.grid.field.copy()
+    time_axis = laser.grid.axes[-1]
+
+    if laser.dim == "rt":
+        azimuthal_phase = np.exp(-1j * laser.grid.azimuthal_modes * theta)
+        env_upper = env * azimuthal_phase[:, None, None]
+        env_upper = env_upper.sum(0)
+        azimuthal_phase = np.exp(1j * laser.grid.azimuthal_modes * theta)
+        env_lower = env * azimuthal_phase[:, None, None]
+        env_lower = env_lower.sum(0)
+        env = np.vstack((env_lower[::-1][:-1], env_upper))
+    elif slice_axis == "x":
+        Nx_middle = env.shape[0] // 2 - 1
+        Nx_slice = int((1 + slice) * Nx_middle)
+        env = env[Nx_slice, :]
+    elif slice_axis == "y":
+        Ny_middle = env.shape[1] // 2 - 1
+        Ny_slice = int((1 + slice) * Ny_middle)
+        env = env[:, Ny_slice, :]
+    else:
+        return None
+
+    if Nt is not None:
+        Nr = env.shape[0]
+        time_axis_new = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], Nt)
+        env_new = np.zeros((Nr, Nt), dtype=env.dtype)
+
+        for ir in range(Nr):
+            interp_fu_abs = interp1d(time_axis, np.abs(env[ir]))
+            slice_abs = interp_fu_abs(time_axis_new)
+            interp_fu_angl = interp1d(time_axis, np.unwrap(np.angle(env[ir])))
+            slice_angl = interp_fu_angl(time_axis_new)
+            env_new[ir] = slice_abs * np.exp(1j * slice_angl)
+
+        time_axis = time_axis_new
+        env = env_new
+
+    env *= np.exp(-1j * omega0 * time_axis[None, :])
+    env = np.real(env)
+
+    if laser.dim == "rt":
+        ext = np.array(
+            [
+                laser.grid.lo[-1],
+                laser.grid.hi[-1],
+                -laser.grid.hi[0],
+                laser.grid.hi[0],
+            ]
+        )
+    else:
+        ext = np.array(
+            [
+                laser.grid.lo[-1],
+                laser.grid.hi[-1],
+                laser.grid.lo[0],
+                laser.grid.hi[0],
+            ]
+        )
+
+    return env, ext

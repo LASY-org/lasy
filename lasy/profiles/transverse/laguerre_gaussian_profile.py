@@ -5,22 +5,21 @@ from .transverse_profile import TransverseProfile
 
 
 class LaguerreGaussianTransverseProfile(TransverseProfile):
-    """
-    Derived class for an analytic profile of a high-order Gaussian
-    laser pulse expressed in the Laguerre-Gaussian formalism.
+    r"""
+    High-order Gaussian laser pulse expressed in the Laguerre-Gaussian formalism.
 
-    More precisely, the transverse envelope
-    (to be used in the :class:CombinedLongitudinalTransverseLaser class)
-    corresponds to:
+    Derived class for an analytic profile.
+    More precisely, the transverse envelope (to be used in the
+    :class:CombinedLongitudinalTransverseLaser class) corresponds to:
 
     .. math::
 
-        \\mathcal{T}(x, y) = r^{|m|}e^{-im\\theta} \\,
-        L_p^{|m|}\\left( \\frac{2 r^2 }{w_0^2}\\right )\\,
-        \\exp\\left( -\\frac{r^2}{w_0^2} \\right)
+        \mathcal{T}(x, y) = r^{|m|}e^{-im\theta} \,
+        L_p^{|m|}\left( \frac{2 r^2 }{w_0^2}\right )\,
+        \exp\left( -\frac{r^2}{w_0^2} \right)
 
-    where :math:`x = r \\cos{\\theta}`,
-    :math:`y = r \\sin{\\theta}`, :math:`L_p^{|m|}` is the
+    where :math:`x = r \cos{\theta}`,
+    :math:`y = r \sin{\theta}`, :math:`L_p^{|m|}` is the
     Generalised Laguerre polynomial of radial order :math:`p` and
     azimuthal order :math:`|m|`
 
@@ -42,7 +41,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
 
     def _evaluate(self, x, y):
         """
-        Returns the transverse envelope
+        Return the transverse envelope.
 
         Parameters
         ----------

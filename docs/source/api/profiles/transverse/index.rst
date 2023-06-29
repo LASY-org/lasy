@@ -13,3 +13,4 @@ Transverse Laser Profiles
    hermite_gaussian_profile
    super_gaussian_profile
    jinc_profile
+   transverse_profile_from_data

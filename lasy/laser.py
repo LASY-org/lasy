@@ -1,8 +1,9 @@
 import numpy as np
-import scipy.constants as scc
-from axiprop.lib import PropagatorFFT2, PropagatorResampling
+from scipy.constants import c
 
-from lasy.utils.box import Box
+from axiprop.lib import PropagatorFFT2, PropagatorResampling
+from axiprop.containers import ScalarFieldEnvelope
+
 from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
     normalize_energy,
@@ -14,8 +15,9 @@ from lasy.utils.openpmd_output import write_to_openpmd_file
 
 class Laser:
     """
-    Top-level class that can evaluate a laser profile on a grid,
-    propagate it, and write it to a file.
+    Evaluate a laser profile on a grid, propagate it, and write it to a file.
+
+    This is a top-level class.
 
     Parameters
     ----------
@@ -45,10 +47,10 @@ class Laser:
 
     Examples
     --------
-
     >>> import matplotlib.pyplot as plt
     >>> from lasy.laser import Laser
     >>> from lasy.profiles.gaussian_profile import GaussianProfile
+    >>> from lasy.utils.laser_utils import get_full_field
     >>> # Create profile.
     >>> profile = GaussianProfile(
     ...     wavelength=0.6e-6,  # m
@@ -72,10 +74,10 @@ class Laser:
     >>> fig, axes = plt.subplots(1, n_steps, sharey=True)
     >>> for step in range(n_steps):
     >>>     laser.propagate(propagate_step)
-    >>>     E_rt, extent = laser.get_full_field()
-    >>>     extent[:2] *= 1e6
-    >>>     extent[2:] *= 1e12
-    >>>     rmin, rmax, tmin, tmax = extent
+    >>>     E_rt, extent = get_full_field(laser)
+    >>>     extent[2:] *= 1e6
+    >>>     extent[:2] *= 1e12
+    >>>     tmin, tmax, rmin, rmax = extent
     >>>     vmax = np.abs(E_rt).max()
     >>>     axes[step].imshow(
     ...         E_rt,
@@ -92,32 +94,34 @@ class Laser:
     """
 
     def __init__(self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1):
-        box = Box(dim, lo, hi, npoints, n_azimuthal_modes)
-        self.box = box
-        self.field = Grid(dim, self.box)
+        self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
         self.dim = dim
         self.profile = profile
 
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
-            x, y, t = np.meshgrid(*box.axes, indexing="ij")
-            self.field.field[...] = profile.evaluate(x, y, t)
+            x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
+            self.grid.field[...] = profile.evaluate(x, y, t)
         elif self.dim == "rt":
             # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
             # theta, to evaluate the laser
-            n_theta = 2 * box.n_azimuthal_modes - 1
+            n_theta = 2 * self.grid.n_azimuthal_modes - 1
             theta1d = 2 * np.pi / n_theta * np.arange(n_theta)
-            theta, r, t = np.meshgrid(theta1d, *box.axes, indexing="ij")
+            theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
             x = r * np.cos(theta)
             y = r * np.sin(theta)
             # Evaluate the profile on the generated grid
             envelope = profile.evaluate(x, y, t)
             # Perform the azimuthal decomposition
-            self.field.field[...] = np.fft.ifft(envelope, axis=0)
+            self.grid.field[...] = np.fft.ifft(envelope, axis=0)
+
+        # For profiles that define the energy, normalize the amplitude
+        if hasattr(profile, "laser_energy"):
+            self.normalize(profile.laser_energy, kind="energy")
 
     def normalize(self, value, kind="energy"):
         """
-        Normalize the pulse either to the energy, peak field amplitude or peak intensity
+        Normalize the pulse either to the energy, peak field amplitude or peak intensity.
 
         Parameters
         ----------
@@ -127,19 +131,18 @@ class Laser:
             Distance by which the laser pulse should be propagated
             Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
-
         if kind == "energy":
-            normalize_energy(self.dim, value, self.field)
+            normalize_energy(self.dim, value, self.grid)
         elif kind == "field":
-            normalize_peak_field_amplitude(value, self.field)
+            normalize_peak_field_amplitude(value, self.grid)
         elif kind == "intensity":
-            normalize_peak_intensity(value, self.field)
+            normalize_peak_intensity(value, self.grid)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
     def propagate(self, distance, nr_boundary=None, backend="NP"):
         """
-        Propagate the laser pulse by the distance specified
+        Propagate the laser pulse by the distance specified.
 
         Parameters
         ----------
@@ -150,6 +153,8 @@ class Laser:
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
             Only used for ``'rt'``.
+        backend : string (optional)
+            Backend used by axiprop (see axiprop documentation).
         """
         time_axis_indx = -1
 
@@ -160,66 +165,64 @@ class Laser:
             absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
             absorb_layer_shape[-1] = 0.0
             if self.dim == "rt":
-                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
+                self.grid.field[:, -nr_boundary:, :] *= absorb_layer_shape[
                     None, :, None
                 ]
             else:
-                self.field.field[-nr_boundary:, :, :] *= absorb_layer_shape[
+                self.grid.field[-nr_boundary:, :, :] *= absorb_layer_shape[
                     :, None, None
                 ]
-                self.field.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
+                self.grid.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
                     :, None, None
                 ]
-                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
+                self.grid.field[:, -nr_boundary:, :] *= absorb_layer_shape[
                     None, :, None
                 ]
-                self.field.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
+                self.grid.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
                     None, :, None
                 ]
 
         # Transform the field from temporal to frequency domain
-        field_fft = np.fft.fft(self.field.field, axis=time_axis_indx, norm="forward")
+        field_fft = np.fft.ifft(self.grid.field, axis=time_axis_indx, norm="backward")
 
         # Create the frequency axis
-        dt = self.box.dx[time_axis_indx]
+        dt = self.grid.dx[time_axis_indx]
         omega0 = self.profile.omega0
-        Nt = self.field.field.shape[time_axis_indx]
+        Nt = self.grid.field.shape[time_axis_indx]
         omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+        # make 3D shape for the frequency axis
+        omega_shape = (1, 1, self.grid.field.shape[time_axis_indx])
 
         if self.dim == "rt":
-            # make 3D shape for the frequency axis
-            omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
-                spatial_axes = (self.box.axes[0],)
+                spatial_axes = (self.grid.axes[0],)
                 self.prop = []
-                for m in self.box.azimuthal_modes:
+                for m in self.grid.azimuthal_modes:
                     self.prop.append(
                         PropagatorResampling(
                             *spatial_axes,
-                            omega / scc.c,
+                            omega / c,
                             mode=m,
                             backend=backend,
                             verbose=False,
                         )
                     )
             # Propagate the spectral image
-            for i_m in range(self.box.azimuthal_modes.size):
+            for i_m in range(self.grid.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
                 self.prop[i_m].step(transform_data, distance, overwrite=True)
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
         else:
-            # make 3D shape for the frequency axis
-            omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
-                Nx, Ny, Nt = self.field.field.shape
-                Lx = self.box.hi[0] - self.box.lo[0]
-                Ly = self.box.hi[1] - self.box.lo[1]
+                Nx, Ny, Nt = self.grid.field.shape
+                Lx = self.grid.hi[0] - self.grid.lo[0]
+                Ly = self.grid.hi[1] - self.grid.lo[1]
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
                 self.prop = PropagatorFFT2(
                     *spatial_axes,
-                    omega / scc.c,
+                    omega / c,
                     backend=backend,
                     verbose=False,
                 )
@@ -229,22 +232,171 @@ class Laser:
             field_fft[:, :, :] = np.transpose(transform_data).copy()
 
         # Choose the time translation assuming propagation at v=c
-        translate_time = distance / scc.c
-        # Translate the box
-        self.box.lo[time_axis_indx] += translate_time
-        self.box.hi[time_axis_indx] += translate_time
-        self.box.axes[time_axis_indx] += translate_time
+        translate_time = distance / c
+
+        # Translate the domain
+        self.grid.lo[time_axis_indx] += translate_time
+        self.grid.hi[time_axis_indx] += translate_time
+        self.grid.axes[time_axis_indx] += translate_time
 
         # Translate the phase of spectral image
         field_fft *= np.exp(-1j * translate_time * omega.reshape(omega_shape))
 
         # Transform field from frequency to temporal domain
-        self.field.field[:, :, :] = np.fft.ifft(
-            field_fft, axis=time_axis_indx, norm="forward"
+        self.grid.field[:, :, :] = np.fft.fft(
+            field_fft, axis=time_axis_indx, norm="backward"
         )
 
         # Translate phase of the retrieved envelope by the distance
-        self.field.field *= np.exp(1j * self.profile.omega0 * distance / scc.c)
+        self.grid.field *= np.exp(1j * omega0 * distance / c)
+
+    def export_to_z(self, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
+        """
+        Export laser pulse to spatial domain from temporal domain (internal LASY representation).
+
+        Parameters
+        ----------
+        z_axis : 1D ndarray of doubles (optional)
+            Spatial `z` axis along which the field should be reconstructed.
+            If not provided, `z_axis = c * t_axis` is considered.
+
+        z0 : scalar (optional)
+            Position from which the field is produced (emitted)
+
+        t0 : scalar (optional)
+            Moment of time at which the field is produced
+
+        backend : string (optional)
+            Backend used by axiprop (see axiprop documentation).
+        """
+        time_axis_indx = -1
+
+        t_axis = self.grid.axes[time_axis_indx]
+        if z_axis is None:
+            z_axis = t_axis * c
+
+        omega0 = self.profile.omega0
+        FieldAxprp = ScalarFieldEnvelope(omega0 / c, t_axis)
+
+        if self.dim == "rt":
+            # Construct the propagator
+            prop = []
+            for m in self.grid.azimuthal_modes:
+                prop.append(
+                    PropagatorResampling(
+                        self.grid.axes[0],
+                        FieldAxprp.k_freq,
+                        mode=m,
+                        backend=backend,
+                        verbose=False,
+                    )
+                )
+
+            field_z = np.zeros(
+                (self.grid.field.shape[0], self.grid.field.shape[1], z_axis.size),
+                dtype=self.grid.field.dtype,
+            )
+
+            # Convert the spectral image to the spatial field representation
+            for i_m in range(self.grid.azimuthal_modes.size):
+                FieldAxprp.import_field(np.transpose(self.grid.field[i_m]).copy())
+
+                field_z[i_m] = (
+                    prop[i_m].t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
+                )
+
+                field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
+        else:
+            # Construct the propagator
+            Nx, Ny, Nt = self.grid.field.shape
+            Lx = self.grid.hi[0] - self.grid.lo[0]
+            Ly = self.grid.hi[1] - self.grid.lo[1]
+            prop = PropagatorFFT2(
+                (Lx, Nx),
+                (Ly, Ny),
+                FieldAxprp.k_freq,
+                backend=backend,
+                verbose=False,
+            )
+            # Convert the spectral image to the spatial field representation
+            FieldAxprp.import_field(np.transpose(self.grid.field).copy())
+            field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
+            field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
+
+        return field_z
+
+    def import_from_z(self, field_z, z_axis, z0=0.0, t0=0.0, backend="NP"):
+        """
+        Import laser pulse from spatial domain to temporal domain (internal LASY representation).
+
+        Parameters
+        ----------
+        z_axis : 1D ndarray of doubles
+            Spatial `z` axis along which the field should be reconstructed.
+
+        z0 : scalar (optional)
+            Position at which the field should be recorded
+
+        t0 : scalar (optional)
+            Moment of time at which the field should be recorded
+
+        backend : string (optional)
+            Backend used by axiprop (see axiprop documentation).
+        """
+        z_axis_indx = -1
+        t_axis = self.grid.axes[z_axis_indx]
+        dz = z_axis[1] - z_axis[0]
+        Nz = z_axis.size
+
+        # Transform the field from spatial to wavenumber domain
+        field_fft = np.fft.fft(field_z, axis=z_axis_indx, norm="forward")
+
+        # Create the axes for wavenumbers, and for corresponding frequency
+        omega0 = self.profile.omega0
+        omega = 2 * np.pi * np.fft.fftfreq(Nz, dz / c) + omega0
+        k_z = omega / c
+
+        if self.dim == "rt":
+            # Construct the propagator
+            prop = []
+            for m in self.grid.azimuthal_modes:
+                prop.append(
+                    PropagatorResampling(
+                        self.grid.axes[0],
+                        omega / c,
+                        mode=m,
+                        backend=backend,
+                        verbose=False,
+                    )
+                )
+
+            # Convert the spectral image to the spatial field representation
+            for i_m in range(self.grid.azimuthal_modes.size):
+                transform_data = np.transpose(field_fft[i_m]).copy()
+                transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None] - omega0 / c))
+                self.grid.field[i_m] = (
+                    prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
+                )
+                self.grid.field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
+        else:
+            # Construct the propagator
+            Nx, Ny, Nt = self.grid.field.shape
+            Lx = self.grid.hi[0] - self.grid.lo[0]
+            Ly = self.grid.hi[1] - self.grid.lo[1]
+            prop = PropagatorFFT2(
+                (Lx, Nx),
+                (Ly, Ny),
+                omega / c,
+                backend=backend,
+                verbose=False,
+            )
+            # Convert the spectral image to the spatial field representation
+            transform_data = np.transpose(field_fft).copy()
+            transform_data *= np.exp(
+                -1j * z_axis[0] * (k_z[:, None, None] - omega0 / c)
+            )
+            self.grid.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
+            self.grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
 
     def write_to_file(self, file_prefix="laser", file_format="h5"):
         """
@@ -262,53 +414,7 @@ class Laser:
             self.dim,
             file_prefix,
             file_format,
-            self.field,
+            self.grid,
             self.profile.lambda0,
             self.profile.pol,
         )
-
-    def get_full_field(self, theta=0, slice=0, slice_axis="x"):
-        """
-        Reconstruct the laser pulse with carrier frequency on the default grid
-
-        Parameters
-        ----------
-        theta : float (rad) (optional)
-            Azimuthal angle
-        slice : float (optional)
-            Normalised position of the slice from -0.5 to 0.5
-
-        Returns
-        -------
-            Et : ndarray (V/m)
-                The reconstructed field, with shape (Nr, Nt_new) (for `rt`)
-                or (Nx, Nt_new) (for `xyt`)
-            extent : ndarray (Xmin, Xmax, Tmin, Tmax)
-                Physical extent of the reconstructed field
-        """
-        omega0 = self.profile.omega0
-        field = self.field.field.copy()
-        time_axis = self.box.axes[-1][None, :]
-
-        if self.dim == "rt":
-            azimuthal_phase = np.exp(-1j * self.box.azimuthal_modes * theta)
-            field *= azimuthal_phase[:, None, None]
-            field = field.sum(0)
-        elif slice_axis == "x":
-            Nx_middle = field.shape[0] // 2 - 1
-            Nx_slice = int((1 + slice) * Nx_middle)
-            field = field[Nx_slice, :]
-        elif slice_axis == "y":
-            Ny_middle = field.shape[1] // 2 - 1
-            Ny_slice = int((1 + slice) * Ny_middle)
-            field = field[:, Ny_slice, :]
-        else:
-            return None
-
-        field *= np.exp(-1j * omega0 * time_axis)
-        field = np.real(field)
-        ext = np.array(
-            [self.box.lo[-1], self.box.hi[-1], self.box.lo[0], self.box.hi[0]]
-        )
-
-        return field, ext
