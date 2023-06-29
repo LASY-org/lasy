@@ -3,7 +3,7 @@ import openpmd_api as io
 from scipy.constants import c
 
 
-def write_to_openpmd_file(dim, file_prefix, file_format, field, wavelength, pol):
+def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     """
     Write the laser field into an openPMD file.
 
@@ -33,7 +33,7 @@ def write_to_openpmd_file(dim, file_prefix, file_format, field, wavelength, pol)
     pol : list of 2 complex numbers
         Polarization vector that multiplies array to get the Ex and Ey arrays.
     """
-    array = field.array
+    array = grid.field
 
     # Create file
     series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
@@ -43,9 +43,9 @@ def write_to_openpmd_file(dim, file_prefix, file_format, field, wavelength, pol)
     m = i.meshes["laserEnvelope"]
     m.grid_spacing = [
         (hi - lo) / (npoints - 1)
-        for hi, lo, npoints in zip(field.hi, field.lo, field.npoints)
+        for hi, lo, npoints in zip(grid.hi, grid.lo, grid.npoints)
     ][::-1]
-    m.grid_global_offset = field.lo[::-1]
+    m.grid_global_offset = grid.lo[::-1]
     m.unit_dimension = {
         io.Unit_Dimension.M: 1,
         io.Unit_Dimension.L: 1,
@@ -74,10 +74,10 @@ def write_to_openpmd_file(dim, file_prefix, file_format, field, wavelength, pol)
         # (see https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record)
         # is different than the representation of modes internal to lasy.
         # Thus, there is a non-trivial conversion here
-        ncomp = 2 * field.n_azimuthal_modes - 1
-        data = np.zeros((ncomp, field.npoints[0], field.npoints[1]), dtype=array.dtype)
+        ncomp = 2 * grid.n_azimuthal_modes - 1
+        data = np.zeros((ncomp, grid.npoints[0], grid.npoints[1]), dtype=array.dtype)
         data[0, :, :] = array[0, :, :]
-        for mode in range(1, field.n_azimuthal_modes):
+        for mode in range(1, grid.n_azimuthal_modes):
             # cos(m*theta) part of the mode
             data[2 * mode - 1, :, :] = array[mode, :, :] + array[-mode, :, :]
             # sin(m*theta) part of the mode

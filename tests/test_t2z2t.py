@@ -51,10 +51,10 @@ def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
     laser_z = laser_t_in.export_to_z()
     laser_t_out.import_from_z(laser_z, z_axis)
 
-    ind0 = laser_t_in.field.array.shape[0] // 2 - 1
+    ind0 = laser_t_in.grid.field.shape[0] // 2 - 1
 
-    laser_t_in_2d = laser_t_in.field.array[ind0]
-    laser_t_out_2d = laser_t_out.field.array[ind0]
+    laser_t_in_2d = laser_t_in.grid.field[ind0]
+    laser_t_out_2d = laser_t_out.grid.field[ind0]
     laser_z_2d = laser_z[ind0]
 
     assert np.allclose(laser_t_in_2d, laser_t_out_2d, atol=2e-7, rtol=0)
@@ -75,8 +75,8 @@ def test_RT_case(gaussian):
     laser_t_in.normalize(1.0, "field")
     laser_t_out.normalize(1.0, "field")
 
-    t_axis = laser_t_in.field.axes[-1]
-    r_axis = laser_t_in.field.axes[0]
+    t_axis = laser_t_in.grid.axes[-1]
+    r_axis = laser_t_in.grid.axes[0]
     z_axis = t_axis * c
 
     laser_z_analytic = get_laser_z_analytic(gaussian, z_axis, r_axis)
@@ -98,8 +98,8 @@ def test_3D_case(gaussian):
     laser_t_in.normalize(1.0, "field")
     laser_t_out.normalize(1.0, "field")
 
-    t_axis = laser_t_in.field.axes[-1]
-    r_axis = np.abs(laser_t_in.field.axes[1])
+    t_axis = laser_t_in.grid.axes[-1]
+    r_axis = np.abs(laser_t_in.grid.axes[1])
     z_axis = t_axis * c
 
     laser_z_analytic = get_laser_z_analytic(gaussian, z_axis, r_axis)

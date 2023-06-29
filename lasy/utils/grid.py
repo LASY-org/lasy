@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Field:
+class Grid:
     def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes):
         # Metadata
         ndims = 2 if dim == "rt" else 3
@@ -26,11 +26,11 @@ class Field:
 
         # Data
         if dim == "xyt":
-            self.array = np.zeros(self.npoints, dtype="complex128")
+            self.field = np.zeros(self.npoints, dtype="complex128")
         elif dim == "rt":
             # Azimuthal modes are arranged in the following order:
             # 0, 1, 2, ..., n_azimuthal_modes-1, -n_azimuthal_modes+1, ..., -1
             ncomp = 2 * self.n_azimuthal_modes - 1
-            self.array = np.zeros(
+            self.field = np.zeros(
                 (ncomp, self.npoints[0], self.npoints[1]), dtype="complex128"
             )

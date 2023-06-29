@@ -24,12 +24,12 @@ def gaussian():
 def get_w0(laser):
     # Calculate the laser waist
     if laser.dim == "xyt":
-        Nx, Ny, Nt = laser.field.array.shape
-        A2 = (np.abs(laser.field.array[Nx // 2 - 1, :, :]) ** 2).sum(-1)
-        ax = laser.field.axes[1]
+        Nx, Ny, Nt = laser.grid.field.shape
+        A2 = (np.abs(laser.grid.field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
+        ax = laser.grid.axes[1]
     else:
-        A2 = (np.abs(laser.field.array[0, :, :]) ** 2).sum(-1)
-        ax = laser.field.axes[0]
+        A2 = (np.abs(laser.grid.field[0, :, :]) ** 2).sum(-1)
+        ax = laser.grid.axes[0]
         if ax[0] > 0:
             A2 = np.r_[A2[::-1], A2]
             ax = np.r_[-ax[::-1], ax]
