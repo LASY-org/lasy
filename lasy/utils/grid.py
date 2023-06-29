@@ -3,7 +3,7 @@ import numpy as np
 
 class Grid:
     """
-    Store an array (typically the envelope) and corresponding metadata
+    Store an array (typically the envelope) and corresponding metadata.
 
     Parameters
     ----------
