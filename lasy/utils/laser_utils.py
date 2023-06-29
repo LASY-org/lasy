@@ -21,8 +21,8 @@ def compute_laser_energy(dim, grid):
 
     grid : a Grid object.
         It contains a ndarrays (V/m) with
-        the value of the envelope field and an object of type
-        lasy.utils.Box that defines the points at which evaluate the laser
+        the value of the envelope field and the associated metadata
+        that defines the points at which evaluate the laser
 
     Returns
     -------

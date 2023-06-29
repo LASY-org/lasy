@@ -233,7 +233,8 @@ class Laser:
 
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / c
-        # Translate the box
+
+        # Translate the domain
         self.grid.lo[time_axis_indx] += translate_time
         self.grid.hi[time_axis_indx] += translate_time
         self.grid.axes[time_axis_indx] += translate_time
