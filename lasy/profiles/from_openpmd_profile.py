@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.signal import hilbert
 from scipy.constants import c
+import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
 from .profile import Profile
 from .from_array_profile import FromArrayProfile
@@ -39,16 +40,24 @@ class FromOpenPMDProfile(Profile):
         If not, the envelope is obtained from the electric field
         using a Hilbert transform
 
+    prefix : string
+        Prefix of the openPMD file from which the envelope is red.
+        Only used when envelope=True.
+        The provided iteration is read from <path>/<prefix>_%T.h5.
+
     wavelength : float (in meter)
         The main laser wavelength :math:`\\lambda_0` of the laser, which defines
         :math:`\\omega_0`, according to :math:`\\omega_0 = 2\\pi c/\\lambda_0`.
-        if envelope is True, this argument is currently required.
-        if envelope is False, this argument is optional: if not specified, the
-        central wavelength is obtained from the Hilbert transform.
+        This argument is optional, and will overwrite the following default
+        behavior:
+         - if envelope is True, the central wavelength is read from the openPMD
+           file at openPMD envelope standard.
+         - if envelope is False, the central wavelength is obtained from the
+           Hilbert transform.
     """
 
     def __init__(self, path, iteration, pol, field, coord=None,
-                 envelope=False, wavelength=None):
+                 envelope=False, prefix=None, wavelength=None):
 
         ts = OpenPMDTimeSeries(path)
         F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=None)
@@ -90,10 +99,13 @@ class FromOpenPMDProfile(Profile):
                 wavelength_loc = wavelength
             array = h*np.exp(1j*omg0_h*t)
         else:
-            # in principle, if the openPMD file represents an envelope,
-            # the wavelength should be read from the file directly
-            assert wavelength is not None
-            wavelength_loc = wavelength
+            if wavelength is None:
+                s = io.Series(path + '/' + prefix + '_%T.h5',io.Access.read_only)
+                it = s.iterations[iteration]
+                omg0 = it.meshes['laserEnvelope'].get_attribute('angularFrequency')
+                wavelength_loc = 2*np.pi*c/omg0
+            else:
+                wavelength_loc = wavelength
             array = F
 
         super().__init__(wavelength_loc, pol)
