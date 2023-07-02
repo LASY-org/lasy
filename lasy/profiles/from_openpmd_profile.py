@@ -56,64 +56,80 @@ class FromOpenPMDProfile(Profile):
            Hilbert transform.
     """
 
-    def __init__(self, path, iteration, pol, field, coord=None,
-                 envelope=False, prefix=None, wavelength=None):
-
+    def __init__(
+        self,
+        path,
+        iteration,
+        pol,
+        field,
+        coord=None,
+        envelope=False,
+        prefix=None,
+        wavelength=None,
+    ):
         ts = OpenPMDTimeSeries(path)
         F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=None)
         assert m.axes in [
-            {0: 'x', 1: 'y', 2: 'z'},
-            {0: 'z', 1: 'y', 2: 'x'},
-            {0: 'x', 1: 'y', 2: 't'},
-            {0: 't', 1: 'y', 2: 'x'}
+            {0: "x", 1: "y", 2: "z"},
+            {0: "z", 1: "y", 2: "x"},
+            {0: "x", 1: "y", 2: "t"},
+            {0: "t", 1: "y", 2: "x"},
         ]
 
-        if m.axes in [{0: 'z', 1: 'y', 2: 'x'}, {0: 't', 1: 'y', 2: 'x'}]:
-            F = F.swapaxes(0,2)
+        if m.axes in [{0: "z", 1: "y", 2: "x"}, {0: "t", 1: "y", 2: "x"}]:
+            F = F.swapaxes(0, 2)
 
-        if 'z' in m.axes.values():
+        if "z" in m.axes.values():
             dt = m.dz / c
-            t = (m.z-m.z[0]) / c
+            t = (m.z - m.z[0]) / c
         else:
             dt = m.dt
             t = m.t
-        axes = {'x':m.x, 'y':m.y, 't':t}
+        axes = {"x": m.x, "y": m.y, "t": t}
 
         # If array does not contain the envelope but the electric field,
         # extract the envelope with a Hilbert transform
         if envelope == False:
-
             # Assumes z is last dimension!
             h = hilbert(F)
 
-            if 'z' in m.axes.values():
+            if "z" in m.axes.values():
                 # Flip to get complex envelope in t assuming z = -c*t
                 h = np.flip(h, axis=2)
 
             # Get central wavelength from array
             phase = np.unwrap(np.angle(h))
-            omg0_h = -np.average(np.diff(phase), weights=\
-                                 .5*(np.abs(h[:,:,1:])+np.abs(h[:,:,:-1])))/dt
-            wavelength_loc = 2*np.pi*c/omg0_h
+            omg0_h = (
+                -np.average(
+                    np.diff(phase),
+                    weights=0.5 * (np.abs(h[:, :, 1:]) + np.abs(h[:, :, :-1])),
+                )
+                / dt
+            )
+            wavelength_loc = 2 * np.pi * c / omg0_h
             if wavelength is not None:
                 wavelength_loc = wavelength
-            array = h*np.exp(1j*omg0_h*t)
+            array = h * np.exp(1j * omg0_h * t)
         else:
             if wavelength is None:
-                s = io.Series(path + '/' + prefix + '_%T.h5',io.Access.read_only)
+                s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
                 it = s.iterations[iteration]
-                omg0 = it.meshes['laserEnvelope'].get_attribute('angularFrequency')
-                wavelength_loc = 2*np.pi*c/omg0
+                omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
+                wavelength_loc = 2 * np.pi * c / omg0
             else:
                 wavelength_loc = wavelength
             array = F
 
         super().__init__(wavelength_loc, pol)
 
-        axes_order = ['x', 'y', 't']
-        self.profile = FromArrayProfile(wavelength=wavelength_loc, pol=pol,
-                                        array=array, axes=axes,
-                                        axes_order=axes_order)
+        axes_order = ["x", "y", "t"]
+        self.profile = FromArrayProfile(
+            wavelength=wavelength_loc,
+            pol=pol,
+            array=array,
+            axes=axes,
+            axes_order=axes_order,
+        )
 
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
