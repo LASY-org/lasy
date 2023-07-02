@@ -50,10 +50,10 @@ class FromOpenPMDProfile(Profile):
         :math:`\\omega_0`, according to :math:`\\omega_0 = 2\\pi c/\\lambda_0`.
         This argument is optional, and will overwrite the following default
         behavior:
-         - if envelope is True, the central wavelength is read from the openPMD
-           file at openPMD envelope standard.
-         - if envelope is False, the central wavelength is obtained from the
-           Hilbert transform.
+        - if envelope is True, the central wavelength is read from the openPMD
+        file at openPMD envelope standard.
+        - if envelope is False, the central wavelength is obtained from the
+        Hilbert transform.
     """
 
     def __init__(
