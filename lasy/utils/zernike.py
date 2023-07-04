@@ -116,8 +116,8 @@ def RmnGenerator(n, m, rho):
         for i in k:
             Rmn = Rmn + ((-1) ** i * math.factorial(n - i)) / (
                 math.factorial(i)
-                * math.factorial((n + m) / 2 - i)
-                * math.factorial((n - m) / 2 - i)
+                * math.factorial(int((n + m) / 2) - i)
+                * math.factorial(int((n - m) / 2) - i)
             ) * rho ** (n - 2 * i)
 
     else:
