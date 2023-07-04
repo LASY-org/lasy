@@ -6,8 +6,8 @@ def gerchberg_saxton_algo(
     laserPos1,
     laserPos2,
     dz,
-    condition="max_itterations",
-    max_itterations=10,
+    condition="max_iterations",
+    max_iterations=10,
     amplitude_error=1.0,
     debug=False,
 ):
@@ -28,12 +28,12 @@ def gerchberg_saxton_algo(
 
     condition : string
         The condition on which to stop the itterative loop.
-        Options are: 'max_itterations', stopping after a fixed number of
-        itterations or 'amplitude_error', waiting for the residual of
+        Options are: 'max_iterations', stopping after a fixed number of
+        iterations or 'amplitude_error', waiting for the residual of
         the e-field amplitude from laserPos1 to fall below 'amplitude_error'
 
-    max_itterations : int
-        Maximum number of itterations to perform
+    max_iterations : int
+        Maximum number of iterations to perform
 
     amplitude_error : float
         Residual value for amplitude given as a fraction of the maximum
@@ -51,8 +51,8 @@ def gerchberg_saxton_algo(
     amp2 = np.abs(laser2.field.field)
     phase1 = np.zeros_like(amp1)
 
-    if condition == "max_itterations":
-        breakout = lambda i: i < max_itterations
+    if condition == "max_iterations":
+        breakout = lambda i: i < max_iterations
         cond = 0
     elif condition == "amplitude_error":
         breakout = lambda amp: amp / amp1_summed > amplitude_error
@@ -76,7 +76,7 @@ def gerchberg_saxton_algo(
                 "Itteration %i : Amplitude Error (summed) = %.2e"
                 % (i, amp_error_summed / amp1_summed)
             )
-        if condition == "max_itterations":
+        if condition == "max_iterations":
             cond += 1
         else:
             cond = amp_error_summed

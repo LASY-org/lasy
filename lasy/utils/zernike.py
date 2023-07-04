@@ -28,7 +28,7 @@ def zernike(x, y, pupilCoords, j):
     """
     Calculate the Zernike Polynomials to arbitrary order.
 
-    Makes use of consructor formula on https://en.wikipedia.org/wiki/Zernike_polynomials
+    Makes use of constructor formula on https://en.wikipedia.org/wiki/Zernike_polynomials
 
     Parameters
     ----------
@@ -83,7 +83,7 @@ def RmnGenerator(n, m, rho):
     Parameters
     ----------
     n,m : tuple of ints
-        The standard Zernike Polynomial Indexes
+        The standard Zernike Polynomial Indices
 
     rho : ndarray (meters)
         The radial positions at which to calculate the profile

@@ -52,7 +52,7 @@ phaseBackward, phaseForward, amp_error = gerchberg_saxton_algo(
     laserForward,
     2 * propDist,
     condition="amplitude_error",
-    max_itterations=50,
+    max_iterations=50,
     amplitude_error=1e-6,
     debug=True,
 )
