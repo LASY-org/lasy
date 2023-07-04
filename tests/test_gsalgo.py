@@ -11,6 +11,7 @@ import copy
 
 w0 = 25.0e-6  # m
 
+
 @pytest.fixture(scope="function")
 def gaussian():
     # Cases with Gaussian laser
