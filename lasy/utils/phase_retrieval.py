@@ -46,9 +46,9 @@ def gerchberg_saxton_algo(
     """
     laser1 = copy.deepcopy(laserPos1)
     laser2 = copy.deepcopy(laserPos2)
-    amp1 = np.abs(laser1.field.field)
+    amp1 = np.abs(laser1.grid.field)
     amp1_summed = np.sum(amp1)
-    amp2 = np.abs(laser2.field.field)
+    amp2 = np.abs(laser2.grid.field)
     phase1 = np.zeros_like(amp1)
 
     if condition == "max_iterations":
@@ -60,15 +60,15 @@ def gerchberg_saxton_algo(
 
     i = 0
     while breakout(cond):
-        laser1.field.field = amp1 * np.exp(1j * phase1)
+        laser1.grid.field = amp1 * np.exp(1j * phase1)
         laser1.propagate(dz)
 
-        phase2 = np.angle(laser1.field.field)
-        laser2.field.field = amp2 * np.exp(1j * phase2)
+        phase2 = np.angle(laser1.grid.field)
+        laser2.grid.field = amp2 * np.exp(1j * phase2)
         laser2.propagate(-dz)
 
-        phase1 = np.angle(laser2.field.field)
-        amp1_calc = np.abs(laser2.field.field)
+        phase1 = np.angle(laser2.grid.field)
+        amp1_calc = np.abs(laser2.grid.field)
         amp_error_summed = np.sum(np.abs(amp1_calc) - amp1)
         if debug:
             i += 1
