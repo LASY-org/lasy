@@ -67,5 +67,3 @@ def test_3D_case(gaussian):
     )
 
     assert amp_error < 1e-6
-
-
