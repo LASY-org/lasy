@@ -9,6 +9,7 @@ from lasy.utils.zernike import zernike
 from lasy.utils.phase_retrieval import gerchberg_saxton_algo
 import copy
 
+w0 = 25.0e-6  # m
 
 @pytest.fixture(scope="function")
 def gaussian():
@@ -18,7 +19,6 @@ def gaussian():
     laser_energy = 1.0e-3  # J
     t_peak = 0.0  # s
     tau = 30.0e-15  # s
-    w0 = 25.0e-6  # m
     profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
     return profile
@@ -38,7 +38,7 @@ def test_3D_case(gaussian):
     x = np.linspace(lo[0], hi[0], npoints[0])
     y = np.linspace(lo[1], hi[1], npoints[1])
     X, Y = np.meshgrid(x, y)
-    pupilRadius = 2 * gaussian.w0
+    pupilRadius = 2 * w0
     phase = -0.2 * zernike(X, Y, (0, 0, pupilRadius), 3)
 
     R = np.sqrt(X**2 + Y**2)
