@@ -16,7 +16,7 @@ def get_zernike_nm(j):
 
     Returns
     -------
-    n,m : tuple of ints
+    n,m : ints
         The standard Zernike Polynomial Indexes
     """
     n = int(np.ceil((-3 + np.sqrt(9 + 8 * j)) / 2))
@@ -82,7 +82,7 @@ def RmnGenerator(n, m, rho):
 
     Parameters
     ----------
-    n,m : tuple of ints
+    n,m : ints
         The standard Zernike Polynomial Indices
 
     rho : ndarray (meters)

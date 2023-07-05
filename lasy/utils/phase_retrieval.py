@@ -27,7 +27,7 @@ def gerchberg_saxton_algo(
         Distance between the two laser pulses
 
     condition : string
-        The condition on which to stop the itterative loop.
+        The condition on which to stop the iterative loop.
         Options are: 'max_iterations', stopping after a fixed number of
         iterations or 'amplitude_error', waiting for the residual of
         the e-field amplitude from laserPos1 to fall below 'amplitude_error'
@@ -38,6 +38,9 @@ def gerchberg_saxton_algo(
     amplitude_error : float
         Residual value for amplitude given as a fraction of the maximum
         initial amplitude value for laserPos1.
+        
+    debug : boolean (default: False)
+        if True, the error at each iteration is printed to standard output
 
     Returns
     -------
@@ -74,7 +77,7 @@ def gerchberg_saxton_algo(
         if debug:
             i += 1
             print(
-                "Itteration %i : Amplitude Error (summed) = %.2e"
+                "Iteration %i : Amplitude Error (summed) = %.2e"
                 % (i, amp_error_summed / amp1_summed)
             )
         if condition == "max_iterations":

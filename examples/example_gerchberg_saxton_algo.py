@@ -46,7 +46,7 @@ laserForward.propagate(propDist)
 laserBackward = copy.deepcopy(laser)
 laserBackward.propagate(-propDist)
 
-# PERFORM GERCHBERG-SAXTON ALGORTIHM TO RETRIEVE PHASE
+# PERFORM GERCHBERG-SAXTON ALGORITHM TO RETRIEVE PHASE
 phaseBackward, phaseForward, amp_error = gerchberg_saxton_algo(
     laserBackward,
     laserForward,
