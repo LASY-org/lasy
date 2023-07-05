@@ -38,7 +38,7 @@ def gerchberg_saxton_algo(
     amplitude_error : float
         Residual value for amplitude given as a fraction of the maximum
         initial amplitude value for laserPos1.
-        
+
     debug : boolean (default: False)
         if True, the error at each iteration is printed to standard output
 
