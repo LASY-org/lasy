@@ -42,7 +42,8 @@ def gerchberg_saxton_algo(
     Returns
     -------
     phase1, phase2 : ndarray of floats (rad)
-        Phase profile of the laser pulse
+        Phase profiles of the laser pulse at the locations where
+        laserPos1 and laserPos2 are defined.
     """
     laser1 = copy.deepcopy(laserPos1)
     laser2 = copy.deepcopy(laserPos2)
