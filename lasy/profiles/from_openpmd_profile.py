@@ -3,11 +3,10 @@ from scipy.signal import hilbert
 from scipy.constants import c
 import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
-from .profile import Profile
 from .from_array_profile import FromArrayProfile
 
 
-class FromOpenPMDProfile(Profile):
+class FromOpenPMDProfile(FromArrayProfile):
     r"""
     Profile defined from an openPMD file.
 
@@ -120,18 +119,11 @@ class FromOpenPMDProfile(Profile):
                 wavelength_loc = wavelength
             array = F
 
-        super().__init__(wavelength_loc, pol)
-
         axes_order = ["x", "y", "t"]
-        self.profile = FromArrayProfile(
+        super().__init__(
             wavelength=wavelength_loc,
             pol=pol,
             array=array,
             axes=axes,
             axes_order=axes_order,
         )
-
-    def evaluate(self, x, y, t):
-        """Return the envelope field of the scaled profile."""
-        envelope = self.profile.evaluate(x, y, t)
-        return envelope
