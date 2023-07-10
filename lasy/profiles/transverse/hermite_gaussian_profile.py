@@ -65,7 +65,6 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
             self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
 
-
     def _evaluate(self, x, y):
         """
         Return the transverse envelope.
@@ -93,8 +92,10 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
             * np.sqrt(1 / (2 ** (self.n_y) * factorial(self.n_y) * self.w0))
             * hermite(self.n_x)(np.sqrt(2) * x / w)
             * hermite(self.n_y)(np.sqrt(2) * y / w)
-            * np.exp(-(x**2 + y**2) / (self.w0**2 * diffract_factor)
-                    - 1.0j * (self.nx + self.ny) * psi )
+            * np.exp(
+                -(x**2 + y**2) / (self.w0**2 * diffract_factor)
+                - 1.0j * (self.nx + self.ny) * psi
+            )
             # Additional Gouy phase
             * (1.0 / diffract_factor)
         )
