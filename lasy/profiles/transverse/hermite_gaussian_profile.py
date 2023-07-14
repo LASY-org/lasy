@@ -94,7 +94,7 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
             * hermite(self.n_y)(np.sqrt(2) * y / w)
             * np.exp(
                 -(x**2 + y**2) / (self.w0**2 * diffract_factor)
-                - 1.0j * (self.nx + self.ny) * psi
+                - 1.0j * (self.n_x + self.n_y) * psi
             )
             # Additional Gouy phase
             * (1.0 / diffract_factor)
