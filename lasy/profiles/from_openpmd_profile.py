@@ -100,8 +100,8 @@ class FromOpenPMDProfile(FromArrayProfile):
             phase = np.unwrap(np.angle(h))
             omg0_h = (
                 -np.average(
-                    np.diff(phase),
-                    weights=0.5 * (np.abs(h[:, :, 1:]) + np.abs(h[:, :, :-1])),
+                    np.gradient(phase, axis=-1),
+                    weights=np.abs(h),
                 )
                 / dt
             )
