@@ -40,7 +40,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         using a Hilbert transform
 
     prefix : string
-        Prefix of the openPMD file from which the envelope is red.
+        Prefix of the openPMD file from which the envelope is read.
         Only used when envelope=True.
         The provided iteration is read from <path>/<prefix>_%T.h5.
 
