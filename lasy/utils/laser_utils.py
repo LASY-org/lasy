@@ -1,6 +1,7 @@
 import numpy as np
-from scipy.constants import c, epsilon_0
+from scipy.constants import c, epsilon_0, e, m_e
 from scipy.interpolate import interp1d
+from scipy.signal import hilbert
 
 
 def compute_laser_energy(dim, grid):
@@ -205,3 +206,108 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
         )
 
     return env, ext
+
+def get_frequency(field, longitudinal_axis, is_envelope=True, omega0=None):
+    """
+    Get the local and average frequency of a signal, either electric field or envelope.
+
+    Parameters
+    ----------
+    field : ndarray of complex or real numbers
+        The field of which the frequency is computed. The last axis must be the
+        longitudinal dimension. Can be the full electric field or the envelope.
+
+    longitudinal_axis : 1D array of doubles
+        The longitudinal axis. Internal to lasy should be time, but can also
+        represent z.
+
+    is_envelope : bool (optional)
+        Whether the field provided uses the envelope representation, as used
+        internally in lasy. If False, field is assumed to represent the
+        electric field.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+        Required if an only if is_envelope is True.
+
+    Returns
+    -------
+    omega : nd array of doubles
+        local angular frequency.
+
+    central_omega : scalar
+        Central angular frequency (averaged omega, weighted by the local
+        envelope amplitude).
+    """
+
+    # Assumes z is last dimension!
+
+    if is_envelope:
+        assert omega0 is not None
+        phase = np.unwrap(np.angle(field))
+        omega = omega0 + np.gradient(-phase, longitudinal_axis,
+                                     axis=-1, edge_order=2)
+        central_omega = np.average(omega, weights=np.abs(field))
+
+        # Clean-up to avoid large errors where the signal is tiny
+        omega = np.where(np.abs(field) > np.max(np.abs(field))/100,
+                         omega, central_omega)
+    else:
+        h = hilbert(field)
+        phase = np.unwrap(np.angle(h))
+        omega = np.gradient(-phase, longitudinal_axis,
+                            axis=-1, edge_order=2)
+        central_omega = np.average(omega, weights=np.abs(h))
+
+        # Clean-up to avoid large errors where the signal is tiny
+        omega = np.where(np.abs(field) > np.max(np.abs(field))/100,
+                         omega, central_omega)
+
+    return omega, central_omega
+
+def field_to_a0 (field, longitudinal_axis, omega0):
+    """
+    Convert envelope from electric field (V/m) to normalized vector potential.
+
+    Parameters
+    ----------
+    field : ndarray of complex numbers
+        Array of the electric field, to be converted to normalized vector potential. The last axis must be the longitudinal dimension.
+
+    longitudinal_axis : 1D array of doubles
+        The longitudinal axis. Internal to lasy should be time, but can also
+        represent z.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+
+    Returns
+    -------
+    Normalized vector potential
+    """
+    omega, omega0 = get_frequency(field, longitudinal_axis, True, omega0)
+    return e * field / (m_e * omega * c)
+
+def a0_to_field (a0, longitudinal_axis, omega0):
+    """
+    Convert envelope from electric field (V/m) to normalized vector potential.
+
+    Parameters
+    ----------
+    a0 : ndarray of complex numbers
+        Array of the normalized vector potential, to be converted to electric
+        field. The last axis must be the longitudinal dimension.
+
+    longitudinal_axis : 1D array of doubles
+        The longitudinal axis. Internal to lasy should be time, but can also
+        represent z.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+
+    Returns
+    -------
+    Envelope of the electric field (V/m).
+    """
+    omega, omega0 = get_frequency(a0, longitudinal_axis, True, omega0)
+    return m_e * omega * c * a0 / e

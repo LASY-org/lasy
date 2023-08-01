@@ -1,9 +1,10 @@
 import numpy as np
 import openpmd_api as io
 from scipy.constants import c
+from .laser_utils import field_to_a0
 
-
-def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
+def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength,
+                          pol, use_a0=False):
     """
     Write the laser field into an openPMD file.
 
@@ -32,6 +33,10 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
 
     pol : list of 2 complex numbers
         Polarization vector that multiplies array to get the Ex and Ey arrays.
+
+    use_a0 : bool (optional)
+        Whether the envelope is converted to normalized vector potential
+        before writing to file.
     """
     array = grid.field
 
@@ -63,6 +68,9 @@ def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength, pol):
     m.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
     m.set_attribute("polarization", pol)
     m.set_attribute("isLaserEnvelope", True)
+
+    if use_a0:
+        array = field_to_a0(array, grid.axes[-1], 2 * np.pi * c / wavelength)
 
     # Pick the correct field
     if dim == "xyt":

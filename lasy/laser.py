@@ -8,7 +8,7 @@ from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
     normalize_energy,
     normalize_peak_field_amplitude,
-    normalize_peak_intensity,
+    normalize_peak_intensity
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
@@ -398,7 +398,7 @@ class Laser:
             self.grid.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
             self.grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
 
-    def write_to_file(self, file_prefix="laser", file_format="h5"):
+    def write_to_file(self, file_prefix="laser", file_format="h5", use_a0=False):
         """
         Write the laser profile + metadata to file.
 
@@ -417,4 +417,5 @@ class Laser:
             self.grid,
             self.profile.lambda0,
             self.profile.pol,
+            use_a0
         )
