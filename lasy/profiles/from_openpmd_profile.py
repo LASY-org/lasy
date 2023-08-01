@@ -46,14 +46,7 @@ class FromOpenPMDProfile(FromArrayProfile):
     """
 
     def __init__(
-        self,
-        path,
-        iteration,
-        pol,
-        field,
-        coord=None,
-        envelope=False,
-        prefix=None
+        self, path, iteration, pol, field, coord=None, envelope=False, prefix=None
     ):
         ts = OpenPMDTimeSeries(path)
         F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=None)
