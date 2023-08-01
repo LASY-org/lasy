@@ -61,10 +61,8 @@ class FromOpenPMDProfile(FromArrayProfile):
             F = F.swapaxes(0, 2)
 
         if "z" in m.axes.values():
-            dt = m.dz / c
             t = (m.z - m.z[0]) / c
         else:
-            dt = m.dt
             t = m.t
         axes = {"x": m.x, "y": m.y, "t": t}
 
