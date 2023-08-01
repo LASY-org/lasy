@@ -43,16 +43,6 @@ class FromOpenPMDProfile(FromArrayProfile):
         Prefix of the openPMD file from which the envelope is read.
         Only used when envelope=True.
         The provided iteration is read from <path>/<prefix>_%T.h5.
-
-    wavelength : float (in meter)
-        The main laser wavelength :math:`\\lambda_0` of the laser, which defines
-        :math:`\\omega_0`, according to :math:`\\omega_0 = 2\\pi c/\\lambda_0`.
-        This argument is optional, and will overwrite the following default
-        behavior:
-        - if envelope is True, the central wavelength is read from the openPMD
-        file at openPMD envelope standard.
-        - if envelope is False, the central wavelength is obtained from the
-        Hilbert transform.
     """
 
     def __init__(
@@ -63,8 +53,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         field,
         coord=None,
         envelope=False,
-        prefix=None,
-        wavelength=None,
+        prefix=None
     ):
         ts = OpenPMDTimeSeries(path)
         F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=None)
@@ -105,23 +94,18 @@ class FromOpenPMDProfile(FromArrayProfile):
                 )
                 / dt
             )
-            wavelength_loc = 2 * np.pi * c / omg0_h
-            if wavelength is not None:
-                wavelength_loc = wavelength
+            wavelength = 2 * np.pi * c / omg0_h
             array = h * np.exp(1j * omg0_h * t)
         else:
-            if wavelength is None:
-                s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
-                it = s.iterations[iteration]
-                omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
-                wavelength_loc = 2 * np.pi * c / omg0
-            else:
-                wavelength_loc = wavelength
+            s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
+            it = s.iterations[iteration]
+            omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
+            wavelength = 2 * np.pi * c / omg0
             array = F
 
         axes_order = ["x", "y", "t"]
         super().__init__(
-            wavelength=wavelength_loc,
+            wavelength=wavelength,
             pol=pol,
             array=array,
             axes=axes,
