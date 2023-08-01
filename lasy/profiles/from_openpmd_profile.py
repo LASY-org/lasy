@@ -80,13 +80,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
             # Get central wavelength from array
             phase = np.unwrap(np.angle(h))
-            omg0_h = (
-                -np.average(
-                    np.gradient(phase, axis=-1),
-                    weights=np.abs(h),
-                )
-                / dt
-            )
+            omg0_h = np.average(np.gradient(-phase, t, axis=-1), weights=np.abs(h) )
             wavelength = 2 * np.pi * c / omg0_h
             array = h * np.exp(1j * omg0_h * t)
         else:
