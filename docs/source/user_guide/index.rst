@@ -21,7 +21,7 @@ First Example
 #############
 
 We will try a simple example to get familiar with the code structure and to verify the installation was successful.
-Lets generate a Gaussian pulse at focus, propagate it backwards by one Rayeligh Length and then output it to file.
+Lets generate a Gaussian pulse at focus, emit it behind the focal plan by one Rayleigh length and then output it to a file.
 
 ..  code-block:: python
    :caption: First lets load in the required functions from the library.
