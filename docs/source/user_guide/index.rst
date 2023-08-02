@@ -53,8 +53,7 @@ Lets generate a Gaussian pulse at focus, propagate it backwards by one Rayeligh 
    laser = Laser(dimensions,lo,hi,num_points,laser_profile)
 
 ..  code-block:: python
-   :caption: By default, the laser antenna will emit on the focal plan.
-   (Optional) Make the laser antenna emit outside the focal plan by one Rayleigh length.
+   :caption: By default, the laser antenna will emit on the focal plan. (Optional) Make the laser antenna emit outside the focal plan by one Rayleigh length.
 
    z_R            = 3.14159*spot_size**2/wavelength    # The Rayleigh length.
    laser.propagate(-z_R)                               # The laser antenna emits behind the focal plane
