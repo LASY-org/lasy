@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.signal import hilbert
 from scipy.constants import c
-from skimage.restoration import unwrap_phase
 import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
 from .from_array_profile import FromArrayProfile
