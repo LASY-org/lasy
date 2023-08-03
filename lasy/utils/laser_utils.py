@@ -351,6 +351,7 @@ def a0_to_field(a0, axes, omega0, direct=True):
     direct : boolean (optional)
         If true, the conversion is done directly with derivative of vector
         potential. Otherwise, this is done using the local frequency.
+
     Returns
     -------
     Envelope of the electric field (V/m).
