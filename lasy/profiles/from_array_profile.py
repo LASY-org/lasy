@@ -55,7 +55,7 @@ class FromArrayProfile(Profile):
                 fill_value=0.0,
             )
 
-        else: # dim = "rt"
+        else:  # dim = "rt"
             assert axes_order in [["r", "t"], ["t", "r"]]
 
             if axes_order == ["t", "r"]:
@@ -74,11 +74,10 @@ class FromArrayProfile(Profile):
                 fill_value=None,
             )
 
-
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
         if self.dim == "xyt":
             envelope = self.field_interp((x, y, t))
         else:
-            envelope = self.field_interp((np.sqrt(x**2+y**2), t))
+            envelope = self.field_interp((np.sqrt(x**2 + y**2), t))
         return envelope

@@ -208,9 +208,16 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 
     return env, ext
 
-def get_frequency(field, axes, dim=None,
-                  is_envelope=True, omega0=None, is_hilbert=False,
-                  phase_unwrap_1d=None):
+
+def get_frequency(
+    field,
+    axes,
+    dim=None,
+    is_envelope=True,
+    omega0=None,
+    is_hilbert=False,
+    phase_unwrap_1d=None,
+):
     """
     Get the local and average frequency of a signal, either electric field or envelope.
 
@@ -265,16 +272,16 @@ def get_frequency(field, axes, dim=None,
     if is_envelope:
         assert omega0 is not None
         phase = np.unwrap(np.angle(field))
-        omega = omega0 + np.gradient(-phase, axes[-1],
-                                     axis=-1, edge_order=2)
+        omega = omega0 + np.gradient(-phase, axes[-1], axis=-1, edge_order=2)
         central_omega = np.average(omega, weights=np.abs(field))
 
         # Clean-up to avoid large errors where the signal is tiny
-        omega = np.where(np.abs(field) > np.max(np.abs(field))/100,
-                         omega, central_omega)
+        omega = np.where(
+            np.abs(field) > np.max(np.abs(field)) / 100, omega, central_omega
+        )
     else:
-        assert dim in ['xyt', 'rt']
-        if dim == 'xyt' and not phase_unwrap_1d:
+        assert dim in ["xyt", "rt"]
+        if dim == "xyt" and not phase_unwrap_1d:
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
         if not is_hilbert:
@@ -285,23 +292,22 @@ def get_frequency(field, axes, dim=None,
             phase = np.unwrap(np.angle(h))
         else:
             phase = unwrap_phase(np.angle(h))
-        omega = np.gradient(-phase, axes[-1],
-                            axis=-1, edge_order=2)
+        omega = np.gradient(-phase, axes[-1], axis=-1, edge_order=2)
 
-        if dim == 'xyt':
-            weights=np.abs(h)
+        if dim == "xyt":
+            weights = np.abs(h)
         else:
-            r = axes[0].reshape((axes[0].size,1))
-            weights=r*np.abs(h)
+            r = axes[0].reshape((axes[0].size, 1))
+            weights = r * np.abs(h)
         central_omega = np.average(omega, weights=weights)
 
         # Clean-up to avoid large errors where the signal is tiny
-        omega = np.where(np.abs(h) > np.max(np.abs(h))/100,
-                         omega, central_omega)
+        omega = np.where(np.abs(h) > np.max(np.abs(h)) / 100, omega, central_omega)
 
     return omega, central_omega
 
-def field_to_a0 (field, axes, omega0):
+
+def field_to_a0(field, axes, omega0):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 
@@ -324,7 +330,8 @@ def field_to_a0 (field, axes, omega0):
     omega, _ = get_frequency(field, axes, is_envelope=True, omega0=omega0)
     return e * field / (m_e * omega * c)
 
-def a0_to_field (a0, axes, omega0):
+
+def a0_to_field(a0, axes, omega0):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 

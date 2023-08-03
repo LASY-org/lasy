@@ -8,7 +8,7 @@ from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
     normalize_energy,
     normalize_peak_field_amplitude,
-    normalize_peak_intensity
+    normalize_peak_intensity,
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
@@ -417,5 +417,5 @@ class Laser:
             self.grid,
             self.profile.lambda0,
             self.profile.pol,
-            use_a0
+            use_a0,
         )

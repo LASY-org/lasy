@@ -62,22 +62,29 @@ class FromOpenPMDProfile(FromArrayProfile):
     """
 
     def __init__(
-        self, path, iteration, pol, field, coord=None, envelope=False,
-            prefix=None, theta=None, phase_unwrap_1d=None
+        self,
+        path,
+        iteration,
+        pol,
+        field,
+        coord=None,
+        envelope=False,
+        prefix=None,
+        theta=None,
+        phase_unwrap_1d=None,
     ):
         ts = OpenPMDTimeSeries(path)
         F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=theta)
 
-        if theta is None: # Envelope obtained from the full 3D array
-
+        if theta is None:  # Envelope obtained from the full 3D array
             assert m.axes in [
                 {0: "x", 1: "y", 2: "z"},
                 {0: "z", 1: "y", 2: "x"},
                 {0: "x", 1: "y", 2: "t"},
-                {0: "t", 1: "y", 2: "x"}
+                {0: "t", 1: "y", 2: "x"},
             ]
 
-            dim = 'xyt'
+            dim = "xyt"
 
             if m.axes in [{0: "z", 1: "y", 2: "x"}, {0: "t", 1: "y", 2: "x"}]:
                 F = F.swapaxes(0, 2)
@@ -103,8 +110,14 @@ class FromOpenPMDProfile(FromArrayProfile):
 
                 # Get central wavelength from array
                 axes_list = [axes[i] for i in axes.keys()]
-                omg_h, omg0_h = get_frequency(h, axes_list, dim, is_envelope=False,
-                    is_hilbert=True, phase_unwrap_1d=phase_unwrap_1d)
+                omg_h, omg0_h = get_frequency(
+                    h,
+                    axes_list,
+                    dim,
+                    is_envelope=False,
+                    is_hilbert=True,
+                    phase_unwrap_1d=phase_unwrap_1d,
+                )
                 wavelength = 2 * np.pi * c / omg0_h
                 array = h * np.exp(1j * omg0_h * t)
             else:
@@ -116,15 +129,15 @@ class FromOpenPMDProfile(FromArrayProfile):
 
             axes_order = ["x", "y", "t"]
 
-        else: # Envelope assumes axial symmetry processing RZ data
+        else:  # Envelope assumes axial symmetry processing RZ data
             assert m.axes in [
                 {0: "r", 1: "z"},
                 {0: "z", 1: "r"},
                 {0: "r", 1: "t"},
-                {0: "t", 1: "r"}
+                {0: "t", 1: "r"},
             ]
 
-            dim = 'rt'
+            dim = "rt"
 
             if m.axes in [{0: "z", 1: "r"}, {0: "t", 1: "r"}]:
                 F = F.swapaxes(0, 1)
@@ -133,10 +146,10 @@ class FromOpenPMDProfile(FromArrayProfile):
                 t = (m.z - m.z[0]) / c
             else:
                 t = m.t
-            r = m.r[m.r.size//2:]
+            r = m.r[m.r.size // 2 :]
             axes = {"r": r, "t": t}
 
-            F = F[F.shape[0]//2:,:]
+            F = F[F.shape[0] // 2 :, :]
 
             if phase_unwrap_1d is None:
                 phase_unwrap_1d = False
@@ -152,9 +165,14 @@ class FromOpenPMDProfile(FromArrayProfile):
 
                 # Get central wavelength from array
                 axes_list = [axes[i] for i in axes.keys()]
-                omg_h, omg0_h = get_frequency(h, axes_list, dim=dim,
-                    is_envelope=False, is_hilbert=True,
-                    phase_unwrap_1d=phase_unwrap_1d)
+                omg_h, omg0_h = get_frequency(
+                    h,
+                    axes_list,
+                    dim=dim,
+                    is_envelope=False,
+                    is_hilbert=True,
+                    phase_unwrap_1d=phase_unwrap_1d,
+                )
                 wavelength = 2 * np.pi * c / omg0_h
                 array = h * np.exp(1j * omg0_h * t)
             else:
@@ -166,7 +184,10 @@ class FromOpenPMDProfile(FromArrayProfile):
 
             axes_order = ["r", "t"]
 
-        print("Wavelength used in the definition of the envelope (nm):", wavelength*1.e9)
+        print(
+            "Wavelength used in the definition of the envelope (nm):",
+            wavelength * 1.0e9,
+        )
 
         super().__init__(
             wavelength=wavelength,

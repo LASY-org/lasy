@@ -2,5 +2,5 @@ axiprop
 numpy
 openpmd-api
 openpmd-viewer
-scipy
 scikit-image
+scipy

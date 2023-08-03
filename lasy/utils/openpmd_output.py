@@ -3,8 +3,10 @@ import openpmd_api as io
 from scipy.constants import c
 from .laser_utils import field_to_a0
 
-def write_to_openpmd_file(dim, file_prefix, file_format, grid, wavelength,
-                          pol, use_a0=False):
+
+def write_to_openpmd_file(
+    dim, file_prefix, file_format, grid, wavelength, pol, use_a0=False
+):
     """
     Write the laser field into an openPMD file.
 
