@@ -267,7 +267,6 @@ def get_frequency(
         Central angular frequency (averaged omega, weighted by the local
         envelope amplitude).
     """
-
     # Assumes t is last dimension!
     if is_envelope:
         assert omega0 is not None
