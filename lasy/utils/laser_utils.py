@@ -332,6 +332,7 @@ def field_to_a0(field, axes, omega0):
     omega, _ = get_frequency(field, axes, is_envelope=True, omega0=omega0)
     return -1j * e * field / (m_e * omega * c)
 
+
 def a0_to_field(a0, axes, omega0, direct=True):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
@@ -360,4 +361,4 @@ def a0_to_field(a0, axes, omega0, direct=True):
         return m_e * c / e * A
     else:
         omega, _ = get_frequency(a0, axes, is_envelope=True, omega0=omega0)
-        return 1j *  m_e * omega * c * a0 / e
+        return 1j * m_e * omega * c * a0 / e
