@@ -3,3 +3,4 @@ numpy
 openpmd-api
 openpmd-viewer
 scipy
+scikit-image

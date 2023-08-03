@@ -2,6 +2,7 @@ import numpy as np
 from scipy.constants import c, epsilon_0, e, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
+from skimage.restoration import unwrap_phase
 
 
 def compute_laser_energy(dim, grid):
@@ -207,7 +208,9 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 
     return env, ext
 
-def get_frequency(field, longitudinal_axis, is_envelope=True, omega0=None):
+def get_frequency(field, axes, dim=None,
+                  is_envelope=True, omega0=None, is_hilbert=False,
+                  phase_unwrap_1d=None):
     """
     Get the local and average frequency of a signal, either electric field or envelope.
 
@@ -217,9 +220,17 @@ def get_frequency(field, longitudinal_axis, is_envelope=True, omega0=None):
         The field of which the frequency is computed. The last axis must be the
         longitudinal dimension. Can be the full electric field or the envelope.
 
-    longitudinal_axis : 1D array of doubles
-        The longitudinal axis. Internal to lasy should be time, but can also
-        represent z.
+    axes : list 1D array of doubles, 1 per dimension
+        The last element must be the time axis.
+
+    dim : string (optional)
+        Dimensionality of the array. Only used if is_envelope is False.
+        Options are:
+
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     is_envelope : bool (optional)
         Whether the field provided uses the envelope representation, as used
@@ -229,6 +240,16 @@ def get_frequency(field, longitudinal_axis, is_envelope=True, omega0=None):
     omega0 : scalar
         Angular frequency at which the envelope is defined.
         Required if an only if is_envelope is True.
+
+    is_hilbert : boolean (optional)
+        If True, the field argument is assumed to be a Hilbert transform, and
+        is used through the computation. Otherwise, the Hilbert transform is
+        calculated in the function.
+
+    phase_unwrap_1d : boolean (optional)
+        Whether the phase unwrapping is done in 1D.
+        This is not recommended, as the unwrapping will not be accurate,
+        but it might be the only practical solution when dim is 'xyt'.
 
     Returns
     -------
@@ -240,12 +261,11 @@ def get_frequency(field, longitudinal_axis, is_envelope=True, omega0=None):
         envelope amplitude).
     """
 
-    # Assumes z is last dimension!
-
+    # Assumes t is last dimension!
     if is_envelope:
         assert omega0 is not None
         phase = np.unwrap(np.angle(field))
-        omega = omega0 + np.gradient(-phase, longitudinal_axis,
+        omega = omega0 + np.gradient(-phase, axes[-1],
                                      axis=-1, edge_order=2)
         central_omega = np.average(omega, weights=np.abs(field))
 
@@ -253,30 +273,46 @@ def get_frequency(field, longitudinal_axis, is_envelope=True, omega0=None):
         omega = np.where(np.abs(field) > np.max(np.abs(field))/100,
                          omega, central_omega)
     else:
-        h = hilbert(field)
-        phase = np.unwrap(np.angle(h))
-        omega = np.gradient(-phase, longitudinal_axis,
+        assert dim in ['xyt', 'rt']
+        if dim == 'xyt' and not phase_unwrap_1d:
+            print("WARNING: using 3D phase unwrapping, this can be expensive")
+
+        if not is_hilbert:
+            h = hilbert(field)
+        else:
+            h = field
+        if phase_unwrap_1d:
+            phase = np.unwrap(np.angle(h))
+        else:
+            phase = unwrap_phase(np.angle(h))
+        omega = np.gradient(-phase, axes[-1],
                             axis=-1, edge_order=2)
-        central_omega = np.average(omega, weights=np.abs(h))
+
+        if dim == 'xyt':
+            weights=np.abs(h)
+        else:
+            r = axes[0].reshape((axes[0].size,1))
+            weights=r*np.abs(h)
+        central_omega = np.average(omega, weights=weights)
 
         # Clean-up to avoid large errors where the signal is tiny
-        omega = np.where(np.abs(field) > np.max(np.abs(field))/100,
+        omega = np.where(np.abs(h) > np.max(np.abs(h))/100,
                          omega, central_omega)
 
     return omega, central_omega
 
-def field_to_a0 (field, longitudinal_axis, omega0):
+def field_to_a0 (field, axes, omega0):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 
     Parameters
     ----------
     field : ndarray of complex numbers
-        Array of the electric field, to be converted to normalized vector potential. The last axis must be the longitudinal dimension.
+        Array of the electric field, to be converted to normalized vector potential.
+        The last axis must be the longitudinal dimension.
 
-    longitudinal_axis : 1D array of doubles
-        The longitudinal axis. Internal to lasy should be time, but can also
-        represent z.
+    axes : list 1D array of doubles, 1 per dimension
+        The last element must be the time axis.
 
     omega0 : scalar
         Angular frequency at which the envelope is defined.
@@ -285,10 +321,10 @@ def field_to_a0 (field, longitudinal_axis, omega0):
     -------
     Normalized vector potential
     """
-    omega, omega0 = get_frequency(field, longitudinal_axis, True, omega0)
+    omega, _ = get_frequency(field, axes, is_envelope=True, omega0=omega0)
     return e * field / (m_e * omega * c)
 
-def a0_to_field (a0, longitudinal_axis, omega0):
+def a0_to_field (a0, axes, omega0):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 
@@ -298,9 +334,8 @@ def a0_to_field (a0, longitudinal_axis, omega0):
         Array of the normalized vector potential, to be converted to electric
         field. The last axis must be the longitudinal dimension.
 
-    longitudinal_axis : 1D array of doubles
-        The longitudinal axis. Internal to lasy should be time, but can also
-        represent z.
+    axes : list 1D array of doubles, 1 per dimension
+        The last element must be the time axis.
 
     omega0 : scalar
         Angular frequency at which the envelope is defined.
@@ -309,5 +344,5 @@ def a0_to_field (a0, longitudinal_axis, omega0):
     -------
     Envelope of the electric field (V/m).
     """
-    omega, omega0 = get_frequency(a0, longitudinal_axis, True, omega0)
+    omega, _ = get_frequency(a0, axes, is_envelope=True, omega0=omega0)
     return m_e * omega * c * a0 / e
