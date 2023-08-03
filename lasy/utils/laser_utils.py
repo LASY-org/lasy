@@ -326,11 +326,13 @@ def field_to_a0(field, axes, omega0):
     -------
     Normalized vector potential
     """
+    # Here, we neglect the time derivative of the envelope of E, the first RHS
+    # term in: E = -dA/dt + 1j * omega0 * A where E and A are the field and
+    # vector potential envelopes, respectively
     omega, _ = get_frequency(field, axes, is_envelope=True, omega0=omega0)
-    return e * field / (m_e * omega * c)
+    return -1j * e * field / (m_e * omega * c)
 
-
-def a0_to_field(a0, axes, omega0):
+def a0_to_field(a0, axes, omega0, direct=True):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 
@@ -346,9 +348,16 @@ def a0_to_field(a0, axes, omega0):
     omega0 : scalar
         Angular frequency at which the envelope is defined.
 
+    direct : boolean (optional)
+        If true, the conversion is done directly with derivative of vector
+        potential. Otherwise, this is done using the local frequency.
     Returns
     -------
     Envelope of the electric field (V/m).
     """
-    omega, _ = get_frequency(a0, axes, is_envelope=True, omega0=omega0)
-    return m_e * omega * c * a0 / e
+    if direct:
+        A = -np.gradient(a0, axes[-1], axis=-1, edge_order=2) + 1j * omega0 * a0
+        return m_e * c / e * A
+    else:
+        omega, _ = get_frequency(a0, axes, is_envelope=True, omega0=omega0)
+        return 1j *  m_e * omega * c * a0 / e
