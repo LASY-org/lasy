@@ -326,7 +326,7 @@ def field_to_a0(grid, omega0):
     # Here, we neglect the time derivative of the envelope of E, the first RHS
     # term in: E = -dA/dt + 1j * omega0 * A where E and A are the field and
     # vector potential envelopes, respectively
-    omega, _ = get_frequency(grid.field, grid.axes, is_envelope=True, omega0=omega0)
+    omega, _ = get_frequency(grid, is_envelope=True, omega0=omega0)
     return -1j * e * grid.field / (m_e * omega * c)
 
 
@@ -359,5 +359,5 @@ def a0_to_field(grid, omega0, direct=True):
         )
         return m_e * c / e * A
     else:
-        omega, _ = get_frequency(grid.field, grid.axes, is_envelope=True, omega0=omega0)
+        omega, _ = get_frequency(grid, is_envelope=True, omega0=omega0)
         return 1j * m_e * omega * c * grid.field / e

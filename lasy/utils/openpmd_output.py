@@ -72,7 +72,7 @@ def write_to_openpmd_file(
     m.set_attribute("isLaserEnvelope", True)
 
     if use_a0:
-        array = field_to_a0(array, grid.axes, 2 * np.pi * c / wavelength)
+        array = field_to_a0(grid, 2 * np.pi * c / wavelength)
 
     # Pick the correct field
     if dim == "xyt":
