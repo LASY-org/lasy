@@ -357,5 +357,5 @@ def a0_to_field(grid, omega0, direct=True):
             1j * omega0 * grid.field
         return m_e * c / e * A
     else:
-        omega, _ = get_frequency(grid.field, axes, is_envelope=True, omega0=omega0)
+        omega, _ = get_frequency(grid.field, grid.axes, is_envelope=True, omega0=omega0)
         return 1j * m_e * omega * c * grid.field / e
