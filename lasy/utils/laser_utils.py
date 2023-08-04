@@ -218,52 +218,52 @@ def get_frequency(
     phase_unwrap_1d=None,
 ):
     """
-     Get the local and average frequency of a signal, either electric field or envelope.
+    Get the local and average frequency of a signal, either electric field or envelope.
 
-     Parameters
-     ----------
-     grid : a Grid object.
-         It contains a ndarrays with the field data from which the
-         frequency is computed, and the associated metadata. The last axis must
-         be the longitudinal dimension.
-         Can be the full electric field or the envelope.
+    Parameters
+    ----------
+    grid : a Grid object.
+        It contains a ndarrays with the field data from which the
+        frequency is computed, and the associated metadata. The last axis must
+        be the longitudinal dimension.
+        Can be the full electric field or the envelope.
 
     dim : string (optional)
-         Dimensionality of the array. Only used if is_envelope is False.
-         Options are:
+        Dimensionality of the array. Only used if is_envelope is False.
+        Options are:
 
-         - 'xyt': The laser pulse is represented on a 3D grid:
-                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
-         - 'rt' : The laser pulse is represented on a 2D grid:
-                  Cylindrical (r) transversely, and temporal (t) longitudinally.
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-     is_envelope : bool (optional)
-         Whether the field provided uses the envelope representation, as used
-         internally in lasy. If False, field is assumed to represent the
-         electric field.
+    is_envelope : bool (optional)
+        Whether the field provided uses the envelope representation, as used
+        internally in lasy. If False, field is assumed to represent the
+        electric field.
 
-     omega0 : scalar
-         Angular frequency at which the envelope is defined.
-         Required if an only if is_envelope is True.
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+        Required if an only if is_envelope is True.
 
-     is_hilbert : boolean (optional)
-         If True, the field argument is assumed to be a Hilbert transform, and
-         is used through the computation. Otherwise, the Hilbert transform is
-         calculated in the function.
+    is_hilbert : boolean (optional)
+        If True, the field argument is assumed to be a Hilbert transform, and
+        is used through the computation. Otherwise, the Hilbert transform is
+        calculated in the function.
 
-     phase_unwrap_1d : boolean (optional)
-         Whether the phase unwrapping is done in 1D.
-         This is not recommended, as the unwrapping will not be accurate,
-         but it might be the only practical solution when dim is 'xyt'.
+    phase_unwrap_1d : boolean (optional)
+        Whether the phase unwrapping is done in 1D.
+        This is not recommended, as the unwrapping will not be accurate,
+        but it might be the only practical solution when dim is 'xyt'.
 
-     Returns
-     -------
-     omega : nd array of doubles
-         local angular frequency.
+    Returns
+    -------
+    omega : nd array of doubles
+        local angular frequency.
 
-     central_omega : scalar
-         Central angular frequency (averaged omega, weighted by the local
-         envelope amplitude).
+    central_omega : scalar
+        Central angular frequency (averaged omega, weighted by the local
+        envelope amplitude).
     """
     # Assumes t is last dimension!
     if is_envelope:
