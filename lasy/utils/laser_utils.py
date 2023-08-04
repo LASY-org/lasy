@@ -210,8 +210,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 
 
 def get_frequency(
-    field,
-    axes,
+    grid,
     dim=None,
     is_envelope=True,
     omega0=None,
@@ -223,14 +222,13 @@ def get_frequency(
 
     Parameters
     ----------
-    field : ndarray of complex or real numbers
-        The field of which the frequency is computed. The last axis must be the
-        longitudinal dimension. Can be the full electric field or the envelope.
+    grid : a Grid object.
+        It contains a ndarrays with the field data from which the
+        frequency is computed, and the associated metadata. The last axis must
+        be the longitudinal dimension.
+        Can be the full electric field or the envelope.
 
-    axes : list 1D array of doubles, 1 per dimension
-        The last element must be the time axis.
-
-    dim : string (optional)
+   dim : string (optional)
         Dimensionality of the array. Only used if is_envelope is False.
         Options are:
 
@@ -270,13 +268,13 @@ def get_frequency(
     # Assumes t is last dimension!
     if is_envelope:
         assert omega0 is not None
-        phase = np.unwrap(np.angle(field))
-        omega = omega0 + np.gradient(-phase, axes[-1], axis=-1, edge_order=2)
-        central_omega = np.average(omega, weights=np.abs(field))
+        phase = np.unwrap(np.angle(grid.field))
+        omega = omega0 + np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
+        central_omega = np.average(omega, weights=np.abs(grid.field))
 
         # Clean-up to avoid large errors where the signal is tiny
         omega = np.where(
-            np.abs(field) > np.max(np.abs(field)) / 100, omega, central_omega
+            np.abs(grid.field) > np.max(np.abs(grid.field)) / 100, omega, central_omega
         )
     else:
         assert dim in ["xyt", "rt"]
@@ -284,19 +282,20 @@ def get_frequency(
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
         if not is_hilbert:
-            h = hilbert(field)
+            h = np.squeeze(hilbert(grid.field))
         else:
-            h = field
+            h = np.squeeze(grid.field)
+        print(h.shape)
         if phase_unwrap_1d:
             phase = np.unwrap(np.angle(h))
         else:
             phase = unwrap_phase(np.angle(h))
-        omega = np.gradient(-phase, axes[-1], axis=-1, edge_order=2)
+        omega = np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
 
         if dim == "xyt":
             weights = np.abs(h)
         else:
-            r = axes[0].reshape((axes[0].size, 1))
+            r = grid.axes[0].reshape((grid.axes[0].size, 1))
             weights = r * np.abs(h)
         central_omega = np.average(omega, weights=weights)
 
@@ -306,18 +305,16 @@ def get_frequency(
     return omega, central_omega
 
 
-def field_to_a0(field, axes, omega0):
+def field_to_a0(grid, omega0):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 
     Parameters
     ----------
-    field : ndarray of complex numbers
-        Array of the electric field, to be converted to normalized vector potential.
+    grid : a Grid object.
+        Contains the array of the electric field, to be converted to normalized
+        vector potential, with corresponding metadata.
         The last axis must be the longitudinal dimension.
-
-    axes : list 1D array of doubles, 1 per dimension
-        The last element must be the time axis.
 
     omega0 : scalar
         Angular frequency at which the envelope is defined.
@@ -329,22 +326,20 @@ def field_to_a0(field, axes, omega0):
     # Here, we neglect the time derivative of the envelope of E, the first RHS
     # term in: E = -dA/dt + 1j * omega0 * A where E and A are the field and
     # vector potential envelopes, respectively
-    omega, _ = get_frequency(field, axes, is_envelope=True, omega0=omega0)
-    return -1j * e * field / (m_e * omega * c)
+    omega, _ = get_frequency(grid.field, grid.axes, is_envelope=True, omega0=omega0)
+    return -1j * e * grid.field / (m_e * omega * c)
 
 
-def a0_to_field(a0, axes, omega0, direct=True):
+def a0_to_field(grid, omega0, direct=True):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 
     Parameters
     ----------
-    a0 : ndarray of complex numbers
-        Array of the normalized vector potential, to be converted to electric
-        field. The last axis must be the longitudinal dimension.
-
-    axes : list 1D array of doubles, 1 per dimension
-        The last element must be the time axis.
+    grid : a Grid object.
+        Contains the array of the normalized vector potential, to be
+        converted to field, with corresponding metadata.
+        The last axis must be the longitudinal dimension.
 
     omega0 : scalar
         Angular frequency at which the envelope is defined.
@@ -358,8 +353,9 @@ def a0_to_field(a0, axes, omega0, direct=True):
     Envelope of the electric field (V/m).
     """
     if direct:
-        A = -np.gradient(a0, axes[-1], axis=-1, edge_order=2) + 1j * omega0 * a0
+        A = -np.gradient(grid.field, grid.axes[-1], axis=-1, edge_order=2) + \
+            1j * omega0 * grid.field
         return m_e * c / e * A
     else:
-        omega, _ = get_frequency(a0, axes, is_envelope=True, omega0=omega0)
-        return 1j * m_e * omega * c * a0 / e
+        omega, _ = get_frequency(grid.field, axes, is_envelope=True, omega0=omega0)
+        return 1j * m_e * omega * c * grid.field / e

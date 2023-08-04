@@ -5,6 +5,7 @@ import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
 from .from_array_profile import FromArrayProfile
 from lasy.utils.laser_utils import get_frequency
+from lasy.utils.grid import Grid
 
 
 class FromOpenPMDProfile(FromArrayProfile):
@@ -109,10 +110,17 @@ class FromOpenPMDProfile(FromArrayProfile):
                     h = np.flip(h, axis=-1)
 
                 # Get central wavelength from array
-                axes_list = [axes[i] for i in axes.keys()]
+                lo = (axes['x'][0], axes['y'][0], axes['t'][0])
+                hi = (axes['x'][-1], axes['y'][-1], axes['t'][-1])
+                npoints = (axes['x'].size, axes['y'].size, axes['t'].size)
+                grid = Grid(dim, lo, hi, npoints)
+                assert np.all(grid.axes[0] == axes['x'])
+                assert np.all(grid.axes[1] == axes['y'])
+                assert np.all(grid.axes[2] == axes['t'])
+                assert grid.field.shape == h.shape
+                grid.field = h
                 omg_h, omg0_h = get_frequency(
-                    h,
-                    axes_list,
+                    grid,
                     dim,
                     is_envelope=False,
                     is_hilbert=True,
@@ -164,10 +172,16 @@ class FromOpenPMDProfile(FromArrayProfile):
                     h = np.flip(h, axis=-1)
 
                 # Get central wavelength from array
-                axes_list = [axes[i] for i in axes.keys()]
+                lo = (axes['r'][0], axes['t'][0])
+                hi = (axes['r'][-1], axes['t'][-1])
+                npoints = (axes['r'].size, axes['t'].size)
+                grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1)
+                assert np.all(grid.axes[0] == axes['r'])
+                assert np.allclose(grid.axes[1], axes['t'], rtol=1.e-14)
+                assert grid.field.shape == h[np.newaxis].shape
+                grid.field = h[np.newaxis]
                 omg_h, omg0_h = get_frequency(
-                    h,
-                    axes_list,
+                    grid,
                     dim=dim,
                     is_envelope=False,
                     is_hilbert=True,
