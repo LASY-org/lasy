@@ -285,7 +285,6 @@ def get_frequency(
             h = np.squeeze(hilbert(grid.field))
         else:
             h = np.squeeze(grid.field)
-        print(h.shape)
         if phase_unwrap_1d:
             phase = np.unwrap(np.angle(h))
         else:

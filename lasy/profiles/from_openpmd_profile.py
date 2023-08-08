@@ -60,6 +60,9 @@ class FromOpenPMDProfile(FromArrayProfile):
         This is not recommended, as the unwrapping will not be accurate,
         but it might be the only practical solution when dim is 'xyt'.
         If None, it is set to False for dim = 'rt' and True for dim = 'xyt'.
+
+    verbose : boolean (optional)
+        Whether to print extended information.
     """
 
     def __init__(
@@ -73,6 +76,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         prefix=None,
         theta=None,
         phase_unwrap_1d=None,
+        verbose=False,
     ):
         ts = OpenPMDTimeSeries(path)
         F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=theta)
@@ -200,10 +204,11 @@ class FromOpenPMDProfile(FromArrayProfile):
 
             axes_order = ["r", "t"]
 
-        print(
-            "Wavelength used in the definition of the envelope (nm):",
-            wavelength * 1.0e9,
-        )
+        if verbose:
+            print(
+                "Wavelength used in the definition of the envelope (nm):",
+                wavelength * 1.0e9,
+            )
 
         super().__init__(
             wavelength=wavelength,
