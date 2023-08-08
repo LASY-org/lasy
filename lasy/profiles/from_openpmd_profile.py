@@ -157,7 +157,9 @@ class FromOpenPMDProfile(FromArrayProfile):
             r = m.r[m.r.size // 2 :]
             axes = {"r": r, "t": t}
 
-            F = 0.5 * (F[F.shape[0] // 2 :, :] + np.flip(F[ : F.shape[0] // 2, :], axis=0))
+            F = 0.5 * (
+                F[F.shape[0] // 2 :, :] + np.flip(F[: F.shape[0] // 2, :], axis=0)
+            )
 
             if phase_unwrap_1d is None:
                 phase_unwrap_1d = False
