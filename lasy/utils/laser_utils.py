@@ -216,6 +216,8 @@ def get_frequency(
     omega0=None,
     is_hilbert=False,
     phase_unwrap_1d=None,
+    lower_bound=0.2,
+    upper_bound=5.0,
 ):
     """
     Get the local and average frequency of a signal, either electric field or envelope.
@@ -256,6 +258,16 @@ def get_frequency(
         This is not recommended, as the unwrapping will not be accurate,
         but it might be the only practical solution when dim is 'xyt'.
 
+    lower_bound : scalar (optional)
+        Relative lower bound for the local frequency
+        Frequencies lower than lower_bound * central_omega are cut
+        to lower_bound * central_omega.
+
+    upper_bound : scalar (optional)
+        Relative upper bound for the local frequency
+        Frequencies larger than upper_bound * central_omega are cut
+        to upper_bound * central_omega.
+
     Returns
     -------
     omega : nd array of doubles
@@ -271,11 +283,6 @@ def get_frequency(
         phase = np.unwrap(np.angle(grid.field))
         omega = omega0 + np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
         central_omega = np.average(omega, weights=np.abs(grid.field))
-
-        # Clean-up to avoid large errors where the signal is tiny
-        omega = np.where(
-            np.abs(grid.field) > np.max(np.abs(grid.field)) / 100, omega, central_omega
-        )
     else:
         assert dim in ["xyt", "rt"]
         if dim == "xyt" and not phase_unwrap_1d:
@@ -298,8 +305,10 @@ def get_frequency(
             weights = r * np.abs(h)
         central_omega = np.average(omega, weights=weights)
 
-        # Clean-up to avoid large errors where the signal is tiny
-        omega = np.where(np.abs(h) > np.max(np.abs(h)) / 100, omega, central_omega)
+    # Filter out too small frequencies
+    omega = np.maximum(omega, lower_bound * central_omega)
+    # Filter out too large frequencies
+    omega = np.minimum(omega, upper_bound * central_omega)
 
     return omega, central_omega
 
