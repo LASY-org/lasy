@@ -398,7 +398,9 @@ class Laser:
             self.grid.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
             self.grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
 
-    def write_to_file(self, file_prefix="laser", file_format="h5", save_as_vector_potential=False):
+    def write_to_file(
+        self, file_prefix="laser", file_format="h5", save_as_vector_potential=False
+    ):
         """
         Write the laser profile + metadata to file.
 

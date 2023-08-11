@@ -5,8 +5,7 @@ from .laser_utils import field_to_vector_potential
 
 
 def write_to_openpmd_file(
-    dim, file_prefix, file_format, grid, wavelength, pol,
-    save_as_vector_potential=False
+    dim, file_prefix, file_format, grid, wavelength, pol, save_as_vector_potential=False
 ):
     """
     Write the laser field into an openPMD file.
