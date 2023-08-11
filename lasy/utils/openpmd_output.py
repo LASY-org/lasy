@@ -5,7 +5,8 @@ from .laser_utils import field_to_a0
 
 
 def write_to_openpmd_file(
-    dim, file_prefix, file_format, grid, wavelength, pol, use_a0=False
+    dim, file_prefix, file_format, grid, wavelength, pol,
+    save_as_vector_potential=False
 ):
     """
     Write the laser field into an openPMD file.
@@ -36,7 +37,7 @@ def write_to_openpmd_file(
     pol : list of 2 complex numbers
         Polarization vector that multiplies array to get the Ex and Ey arrays.
 
-    use_a0 : bool (optional)
+    save_as_vector_potential : bool (optional)
         Whether the envelope is converted to normalized vector potential
         before writing to file.
     """
@@ -71,7 +72,7 @@ def write_to_openpmd_file(
     m.set_attribute("polarization", pol)
     m.set_attribute("isLaserEnvelope", True)
 
-    if use_a0:
+    if save_as_vector_potential:
         array = field_to_a0(grid, 2 * np.pi * c / wavelength)
 
     # Pick the correct field

@@ -46,7 +46,6 @@ class FromOpenPMDProfile(FromArrayProfile):
         Only used when envelope=True.
         The provided iteration is read from <path>/<prefix>_%T.h5.
 
-
     theta : float or None, optional
         Only used if the openPMD input is in thetaMode geometry.
         Directly passed to openpmd_viewer.OpenPMDTimeSeries.get_field.
