@@ -313,7 +313,7 @@ def get_frequency(
     return omega, central_omega
 
 
-def field_to_a0(grid, omega0):
+def field_to_vector_potential(grid, omega0):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 
@@ -338,7 +338,7 @@ def field_to_a0(grid, omega0):
     return -1j * e * grid.field / (m_e * omega * c)
 
 
-def a0_to_field(grid, omega0, direct=True):
+def vector_potential_to_field(grid, omega0, direct=True):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 

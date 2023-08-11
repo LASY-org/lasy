@@ -104,7 +104,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
             # If array does not contain the envelope but the electric field,
             # extract the envelope with a Hilbert transform
-            if envelope == False:
+            if not envelope:
                 # Assumes z is last dimension!
                 h = hilbert(F)
 
@@ -168,7 +168,7 @@ class FromOpenPMDProfile(FromArrayProfile):
                 phase_unwrap_1d = False
             # If array does not contain the envelope but the electric field,
             # extract the envelope with a Hilbert transform
-            if envelope == False:
+            if not envelope:
                 # Assumes z is last dimension!
                 h = hilbert(F)
 

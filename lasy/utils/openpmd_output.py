@@ -1,7 +1,7 @@
 import numpy as np
 import openpmd_api as io
 from scipy.constants import c
-from .laser_utils import field_to_a0
+from .laser_utils import field_to_vector_potential
 
 
 def write_to_openpmd_file(
@@ -73,7 +73,7 @@ def write_to_openpmd_file(
     m.set_attribute("isLaserEnvelope", True)
 
     if save_as_vector_potential:
-        array = field_to_a0(grid, 2 * np.pi * c / wavelength)
+        array = field_to_vector_potential(grid, 2 * np.pi * c / wavelength)
 
     # Pick the correct field
     if dim == "xyt":
