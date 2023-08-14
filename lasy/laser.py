@@ -4,6 +4,7 @@ from scipy.constants import c
 try:
     from axiprop.lib import PropagatorFFT2, PropagatorResampling
     from axiprop.containers import ScalarFieldEnvelope
+
     axiprop_installed = True
 except ImportError:
     axiprop_installed = False
@@ -276,7 +277,7 @@ class Laser:
 
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
-        """        
+        """
         assert axiprop_installed, (
             "`export_to_z` requires `axiprop` to be installed."
             "You can install it with `pip install axiprop`."
