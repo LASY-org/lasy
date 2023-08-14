@@ -1,4 +1,3 @@
-axiprop
 numpy
 openpmd-api
 openpmd-viewer

@@ -1,8 +1,12 @@
 import numpy as np
 from scipy.constants import c
 
-from axiprop.lib import PropagatorFFT2, PropagatorResampling
-from axiprop.containers import ScalarFieldEnvelope
+try:
+    from axiprop.lib import PropagatorFFT2, PropagatorResampling
+    from axiprop.containers import ScalarFieldEnvelope
+    axiprop_installed = True
+except ImportError:
+    axiprop_installed = False
 
 from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
@@ -156,6 +160,10 @@ class Laser:
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
         """
+        assert axiprop_installed, (
+            "Laser propagation requires `axiprop` to be installed."
+            "You can install it with `pip install axiprop`."
+        )
         time_axis_indx = -1
 
         # apply boundary "absorption" if required
@@ -268,7 +276,11 @@ class Laser:
 
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
-        """
+        """        
+        assert axiprop_installed, (
+            "`export_to_z` requires `axiprop` to be installed."
+            "You can install it with `pip install axiprop`."
+        )
         time_axis_indx = -1
 
         t_axis = self.grid.axes[time_axis_indx]
@@ -343,6 +355,10 @@ class Laser:
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
         """
+        assert axiprop_installed, (
+            "`import_from_z` requires `axiprop` to be installed."
+            "You can install it with `pip install axiprop`."
+        )
         z_axis_indx = -1
         t_axis = self.grid.axes[z_axis_indx]
         dz = z_axis[1] - z_axis[0]
