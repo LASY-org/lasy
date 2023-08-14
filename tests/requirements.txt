@@ -1,2 +1,3 @@
 openpmd-viewer
 pytest
+axiprop
