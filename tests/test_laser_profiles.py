@@ -178,7 +178,9 @@ def test_from_array_profile():
     axes = {"x": x, "y": y, "t": t}
     dim = "xyt"
 
-    profile = FromArrayProfile(wavelength=wavelength, pol=pol, array=E, axes=axes)
+    profile = FromArrayProfile(
+        wavelength=wavelength, pol=pol, array=E, dim=dim, axes=axes
+    )
     laser = Laser(dim, lo, hi, npoints, profile)
     laser.write_to_file("fromArray")
 

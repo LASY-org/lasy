@@ -33,25 +33,51 @@ class FromArrayProfile(Profile):
         ['x', 'y', 't'] and ['t', 'y', 'x'].
     """
 
-    def __init__(self, wavelength, pol, array, axes, axes_order=["x", "y", "t"]):
+    def __init__(self, wavelength, pol, array, dim, axes, axes_order=["x", "y", "t"]):
         super().__init__(wavelength, pol)
 
+        assert dim in ["xyt", "rt"]
         self.axes = axes
-        assert axes_order in [["x", "y", "t"], ["t", "y", "x"]]
+        self.dim = dim
 
-        if axes_order == ["t", "y", "x"]:
-            self.array = np.swapaxes(array, 0, 2)
-        else:
-            self.array = array
+        if dim == "xyt":
+            assert axes_order in [["x", "y", "t"], ["t", "y", "x"]]
 
-        self.field_interp = RegularGridInterpolator(
-            (axes["x"], axes["y"], axes["t"]),
-            array,
-            bounds_error=False,
-            fill_value=0.0,
-        )
+            if axes_order == ["t", "y", "x"]:
+                self.array = np.swapaxes(array, 0, 2)
+            else:
+                self.array = array
+
+            self.field_interp = RegularGridInterpolator(
+                (axes["x"], axes["y"], axes["t"]),
+                array,
+                bounds_error=False,
+                fill_value=0.0,
+            )
+
+        else:  # dim = "rt"
+            assert axes_order in [["r", "t"], ["t", "r"]]
+
+            if axes_order == ["t", "r"]:
+                self.array = np.swapaxes(array, 0, 2)
+            else:
+                self.array = array
+
+            # The first point is at dr/2.
+            # To avoid problems within the first cell, fill_value in None,
+            # so the value is interpolated. This might cause issues at the upper
+            # boundary.
+            self.field_interp = RegularGridInterpolator(
+                (axes["r"], axes["t"]),
+                array,
+                bounds_error=False,
+                fill_value=None,
+            )
 
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
-        envelope = self.field_interp((x, y, t))
+        if self.dim == "xyt":
+            envelope = self.field_interp((x, y, t))
+        else:
+            envelope = self.field_interp((np.sqrt(x**2 + y**2), t))
         return envelope

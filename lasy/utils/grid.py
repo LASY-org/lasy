@@ -29,7 +29,7 @@ class Grid:
         used in order to represent the laser field.
     """
 
-    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes):
+    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None):
         # Metadata
         ndims = 2 if dim == "rt" else 3
         assert dim in ["rt", "xyt"]

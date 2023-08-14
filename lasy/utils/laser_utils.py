@@ -1,6 +1,8 @@
 import numpy as np
-from scipy.constants import c, epsilon_0
+from scipy.constants import c, epsilon_0, e, m_e
 from scipy.interpolate import interp1d
+from scipy.signal import hilbert
+from skimage.restoration import unwrap_phase
 
 
 def compute_laser_energy(dim, grid):
@@ -205,3 +207,165 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
         )
 
     return env, ext
+
+
+def get_frequency(
+    grid,
+    dim=None,
+    is_envelope=True,
+    omega0=None,
+    is_hilbert=False,
+    phase_unwrap_1d=None,
+    lower_bound=0.2,
+    upper_bound=5.0,
+):
+    """
+    Get the local and average frequency of a signal, either electric field or envelope.
+
+    Parameters
+    ----------
+    grid : a Grid object.
+        It contains a ndarrays with the field data from which the
+        frequency is computed, and the associated metadata. The last axis must
+        be the longitudinal dimension.
+        Can be the full electric field or the envelope.
+
+    dim : string (optional)
+        Dimensionality of the array. Only used if is_envelope is False.
+        Options are:
+
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    is_envelope : bool (optional)
+        Whether the field provided uses the envelope representation, as used
+        internally in lasy. If False, field is assumed to represent the
+        electric field.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+        Required if an only if is_envelope is True.
+
+    is_hilbert : boolean (optional)
+        If True, the field argument is assumed to be a Hilbert transform, and
+        is used through the computation. Otherwise, the Hilbert transform is
+        calculated in the function.
+
+    phase_unwrap_1d : boolean (optional)
+        Whether the phase unwrapping is done in 1D.
+        This is not recommended, as the unwrapping will not be accurate,
+        but it might be the only practical solution when dim is 'xyt'.
+
+    lower_bound : scalar (optional)
+        Relative lower bound for the local frequency
+        Frequencies lower than lower_bound * central_omega are cut
+        to lower_bound * central_omega.
+
+    upper_bound : scalar (optional)
+        Relative upper bound for the local frequency
+        Frequencies larger than upper_bound * central_omega are cut
+        to upper_bound * central_omega.
+
+    Returns
+    -------
+    omega : nd array of doubles
+        local angular frequency.
+
+    central_omega : scalar
+        Central angular frequency (averaged omega, weighted by the local
+        envelope amplitude).
+    """
+    # Assumes t is last dimension!
+    if is_envelope:
+        assert omega0 is not None
+        phase = np.unwrap(np.angle(grid.field))
+        omega = omega0 + np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
+        central_omega = np.average(omega, weights=np.abs(grid.field))
+    else:
+        assert dim in ["xyt", "rt"]
+        if dim == "xyt" and not phase_unwrap_1d:
+            print("WARNING: using 3D phase unwrapping, this can be expensive")
+
+        if not is_hilbert:
+            h = np.squeeze(hilbert(grid.field))
+        else:
+            h = np.squeeze(grid.field)
+        if phase_unwrap_1d:
+            phase = np.unwrap(np.angle(h))
+        else:
+            phase = unwrap_phase(np.angle(h))
+        omega = np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
+
+        if dim == "xyt":
+            weights = np.abs(h)
+        else:
+            r = grid.axes[0].reshape((grid.axes[0].size, 1))
+            weights = r * np.abs(h)
+        central_omega = np.average(omega, weights=weights)
+
+    # Filter out too small frequencies
+    omega = np.maximum(omega, lower_bound * central_omega)
+    # Filter out too large frequencies
+    omega = np.minimum(omega, upper_bound * central_omega)
+
+    return omega, central_omega
+
+
+def field_to_vector_potential(grid, omega0):
+    """
+    Convert envelope from electric field (V/m) to normalized vector potential.
+
+    Parameters
+    ----------
+    grid : a Grid object.
+        Contains the array of the electric field, to be converted to normalized
+        vector potential, with corresponding metadata.
+        The last axis must be the longitudinal dimension.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+
+    Returns
+    -------
+    Normalized vector potential
+    """
+    # Here, we neglect the time derivative of the envelope of E, the first RHS
+    # term in: E = -dA/dt + 1j * omega0 * A where E and A are the field and
+    # vector potential envelopes, respectively
+    omega, _ = get_frequency(grid, is_envelope=True, omega0=omega0)
+    return -1j * e * grid.field / (m_e * omega * c)
+
+
+def vector_potential_to_field(grid, omega0, direct=True):
+    """
+    Convert envelope from electric field (V/m) to normalized vector potential.
+
+    Parameters
+    ----------
+    grid : a Grid object.
+        Contains the array of the normalized vector potential, to be
+        converted to field, with corresponding metadata.
+        The last axis must be the longitudinal dimension.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+
+    direct : boolean (optional)
+        If true, the conversion is done directly with derivative of vector
+        potential. Otherwise, this is done using the local frequency.
+
+    Returns
+    -------
+    Envelope of the electric field (V/m).
+    """
+    if direct:
+        A = (
+            -np.gradient(grid.field, grid.axes[-1], axis=-1, edge_order=2)
+            + 1j * omega0 * grid.field
+        )
+        return m_e * c / e * A
+    else:
+        omega, _ = get_frequency(grid, is_envelope=True, omega0=omega0)
+        return 1j * m_e * omega * c * grid.field / e
