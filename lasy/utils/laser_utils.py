@@ -363,7 +363,7 @@ def vector_potential_to_field(grid, omega0, direct=True):
 
 
 def field_to_envelope(grid, dim, phase_unwrap_1d):
-    """Get the complex envelope of a filed by applying a Hilbert transform.
+    """Get the complex envelope of a field by applying a Hilbert transform.
 
     Parameters
     ----------
