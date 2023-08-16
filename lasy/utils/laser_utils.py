@@ -382,7 +382,7 @@ def field_to_envelope(grid, dim, phase_unwrap_1d):
         A tuple with the envelope array and the central wavelength.
     """
     # hilbert transform needs inverted time axis.
-    grid.field = hilbert(grid.field[:,:,::-1])[:,:,::-1]
+    grid.field = hilbert(grid.field[:, :, ::-1])[:, :, ::-1]
 
     # Get central wavelength from array
     omg_h, omg0_h = get_frequency(

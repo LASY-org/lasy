@@ -85,7 +85,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             if phase_unwrap_1d is None:
                 phase_unwrap_1d = False
             axes_order = ["r", "t"]
-        
+
         F, axes = reorder_array(F, m, dim)
 
         # If array does not contain the envelope but the electric field,

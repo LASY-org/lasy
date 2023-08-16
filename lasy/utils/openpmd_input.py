@@ -23,7 +23,7 @@ def reorder_array(array, md, dim):
     axes : dict
         A dictionary with the lasy axes information for the array.
     """
-    if dim == 'xyt':
+    if dim == "xyt":
         return reorder_array_xyt(array, md)
     else:
         return reorder_array_rt(array, md)
@@ -103,8 +103,8 @@ def reorder_array_rt(array, md):
     axes = {"r": r, "t": t}
 
     array = 0.5 * (
-        array[array.shape[0] // 2 :, :] +
-        np.flip(array[: array.shape[0] // 2, :], axis=0)
+        array[array.shape[0] // 2 :, :]
+        + np.flip(array[: array.shape[0] // 2, :], axis=0)
     )
     return array, axes
 
@@ -127,7 +127,7 @@ def create_grid(array, axes, dim):
         A lasy grid containing the input array.
     """
     # Create grid.
-    if dim == 'xyt':
+    if dim == "xyt":
         lo = (axes["x"][0], axes["y"][0], axes["t"][0])
         hi = (axes["x"][-1], axes["y"][-1], axes["t"][-1])
         npoints = (axes["x"].size, axes["y"].size, axes["t"].size)
@@ -137,7 +137,7 @@ def create_grid(array, axes, dim):
         assert np.all(grid.axes[2] == axes["t"])
         assert grid.field.shape == array.shape
         grid.field = array
-    elif dim == 'rt':
+    elif dim == "rt":
         lo = (axes["r"][0], axes["t"][0])
         hi = (axes["r"][-1], axes["t"][-1])
         npoints = (axes["r"].size, axes["t"].size)
