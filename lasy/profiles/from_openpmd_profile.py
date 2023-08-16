@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.signal import hilbert
 from scipy.constants import c
 import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
