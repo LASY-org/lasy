@@ -36,11 +36,6 @@ class FromOpenPMDProfile(FromArrayProfile):
         Name of the field containing the laser pulse
         Passed directly OpenPMDTimeSeries.
 
-    envelope : boolean
-        Whether the file represents a laser envelope.
-        If not, the envelope is obtained from the electric field
-        using a Hilbert transform
-
     prefix : string
         Prefix of the openPMD file from which the envelope is read.
         Only used when envelope=True.
@@ -71,7 +66,6 @@ class FromOpenPMDProfile(FromArrayProfile):
         pol,
         field,
         coord=None,
-        envelope=False,
         prefix=None,
         theta=None,
         phase_unwrap_1d=None,
@@ -96,7 +90,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
         # If array does not contain the envelope but the electric field,
         # extract the envelope with a Hilbert transform
-        if not envelope:
+        if not np.iscomplexobj(F):
             grid = create_grid(F, axes, dim)
             grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_1d)
             array = grid.field[0]
