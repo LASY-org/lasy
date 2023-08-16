@@ -4,8 +4,8 @@ from scipy.constants import c
 import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
 from .from_array_profile import FromArrayProfile
-from lasy.utils.laser_utils import get_frequency
-from lasy.utils.grid import Grid
+from lasy.utils.laser_utils import field_to_envelope
+from lasy.utils.openpmd_input import reorder_array, create_grid
 
 
 class FromOpenPMDProfile(FromArrayProfile):
@@ -81,128 +81,32 @@ class FromOpenPMDProfile(FromArrayProfile):
         F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=theta)
 
         if theta is None:  # Envelope obtained from the full 3D array
-            assert m.axes in [
-                {0: "x", 1: "y", 2: "z"},
-                {0: "z", 1: "y", 2: "x"},
-                {0: "x", 1: "y", 2: "t"},
-                {0: "t", 1: "y", 2: "x"},
-            ]
-
             dim = "xyt"
-
-            if m.axes in [{0: "z", 1: "y", 2: "x"}, {0: "t", 1: "y", 2: "x"}]:
-                F = F.swapaxes(0, 2)
-
-            if "z" in m.axes.values():
-                t = (m.z - m.z[0]) / c
-            else:
-                t = m.t
-            axes = {"x": m.x, "y": m.y, "t": t}
-
             if phase_unwrap_1d is None:
                 phase_unwrap_1d = True
-
-            # If array does not contain the envelope but the electric field,
-            # extract the envelope with a Hilbert transform
-            if not envelope:
-                # Assumes z is last dimension!
-                h = hilbert(F)
-
-                if "z" in m.axes.values():
-                    # Flip to get complex envelope in t assuming z = -c*t
-                    h = np.flip(h, axis=-1)
-
-                # Get central wavelength from array
-                lo = (axes["x"][0], axes["y"][0], axes["t"][0])
-                hi = (axes["x"][-1], axes["y"][-1], axes["t"][-1])
-                npoints = (axes["x"].size, axes["y"].size, axes["t"].size)
-                grid = Grid(dim, lo, hi, npoints)
-                assert np.all(grid.axes[0] == axes["x"])
-                assert np.all(grid.axes[1] == axes["y"])
-                assert np.all(grid.axes[2] == axes["t"])
-                assert grid.field.shape == h.shape
-                grid.field = h
-                omg_h, omg0_h = get_frequency(
-                    grid,
-                    dim,
-                    is_envelope=False,
-                    is_hilbert=True,
-                    phase_unwrap_1d=phase_unwrap_1d,
-                )
-                wavelength = 2 * np.pi * c / omg0_h
-                array = h * np.exp(1j * omg0_h * t)
-            else:
-                s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
-                it = s.iterations[iteration]
-                omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
-                wavelength = 2 * np.pi * c / omg0
-                array = F
-
             axes_order = ["x", "y", "t"]
 
         else:  # Envelope assumes axial symmetry processing RZ data
-            assert m.axes in [
-                {0: "r", 1: "z"},
-                {0: "z", 1: "r"},
-                {0: "r", 1: "t"},
-                {0: "t", 1: "r"},
-            ]
-
             dim = "rt"
-
-            if m.axes in [{0: "z", 1: "r"}, {0: "t", 1: "r"}]:
-                F = F.swapaxes(0, 1)
-
-            if "z" in m.axes.values():
-                t = (m.z - m.z[0]) / c
-            else:
-                t = m.t
-            r = m.r[m.r.size // 2 :]
-            axes = {"r": r, "t": t}
-
-            F = 0.5 * (
-                F[F.shape[0] // 2 :, :] + np.flip(F[: F.shape[0] // 2, :], axis=0)
-            )
-
             if phase_unwrap_1d is None:
                 phase_unwrap_1d = False
-            # If array does not contain the envelope but the electric field,
-            # extract the envelope with a Hilbert transform
-            if not envelope:
-                # Assumes z is last dimension!
-                h = hilbert(F)
-
-                if "z" in m.axes.values():
-                    # Flip to get complex envelope in t assuming z = -c*t
-                    h = np.flip(h, axis=-1)
-
-                # Get central wavelength from array
-                lo = (axes["r"][0], axes["t"][0])
-                hi = (axes["r"][-1], axes["t"][-1])
-                npoints = (axes["r"].size, axes["t"].size)
-                grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1)
-                assert np.all(grid.axes[0] == axes["r"])
-                assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
-                assert grid.field.shape == h[np.newaxis].shape
-                grid.field = h[np.newaxis]
-                omg_h, omg0_h = get_frequency(
-                    grid,
-                    dim=dim,
-                    is_envelope=False,
-                    is_hilbert=True,
-                    phase_unwrap_1d=phase_unwrap_1d,
-                )
-                wavelength = 2 * np.pi * c / omg0_h
-                array = h * np.exp(1j * omg0_h * t)
-            else:
-                s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
-                it = s.iterations[iteration]
-                omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
-                wavelength = 2 * np.pi * c / omg0
-                array = F
-
             axes_order = ["r", "t"]
+        
+        F, axes = reorder_array(F, m, dim)
 
+        # If array does not contain the envelope but the electric field,
+        # extract the envelope with a Hilbert transform
+        if not envelope:
+            grid = create_grid(F, axes, dim)
+            grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_1d)
+            array = grid.field[0]
+        else:
+            s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
+            it = s.iterations[iteration]
+            omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
+            array = F
+
+        wavelength = 2 * np.pi * c / omg0
         if verbose:
             print(
                 "Wavelength used in the definition of the envelope (nm):",
