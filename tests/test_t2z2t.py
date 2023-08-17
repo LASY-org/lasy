@@ -50,7 +50,8 @@ def get_laser_z_analytic(profile, z_axis, r_axis):
 
 def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
     laser_z = export_to_z(laser_t_in.dim, laser_t_in.grid, laser_t_in.profile.omega0)
-    import_from_z(laser_z.dim, las_z.grid, laser_z.profile.omega0, z_axis)
+    import_from_z(laser_t_out.dim, laser_t_out.grid, laser_t_out.profile.omega0,
+                  laser_z, z_axis)
 
     ind0 = laser_t_in.grid.field.shape[0] // 2 - 1
 
