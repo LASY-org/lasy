@@ -3,9 +3,11 @@ from scipy.constants import c, epsilon_0, e, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
 from skimage.restoration import unwrap_phase
+
 try:
     from axiprop.lib import PropagatorFFT2, PropagatorResampling
     from axiprop.containers import ScalarFieldEnvelope
+
     axiprop_installed = True
 except ImportError:
     axiprop_installed = False
