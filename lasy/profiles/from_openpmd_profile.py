@@ -4,7 +4,7 @@ import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
 from .from_array_profile import FromArrayProfile
 from lasy.utils.laser_utils import field_to_envelope, create_grid
-from lasy.utils.openpmd_input import reorder_array
+from lasy.utils.openpmd_input import refactor_array
 
 
 class FromOpenPMDProfile(FromArrayProfile):
@@ -97,7 +97,7 @@ class FromOpenPMDProfile(FromArrayProfile):
                 phase_unwrap_1d = False
             axes_order = ["r", "t"]
 
-        F, axes = reorder_array(F, m, dim)
+        F, axes = refactor_array(F, m, dim)
 
         # If array does not contain the envelope but the electric field,
         # extract the envelope with a Hilbert transform
