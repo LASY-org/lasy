@@ -1,8 +1,6 @@
 import numpy as np
 import scipy.constants as ct
 
-from .grid import Grid
-
 
 def reorder_array(array, md, dim):
     """Reorder an openPMD array to the lasy representation.
@@ -107,43 +105,3 @@ def reorder_array_rt(array, md):
         + np.flip(array[: array.shape[0] // 2, :], axis=0)
     )
     return array, axes
-
-
-def create_grid(array, axes, dim):
-    """Create a lasy grid from a numpy array.
-
-    Parameters
-    ----------
-    array : ndarray
-        The input field array.
-    axes : dict
-        Dictionary with the information of the array axes.
-    dim : {'xyt, 'rt'}
-        The dimensionality of the array.
-
-    Returns
-    -------
-    grid : Grid
-        A lasy grid containing the input array.
-    """
-    # Create grid.
-    if dim == "xyt":
-        lo = (axes["x"][0], axes["y"][0], axes["t"][0])
-        hi = (axes["x"][-1], axes["y"][-1], axes["t"][-1])
-        npoints = (axes["x"].size, axes["y"].size, axes["t"].size)
-        grid = Grid(dim, lo, hi, npoints)
-        assert np.all(grid.axes[0] == axes["x"])
-        assert np.all(grid.axes[1] == axes["y"])
-        assert np.all(grid.axes[2] == axes["t"])
-        assert grid.field.shape == array.shape
-        grid.field = array
-    else:  # dim == "rt":
-        lo = (axes["r"][0], axes["t"][0])
-        hi = (axes["r"][-1], axes["t"][-1])
-        npoints = (axes["r"].size, axes["t"].size)
-        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1)
-        assert np.all(grid.axes[0] == axes["r"])
-        assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
-        assert grid.field.shape == array[np.newaxis].shape
-        grid.field = array[np.newaxis]
-    return grid

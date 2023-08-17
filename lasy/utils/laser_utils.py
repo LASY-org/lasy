@@ -4,6 +4,8 @@ from scipy.interpolate import interp1d
 from scipy.signal import hilbert
 from skimage.restoration import unwrap_phase
 
+from .grid import Grid
+
 
 def compute_laser_energy(dim, grid):
     """
@@ -417,3 +419,43 @@ def hilbert_transform(grid):
         The lasy grid whose field should be transformed.
     """
     return hilbert(grid.field[:, :, ::-1])[:, :, ::-1]
+
+
+def create_grid(array, axes, dim):
+    """Create a lasy grid from a numpy array.
+
+    Parameters
+    ----------
+    array : ndarray
+        The input field array.
+    axes : dict
+        Dictionary with the information of the array axes.
+    dim : {'xyt, 'rt'}
+        The dimensionality of the array.
+
+    Returns
+    -------
+    grid : Grid
+        A lasy grid containing the input array.
+    """
+    # Create grid.
+    if dim == "xyt":
+        lo = (axes["x"][0], axes["y"][0], axes["t"][0])
+        hi = (axes["x"][-1], axes["y"][-1], axes["t"][-1])
+        npoints = (axes["x"].size, axes["y"].size, axes["t"].size)
+        grid = Grid(dim, lo, hi, npoints)
+        assert np.all(grid.axes[0] == axes["x"])
+        assert np.all(grid.axes[1] == axes["y"])
+        assert np.all(grid.axes[2] == axes["t"])
+        assert grid.field.shape == array.shape
+        grid.field = array
+    else:  # dim == "rt":
+        lo = (axes["r"][0], axes["t"][0])
+        hi = (axes["r"][-1], axes["t"][-1])
+        npoints = (axes["r"].size, axes["t"].size)
+        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1)
+        assert np.all(grid.axes[0] == axes["r"])
+        assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
+        assert grid.field.shape == array[np.newaxis].shape
+        grid.field = array[np.newaxis]
+    return grid
