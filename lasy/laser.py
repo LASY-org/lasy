@@ -2,7 +2,6 @@ import numpy as np
 from scipy.constants import c
 
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
-from axiprop.containers import ScalarFieldEnvelope
 
 from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (

@@ -3,6 +3,12 @@ from scipy.constants import c, epsilon_0, e, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
 from skimage.restoration import unwrap_phase
+try:
+    from axiprop.lib import PropagatorFFT2, PropagatorResampling
+    from axiprop.containers import ScalarFieldEnvelope
+    axiprop_installed = True
+except ImportError:
+    axiprop_installed = False
 
 from .grid import Grid
 
@@ -495,6 +501,10 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
     backend : string (optional)
         Backend used by axiprop (see axiprop documentation).
     """
+    assert axiprop_installed, (
+        "Laser propagation requires `axiprop` to be installed."
+        "You can install it with `pip install axiprop`."
+    )
     time_axis_indx = -1
 
     t_axis = grid.axes[time_axis_indx]
@@ -582,7 +592,10 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
     backend : string (optional)
         Backend used by axiprop (see axiprop documentation).
     """
-
+    assert axiprop_installed, (
+        "Laser propagation requires `axiprop` to be installed."
+        "You can install it with `pip install axiprop`."
+    )
     z_axis_indx = -1
     t_axis = grid.axes[z_axis_indx]
     dz = z_axis[1] - z_axis[0]
