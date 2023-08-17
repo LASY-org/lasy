@@ -26,7 +26,7 @@ def compute_laser_energy(dim, grid):
     grid : a Grid object.
         It contains a ndarrays (V/m) with
         the value of the envelope field and the associated metadata
-        that defines the points at which evaluate the laser
+        that defines the points at which the laser is defined.
 
     Returns
     -------
@@ -75,10 +75,10 @@ def normalize_energy(dim, energy, grid):
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     energy : scalar (J)
-        Energy of the laser pulse after normalization
+        Energy of the laser pulse after normalization.
 
     grid: a Grid object
-        Contains value of the laser envelope and metadata
+        Contains value of the laser envelope and metadata.
     """
     if energy is None:
         return
@@ -95,10 +95,10 @@ def normalize_peak_field_amplitude(amplitude, grid):
     Parameters
     ----------
     amplitude : scalar (V/m)
-        Peak field amplitude of the laser pulse after normalization
+        Peak field amplitude of the laser pulse after normalization.
 
     grid : a Grid object
-        Contains value of the laser envelope and metadata
+        Contains value of the laser envelope and metadata.
     """
     if amplitude is None:
         return
@@ -112,10 +112,10 @@ def normalize_peak_intensity(peak_intensity, grid):
     Parameters
     ----------
     peak_intensity : scalar (W/m^2)
-        Peak field amplitude of the laser pulse after normalization
+        Peak field amplitude of the laser pulse after normalization.
 
     grid : a Grid object
-        Contains value of the laser envelope and metadata
+        Contains value of the laser envelope and metadata.
     """
     if peak_intensity is None:
         return
@@ -134,7 +134,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     theta : float (rad) (optional)
         Azimuthal angle
     slice : float (optional)
-        Normalised position of the slice from -0.5 to 0.5
+        Normalised position of the slice from -0.5 to 0.5.
     Nt: int (optional)
         Number of time points on which field should be sampled. If is None,
         the orignal time grid is used, otherwise field is interpolated on a
@@ -144,9 +144,9 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     -------
         Et : ndarray (V/m)
             The reconstructed field, with shape (Nr, Nt) (for `rt`)
-            or (Nx, Nt) (for `xyt`)
+            or (Nx, Nt) (for `xyt`).
         extent : ndarray (Tmin, Tmax, Xmin, Xmax)
-            Physical extent of the reconstructed field
+            Physical extent of the reconstructed field.
     """
     omega0 = laser.profile.omega0
     env = laser.grid.field.copy()
@@ -459,3 +459,182 @@ def create_grid(array, axes, dim):
         assert grid.field.shape == array[np.newaxis].shape
         grid.field = array[np.newaxis]
     return grid
+
+def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
+    """
+    Export laser pulse to spatial domain from temporal domain (internal LASY representation).
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains a ndarrays (V/m) with
+        the value of the envelope field and the associated metadata
+        that defines the points at which the laser is defined.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+
+    z_axis : 1D ndarray of doubles (optional)
+        Spatial `z` axis along which the field should be reconstructed.
+        If not provided, `z_axis = c * t_axis` is considered.
+
+    z0 : scalar (optional)
+        Position from which the field is produced (emitted).
+
+    t0 : scalar (optional)
+        Moment of time at which the field is produced.
+
+    backend : string (optional)
+        Backend used by axiprop (see axiprop documentation).
+    """
+    time_axis_indx = -1
+
+    t_axis = grid.axes[time_axis_indx]
+    if z_axis is None:
+        z_axis = t_axis * c
+
+    FieldAxprp = ScalarFieldEnvelope(omega0 / c, t_axis)
+
+    if dim == "rt":
+        # Construct the propagator
+        prop = []
+        for m in grid.azimuthal_modes:
+            prop.append(
+                PropagatorResampling(
+                    grid.axes[0],
+                    FieldAxprp.k_freq,
+                    mode=m,
+                    backend=backend,
+                    verbose=False,
+                )
+            )
+
+        field_z = np.zeros(
+            (grid.field.shape[0], grid.field.shape[1], z_axis.size),
+            dtype=grid.field.dtype,
+        )
+
+        # Convert the spectral image to the spatial field representation
+        for i_m in range(grid.azimuthal_modes.size):
+            FieldAxprp.import_field(np.transpose(grid.field[i_m]).copy())
+
+            field_z[i_m] = (
+                prop[i_m].t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
+            )
+
+            field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
+    else:
+        # Construct the propagator
+        Nx, Ny, Nt = grid.field.shape
+        Lx = grid.hi[0] - grid.lo[0]
+        Ly = grid.hi[1] - grid.lo[1]
+        prop = PropagatorFFT2(
+            (Lx, Nx),
+            (Ly, Ny),
+            FieldAxprp.k_freq,
+            backend=backend,
+            verbose=False,
+        )
+        # Convert the spectral image to the spatial field representation
+        FieldAxprp.import_field(np.transpose(grid.field).copy())
+        field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
+        field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
+
+    return field_z
+
+def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="NP"):
+    """
+    Import laser pulse from spatial domain to temporal domain (internal LASY representation).
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains a ndarrays (V/m) with
+        the value of the envelope field and the associated metadata
+        that defines the points at which the laser is defined.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+
+    z_axis : 1D ndarray of doubles
+        Spatial `z` axis along which the field should be reconstructed.
+
+    z0 : scalar (optional)
+        Position at which the field should be recorded
+
+    t0 : scalar (optional)
+        Moment of time at which the field should be recorded
+
+    backend : string (optional)
+        Backend used by axiprop (see axiprop documentation).
+    """
+
+    
+    
+    z_axis_indx = -1
+    t_axis = grid.axes[z_axis_indx]
+    dz = z_axis[1] - z_axis[0]
+    Nz = z_axis.size
+
+    # Transform the field from spatial to wavenumber domain
+    field_fft = np.fft.fft(field_z, axis=z_axis_indx, norm="forward")
+
+    # Create the axes for wavenumbers, and for corresponding frequency
+    omega = 2 * np.pi * np.fft.fftfreq(Nz, dz / c) + omega0
+    k_z = omega / c
+
+    if dim == "rt":
+        # Construct the propagator
+        prop = []
+        for m in grid.azimuthal_modes:
+            prop.append(
+                PropagatorResampling(
+                    grid.axes[0],
+                    omega / c,
+                    mode=m,
+                    backend=backend,
+                    verbose=False,
+                )
+            )
+
+        # Convert the spectral image to the spatial field representation
+        for i_m in range(grid.azimuthal_modes.size):
+            transform_data = np.transpose(field_fft[i_m]).copy()
+            transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None] - omega0 / c))
+            grid.field[i_m] = (
+                prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
+            )
+            grid.field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
+    else:
+        # Construct the propagator
+        Nx, Ny, Nt = grid.field.shape
+        Lx = grid.hi[0] - grid.lo[0]
+        Ly = grid.hi[1] - grid.lo[1]
+        prop = PropagatorFFT2(
+            (Lx, Nx),
+            (Ly, Ny),
+            omega / c,
+            backend=backend,
+            verbose=False,
+        )
+        # Convert the spectral image to the spatial field representation
+        transform_data = np.transpose(field_fft).copy()
+        transform_data *= np.exp(
+            -1j * z_axis[0] * (k_z[:, None, None] - omega0 / c)
+        )
+        grid.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
+        grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
