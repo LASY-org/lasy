@@ -211,6 +211,103 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     return env, ext
 
 
+def get_spectrum(
+    grid,
+    dim,
+    bins=20,
+    range=None,
+    is_envelope=True,
+    is_hilbert=False,
+    omega0=None,
+    phase_unwrap_1d=None
+):
+    """
+    Get the the frequency spectrum of an electric field or envelope.
+
+    Parameters
+    ----------
+    grid : a Grid object.
+        It contains a ndarrays with the field data from which the
+        spectrum is computed, and the associated metadata. The last axis must
+        be the longitudinal dimension.
+        Can be the full electric field or the envelope.
+
+    dim : string (optional)
+        Dimensionality of the array. Only used if is_envelope is False.
+        Options are:
+
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    bins : int (optional)
+        Number of bins of the spectrum.
+
+    range : list of float (optional)
+        List of two values indicating the minimum and maximum frequency of the
+        spectrum.
+
+    is_envelope : bool (optional)
+        Whether the field provided uses the envelope representation, as used
+        internally in lasy. If False, field is assumed to represent the
+        the electric field.
+
+    is_hilbert : boolean (optional)
+        If True, the field argument is assumed to be a Hilbert transform, and
+        is used through the computation. Otherwise, the Hilbert transform is
+        calculated in the function.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+        Required if an only if is_envelope is True.
+
+    phase_unwrap_1d : boolean (optional)
+        Whether the phase unwrapping is done in 1D.
+        This is not recommended, as the unwrapping will not be accurate,
+        but it might be the only practical solution when dim is 'xyt'.
+
+    Returns
+    -------
+    spectrum : ndarray of doubles
+        Array with the spectrum amplitudes.
+
+    omega_spectrum : scalar
+        Array with the frequencies of the spectrum.
+    """
+    # Get frequency array.
+    omega, central_omega = get_frequency(
+        grid=grid,
+        dim=dim,
+        is_envelope=is_envelope,
+        is_hilbert=is_hilbert,
+        omega0=omega0,
+        phase_unwrap_1d=phase_unwrap_1d
+    )
+    # Calculate weights of each frequency (amplitude of the field).
+    if dim == "xyt":
+        dV = grid.dx[0] * grid.dx[1] * dz
+        weights = np.abs(grid.field) * dV
+    elif dim == "rt":
+        r = grid.axes[0]
+        dr = grid.dx[0]
+        dz = grid.dx[-1] * c
+        # 1D array that computes the volume of radial cells
+        dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
+        weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
+    # Get weighted spectrum.
+    # Neglects the 2 first and last time slices, whose values seems to be
+    # slightly off (maybe due to lower order derivative at the edges).
+    spectrum, edges = np.histogram(
+        a=np.squeeze(omega)[..., 2:-2],
+        weights=np.squeeze(weights[..., 2:-2]),
+        bins=bins,
+        range=range
+    )
+    omega_spectrum = edges[1:] - (edges[1] - edges[0]) / 2
+    return spectrum, omega_spectrum
+
+
 def get_frequency(
     grid,
     dim=None,
