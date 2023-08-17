@@ -35,6 +35,13 @@ class FromOpenPMDProfile(FromArrayProfile):
         Name of the field containing the laser pulse
         Passed directly OpenPMDTimeSeries.
 
+    is_envelope : boolean
+        Whether the field to read represents a laser envelope.
+        If not, the envelope is obtained from the electric field
+        using a Hilbert transform. If not specified, lasy will try to guess
+        whether the field is an envelope by checking whether it is a complex
+        array.
+
     prefix : string
         Prefix of the openPMD file from which the envelope is read.
         Only used when envelope=True.
@@ -65,6 +72,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         pol,
         field,
         coord=None,
+        is_envelope=None,
         prefix=None,
         theta=None,
         phase_unwrap_1d=None,
@@ -72,6 +80,10 @@ class FromOpenPMDProfile(FromArrayProfile):
     ):
         ts = OpenPMDTimeSeries(path)
         F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=theta)
+
+        # If `is_envelope` is not given, assume that complex arrays are envelopes.
+        if is_envelope is None:
+            is_envelope = np.iscomplexobj(F)
 
         if theta is None:  # Envelope obtained from the full 3D array
             dim = "xyt"
@@ -89,7 +101,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
         # If array does not contain the envelope but the electric field,
         # extract the envelope with a Hilbert transform
-        if not np.iscomplexobj(F):
+        if not is_envelope:
             grid = create_grid(F, axes, dim)
             grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_1d)
             array = grid.field[0]
