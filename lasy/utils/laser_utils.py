@@ -40,16 +40,11 @@ def compute_laser_energy(dim, grid):
 
     envelope = grid.field
 
-    dz = grid.dx[-1] * c
+    dV = get_grid_cell_volume(grid, dim)
 
     if dim == "xyt":
-        dV = grid.dx[0] * grid.dx[1] * dz
         energy = ((dV * epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
     elif dim == "rt":
-        r = grid.axes[0]
-        dr = grid.dx[0]
-        # 1D array that computes the volume of radial cells
-        dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
         energy = (
             dV[np.newaxis, :, np.newaxis]
             * epsilon_0
@@ -216,13 +211,11 @@ def get_spectrum(
     dim,
     bins=20,
     range=None,
-    is_envelope=True,
-    is_hilbert=False,
     omega0=None,
     phase_unwrap_1d=None
 ):
     """
-    Get the the frequency spectrum of an electric field or envelope.
+    Get the the frequency spectrum of an envelope.
 
     Parameters
     ----------
@@ -248,16 +241,6 @@ def get_spectrum(
         List of two values indicating the minimum and maximum frequency of the
         spectrum.
 
-    is_envelope : bool (optional)
-        Whether the field provided uses the envelope representation, as used
-        internally in lasy. If False, field is assumed to represent the
-        the electric field.
-
-    is_hilbert : boolean (optional)
-        If True, the field argument is assumed to be a Hilbert transform, and
-        is used through the computation. Otherwise, the Hilbert transform is
-        calculated in the function.
-
     omega0 : scalar
         Angular frequency at which the envelope is defined.
         Required if an only if is_envelope is True.
@@ -279,21 +262,15 @@ def get_spectrum(
     omega, central_omega = get_frequency(
         grid=grid,
         dim=dim,
-        is_envelope=is_envelope,
-        is_hilbert=is_hilbert,
+        is_envelope=True,
         omega0=omega0,
         phase_unwrap_1d=phase_unwrap_1d
     )
     # Calculate weights of each frequency (amplitude of the field).
+    dV = get_grid_cell_volume(grid, dim)
     if dim == "xyt":
-        dV = grid.dx[0] * grid.dx[1] * dz
         weights = np.abs(grid.field) * dV
     elif dim == "rt":
-        r = grid.axes[0]
-        dr = grid.dx[0]
-        dz = grid.dx[-1] * c
-        # 1D array that computes the volume of radial cells
-        dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
         weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
     # Get weighted spectrum.
     # Neglects the 2 first and last time slices, whose values seems to be
@@ -410,6 +387,32 @@ def get_frequency(
     return omega, central_omega
 
 
+def get_duration(grid, dim):
+    """Get envelope duration, measured as RMS.
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the envelope to analyze.
+    dim : str
+        Dimensionality of the grid.
+
+    Returns
+    -------
+    float
+        RMS duration of the envelope in seconds.
+    """
+    # Calculate weights of each frequency (amplitude of the field).
+    dV = get_grid_cell_volume(grid, dim)
+    if dim == "xyt":
+        weights = np.abs(grid.field) * dV
+    elif dim == "rt":
+        weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
+    # project weights to longitudinal axes
+    weights = np.sum(weights, axis=(0, 1))
+    return weighted_std(grid.axes[-1], weights)
+
+
 def field_to_vector_potential(grid, omega0):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
@@ -516,6 +519,53 @@ def hilbert_transform(grid):
         The lasy grid whose field should be transformed.
     """
     return hilbert(grid.field[:, :, ::-1])[:, :, ::-1]
+
+
+def get_grid_cell_volume(grid, dim):
+    """Get the volume of the grid cells.
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid form which to compute the cell volume
+    dim : str
+        Dimensionality of the grid.
+
+    Returns
+    -------
+    float or ndarray
+        A float with the cell volume (if dim=='xyt') or a numpy array with the
+        radial distribution of cell volumes (if dim=='rt').
+    """
+    if dim == "xyt":
+        dV = grid.dx[0] * grid.dx[1] * dz
+    elif dim == "rt":
+        r = grid.axes[0]
+        dr = grid.dx[0]
+        dz = grid.dx[-1] * c
+        # 1D array that computes the volume of radial cells
+        dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
+    return dV
+
+
+def weighted_std(values, weights=None):
+    """Calculates the weighted standard deviation of the given values
+
+    Parameters
+    ----------
+    values: array
+        Contains the values to be analyzed
+
+    weights : array
+        Contains the weights of the values to analyze
+
+    Returns
+    -------
+    A float with the value of the standard deviation
+    """
+    mean_val = np.average(values, weights=weights)
+    std = np.sqrt(np.average((values-mean_val)**2, weights=weights))
+    return std
 
 
 def create_grid(array, axes, dim):
