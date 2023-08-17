@@ -460,6 +460,7 @@ def create_grid(array, axes, dim):
         grid.field = array[np.newaxis]
     return grid
 
+
 def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
     """
     Export laser pulse to spatial domain from temporal domain (internal LASY representation).
@@ -525,9 +526,7 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
         for i_m in range(grid.azimuthal_modes.size):
             FieldAxprp.import_field(np.transpose(grid.field[i_m]).copy())
 
-            field_z[i_m] = (
-                prop[i_m].t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
-            )
+            field_z[i_m] = prop[i_m].t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
 
             field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
     else:
@@ -548,6 +547,7 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
         field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
 
     return field_z
+
 
 def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="NP"):
     """
@@ -583,8 +583,6 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         Backend used by axiprop (see axiprop documentation).
     """
 
-    
-    
     z_axis_indx = -1
     t_axis = grid.axes[z_axis_indx]
     dz = z_axis[1] - z_axis[0]
@@ -615,9 +613,7 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         for i_m in range(grid.azimuthal_modes.size):
             transform_data = np.transpose(field_fft[i_m]).copy()
             transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None] - omega0 / c))
-            grid.field[i_m] = (
-                prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
-            )
+            grid.field[i_m] = prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
             grid.field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
     else:
         # Construct the propagator
@@ -633,8 +629,6 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         )
         # Convert the spectral image to the spatial field representation
         transform_data = np.transpose(field_fft).copy()
-        transform_data *= np.exp(
-            -1j * z_axis[0] * (k_z[:, None, None] - omega0 / c)
-        )
+        transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
         grid.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
         grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
