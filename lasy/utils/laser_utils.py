@@ -213,6 +213,7 @@ def get_frequency(
     grid,
     dim=None,
     is_envelope=True,
+    is_hilbert=False,
     omega0=None,
     phase_unwrap_1d=None,
     lower_bound=0.2,
@@ -241,7 +242,12 @@ def get_frequency(
     is_envelope : bool (optional)
         Whether the field provided uses the envelope representation, as used
         internally in lasy. If False, field is assumed to represent the
-        Hilbert transform of the electric field.
+        the electric field.
+
+    is_hilbert : boolean (optional)
+        If True, the field argument is assumed to be a Hilbert transform, and
+        is used through the computation. Otherwise, the Hilbert transform is
+        calculated in the function.
 
     omega0 : scalar
         Angular frequency at which the envelope is defined.
@@ -282,6 +288,7 @@ def get_frequency(
         if dim == "xyt" and not phase_unwrap_1d:
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
+        h = grid.field if is_hilbert else hilbert_transform(grid)
         h = np.squeeze(grid.field)
         if phase_unwrap_1d:
             phase = np.unwrap(np.angle(h))
@@ -382,15 +389,31 @@ def field_to_envelope(grid, dim, phase_unwrap_1d):
         A tuple with the envelope array and the central wavelength.
     """
     # hilbert transform needs inverted time axis.
-    grid.field = hilbert(grid.field[:, :, ::-1])[:, :, ::-1]
+    grid.field = hilbert_transform(grid)
 
     # Get central wavelength from array
     omg_h, omg0_h = get_frequency(
         grid,
         dim=dim,
         is_envelope=False,
+        is_hilbert=True,
         phase_unwrap_1d=phase_unwrap_1d,
     )
     grid.field *= np.exp(1j * omg0_h * grid.axes[-1])
 
     return grid, omg0_h
+
+
+def hilbert_transform(grid):
+    """Make a hilbert transform of the grid field.
+
+    Currently the arrays need to be flipped along t (both the input field and
+    its transform) to get the imaginary part (and thus the phase) with the
+    correct sign.
+
+    Parameters
+    ----------
+    grid : Grid
+        The lasy grid whose field should be transformed.
+    """
+    return hilbert(grid.field[:, :, ::-1])[:, :, ::-1]
