@@ -4,6 +4,8 @@ from scipy.interpolate import interp1d
 from scipy.signal import hilbert
 from skimage.restoration import unwrap_phase
 
+from .grid import Grid
+
 
 def compute_laser_energy(dim, grid):
     """
@@ -213,8 +215,8 @@ def get_frequency(
     grid,
     dim=None,
     is_envelope=True,
-    omega0=None,
     is_hilbert=False,
+    omega0=None,
     phase_unwrap_1d=None,
     lower_bound=0.2,
     upper_bound=5.0,
@@ -242,16 +244,16 @@ def get_frequency(
     is_envelope : bool (optional)
         Whether the field provided uses the envelope representation, as used
         internally in lasy. If False, field is assumed to represent the
-        electric field.
-
-    omega0 : scalar
-        Angular frequency at which the envelope is defined.
-        Required if an only if is_envelope is True.
+        the electric field.
 
     is_hilbert : boolean (optional)
         If True, the field argument is assumed to be a Hilbert transform, and
         is used through the computation. Otherwise, the Hilbert transform is
         calculated in the function.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+        Required if an only if is_envelope is True.
 
     phase_unwrap_1d : boolean (optional)
         Whether the phase unwrapping is done in 1D.
@@ -288,10 +290,8 @@ def get_frequency(
         if dim == "xyt" and not phase_unwrap_1d:
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
-        if not is_hilbert:
-            h = np.squeeze(hilbert(grid.field))
-        else:
-            h = np.squeeze(grid.field)
+        h = grid.field if is_hilbert else hilbert_transform(grid)
+        h = np.squeeze(grid.field)
         if phase_unwrap_1d:
             phase = np.unwrap(np.angle(h))
         else:
@@ -369,3 +369,93 @@ def vector_potential_to_field(grid, omega0, direct=True):
     else:
         omega, _ = get_frequency(grid, is_envelope=True, omega0=omega0)
         return 1j * m_e * omega * c * grid.field / e
+
+
+def field_to_envelope(grid, dim, phase_unwrap_1d):
+    """Get the complex envelope of a field by applying a Hilbert transform.
+
+    Parameters
+    ----------
+    grid : Grid
+        The field from which to extract the envelope.
+    dim : str
+        Dimensions of the field. Possible values are `'xyt'` or `'rt'`.
+    phase_unwrap_1d : bool
+        Whether the phase unwrapping is done in 1D. This is not recommended,
+        as the unwrapping will not be accurate, but it might be the only
+        practical solution when dim is 'xyt'.
+
+    Returns
+    -------
+    tuple
+        A tuple with the envelope array and the central wavelength.
+    """
+    # hilbert transform needs inverted time axis.
+    grid.field = hilbert_transform(grid)
+
+    # Get central wavelength from array
+    omg_h, omg0_h = get_frequency(
+        grid,
+        dim=dim,
+        is_envelope=False,
+        is_hilbert=True,
+        phase_unwrap_1d=phase_unwrap_1d,
+    )
+    grid.field *= np.exp(1j * omg0_h * grid.axes[-1])
+
+    return grid, omg0_h
+
+
+def hilbert_transform(grid):
+    """Make a hilbert transform of the grid field.
+
+    Currently the arrays need to be flipped along t (both the input field and
+    its transform) to get the imaginary part (and thus the phase) with the
+    correct sign.
+
+    Parameters
+    ----------
+    grid : Grid
+        The lasy grid whose field should be transformed.
+    """
+    return hilbert(grid.field[:, :, ::-1])[:, :, ::-1]
+
+
+def create_grid(array, axes, dim):
+    """Create a lasy grid from a numpy array.
+
+    Parameters
+    ----------
+    array : ndarray
+        The input field array.
+    axes : dict
+        Dictionary with the information of the array axes.
+    dim : {'xyt, 'rt'}
+        The dimensionality of the array.
+
+    Returns
+    -------
+    grid : Grid
+        A lasy grid containing the input array.
+    """
+    # Create grid.
+    if dim == "xyt":
+        lo = (axes["x"][0], axes["y"][0], axes["t"][0])
+        hi = (axes["x"][-1], axes["y"][-1], axes["t"][-1])
+        npoints = (axes["x"].size, axes["y"].size, axes["t"].size)
+        grid = Grid(dim, lo, hi, npoints)
+        assert np.all(grid.axes[0] == axes["x"])
+        assert np.all(grid.axes[1] == axes["y"])
+        assert np.all(grid.axes[2] == axes["t"])
+        assert grid.field.shape == array.shape
+        grid.field = array
+    else:  # dim == "rt":
+        lo = (axes["r"][0], axes["t"][0])
+        hi = (axes["r"][-1], axes["t"][-1])
+        npoints = (axes["r"].size, axes["t"].size)
+        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1)
+        assert np.all(grid.axes[0] == axes["r"])
+        assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
+        assert grid.field.shape == array[np.newaxis].shape
+        grid.field = array[np.newaxis]
+    return grid
