@@ -75,7 +75,7 @@ html_theme_options = {
         {
             "name": "GitHub",
             "url": "https://github.com/LASY-org/lasy",
-            "icon": "fab fa-github-square",
+            "icon": "fa-brands fa-github",
         },
     ],
 }
