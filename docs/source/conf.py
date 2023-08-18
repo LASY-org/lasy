@@ -38,7 +38,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
-    "sphinx_panels",
+    "sphinx_design",
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
 ]
@@ -75,7 +75,7 @@ html_theme_options = {
         {
             "name": "GitHub",
             "url": "https://github.com/LASY-org/lasy",
-            "icon": "fab fa-github-square",
+            "icon": "fa-brands fa-github",
         },
     ],
 }
