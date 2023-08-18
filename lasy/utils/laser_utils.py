@@ -3,6 +3,8 @@ from scipy.constants import c, epsilon_0, e, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
 from skimage.restoration import unwrap_phase
+from axiprop.lib import PropagatorFFT2, PropagatorResampling
+from axiprop.containers import ScalarFieldEnvelope
 
 try:
     from axiprop.lib import PropagatorFFT2, PropagatorResampling
@@ -32,7 +34,7 @@ def compute_laser_energy(dim, grid):
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
-        It contains a ndarrays (V/m) with
+        It contains an ndarray (V/m) with
         the value of the envelope field and the associated metadata
         that defines the points at which the laser is defined.
 
@@ -501,12 +503,9 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
         Moment of time at which the field is produced.
 
     backend : string (optional)
-        Backend used by axiprop (see axiprop documentation).
+        Backend used by axiprop (see AVAILABLE_BACKENDS in axiprop
+        documentation for more information).
     """
-    assert axiprop_installed, (
-        "Laser propagation requires `axiprop` to be installed."
-        "You can install it with `pip install axiprop`."
-    )
     time_axis_indx = -1
 
     t_axis = grid.axes[time_axis_indx]
@@ -575,7 +574,7 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
-        It contains a ndarrays (V/m) with
+        It contains an ndarray (V/m) with
         the value of the envelope field and the associated metadata
         that defines the points at which the laser is defined.
 
@@ -592,12 +591,9 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         Moment of time at which the field should be recorded
 
     backend : string (optional)
-        Backend used by axiprop (see axiprop documentation).
+        Backend used by axiprop (see AVAILABLE_BACKENDS in axiprop
+        documentation for more information).
     """
-    assert axiprop_installed, (
-        "Laser propagation requires `axiprop` to be installed."
-        "You can install it with `pip install axiprop`."
-    )
     z_axis_indx = -1
     t_axis = grid.axes[z_axis_indx]
     dz = z_axis[1] - z_axis[0]

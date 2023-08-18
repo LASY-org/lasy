@@ -21,7 +21,7 @@ First Example
 #############
 
 We will try a simple example to get familiar with the code structure and to verify the installation was successful.
-Lets generate a Gaussian pulse at focus, propagate it backwards by one Rayeligh Length and then output it to file.
+Let's generate a Gaussian pulse at focus, propagate it backwards by one Rayleigh length (the pulse is then located upstream of the focal plane) and then output it to a file.
 
 ..  code-block:: python
    :caption: First lets load in the required functions from the library.
@@ -53,17 +53,17 @@ Lets generate a Gaussian pulse at focus, propagate it backwards by one Rayeligh 
    laser = Laser(dimensions,lo,hi,num_points,laser_profile)
 
 ..  code-block:: python
-   :caption: Propagate the laser pulse backwards by one Rayeligh length.
+   :caption: By default, the values of the laser envelope are injected on the focal plan. One can propagate it backwards by one Rayleigh length (optional).
 
-   z_R            = 3.14159*spot_size**2/wavelength    # The Rayleigh length.
-   laser.propagate(-z_R)
+   z_R            = 3.14159*spot_size**2/wavelength    # The Rayleigh length
+   laser.propagate(-z_R)                               # Propagate the pulse upstream of the focal plane
 
 ..  code-block:: python
-   :caption: Output the result to file. Here we utilise the openPMD standard.
+   :caption: Output the result to a file. Here we utilise the openPMD standard.
 
    file_prefix    = 'test_output' # The file name will start with this prefix
    file_format    = 'h5'          # Format to be used for the output file
 
    laser.write_to_file(file_prefix, file_format)
 
-This file may now be viewed, copied, shared or used as an input to a variety of other simulation tools.
+The generated file may now be viewed or used as a laser input to a variety of other simulation tools.
