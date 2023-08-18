@@ -4,5 +4,5 @@
 matplotlib
 numpydoc
 pydata-sphinx-theme
-sphinx-gallery
 sphinx-design
+sphinx-gallery
