@@ -206,14 +206,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     return env, ext
 
 
-def get_spectrum(
-    grid,
-    dim,
-    bins=20,
-    range=None,
-    omega0=None,
-    phase_unwrap_1d=None
-):
+def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=None):
     """
     Get the the frequency spectrum of an envelope.
 
@@ -264,7 +257,7 @@ def get_spectrum(
         dim=dim,
         is_envelope=True,
         omega0=omega0,
-        phase_unwrap_1d=phase_unwrap_1d
+        phase_unwrap_1d=phase_unwrap_1d,
     )
     # Calculate weights of each frequency (amplitude of the field).
     dV = get_grid_cell_volume(grid, dim)
@@ -279,7 +272,7 @@ def get_spectrum(
         a=np.squeeze(omega)[..., 2:-2],
         weights=np.squeeze(weights[..., 2:-2]),
         bins=bins,
-        range=range
+        range=range,
     )
     omega_spectrum = edges[1:] - (edges[1] - edges[0]) / 2
     return spectrum, omega_spectrum
@@ -564,7 +557,7 @@ def weighted_std(values, weights=None):
     A float with the value of the standard deviation
     """
     mean_val = np.average(values, weights=weights)
-    std = np.sqrt(np.average((values-mean_val)**2, weights=weights))
+    std = np.sqrt(np.average((values - mean_val) ** 2, weights=weights))
     return std
 
 
