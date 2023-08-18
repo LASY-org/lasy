@@ -530,12 +530,12 @@ def get_grid_cell_volume(grid, dim):
         A float with the cell volume (if dim=='xyt') or a numpy array with the
         radial distribution of cell volumes (if dim=='rt').
     """
+    dz = grid.dx[-1] * c
     if dim == "xyt":
         dV = grid.dx[0] * grid.dx[1] * dz
     elif dim == "rt":
         r = grid.axes[0]
         dr = grid.dx[0]
-        dz = grid.dx[-1] * c
         # 1D array that computes the volume of radial cells
         dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
     return dV
