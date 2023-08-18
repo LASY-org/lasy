@@ -5,6 +5,7 @@ import pytest
 import numpy as np
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
+from lasy.utils.laser_utils import import_from_z, export_to_z
 from scipy.constants import c
 
 
@@ -48,8 +49,10 @@ def get_laser_z_analytic(profile, z_axis, r_axis):
 
 
 def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
-    laser_z = laser_t_in.export_to_z()
-    laser_t_out.import_from_z(laser_z, z_axis)
+    laser_z = export_to_z(laser_t_in.dim, laser_t_in.grid, laser_t_in.profile.omega0)
+    import_from_z(
+        laser_t_out.dim, laser_t_out.grid, laser_t_out.profile.omega0, laser_z, z_axis
+    )
 
     ind0 = laser_t_in.grid.field.shape[0] // 2 - 1
 
