@@ -44,7 +44,7 @@ def compute_laser_energy(dim, grid):
 
     if dim == "xyt":
         energy = ((dV * epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
-    elif dim == "rt":
+    else:  # dim == "rt":
         energy = (
             dV[np.newaxis, :, np.newaxis]
             * epsilon_0
@@ -263,7 +263,7 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
     dV = get_grid_cell_volume(grid, dim)
     if dim == "xyt":
         weights = np.abs(grid.field) * dV
-    elif dim == "rt":
+    else:  # dim == "rt":
         weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
     # Get weighted spectrum.
     # Neglects the 2 first and last time slices, whose values seems to be
@@ -399,7 +399,7 @@ def get_duration(grid, dim):
     dV = get_grid_cell_volume(grid, dim)
     if dim == "xyt":
         weights = np.abs(grid.field) * dV
-    elif dim == "rt":
+    else:  # dim == "rt":
         weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
     # project weights to longitudinal axes
     weights = np.sum(weights, axis=(0, 1))
@@ -533,7 +533,7 @@ def get_grid_cell_volume(grid, dim):
     dz = grid.dx[-1] * c
     if dim == "xyt":
         dV = grid.dx[0] * grid.dx[1] * dz
-    elif dim == "rt":
+    else:  # dim == "rt":
         r = grid.axes[0]
         dr = grid.dx[0]
         # 1D array that computes the volume of radial cells
