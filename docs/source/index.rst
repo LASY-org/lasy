@@ -17,66 +17,64 @@ The laser field is then exported in a standardized file, that can be read by ext
 
 The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>`__. Contributions are welcome!
 
-.. panels::
-    :card: + intro-card text-center
-    :column: col-lg-6 col-md-6 col-sm-6 col-xs-12 p-2 d-flex
+.. grid:: 1 1 2 2
+    :gutter: 2
 
-    ---
+    .. grid-item-card:: Getting Started
+        :text-align: center
 
-    **Getting Started**
-    ^^^^^^^^^^^^^^
+        New to ``lasy``? Check this out for installation instructions and a first example.
 
+        +++
 
-    New to ``lasy``? Check this out for installation instructions and a first example.
+        .. button-ref:: user_guide/index
+                :expand:
+                :color: primary
+                :click-parent:
 
-    +++
+                More Information
 
-    .. link-button:: user_guide/index
-            :type: ref
-            :text: More Information
-            :classes: btn-outline-primary btn-block stretched-link
+    .. grid-item-card:: Overview of the Code
+        :text-align: center
 
-    ---
+        An overview of the key concepts and functionality of the code.
 
-    **Overview of the Code**
-    ^^^^^^^^^^^^^^^^^^^^^^^^
+        +++
 
-    An overview of the key concepts and functionality of the code.
+        .. button-ref:: code_overview/index
+                :expand:
+                :color: primary
+                :click-parent:
 
-    +++
+                Get an overview of the code
 
-    .. link-button:: code_overview/index
-            :type: ref
-            :text: Get an overview of the code
-            :classes: btn-outline-primary btn-block stretched-link
+    .. grid-item-card:: API Reference
+        :text-align: center
 
-    ---
+        Get into the nuts and bolts of the ``lasy`` API with the documentation here.
 
-    **API Reference**
-    ^^^^^^^^^^^^^^^^^
+        +++
 
-    Get into the nuts and bolts of the ``lasy`` API with the documentation here.
+        .. button-ref:: api/index
+                :expand:
+                :color: primary
+                :click-parent:
 
-    +++
+                Take a look at the API Reference
 
-    .. link-button:: api/index
-            :type: ref
-            :text: Take a look at the API Reference
-            :classes: btn-outline-primary btn-block stretched-link
+    .. grid-item-card:: Tutorials
+        :text-align: center
 
-    ---
+        Some step-by-step guides to using the code and some common examples which you might find useful.
 
-    **Tutorials**
-    ^^^^^^^^^^^^^
+        +++
 
-    Some step-by-step guides to using the code and some common examples which you might find useful.
-
-    +++
-
-    .. link-button:: tutorials/index
-            :type: ref
-            :text: Show me some tutorials
-            :classes: btn-outline-primary btn-block stretched-link
+        .. button-ref:: tutorials/index
+                :expand:
+                :color: primary
+                :click-parent:
+                
+                Show me some Tutorials
 
 .. toctree::
    :hidden:

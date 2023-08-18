@@ -38,7 +38,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
-    "sphinx_panels",
+    "sphinx_design",
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
 ]
