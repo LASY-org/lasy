@@ -48,6 +48,7 @@ Then, for each contribution:
 # Style conventions
 
 - Docstrings are written using the Numpy style.
+- Functions in `utils/laser_utils.py` only depend on standard types (Python & Numpy) and on the `Grid` class. That way, they are relatively stand-alone and can be used on different data structures. A simple Grid factory is provided for that purpose.
 - A PR should be open for any contribution: the description helps to explain the code and open dicussion.
 
 ## Install
