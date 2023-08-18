@@ -216,7 +216,6 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
         It contains a ndarrays with the field data from which the
         spectrum is computed, and the associated metadata. The last axis must
         be the longitudinal dimension.
-        Can be the full electric field or the envelope.
 
     dim : string (optional)
         Dimensionality of the array. Only used if is_envelope is False.
@@ -236,7 +235,6 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
 
     omega0 : scalar
         Angular frequency at which the envelope is defined.
-        Required if an only if is_envelope is True.
 
     phase_unwrap_1d : boolean (optional)
         Whether the phase unwrapping is done in 1D.
@@ -251,7 +249,7 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
     omega_spectrum : scalar
         Array with the frequencies of the spectrum.
     """
-    # Get frequency array.
+    # Get the array of angular frequency.
     omega, central_omega = get_frequency(
         grid=grid,
         dim=dim,
@@ -267,7 +265,7 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
         weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
     # Get weighted spectrum.
     # Neglects the 2 first and last time slices, whose values seems to be
-    # slightly off (maybe due to lower order derivative at the edges).
+    # slightly off (maybe due to lower-order derivative at the edges).
     spectrum, edges = np.histogram(
         a=np.squeeze(omega)[..., 2:-2],
         weights=np.squeeze(weights[..., 2:-2]),
