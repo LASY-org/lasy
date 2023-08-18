@@ -542,7 +542,7 @@ def get_grid_cell_volume(grid, dim):
 
 
 def weighted_std(values, weights=None):
-    """Calculates the weighted standard deviation of the given values
+    """Calculate the weighted standard deviation of the given values.
 
     Parameters
     ----------
