@@ -206,7 +206,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     return env, ext
 
 
-def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=None):
+def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=None, is_envelope=True, method='fft'):
     """
     Get the the frequency spectrum of an envelope.
 
@@ -249,30 +249,69 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
     omega_spectrum : scalar
         Array with the frequencies of the spectrum.
     """
-    # Get the array of angular frequency.
-    omega, central_omega = get_frequency(
-        grid=grid,
-        dim=dim,
-        is_envelope=True,
-        omega0=omega0,
-        phase_unwrap_1d=phase_unwrap_1d,
-    )
-    # Calculate weights of each frequency (amplitude of the field).
-    dV = get_grid_cell_volume(grid, dim)
-    if dim == "xyt":
-        weights = np.abs(grid.field) * dV
-    else:  # dim == "rt":
-        weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
-    # Get weighted spectrum.
-    # Neglects the 2 first and last time slices, whose values seems to be
-    # slightly off (maybe due to lower-order derivative at the edges).
-    spectrum, edges = np.histogram(
-        a=np.squeeze(omega)[..., 2:-2],
-        weights=np.squeeze(weights[..., 2:-2]),
-        bins=bins,
-        range=range,
-    )
-    omega_spectrum = edges[1:] - (edges[1] - edges[0]) / 2
+    if method == 'fft':
+
+        # spectrum = np.fft.fft(grid.field[0, 0]) * grid.dx[-1]
+        spectrum = np.fft.fft(grid.field) * grid.dx[-1]
+        dV = get_grid_cell_volume(grid, dim)
+        if dim == "xyt":
+            spectrum = np.sum(spectrum, axis=(0, 1))
+        else:
+            spectrum = np.sum(spectrum * dV[np.newaxis, :, np.newaxis] / dV[0], axis=1)[0]
+        # spectrum = np.abs(spectrum[:int(len(spectrum) / 2)])
+        freq = np.fft.fftfreq(spectrum.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
+        omega_spectrum = 2 * np.pi * freq
+        
+        if is_envelope:
+            omega_spectrum = omega0 - omega_spectrum
+
+        i_sort = np.argsort(omega_spectrum)
+        omega_spectrum = omega_spectrum[i_sort]
+        spectrum = np.abs(spectrum[i_sort])
+
+        i_keep = omega_spectrum >= 0.
+        omega_spectrum = omega_spectrum[i_keep]
+        spectrum = spectrum[i_keep]
+
+        omega_interp = np.linspace(*range, bins)
+        spectrum = np.interp(omega_interp, omega_spectrum, spectrum)
+        omega_spectrum = omega_interp
+
+        # spectrum = np.fft.fft(grid.field) * grid.dx[-1]
+        # spectrum = np.abs(spectrum[..., :int(spectrum.shape[-1] / 2)])
+        # omega_spectrum = 2 * np.pi / (grid.axes[-1][-1] - grid.axes[-1][0]) * np.arange(spectrum.shape[-1])
+        # if is_envelope:
+        #     omega_spectrum = omega_spectrum
+        # dV = get_grid_cell_volume(grid, dim)
+        # if dim == "xyt":
+        #     spectrum = np.sum(spectrum * dV, axis=(0, 1))
+        # else:
+        #     spectrum = np.sum(spectrum * dV[np.newaxis, :, np.newaxis], axis=1)[0]
+    else:
+        # Get the array of angular frequency.
+        omega, central_omega = get_frequency(
+            grid=grid,
+            dim=dim,
+            is_envelope=True,
+            omega0=omega0,
+            phase_unwrap_1d=phase_unwrap_1d,
+        )
+        # Calculate weights of each frequency (amplitude of the field).
+        dV = get_grid_cell_volume(grid, dim)
+        if dim == "xyt":
+            weights = np.abs(grid.field) * dV
+        else:  # dim == "rt":
+            weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
+        # Get weighted spectrum.
+        # Neglects the 2 first and last time slices, whose values seems to be
+        # slightly off (maybe due to lower-order derivative at the edges).
+        spectrum, edges = np.histogram(
+            a=np.squeeze(omega)[..., 2:-2],
+            weights=np.squeeze(weights[..., 2:-2]),
+            bins=bins,
+            range=range,
+        )
+        omega_spectrum = edges[1:] - (edges[1] - edges[0]) / 2
     return spectrum, omega_spectrum
 
 
