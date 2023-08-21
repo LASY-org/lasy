@@ -53,12 +53,6 @@ def write_to_openpmd_file(
         for hi, lo, npoints in zip(grid.hi, grid.lo, grid.npoints)
     ][::-1]
     m.grid_global_offset = grid.lo[::-1]
-    m.unit_dimension = {
-        io.Unit_Dimension.M: 1,
-        io.Unit_Dimension.L: 1,
-        io.Unit_Dimension.I: -1,
-        io.Unit_Dimension.T: -3,
-    }
     if dim == "xyt":
         m.geometry = io.Geometry.cartesian
         m.axis_labels = ["t", "y", "x"]
@@ -69,7 +63,17 @@ def write_to_openpmd_file(
     # Store metadata needed to reconstruct the field
     m.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
     m.set_attribute("polarization", pol)
-    m.set_attribute("isLaserEnvelope", True)
+    if save_as_vector_potential:
+        m.set_attribute("envelopeField", "normalized_vector_potential")
+        m.unit_dimension = {}
+    else:
+        m.set_attribute("envelopeField", "electric_field")
+        m.unit_dimension = {
+            io.Unit_Dimension.M: 1,
+            io.Unit_Dimension.L: 1,
+            io.Unit_Dimension.I: -1,
+            io.Unit_Dimension.T: -3,
+        }
 
     if save_as_vector_potential:
         array = field_to_vector_potential(grid, 2 * np.pi * c / wavelength)
