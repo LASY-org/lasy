@@ -206,7 +206,16 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     return env, ext
 
 
-def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=None, is_envelope=True, method='fft'):
+def get_spectrum(
+    grid,
+    dim,
+    bins=20,
+    range=None,
+    omega0=None,
+    phase_unwrap_1d=None,
+    is_envelope=True,
+    method="fft",
+):
     """
     Get the the frequency spectrum of an envelope.
 
@@ -249,19 +258,22 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
     omega_spectrum : scalar
         Array with the frequencies of the spectrum.
     """
-    if method == 'fft':
-
+    if method == "fft":
         # spectrum = np.fft.fft(grid.field[0, 0]) * grid.dx[-1]
         spectrum = np.fft.fft(grid.field) * grid.dx[-1]
         dV = get_grid_cell_volume(grid, dim)
         if dim == "xyt":
             spectrum = np.sum(spectrum, axis=(0, 1))
         else:
-            spectrum = np.sum(spectrum * dV[np.newaxis, :, np.newaxis] / dV[0], axis=1)[0]
+            spectrum = np.sum(spectrum * dV[np.newaxis, :, np.newaxis] / dV[0], axis=1)[
+                0
+            ]
         # spectrum = np.abs(spectrum[:int(len(spectrum) / 2)])
-        freq = np.fft.fftfreq(spectrum.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
+        freq = np.fft.fftfreq(
+            spectrum.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0])
+        )
         omega_spectrum = 2 * np.pi * freq
-        
+
         if is_envelope:
             omega_spectrum = omega0 - omega_spectrum
 
@@ -269,7 +281,7 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
         omega_spectrum = omega_spectrum[i_sort]
         spectrum = np.abs(spectrum[i_sort])
 
-        i_keep = omega_spectrum >= 0.
+        i_keep = omega_spectrum >= 0.0
         omega_spectrum = omega_spectrum[i_keep]
         spectrum = spectrum[i_keep]
 
