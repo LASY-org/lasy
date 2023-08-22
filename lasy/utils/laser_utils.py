@@ -292,7 +292,7 @@ def get_spectrum(
         omega_spectrum = omega_spectrum[:i_keep]
 
     # Square to get energy-like spectrum (check if appropriate).
-    spectrum = spectrum ** 2
+    spectrum = spectrum**2
 
     # Sum spectrum transversely.
     if not on_axis:
