@@ -264,6 +264,7 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
         
         if is_envelope:
             omega_spectrum = omega0 - omega_spectrum
+            spectrum /= 2
 
         i_sort = np.argsort(omega_spectrum)
         omega_spectrum = omega_spectrum[i_sort]
