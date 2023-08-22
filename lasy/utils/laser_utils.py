@@ -213,7 +213,7 @@ def get_spectrum(
     bins=20,
     is_envelope=True,
     omega0=None,
-    on_axis=False,
+    mode='sum'
 ):
     """
     Get the the frequency spectrum of an envelope or electric field.
@@ -251,14 +251,15 @@ def get_spectrum(
         Angular frequency at which the envelope is defined. Required if
         `is_envelope=True`.
 
-    on_axis : bool (optional)
-        Whether to get the spectrum on axis or, otherwise, the summed spectrum
-        along the transverse direction(s).
+    mode : {'sum', 'on_axis', 'full'} (optional)
+        Whether to return the summed spectrum along the transverse direction(s),
+        the on-axis spectrum, or the full (unsumed) spectrum in the whole
+        transverse domain.
 
     Returns
     -------
     spectrum : ndarray of doubles
-        Array with the spectrum amplitudes (FFT amplitude * dt).
+        Array with the spectral density in J/(rad/s).
 
     omega_spectrum : scalar
         Array with the frequencies of the spectrum.
@@ -268,7 +269,7 @@ def get_spectrum(
     omega_spectrum = 2 * np.pi * freq
 
     # Get on axis or full field.
-    if on_axis:
+    if mode == 'on_axis':
         if dim == "xyt":
             nx, ny, nt = grid.field.shape
             field = grid.field[nx // 2, ny // 2]
@@ -295,17 +296,28 @@ def get_spectrum(
     spectrum = spectrum ** 2
 
     # Sum spectrum transversely.
-    if not on_axis:
-        dV = get_grid_cell_volume(grid, dim)
+    dV = get_grid_cell_volume(grid, dim)
+    if mode == 'on_axis':
         if dim == "xyt":
-            spectrum = np.sum(spectrum, axis=(0, 1))
+            spectrum *= dV
         else:
-            spectrum = np.sum(spectrum[0] * dV[:, np.newaxis] / dV[0], axis=0)
+            spectrum *= dV[0]
+    else:
+        if dim == "xyt":
+            spectrum = spectrum * dV
+        else:
+            spectrum = spectrum[0] * dV[:, np.newaxis]
+        if mode == 'sum':
+            if dim == "xyt":
+                spectrum = np.sum(spectrum, axis=(0, 1))
+            else:
+                spectrum = np.sum(spectrum, axis=0)
+    spectrum *= epsilon_0 / grid.dx[-1] / np.pi
 
-    # Sort freqency array (and the spectrum accordingly).
+    # Sort frequency array (and the spectrum accordingly).
     i_sort = np.argsort(omega_spectrum)
     omega_spectrum = omega_spectrum[i_sort]
-    spectrum = np.abs(spectrum[i_sort])
+    spectrum = spectrum[..., i_sort]
 
     # If the user specified a frequency range, interpolate into it.
     if range is not None:
@@ -419,7 +431,7 @@ def get_frequency(
 
 
 def get_duration(grid, dim):
-    """Get envelope duration, measured as RMS.
+    """Get duration of the intensity of the envelope, measured as RMS.
 
     Parameters
     ----------
@@ -431,14 +443,14 @@ def get_duration(grid, dim):
     Returns
     -------
     float
-        RMS duration of the envelope in seconds.
+        RMS duration of the envelope intensity in seconds.
     """
     # Calculate weights of each grid cell (amplitude of the field).
     dV = get_grid_cell_volume(grid, dim)
     if dim == "xyt":
-        weights = np.abs(grid.field) * dV
+        weights = np.abs(grid.field)**2 * dV
     else:  # dim == "rt":
-        weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
+        weights = np.abs(grid.field)**2 * dV[np.newaxis, :, np.newaxis]
     # project weights to longitudinal axes
     weights = np.sum(weights, axis=(0, 1))
     return weighted_std(grid.axes[-1], weights)
