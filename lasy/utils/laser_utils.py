@@ -297,9 +297,7 @@ def get_spectrum(
         if dim == "xyt":
             spectrum = np.sum(spectrum, axis=(0, 1))
         else:
-            spectrum = np.sum(spectrum * dV[np.newaxis, :, np.newaxis] / dV[0], axis=1)[
-                0
-            ]
+            spectrum = np.sum(spectrum[0] * dV[:, np.newaxis] / dV[0], axis=0)
 
     # Sort freqency array (and the spectrum accordingly).
     i_sort = np.argsort(omega_spectrum)
