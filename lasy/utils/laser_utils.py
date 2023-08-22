@@ -273,9 +273,10 @@ def get_spectrum(grid, dim, bins=20, range=None, omega0=None, phase_unwrap_1d=No
         omega_spectrum = omega_spectrum[i_keep]
         spectrum = spectrum[i_keep]
 
-        omega_interp = np.linspace(*range, bins)
-        spectrum = np.interp(omega_interp, omega_spectrum, spectrum)
-        omega_spectrum = omega_interp
+        if range is not None:
+            omega_interp = np.linspace(*range, bins)
+            spectrum = np.interp(omega_interp, omega_spectrum, spectrum)
+            omega_spectrum = omega_interp
 
         # spectrum = np.fft.fft(grid.field) * grid.dx[-1]
         # spectrum = np.abs(spectrum[..., :int(spectrum.shape[-1] / 2)])
