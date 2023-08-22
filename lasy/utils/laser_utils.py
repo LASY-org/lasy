@@ -265,16 +265,14 @@ def get_spectrum(
         Array with the frequencies of the spectrum.
     """
     # Get the frequencies of the fft output.
-    freq = np.fft.fftfreq(
-        grid.field.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0])
-    )
+    freq = np.fft.fftfreq(grid.field.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
     omega_spectrum = 2 * np.pi * freq
 
     # Get on axis or full field.
     if on_axis:
         if dim == "xyt":
             nx, ny, nt = grid.field.shape
-            field = grid.field[nx//2, ny//2]
+            field = grid.field[nx // 2, ny // 2]
         else:
             field = grid.field[0, 0]
     else:
@@ -300,10 +298,9 @@ def get_spectrum(
         if dim == "xyt":
             spectrum = np.sum(spectrum, axis=(0, 1))
         else:
-            spectrum = np.sum(
-                spectrum * dV[np.newaxis, :, np.newaxis] / dV[0],
-                axis=1
-            )[0]
+            spectrum = np.sum(spectrum * dV[np.newaxis, :, np.newaxis] / dV[0], axis=1)[
+                0
+            ]
 
     # Sort freqency array (and the spectrum accordingly).
     i_sort = np.argsort(omega_spectrum)
