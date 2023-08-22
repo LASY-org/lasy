@@ -436,7 +436,7 @@ def get_duration(grid, dim):
     float
         RMS duration of the envelope in seconds.
     """
-    # Calculate weights of each frequency (amplitude of the field).
+    # Calculate weights of each grid cell (amplitude of the field).
     dV = get_grid_cell_volume(grid, dim)
     if dim == "xyt":
         weights = np.abs(grid.field) * dV
