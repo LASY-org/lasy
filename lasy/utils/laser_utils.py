@@ -207,13 +207,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 
 
 def get_spectrum(
-    grid,
-    dim,
-    range=None,
-    bins=20,
-    is_envelope=True,
-    omega0=None,
-    mode='sum'
+    grid, dim, range=None, bins=20, is_envelope=True, omega0=None, mode="sum"
 ):
     """
     Get the the frequency spectrum of an envelope or electric field.
@@ -269,7 +263,7 @@ def get_spectrum(
     omega_spectrum = 2 * np.pi * freq
 
     # Get on axis or full field.
-    if mode == 'on_axis':
+    if mode == "on_axis":
         if dim == "xyt":
             nx, ny, nt = grid.field.shape
             field = grid.field[nx // 2, ny // 2]
@@ -297,7 +291,7 @@ def get_spectrum(
 
     # Sum spectrum transversely.
     dV = get_grid_cell_volume(grid, dim)
-    if mode == 'on_axis':
+    if mode == "on_axis":
         if dim == "xyt":
             spectrum *= dV
         else:
@@ -307,7 +301,7 @@ def get_spectrum(
             spectrum = spectrum * dV
         else:
             spectrum = spectrum[0] * dV[:, np.newaxis]
-        if mode == 'sum':
+        if mode == "sum":
             if dim == "xyt":
                 spectrum = np.sum(spectrum, axis=(0, 1))
             else:
@@ -448,9 +442,9 @@ def get_duration(grid, dim):
     # Calculate weights of each grid cell (amplitude of the field).
     dV = get_grid_cell_volume(grid, dim)
     if dim == "xyt":
-        weights = np.abs(grid.field)**2 * dV
+        weights = np.abs(grid.field) ** 2 * dV
     else:  # dim == "rt":
-        weights = np.abs(grid.field)**2 * dV[np.newaxis, :, np.newaxis]
+        weights = np.abs(grid.field) ** 2 * dV[np.newaxis, :, np.newaxis]
     # project weights to longitudinal axes
     weights = np.sum(weights, axis=(0, 1))
     return weighted_std(grid.axes[-1], weights)

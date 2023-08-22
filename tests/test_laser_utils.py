@@ -2,7 +2,7 @@ import numpy as np
 
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.laser_utils import (get_spectrum, compute_laser_energy, get_duration)
+from lasy.utils.laser_utils import get_spectrum, compute_laser_energy, get_duration
 
 
 def get_gaussian_profile():
@@ -33,12 +33,13 @@ def get_gaussian_laser(dim):
 
 def test_laser_analysis_utils():
     """Test the different laser analysis utilities in both geometries."""
-    for dim in ["xyt", 'rt']:
+    for dim in ["xyt", "rt"]:
         laser = get_gaussian_laser(dim)
 
         # Check that energy computed from spectrum agrees with `compute_laser_energy`.
-        spectrum, omega = get_spectrum(laser.grid, dim, is_envelope=True,
-                                       omega0=laser.profile.omega0)
+        spectrum, omega = get_spectrum(
+            laser.grid, dim, is_envelope=True, omega0=laser.profile.omega0
+        )
         d_omega = omega[1] - omega[0]
         spectrum_energy = np.sum(spectrum) * d_omega
         energy = compute_laser_energy(dim, laser.grid)
@@ -47,10 +48,16 @@ def test_laser_analysis_utils():
         # Check that:
         # 1. The on-axis spectrum agrees with the on-axis value of the full spectrum
         # 2. The summed full spectrum agrees with the summed spectrum.
-        spectrum_oa, omega = get_spectrum(laser.grid, dim, is_envelope=True,
-                                          omega0=laser.profile.omega0, mode='on_axis')
-        spectrum_full, omega = get_spectrum(laser.grid, dim, is_envelope=True,
-                                            omega0=laser.profile.omega0, mode='full')
+        spectrum_oa, omega = get_spectrum(
+            laser.grid,
+            dim,
+            is_envelope=True,
+            omega0=laser.profile.omega0,
+            mode="on_axis",
+        )
+        spectrum_full, omega = get_spectrum(
+            laser.grid, dim, is_envelope=True, omega0=laser.profile.omega0, mode="full"
+        )
         if dim == "xyt":
             nx, ny, nt = laser.grid.field.shape
             spectrum_oa_from_full = spectrum_full[nx // 2, ny // 2]
@@ -63,8 +70,9 @@ def test_laser_analysis_utils():
 
         # Check that laser duration agrees with the given one.
         tau_rms = get_duration(laser.grid, dim)
-        np.testing.assert_approx_equal(2*tau_rms, laser.profile.long_profile.tau, significant=3)
-        
+        np.testing.assert_approx_equal(
+            2 * tau_rms, laser.profile.long_profile.tau, significant=3
+        )
 
 
 if __name__ == "__main__":
