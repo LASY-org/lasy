@@ -216,18 +216,17 @@ def get_spectrum(
     on_axis=False,
 ):
     """
-    Get the the frequency spectrum of an envelope.
+    Get the the frequency spectrum of an envelope or electric field.
 
     Parameters
     ----------
     grid : a Grid object.
-        It contains a ndarrays with the field data from which the
+        It contains an ndarray with the field data from which the
         spectrum is computed, and the associated metadata. The last axis must
         be the longitudinal dimension.
 
     dim : string (optional)
-        Dimensionality of the array. Only used if is_envelope is False.
-        Options are:
+        Dimensionality of the array. Options are:
 
         - 'xyt': The laser pulse is represented on a 3D grid:
                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
