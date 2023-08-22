@@ -209,12 +209,11 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 def get_spectrum(
     grid,
     dim,
-    bins=20,
     range=None,
-    omega0=None,
-    phase_unwrap_1d=None,
+    bins=20,
     is_envelope=True,
-    method="fft",
+    omega0=None,
+    on_axis=False,
 ):
     """
     Get the the frequency spectrum of an envelope.
@@ -235,97 +234,88 @@ def get_spectrum(
         - 'rt' : The laser pulse is represented on a 2D grid:
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    bins : int (optional)
-        Number of bins of the spectrum.
-
     range : list of float (optional)
         List of two values indicating the minimum and maximum frequency of the
-        spectrum.
+        spectrum. If provided, only the FFT spectrum within this range
+        will be returned using interpolation.
 
-    omega0 : scalar
-        Angular frequency at which the envelope is defined.
+    bins : int (optional)
+        Number of bins of to which to interpolate the spectrum if a `range`
+        is given.
 
-    phase_unwrap_1d : boolean (optional)
-        Whether the phase unwrapping is done in 1D.
-        This is not recommended, as the unwrapping will not be accurate,
-        but it might be the only practical solution when dim is 'xyt'.
+    is_envelope : bool (optional)
+        Whether the field provided uses the envelope representation, as used
+        internally in lasy. If False, field is assumed to represent the
+        the electric field.
+
+    omega0 : scalar (optional)
+        Angular frequency at which the envelope is defined. Required if
+        `is_envelope=True`.
+
+    on_axis : bool (optional)
+        Whether to get the spectrum on axis or, otherwise, the summed spectrum
+        along the transverse direction(s).
 
     Returns
     -------
     spectrum : ndarray of doubles
-        Array with the spectrum amplitudes.
+        Array with the spectrum amplitudes (FFT amplitude * dt).
 
     omega_spectrum : scalar
         Array with the frequencies of the spectrum.
     """
-    if method == "fft":
-        # spectrum = np.fft.fft(grid.field[0, 0]) * grid.dx[-1]
-        spectrum = np.fft.fft(grid.field) * grid.dx[-1]
+    # Get the frequencies of the fft output.
+    freq = np.fft.fftfreq(
+        grid.field.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0])
+    )
+    omega_spectrum = 2 * np.pi * freq
+
+    # Get on axis or full field.
+    if on_axis:
+        if dim == "xyt":
+            nx, ny, nt = grid.field.shape
+            field = grid.field[nx//2, ny//2]
+        else:
+            field = grid.field[0, 0]
+    else:
+        field = grid.field
+
+    # Get spectrum.
+    if is_envelope:
+        # Assume that the FFT of the envelope and the FFT of the complex
+        # conjugate of the envelope do not overlap. Then we only need
+        # one of them.
+        spectrum = 0.5 * np.abs(np.fft.fft(field)) * grid.dx[-1]
+        omega_spectrum = omega0 - omega_spectrum
+    else:
+        spectrum = np.fft.fft(field) * grid.dx[-1]
+        # Keep only positive frequencies.
+        i_keep = spectrum.shape[-1] // 2
+        spectrum = np.abs(spectrum[:i_keep])
+        omega_spectrum = omega_spectrum[:i_keep]
+
+    # Sum spectrum transversely.
+    if not on_axis:
         dV = get_grid_cell_volume(grid, dim)
         if dim == "xyt":
             spectrum = np.sum(spectrum, axis=(0, 1))
         else:
-            spectrum = np.sum(spectrum * dV[np.newaxis, :, np.newaxis] / dV[0], axis=1)[
-                0
-            ]
-        # spectrum = np.abs(spectrum[:int(len(spectrum) / 2)])
-        freq = np.fft.fftfreq(
-            spectrum.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0])
-        )
-        omega_spectrum = 2 * np.pi * freq
+            spectrum = np.sum(
+                spectrum * dV[np.newaxis, :, np.newaxis] / dV[0],
+                axis=1
+            )[0]
 
-        if is_envelope:
-            omega_spectrum = omega0 - omega_spectrum
-            spectrum /= 2
+    # Sort freqency array (and the spectrum accordingly).
+    i_sort = np.argsort(omega_spectrum)
+    omega_spectrum = omega_spectrum[i_sort]
+    spectrum = np.abs(spectrum[i_sort])
 
-        i_sort = np.argsort(omega_spectrum)
-        omega_spectrum = omega_spectrum[i_sort]
-        spectrum = np.abs(spectrum[i_sort])
+    # If the user specified a frequency range, interpolate into it.
+    if range is not None:
+        omega_interp = np.linspace(*range, bins)
+        spectrum = np.interp(omega_interp, omega_spectrum, spectrum)
+        omega_spectrum = omega_interp
 
-        i_keep = omega_spectrum >= 0.0
-        omega_spectrum = omega_spectrum[i_keep]
-        spectrum = spectrum[i_keep]
-
-        if range is not None:
-            omega_interp = np.linspace(*range, bins)
-            spectrum = np.interp(omega_interp, omega_spectrum, spectrum)
-            omega_spectrum = omega_interp
-
-        # spectrum = np.fft.fft(grid.field) * grid.dx[-1]
-        # spectrum = np.abs(spectrum[..., :int(spectrum.shape[-1] / 2)])
-        # omega_spectrum = 2 * np.pi / (grid.axes[-1][-1] - grid.axes[-1][0]) * np.arange(spectrum.shape[-1])
-        # if is_envelope:
-        #     omega_spectrum = omega_spectrum
-        # dV = get_grid_cell_volume(grid, dim)
-        # if dim == "xyt":
-        #     spectrum = np.sum(spectrum * dV, axis=(0, 1))
-        # else:
-        #     spectrum = np.sum(spectrum * dV[np.newaxis, :, np.newaxis], axis=1)[0]
-    else:
-        # Get the array of angular frequency.
-        omega, central_omega = get_frequency(
-            grid=grid,
-            dim=dim,
-            is_envelope=True,
-            omega0=omega0,
-            phase_unwrap_1d=phase_unwrap_1d,
-        )
-        # Calculate weights of each frequency (amplitude of the field).
-        dV = get_grid_cell_volume(grid, dim)
-        if dim == "xyt":
-            weights = np.abs(grid.field) * dV
-        else:  # dim == "rt":
-            weights = np.abs(grid.field) * dV[np.newaxis, :, np.newaxis]
-        # Get weighted spectrum.
-        # Neglects the 2 first and last time slices, whose values seems to be
-        # slightly off (maybe due to lower-order derivative at the edges).
-        spectrum, edges = np.histogram(
-            a=np.squeeze(omega)[..., 2:-2],
-            weights=np.squeeze(weights[..., 2:-2]),
-            bins=bins,
-            range=range,
-        )
-        omega_spectrum = edges[1:] - (edges[1] - edges[0]) / 2
     return spectrum, omega_spectrum
 
 
