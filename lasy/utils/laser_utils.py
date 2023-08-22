@@ -291,6 +291,9 @@ def get_spectrum(
         spectrum = np.abs(spectrum[:i_keep])
         omega_spectrum = omega_spectrum[:i_keep]
 
+    # Square to get energy-like spectrum (check if appropriate).
+    spectrum = spectrum ** 2
+
     # Sum spectrum transversely.
     if not on_axis:
         dV = get_grid_cell_volume(grid, dim)
