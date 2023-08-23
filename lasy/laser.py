@@ -16,7 +16,7 @@ class Laser:
     """
     Evaluate a laser profile on a grid, propagate it, and write it to a file.
 
-    This is a top-level class. 
+    This is a top-level class.
 
     Parameters
     ----------
