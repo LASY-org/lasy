@@ -42,16 +42,11 @@ def compute_laser_energy(dim, grid):
 
     envelope = grid.field
 
-    dz = grid.dx[-1] * c
+    dV = get_grid_cell_volume(grid, dim)
 
     if dim == "xyt":
-        dV = grid.dx[0] * grid.dx[1] * dz
         energy = ((dV * epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
-    elif dim == "rt":
-        r = grid.axes[0]
-        dr = grid.dx[0]
-        # 1D array that computes the volume of radial cells
-        dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
+    else:  # dim == "rt":
         energy = (
             dV[np.newaxis, :, np.newaxis]
             * epsilon_0
@@ -213,6 +208,145 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     return env, ext
 
 
+def get_spectrum(
+    grid, dim, range=None, bins=20, is_envelope=True, omega0=None, method="sum"
+):
+    r"""
+    Get the frequency spectrum of an envelope or electric field.
+
+    The spectrum can be calculated in three different ways, depending on the
+    `method` specified by the user:
+
+    Initially, the spectrum is calculated as the Fourier transform of the
+    electric field :math:`E(t)`.
+
+    ..math::
+        \int E(t) e^{-i \omega t} dt
+
+    neglecting the negative frequencies. If ``method=="raw"``, no further
+    processing is done and the returned spectrum is a complex array with the
+    same transverse dimensions as the input grid. The units are
+    :math:`\mathrm{V / Hz}`.
+
+    For the other methods, the spectral energy density is calculated as
+
+    ..math::
+        \frac{\epsilon_0 c}{2\pi} |\int E(t) e^{-i \omega t} dt| ^ 2
+
+    If ``method=="on_axis"``, a 1D real array with on-axis value of the
+    equation above is returned. The units are :math:`\mathrm{J / (rad Hz m^2)}`.
+
+    Otherwise, if ``method=="sum"`` (default), the transverse integral of the
+    spectral energy density is calculated:
+
+    ..math::
+        \frac{\epsilon_0 c}{2\pi} \int |\int E(t) e^{-i \omega t} dt| ^ 2 dx dy
+
+    The units of this array are :math:`\mathrm{J / (rad Hz)}`
+
+    Parameters
+    ----------
+    grid : a Grid object.
+        It contains an ndarray with the field data from which the
+        spectrum is computed, and the associated metadata. The last axis must
+        be the longitudinal dimension.
+
+    dim : string (optional)
+        Dimensionality of the array. Options are:
+
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    range : list of float (optional)
+        List of two values indicating the minimum and maximum frequency of the
+        spectrum. If provided, only the FFT spectrum within this range
+        will be returned using interpolation.
+
+    bins : int (optional)
+        Number of bins into which to interpolate the spectrum if a `range`
+        is given.
+
+    is_envelope : bool (optional)
+        Whether the field provided uses the envelope representation, as used
+        internally in lasy. If False, field is assumed to represent the
+        the full electric field (with fast oscillations).
+
+    omega0 : scalar (optional)
+        Angular frequency at which the envelope is defined. Required if
+        `is_envelope=True`.
+
+    method : {'sum', 'on_axis', 'raw'} (optional)
+        Determines the type of spectrum that is returned as described above.
+        By default 'sum'.
+
+    Returns
+    -------
+    spectrum : ndarray
+        Array with the spectrum (units and array type depend on ``method``).
+
+    omega : ndarray
+        Array with the angular frequencies of the spectrum.
+    """
+    # Get the frequencies of the fft output.
+    freq = np.fft.fftfreq(grid.field.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
+    omega = 2 * np.pi * freq
+
+    # Get on axis or full field.
+    if method == "on_axis":
+        if dim == "xyt":
+            nx, ny, nt = grid.field.shape
+            field = grid.field[nx // 2, ny // 2]
+        else:
+            field = grid.field[0, 0]
+    else:
+        field = grid.field
+
+    # Get spectrum.
+    if is_envelope:
+        # Assume that the FFT of the envelope and the FFT of the complex
+        # conjugate of the envelope do not overlap. Then we only need
+        # one of them.
+        spectrum = 0.5 * np.fft.fft(field) * grid.dx[-1]
+        omega = omega0 - omega
+        # Sort frequency array (and the spectrum accordingly).
+        i_sort = np.argsort(omega)
+        omega = omega[i_sort]
+        spectrum = spectrum[..., i_sort]
+        # Keep only positive frequencies.
+        i_keep = omega >= 0
+        omega = omega[i_keep]
+        spectrum = spectrum[..., i_keep]
+    else:
+        spectrum = np.fft.fft(field) * grid.dx[-1]
+        # Keep only positive frequencies.
+        i_keep = spectrum.shape[-1] // 2
+        omega = omega[:i_keep]
+        spectrum = spectrum[..., :i_keep]
+
+    # Convert to spectral energy density (J/(m^2 rad Hz)).
+    if method != "raw":
+        spectrum = np.abs(spectrum) ** 2 * epsilon_0 * c / np.pi
+
+    # Integrate transversely.
+    if method == "sum":
+        dV = get_grid_cell_volume(grid, dim)
+        dz = grid.dx[-1] * c
+        if dim == "xyt":
+            spectrum = np.sum(spectrum * dV / dz, axis=(0, 1))
+        else:
+            spectrum = np.sum(spectrum[0] * dV[:, np.newaxis] / dz, axis=0)
+
+    # If the user specified a frequency range, interpolate into it.
+    if method in ["sum", "on_axis"] and range is not None:
+        omega_interp = np.linspace(*range, bins)
+        spectrum = np.interp(omega_interp, omega, spectrum)
+        omega = omega_interp
+
+    return spectrum, omega
+
+
 def get_frequency(
     grid,
     dim=None,
@@ -313,6 +447,32 @@ def get_frequency(
     omega = np.minimum(omega, upper_bound * central_omega)
 
     return omega, central_omega
+
+
+def get_duration(grid, dim):
+    """Get duration of the intensity of the envelope, measured as RMS.
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the envelope to analyze.
+    dim : str
+        Dimensionality of the grid.
+
+    Returns
+    -------
+    float
+        RMS duration of the envelope intensity in seconds.
+    """
+    # Calculate weights of each grid cell (amplitude of the field).
+    dV = get_grid_cell_volume(grid, dim)
+    if dim == "xyt":
+        weights = np.abs(grid.field) ** 2 * dV
+    else:  # dim == "rt":
+        weights = np.abs(grid.field) ** 2 * dV[np.newaxis, :, np.newaxis]
+    # project weights to longitudinal axes
+    weights = np.sum(weights, axis=(0, 1))
+    return weighted_std(grid.axes[-1], weights)
 
 
 def field_to_vector_potential(grid, omega0):
@@ -421,6 +581,53 @@ def hilbert_transform(grid):
         The lasy grid whose field should be transformed.
     """
     return hilbert(grid.field[:, :, ::-1])[:, :, ::-1]
+
+
+def get_grid_cell_volume(grid, dim):
+    """Get the volume of the grid cells.
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid form which to compute the cell volume
+    dim : str
+        Dimensionality of the grid.
+
+    Returns
+    -------
+    float or ndarray
+        A float with the cell volume (if dim=='xyt') or a numpy array with the
+        radial distribution of cell volumes (if dim=='rt').
+    """
+    dz = grid.dx[-1] * c
+    if dim == "xyt":
+        dV = grid.dx[0] * grid.dx[1] * dz
+    else:  # dim == "rt":
+        r = grid.axes[0]
+        dr = grid.dx[0]
+        # 1D array that computes the volume of radial cells
+        dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
+    return dV
+
+
+def weighted_std(values, weights=None):
+    """Calculate the weighted standard deviation of the given values.
+
+    Parameters
+    ----------
+    values: array
+        Contains the values to be analyzed
+
+    weights : array
+        Contains the weights of the values to analyze
+
+    Returns
+    -------
+    A float with the value of the standard deviation
+    """
+    mean_val = np.average(values, weights=weights)
+    std = np.sqrt(np.average((values - mean_val) ** 2, weights=weights))
+    return std
 
 
 def create_grid(array, axes, dim):
