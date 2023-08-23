@@ -2,9 +2,11 @@ import numpy as np
 from scipy.constants import c, epsilon_0, e, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
-from skimage.restoration import unwrap_phase
-from axiprop.lib import PropagatorFFT2, PropagatorResampling
-from axiprop.containers import ScalarFieldEnvelope
+try:
+    from skimage.restoration import unwrap_phase
+    skimage_installed = True
+except ImportError:
+    skimage_installed = False
 
 from .grid import Grid
 
@@ -353,7 +355,7 @@ def get_frequency(
     is_envelope=True,
     is_hilbert=False,
     omega0=None,
-    phase_unwrap_1d=None,
+    phase_unwrap_nd=False,
     lower_bound=0.2,
     upper_bound=5.0,
 ):
@@ -391,10 +393,11 @@ def get_frequency(
         Angular frequency at which the envelope is defined.
         Required if an only if is_envelope is True.
 
-    phase_unwrap_1d : boolean (optional)
-        Whether the phase unwrapping is done in 1D.
-        This is not recommended, as the unwrapping will not be accurate,
-        but it might be the only practical solution when dim is 'xyt'.
+    phase_unwrap_nd : boolean (optional)
+        If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
+        If False, the phase unwrapping is done in z, treating each transverse cell
+        separately. This should be less accurate but faster.
+        If set to True, scikit-image must be installed.
 
     lower_bound : scalar (optional)
         Relative lower bound for the local frequency
@@ -423,15 +426,15 @@ def get_frequency(
         central_omega = np.average(omega, weights=np.abs(grid.field))
     else:
         assert dim in ["xyt", "rt"]
-        if dim == "xyt" and not phase_unwrap_1d:
+        if dim == "xyt" and phase_unwrap_nd:
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
         h = grid.field if is_hilbert else hilbert_transform(grid)
         h = np.squeeze(grid.field)
-        if phase_unwrap_1d:
-            phase = np.unwrap(np.angle(h))
-        else:
+        if phase_unwrap_nd:
             phase = unwrap_phase(np.angle(h))
+        else:
+            phase = np.unwrap(np.angle(h))
         omega = np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
 
         if dim == "xyt":
@@ -533,19 +536,22 @@ def vector_potential_to_field(grid, omega0, direct=True):
         return 1j * m_e * omega * c * grid.field / e
 
 
-def field_to_envelope(grid, dim, phase_unwrap_1d):
+def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     """Get the complex envelope of a field by applying a Hilbert transform.
 
     Parameters
     ----------
     grid : Grid
         The field from which to extract the envelope.
+
     dim : str
         Dimensions of the field. Possible values are `'xyt'` or `'rt'`.
-    phase_unwrap_1d : bool
-        Whether the phase unwrapping is done in 1D. This is not recommended,
-        as the unwrapping will not be accurate, but it might be the only
-        practical solution when dim is 'xyt'.
+
+    phase_unwrap_nd : boolean (optional)
+        If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
+        If False, the phase unwrapping is done in z, treating each transverse cell
+        separately. This should be less accurate but faster.
+        If set to True, scikit-image must be installed.
 
     Returns
     -------
@@ -561,7 +567,7 @@ def field_to_envelope(grid, dim, phase_unwrap_1d):
         dim=dim,
         is_envelope=False,
         is_hilbert=True,
-        phase_unwrap_1d=phase_unwrap_1d,
+        phase_unwrap_nd=phase_unwrap_nd,
     )
     grid.field *= np.exp(1j * omg0_h * grid.axes[-1])
 
