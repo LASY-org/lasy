@@ -2,8 +2,10 @@ import numpy as np
 from scipy.constants import c, epsilon_0, e, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
+
 try:
     from skimage.restoration import unwrap_phase
+
     skimage_installed = True
 except ImportError:
     skimage_installed = False
