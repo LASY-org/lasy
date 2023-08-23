@@ -263,7 +263,7 @@ def get_spectrum(
         will be returned using interpolation.
 
     bins : int (optional)
-        Number of bins of to which to interpolate the spectrum if a `range`
+        Number of bins into which to interpolate the spectrum if a `range`
         is given.
 
     is_envelope : bool (optional)
