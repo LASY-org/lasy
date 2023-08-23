@@ -851,8 +851,8 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         grid.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
         grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
 
-def convert_z_to_t(array, axes, dim, dummy=False, omega0=None):
 
+def convert_z_to_t(array, axes, dim, dummy=False, omega0=None):
     t = (axes["z"] - axes["z"][0]) / c
     if dim == "xyt":
         axes = {"x": axes["x"], "y": axes["y"], "t": t}

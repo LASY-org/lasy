@@ -1,6 +1,7 @@
 import numpy as np
 from .laser_utils import dummy_z_to_t
 
+
 def refactor_array(array, md, dim):
     """Refactor an openPMD array to the lasy representation.
 
@@ -32,6 +33,7 @@ def refactor_array(array, md, dim):
 
     return array, axes
 
+
 def reorder_array_xyt(array, md):
     """Reorder an openPMD array to the lasy representation in `xyt` geometry.
 
@@ -61,7 +63,7 @@ def reorder_array_xyt(array, md):
         axes = {"x": md.x, "y": md.y, "z": md.z}
     elif md.axes == {0: "t", 1: "y", 2: "x"}:
         array = array.swapaxes(0, 2)
-        axes = {"x": md.x, "y": md.y, "t": md.t }
+        axes = {"x": md.x, "y": md.y, "t": md.t}
 
     return array, axes
 
