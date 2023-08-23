@@ -430,13 +430,15 @@ def get_frequency(
         if phase_unwrap_nd:
             try:
                 from skimage.restoration import unwrap_phase
+
                 skimage_installed = True
             except ImportError:
                 skimage_installed = False
-            assert(skimage_installed,
-                   "scikit-image must be install for nd phase unwrapping.",
-                   "Please install scikit-image or use phase_unwrap_nd=False.",
-                   )
+            assert (
+                skimage_installed,
+                "scikit-image must be install for nd phase unwrapping.",
+                "Please install scikit-image or use phase_unwrap_nd=False.",
+            )
             phase = unwrap_phase(np.angle(h))
         else:
             phase = np.unwrap(np.angle(h))
