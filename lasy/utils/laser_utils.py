@@ -207,10 +207,40 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 
 
 def get_spectrum(
-    grid, dim, range=None, bins=20, is_envelope=True, omega0=None, mode="sum"
+    grid, dim, range=None, bins=20, is_envelope=True, omega0=None, method="sum"
 ):
-    """
+    r"""
     Get the the frequency spectrum of an envelope or electric field.
+
+    The spectrum can be calculated in three different ways, depending on the
+    `method` specified by the user:
+
+    Initially, the spectrum is calculated as the Fourier transform of the
+    electric field :math:`E(t)`.
+
+    ..math::
+        \int E(t) e^{-i \omega t} dt
+
+    neglecting the negative frequencies. If ``method=="raw"``, no further
+    processing is done and the returned spectrum is a complex array with the
+    same transverse dimensions as the input grid. The units are
+    :math:`\mathrm{V / Hz}`.
+
+    For the other methods, the spectral energy density is calculated as
+
+    ..math::
+        \frac{\epsilon_0 c}{2\pi} |\int E(t) e^{-i \omega t} dt| ^ 2
+
+    If ``method=="on_axis"``, a 1D real array with on-axis value of the
+    equation above is returned. The units are :math:`\mathrm{J / (rad Hz m^2)}`.
+
+    Otherwise, if ``method=="sum"`` (default), the transverse integral of the
+    spectral energy density is calculated:
+
+    ..math::
+        \frac{\epsilon_0 c}{2\pi} \int |\int E(t) e^{-i \omega t} dt| ^ 2 dx dy
+
+    The units of this array are :math:`\mathrm{J / (rad Hz)}`
 
     Parameters
     ----------
@@ -245,25 +275,24 @@ def get_spectrum(
         Angular frequency at which the envelope is defined. Required if
         `is_envelope=True`.
 
-    mode : {'sum', 'on_axis', 'full'} (optional)
-        Whether to return the summed spectrum along the transverse direction(s),
-        the on-axis spectrum, or the full (unsumed) spectrum in the whole
-        transverse domain.
+    method : {'sum', 'on_axis', 'raw'} (optional)
+        Determines the type of spectrum that is returned as described above.
+        By default 'sum'.
 
     Returns
     -------
-    spectrum : ndarray of doubles
-        Array with the spectral density in J/(rad/s).
+    spectrum : ndarray
+        Array with the spectrum (units and array type depend on ``method``).
 
-    omega_spectrum : scalar
-        Array with the frequencies of the spectrum.
+    omega : ndarray
+        Array with the angular frequencies of the spectrum.
     """
     # Get the frequencies of the fft output.
     freq = np.fft.fftfreq(grid.field.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
-    omega_spectrum = 2 * np.pi * freq
+    omega = 2 * np.pi * freq
 
     # Get on axis or full field.
-    if mode == "on_axis":
+    if method == "on_axis":
         if dim == "xyt":
             nx, ny, nt = grid.field.shape
             field = grid.field[nx // 2, ny // 2]
@@ -277,49 +306,43 @@ def get_spectrum(
         # Assume that the FFT of the envelope and the FFT of the complex
         # conjugate of the envelope do not overlap. Then we only need
         # one of them.
-        spectrum = 0.5 * np.abs(np.fft.fft(field)) * grid.dx[-1]
-        omega_spectrum = omega0 - omega_spectrum
+        spectrum = 0.5 * np.fft.fft(field) * grid.dx[-1]
+        omega = omega0 - omega
+        # Sort frequency array (and the spectrum accordingly).
+        i_sort = np.argsort(omega)
+        omega = omega[i_sort]
+        spectrum = spectrum[..., i_sort]
+        # Keep only positive frequencies.
+        i_keep = omega >= 0
+        omega = omega[i_keep]
+        spectrum = spectrum[..., i_keep]
     else:
         spectrum = np.fft.fft(field) * grid.dx[-1]
         # Keep only positive frequencies.
         i_keep = spectrum.shape[-1] // 2
-        spectrum = np.abs(spectrum[:i_keep])
-        omega_spectrum = omega_spectrum[:i_keep]
+        omega = omega[:i_keep]
+        spectrum = spectrum[:i_keep]
 
-    # Square to get energy-like spectrum (check if appropriate).
-    spectrum = spectrum**2
+    # Convert to spectral energy density (J/(m^2 rad Hz)).
+    if method != "raw":
+        spectrum = np.abs(spectrum)**2 * epsilon_0 * c / np.pi
 
-    # Sum spectrum transversely.
-    dV = get_grid_cell_volume(grid, dim)
-    if mode == "on_axis":
+    # Integrate transversely.
+    if method == "sum":
+        dV = get_grid_cell_volume(grid, dim)
+        dz = grid.dx[-1] * c
         if dim == "xyt":
-            spectrum *= dV
+            spectrum = np.sum(spectrum * dV / dz, axis=(0, 1))
         else:
-            spectrum *= dV[0]
-    else:
-        if dim == "xyt":
-            spectrum = spectrum * dV
-        else:
-            spectrum = spectrum[0] * dV[:, np.newaxis]
-        if mode == "sum":
-            if dim == "xyt":
-                spectrum = np.sum(spectrum, axis=(0, 1))
-            else:
-                spectrum = np.sum(spectrum, axis=0)
-    spectrum *= epsilon_0 / grid.dx[-1] / np.pi
-
-    # Sort frequency array (and the spectrum accordingly).
-    i_sort = np.argsort(omega_spectrum)
-    omega_spectrum = omega_spectrum[i_sort]
-    spectrum = spectrum[..., i_sort]
+            spectrum = np.sum(spectrum[0] * dV[:, np.newaxis] / dz, axis=0)
 
     # If the user specified a frequency range, interpolate into it.
     if range is not None:
         omega_interp = np.linspace(*range, bins)
-        spectrum = np.interp(omega_interp, omega_spectrum, spectrum)
-        omega_spectrum = omega_interp
+        spectrum = np.interp(omega_interp, omega, spectrum)
+        omega = omega_interp
 
-    return spectrum, omega_spectrum
+    return spectrum, omega
 
 
 def get_frequency(
