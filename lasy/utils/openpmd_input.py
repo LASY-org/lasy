@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.constants as ct
+from scipy.constants import c
 
 
 def reorder_array(array, md, dim):
@@ -55,7 +55,7 @@ def reorder_array_xyt(array, md):
         array = array.swapaxes(0, 2)
 
     if "z" in md.axes.values():
-        t = (md.z - md.z[0]) / ct.c
+        t = (md.z - md.z[0]) / c
         # Flip to get complex envelope in t assuming z = -c*t
         array = np.flip(array, axis=-1)
     else:
@@ -92,7 +92,7 @@ def reorder_array_rt(array, md):
         array = array.swapaxes(0, 1)
 
     if "z" in md.axes.values():
-        t = (md.z - md.z[0]) / ct.c
+        t = (md.z - md.z[0]) / c
         # Flip to get complex envelope in t assuming z = -c*t
         array = np.flip(array, axis=-1)
     else:
