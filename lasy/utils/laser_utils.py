@@ -2,13 +2,6 @@ import numpy as np
 from scipy.constants import c, epsilon_0, e, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
-
-try:
-    from skimage.restoration import unwrap_phase
-
-    skimage_installed = True
-except ImportError:
-    skimage_installed = False
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 from axiprop.containers import ScalarFieldEnvelope
 from .grid import Grid
@@ -435,7 +428,12 @@ def get_frequency(
         h = grid.field if is_hilbert else hilbert_transform(grid)
         h = np.squeeze(grid.field)
         if phase_unwrap_nd:
-            phase = unwrap_phase(np.angle(h))
+            try:
+                from skimage.restoration import unwrap_phase
+                phase = unwrap_phase(np.angle(h))
+            except ImportError:
+                print("scikit-image must be install for nd phase unwrapping.",
+                      "Please install scikit-image or use phase_unwrap_nd=False.")
         else:
             phase = np.unwrap(np.angle(h))
         omega = np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
