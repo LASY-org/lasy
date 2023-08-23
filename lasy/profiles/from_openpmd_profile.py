@@ -57,7 +57,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     phase_unwrap_nd : boolean (optional)
         If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
-        If False, the phase unwrapping is done in z, treating each transverse cell
+        If False, the phase unwrapping is done in t, treating each transverse cell
         separately. This should be less accurate but faster.
         If set to True, scikit-image must be installed.
 
