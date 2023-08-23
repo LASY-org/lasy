@@ -321,7 +321,7 @@ def get_spectrum(
         # Keep only positive frequencies.
         i_keep = spectrum.shape[-1] // 2
         omega = omega[:i_keep]
-        spectrum = spectrum[:i_keep]
+        spectrum = spectrum[..., :i_keep]
 
     # Convert to spectral energy density (J/(m^2 rad Hz)).
     if method != "raw":
@@ -337,7 +337,7 @@ def get_spectrum(
             spectrum = np.sum(spectrum[0] * dV[:, np.newaxis] / dz, axis=0)
 
     # If the user specified a frequency range, interpolate into it.
-    if range is not None:
+    if method in ["sum", "on_axis"] and range is not None:
         omega_interp = np.linspace(*range, bins)
         spectrum = np.interp(omega_interp, omega, spectrum)
         omega = omega_interp
