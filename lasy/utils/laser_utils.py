@@ -6,6 +6,14 @@ from skimage.restoration import unwrap_phase
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 from axiprop.containers import ScalarFieldEnvelope
 
+try:
+    from axiprop.lib import PropagatorFFT2, PropagatorResampling
+    from axiprop.containers import ScalarFieldEnvelope
+
+    axiprop_installed = True
+except ImportError:
+    axiprop_installed = False
+
 from .grid import Grid
 
 
@@ -842,3 +850,23 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
         grid.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
         grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
+
+
+def convert_z_to_t(array, axes, dim, dummy=False, omega0=None):
+    t = (axes["z"] - axes["z"][0]) / c
+    if dim == "xyt":
+        axes = {"x": axes["x"], "y": axes["y"], "t": t}
+    else:
+        axes = {"r": axes["r"], "t": t}
+
+    if dummy:
+        # Flip to get complex envelope in t assuming z = -c*t
+        array = np.flip(array, axis=-1)
+
+        return array, axes
+
+    else:
+        grid = create_grid(array, axes, dim)
+        assert omega0 is not None
+        import_from_z(dim, grid, omega0, array, axes["z"], z0=0.0, t0=0.0, backend="NP")
+        return grid.field, axes

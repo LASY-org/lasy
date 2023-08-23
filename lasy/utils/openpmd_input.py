@@ -1,9 +1,9 @@
 import numpy as np
-import scipy.constants as ct
+from .laser_utils import dummy_z_to_t
 
 
-def reorder_array(array, md, dim):
-    """Reorder an openPMD array to the lasy representation.
+def refactor_array(array, md, dim):
+    """Refactor an openPMD array to the lasy representation.
 
     Parameters
     ----------
@@ -22,9 +22,16 @@ def reorder_array(array, md, dim):
         A dictionary with the lasy axes information for the array.
     """
     if dim == "xyt":
-        return reorder_array_xyt(array, md)
+        array, axes = reorder_array_xyt(array, md)
     else:
-        return reorder_array_rt(array, md)
+        array, axes = reorder_array_rt(array, md)
+
+    if "z" in axes.keys:
+        # Data uses z representation, need to convert to
+        # t representation used inside lasy
+        array, axes = convert_z_to_t(array, axes, dim, dummy=True)
+
+    return array, axes
 
 
 def reorder_array_xyt(array, md):
@@ -51,16 +58,13 @@ def reorder_array_xyt(array, md):
         {0: "t", 1: "y", 2: "x"},
     ]
 
-    if md.axes in [{0: "z", 1: "y", 2: "x"}, {0: "t", 1: "y", 2: "x"}]:
+    if md.axes == {0: "z", 1: "y", 2: "x"}:
         array = array.swapaxes(0, 2)
+        axes = {"x": md.x, "y": md.y, "z": md.z}
+    elif md.axes == {0: "t", 1: "y", 2: "x"}:
+        array = array.swapaxes(0, 2)
+        axes = {"x": md.x, "y": md.y, "t": md.t}
 
-    if "z" in md.axes.values():
-        t = (md.z - md.z[0]) / ct.c
-        # Flip to get complex envelope in t assuming z = -c*t
-        array = np.flip(array, axis=-1)
-    else:
-        t = md.t
-    axes = {"x": md.x, "y": md.y, "t": t}
     return array, axes
 
 
@@ -88,20 +92,16 @@ def reorder_array_rt(array, md):
         {0: "t", 1: "r"},
     ]
 
-    if md.axes in [{0: "z", 1: "r"}, {0: "t", 1: "r"}]:
+    if md.axes == {0: "z", 1: "r"}:
         array = array.swapaxes(0, 1)
-
-    if "z" in md.axes.values():
-        t = (md.z - md.z[0]) / ct.c
-        # Flip to get complex envelope in t assuming z = -c*t
-        array = np.flip(array, axis=-1)
-    else:
-        t = md.t
-    r = md.r[md.r.size // 2 :]
-    axes = {"r": r, "t": t}
+        axes = {"r": md.r[md.r.size // 2 :], "z": md.z}
+    if md.axes == {0: "t", 1: "r"}:
+        array = array.swapaxes(0, 1)
+        axes = {"r": md.r[md.r.size // 2 :], "t": md.t}
 
     array = 0.5 * (
         array[array.shape[0] // 2 :, :]
         + np.flip(array[: array.shape[0] // 2, :], axis=0)
     )
+
     return array, axes
