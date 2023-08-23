@@ -210,7 +210,7 @@ def get_spectrum(
     grid, dim, range=None, bins=20, is_envelope=True, omega0=None, method="sum"
 ):
     r"""
-    Get the the frequency spectrum of an envelope or electric field.
+    Get the frequency spectrum of an envelope or electric field.
 
     The spectrum can be calculated in three different ways, depending on the
     `method` specified by the user:
