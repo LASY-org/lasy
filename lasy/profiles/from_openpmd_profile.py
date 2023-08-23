@@ -55,11 +55,11 @@ class FromOpenPMDProfile(FromArrayProfile):
         corresponding to the plane of observation given by `theta`;
         otherwise it returns a full 3D Cartesian array.
 
-    phase_unwrap_1d : boolean (optional)
-        Whether the phase unwrapping is done in 1D.
-        This is not recommended, as the unwrapping will not be accurate,
-        but it might be the only practical solution when dim is 'xyt'.
-        If None, it is set to False for dim = 'rt' and True for dim = 'xyt'.
+    phase_unwrap_nd : boolean (optional)
+        If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
+        If False, the phase unwrapping is done in t, treating each transverse cell
+        separately. This should be less accurate but faster.
+        If set to True, scikit-image must be installed.
 
     verbose : boolean (optional)
         Whether to print extended information.
@@ -75,7 +75,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         is_envelope=None,
         prefix=None,
         theta=None,
-        phase_unwrap_1d=None,
+        phase_unwrap_nd=False,
         verbose=False,
     ):
         ts = OpenPMDTimeSeries(path)
@@ -87,14 +87,10 @@ class FromOpenPMDProfile(FromArrayProfile):
 
         if theta is None:  # Envelope obtained from the full 3D array
             dim = "xyt"
-            if phase_unwrap_1d is None:
-                phase_unwrap_1d = True
             axes_order = ["x", "y", "t"]
 
         else:  # Envelope assumes axial symmetry processing RZ data
             dim = "rt"
-            if phase_unwrap_1d is None:
-                phase_unwrap_1d = False
             axes_order = ["r", "t"]
 
         F, axes = reorder_array(F, m, dim)
@@ -103,7 +99,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         # extract the envelope with a Hilbert transform
         if not is_envelope:
             grid = create_grid(F, axes, dim)
-            grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_1d)
+            grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
             array = grid.field[0]
         else:
             s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
