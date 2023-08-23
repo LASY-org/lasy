@@ -325,7 +325,7 @@ def get_spectrum(
 
     # Convert to spectral energy density (J/(m^2 rad Hz)).
     if method != "raw":
-        spectrum = np.abs(spectrum)**2 * epsilon_0 * c / np.pi
+        spectrum = np.abs(spectrum) ** 2 * epsilon_0 * c / np.pi
 
     # Integrate transversely.
     if method == "sum":
