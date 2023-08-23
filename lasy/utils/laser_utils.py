@@ -269,7 +269,7 @@ def get_spectrum(
     is_envelope : bool (optional)
         Whether the field provided uses the envelope representation, as used
         internally in lasy. If False, field is assumed to represent the
-        the electric field.
+        the full electric field (with fast oscillations).
 
     omega0 : scalar (optional)
         Angular frequency at which the envelope is defined. Required if
