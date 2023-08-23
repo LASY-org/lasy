@@ -434,8 +434,7 @@ def get_frequency(
                 skimage_installed = True
             except ImportError:
                 skimage_installed = False
-            assert (
-                skimage_installed,
+            assert skimage_installed, (
                 "scikit-image must be install for nd phase unwrapping.",
                 "Please install scikit-image or use phase_unwrap_nd=False.",
             )
