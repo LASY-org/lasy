@@ -64,14 +64,15 @@ class FromArrayProfile(Profile):
                 self.array = array
 
             # The first point is at dr/2.
-            # To avoid problems within the first cell, fill_value in None,
-            # so the value is interpolated. This might cause issues at the upper
-            # boundary.
+            # To make correct interpolation within the first cell, mirror
+            # field and axes along r.
+            r = np.concatenate((-axes["r"][::-1], axes["r"]))
+            array = np.concatenate((array[::-1], array))
             self.field_interp = RegularGridInterpolator(
-                (axes["r"], axes["t"]),
+                (r, axes["t"]),
                 array,
                 bounds_error=False,
-                fill_value=0.,
+                fill_value=0.0,
             )
 
     def evaluate(self, x, y, t):
