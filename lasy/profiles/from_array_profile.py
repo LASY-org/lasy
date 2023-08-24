@@ -71,7 +71,7 @@ class FromArrayProfile(Profile):
                 (axes["r"], axes["t"]),
                 array,
                 bounds_error=False,
-                fill_value=None,
+                fill_value=0.,
             )
 
     def evaluate(self, x, y, t):
