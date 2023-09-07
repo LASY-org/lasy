@@ -103,7 +103,7 @@ def write_to_openpmd_file(
     # Define the dataset
     dataset = io.Dataset(data.dtype, data.shape)
     env = m[io.Mesh_Record_Component.SCALAR]
-    env.position = np.zeros(len(dim))
+    env.position = np.zeros(len(dim), dtype=np.float64)
     env.reset_dataset(dataset)
     env.store_chunk(data)
 
