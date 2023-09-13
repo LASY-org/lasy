@@ -90,17 +90,15 @@ class SpaceTimeProfile(Profile):
         """
         transverse = np.exp(-(x**2 + y**2) / self.w0**2)
 
-        tau_eff = np.sqrt(self.tau**2 + (2 * self.sc / self.w0)**2)
+        tau_eff = np.sqrt(self.tau**2 + (2 * self.sc / self.w0) ** 2)
 
         spacetime = np.exp(
-        	-(t - self.t_peak
-        	+ (2 * 1j * self.sc * x / self.w0**2))**2 / tau_eff**2
-        	)
+            -((t - self.t_peak + (2 * 1j * self.sc * x / self.w0**2)) ** 2)
+            / tau_eff**2
+        )
 
-        oscillatory = *np.exp(
-        	1.0j * (self.cep_phase - self.omega0 * (t - self.t_peak))
-        	)
+        oscillatory = *np.exp(1.0j * (self.cep_phase - self.omega0 * (t - self.t_peak)))
 
-        envelope = transverse*spacetime*oscillatory
+        envelope = transverse * spacetime * oscillatory
 
         return envelope
