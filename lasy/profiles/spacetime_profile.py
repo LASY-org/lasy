@@ -4,12 +4,12 @@ from .profile import Profile
 
 
 class SpaceTimeProfile(Profile):
-    r"""
+    """
     Class that can evaluate a pulse that has certain space-time couplings
     """
 
     def __init__(self, wavelength, pol, laser_energy, w0, tau, sc, t_peak, cep_phase=0):
-        """
+        r"""
         Defines a laser pulse.
 
         More precisely, the electric field corresponds to:
