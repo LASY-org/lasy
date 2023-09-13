@@ -93,12 +93,12 @@ class SpaceTimeProfile(Profile):
         tau_eff = np.sqrt(self.tau**2 + (2 * self.sc / self.w0)**2)
 
         spacetime = np.exp(
-        	-(time - self.t_peak
+        	-(t - self.t_peak
         	+ (2 * 1j * self.sc * x / self.w0**2))**2 / tau_eff**2
         	)
 
         oscillatory = *np.exp(
-        	1.0j * (self.cep_phase - self.omega0 * (time - self.t_peak))
+        	1.0j * (self.cep_phase - self.omega0 * (t - self.t_peak))
         	)
 
         envelope = transverse*spacetime*oscillatory
