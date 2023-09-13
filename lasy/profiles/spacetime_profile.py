@@ -4,15 +4,10 @@ from .profile import Profile
 
 
 class SpaceTimeProfile(Profile):
-    """
+    r"""
     Class that can evaluate a pulse that has certain space-time couplings
-    """
 
-    def __init__(self, wavelength, pol, laser_energy, w0, tau, sc, t_peak, cep_phase=0):
-        r"""
-        Defines a laser pulse.
-
-        More precisely, the electric field corresponds to:
+    More precisely, the electric field corresponds to:
 
         .. math::
 
@@ -66,11 +61,11 @@ class SpaceTimeProfile(Profile):
             The Carrier Enveloppe Phase (CEP), i.e. :math:`\\phi_{cep}`
             in the above formula (i.e. the phase of the laser
             oscillation, at the time where the laser envelope is maximum)
-        """
+    """
+
+    def __init__(self, wavelength, pol, laser_energy, w0, tau, sc, t_peak, cep_phase=0):
         super().__init__(wavelength, pol)
-        wavelength,
-        pol,
-        laser_energy,
+        self.laser_energy = laser_energy
         self.w0 = w0
         self.tau = tau
         self.sc = sc
