@@ -4,7 +4,7 @@ from .profile import Profile
 
 
 class SpaceTimeProfile(Profile):
-    """
+    r"""
     Class that can evaluate a pulse that has certain space-time couplings
     """
 
