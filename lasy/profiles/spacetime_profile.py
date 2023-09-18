@@ -49,9 +49,7 @@ class SpaceTimeProfile(Profile):
 
         sc: spatial chirp, b in the above formula, that results in a mixing
             of the longitudinal and transverse profiles. Must be in units
-            of [x/omega]. An imaginary value for this property is possible,
-            which would represent a pulse-front tilt in the focus.
-            A representative real value is b = w0 * tau.
+            of [x/omega]. A representative real value is b = w0 * tau.
 
         t_peak: float (in second)
             The time at which the laser envelope reaches its maximum amplitude,
@@ -97,7 +95,7 @@ class SpaceTimeProfile(Profile):
             / tau_eff**2
         )
 
-        oscillatory = *np.exp(1.0j * (self.cep_phase - self.omega0 * (t - self.t_peak)))
+        oscillatory = np.exp(1.0j * (self.cep_phase - self.omega0 * (t - self.t_peak)))
 
         envelope = transverse * spacetime * oscillatory
 
