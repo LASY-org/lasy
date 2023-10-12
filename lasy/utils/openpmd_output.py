@@ -111,3 +111,4 @@ def write_to_openpmd_file(
     env.store_chunk(data)
 
     series.flush()
+    series.close()
