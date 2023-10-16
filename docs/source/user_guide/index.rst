@@ -4,18 +4,10 @@ User Guide
 Installation
 ############
 
-To install the code you will need to first clone the repository to your local machine.
-Change into the new directory and then run the install command as given below.
-
 ..  code-block:: bash
     :caption: Installation Instructions
 
-    git clone https://github.com/LASY-org/lasy.git
-    cd lasy
-    python3 -m pip install -v .
-
-More installation options and further instructions will be added in due course.
-
+    python -m pip install lasy
 
 First Example
 #############

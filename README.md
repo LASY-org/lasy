@@ -54,7 +54,7 @@ Then, for each contribution:
 ## Install
 
 ```
-python3 -m pip install -v .
+python3 -m pip install lasy
 ```
 
 For tests, you need to have a few extra packages, such as `pytest` and `openpmd-viewer` installed:
