@@ -16,6 +16,23 @@ Change into the new directory and then run the install command as given below.
 
 More installation options and further instructions will be added in due course.
 
+For tests, you need to have a few extra packages, such as `pytest` and `openpmd-viewer` installed:
+
+..  code-block:: bash
+
+    python3 -m pip install -r tests/requirements.txt
+
+Test
+############
+
+After successful installation, you can run the unit tests:
+
+..  code-block:: bash
+
+    python3 -m pytest tests/                                                                 # Run all tests
+    python3 -m pytest tests/test_laser_profiles.py                                           # Run tests from a single file
+    python3 -m pytest tests/test_laser_profiles.py::test_profile_gaussian_3d_cartesian       # Run a single test (useful during debugging)
+    python3 -m pytest -s -vvvv tests/                                                        # Run all tests, do not capture "print" output and be verbose
 
 First Example
 #############
