@@ -10,7 +10,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
 
     Derived class for an analytic profile.
     More precisely, at focus (`z_foc=0`), the transverse envelope (to be used in the
-    :class:CombinedLongitudinalTransverseLaser class) corresponds to:
+    :class:`.CombinedLongitudinalTransverseLaser` class) corresponds to:
 
     .. math::
 
