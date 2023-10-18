@@ -6,5 +6,5 @@ This transverse profile can also be implemented via the lowest order mode of eit
 
 ------------
 
-.. autoclass:: lasy.profiles.transverse.gaussian_profile.GaussianTransverseProfile
+.. autoclass:: lasy.profiles.transverse.GaussianTransverseProfile
     :members:

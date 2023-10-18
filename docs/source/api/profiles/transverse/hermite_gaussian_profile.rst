@@ -9,5 +9,5 @@ Hermite-Gaussian modes are a family of solutions to the paraxial wave equation w
 
 ------------
 
-.. autoclass:: lasy.profiles.transverse.hermite_gaussian_profile.HermiteGaussianTransverseProfile
+.. autoclass:: lasy.profiles.transverse.HermiteGaussianTransverseProfile
     :members:
