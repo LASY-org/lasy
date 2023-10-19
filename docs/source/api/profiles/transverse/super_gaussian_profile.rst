@@ -10,5 +10,5 @@ The shape of the profile is characterised by the waist :math:`w_0` and by one "o
 
 ------------
 
-.. autoclass:: lasy.profiles.transverse.super_gaussian_profile.SuperGaussianTransverseProfile
+.. autoclass:: lasy.profiles.transverse.SuperGaussianTransverseProfile
     :members:
