@@ -41,6 +41,7 @@ extensions = [
     "sphinx_design",
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
+    "nbsphinx",
 ]
 
 # Numpydoc settings
