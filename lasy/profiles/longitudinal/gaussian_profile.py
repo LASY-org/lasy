@@ -8,7 +8,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
     Derived class for the analytic profile of a longitudinally-Gaussian laser pulse.
 
     More precisely, the longitudinal envelope
-    (to be used in the :class:CombinedLongitudinalTransverseProfile class)
+    (to be used in the :class:`.CombinedLongitudinalTransverseProfile` class)
     corresponds to:
 
     .. math::

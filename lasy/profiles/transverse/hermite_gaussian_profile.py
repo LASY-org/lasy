@@ -11,7 +11,7 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
 
     Derived class for an analytic profile.
     More precisely, the transverse envelope (to be used in the
-    :class:CombinedLongitudinalTransverseLaser class) corresponds to:
+    :class:`.CombinedLongitudinalTransverseLaser` class) corresponds to:
 
     .. math::
 
