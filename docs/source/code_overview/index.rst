@@ -3,12 +3,22 @@ Overview of the Code
 
 ``lasy`` manipulates laser pulses, and operates on the laser envelope.
 It can be used to define the 3D profile of a laser pulse.
-The user can define seperately the transverse and longitudinal profile of the laser pulse either from a range common analytic profiles or using experimental measurements.
+The user can define separately the transverse and longitudinal profile of the laser pulse either from a range common analytic profiles or using experimental measurements.
 Once defined the laser pulse may be propagated to a user defined location.
 Finally the laser profile may be outputted to file for use as an input to a variety of different simulation tools.
 
-Structure
-#########
+Codes Supporting LASY Data
+##########################
+
+A list of codes which support LASY Data as input:
+
+* `FBPIC <https://github.com/fbpic/fbpic>`_
+* `Wake-T <https://github.com/AngelFP/Wake-T>`_
+* `WarpX <https://github.com/ECP-WarpX/WarpX>`_
+* `HiPACE++ <https://github.com/Hi-PACE/hipace>`_
+
+Structure of lasy
+#################
 
 All information pertaining to the representation of the laser pulse in the code is stored in the :doc:`laser <../api/laser>` object.
 This contains both the physical and computational parameters.
@@ -44,13 +54,3 @@ In cylindrical coordinates, the envelope is decomposed in :math:`N_m` azimuthal 
    \begin{aligned}
    E_x (r,\theta,t) = \operatorname{Re}\left( \sum_{-N_m+1}^{N_m-1}\mathcal{E}_m(r,t) e^{-im\theta}e^{-i\omega_0t}p_x\right)\\
    E_y (r,\theta,t) = \operatorname{Re}\left( \sum_{-N_m+1}^{N_m-1}\mathcal{E}_m(r,t) e^{-im\theta}e^{-i\omega_0t}p_y\right).\end{aligned}
-
-
-.. toctree::
-   :hidden:
-   :maxdepth: 4
-
-   motivation
-   data_standards
-   laser_propagation
-   codes_supporting_lasy
