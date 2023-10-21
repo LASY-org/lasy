@@ -2,9 +2,9 @@
 #   python -m pip install --upgrade -r docs/requirements.txt
 -e .
 matplotlib
-numpydoc
 jupyter
 nbsphinx
+numpydoc
 pydata-sphinx-theme
 sphinx-design
 sphinx-gallery
