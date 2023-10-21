@@ -3,6 +3,7 @@
 -e .
 matplotlib
 numpydoc
+jupyter
 nbsphinx
 pydata-sphinx-theme
 sphinx-design
