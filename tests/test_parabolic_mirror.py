@@ -15,19 +15,14 @@ from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.optical_elements import ParabolicMirror
 
 wavelength = 0.8e-6
-w0 = 10.0e-3  # m, initialized in near field
+w0 = 5.0e-3  # m, initialized in near field
 
-@pytest.fixture(scope="function")
-def gaussian():
-    # Cases with Gaussian laser
-    pol = (1, 0)
-    laser_energy = 1.0  # J
-    t_peak = 0.0e-15  # s
-    tau = 30.0e-15  # s
-    profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
-
-    return profile
-
+# The laser is initialized in the near field
+pol = (1, 0)
+laser_energy = 1.0  # J
+t_peak = 0.0e-15  # s
+tau = 30.0e-15  # s
+gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
 def get_w0(laser):
     # Calculate the laser waist
@@ -49,7 +44,6 @@ def get_w0(laser):
 
     return sigma
 
-
 def check_parabolic_mirror(laser):
     # Propagate laser after parabolic mirror + vacuum
     f0 = 8. # focal distance in m
@@ -60,26 +54,24 @@ def check_parabolic_mirror(laser):
     err = 2 * np.abs(w0_theor - w0_num) / (w0_theor + w0_num)
     assert err < 1e-3
 
-"""
-def test_3D_case(gaussian):
+def test_3D_case():
     # - 3D case
     # The laser is initialized in the near field
     dim = "xyt"
-    lo = (-25e-3, -25e-3, -60e-15)
-    hi = (+25e-3, +25e-3, +60e-15)
-    npoints = (3000, 3000, 100)
+    lo = (-12e-3, -12e-3, -60e-15)
+    hi = (+12e-3, +12e-3, +60e-15)
+    npoints = (500, 500, 100)
 
-    laser = Laser(dim, lo, hi, npoints, gaussian)
+    laser = Laser(dim, lo, hi, npoints, gaussian_profile)
     check_parabolic_mirror(laser)
-"""
 
-def test_RT_case(gaussian):
+def test_RT_case():
     # - Cylindrical case
     # The laser is initialized in the near field
     dim = "rt"
     lo = (0e-6, -60e-15)
-    hi = (25e-3, +60e-15)
-    npoints = (1500, 100)
+    hi = (15e-3, +60e-15)
+    npoints = (750, 100)
 
-    laser = Laser(dim, lo, hi, npoints, gaussian)
+    laser = Laser(dim, lo, hi, npoints, gaussian_profile)
     check_parabolic_mirror(laser)
