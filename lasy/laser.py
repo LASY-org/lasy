@@ -204,12 +204,12 @@ class Laser:
 
            # Apply optical element
             if initial_optical_element is not None:
-                r, w = np.meshgrid(self.grid.r, omega, indexing="ij")
+                r, w = np.meshgrid( self.grid.axes[0], omega, indexing="ij")
                 # The line below assumes that amplitude_multiplier
                 # is cylindrically-symmetric, hence we pass
                 # `r` as `x` and 0 as `y`
                 multiplier = initial_optical_element.amplitude_multiplier(r, 0, w)
-                for m in self.grid.azimuthal_modes:
+                for i_m in range(self.grid.azimuthal_modes.size):
                     field_fft[i_m, :, :] *= multiplier
 
             # Construct the propagator (check if exists)
@@ -235,7 +235,8 @@ class Laser:
 
            # Apply optical element
             if initial_optical_element is not None:
-                x, y, w = np.meshgrid(self.grid.x, self.grid.y, omega, indexing="ij")
+                x, y, w = np.meshgrid(self.grid.axes[0], self.grid.axes[1],
+                                      omega, indexing="ij")
                 field_fft *= initial_optical_element.amplitude_multiplier(x, y, w)
 
             # Construct the propagator (check if exists)

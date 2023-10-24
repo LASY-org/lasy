@@ -1,5 +1,6 @@
-from . import OpticalElement
+from .optical_element import OpticalElement
 import numpy as np
+from scipy.constants import c
 
 class ParabolicMirror(OpticalElement):
     r"""
@@ -9,7 +10,7 @@ class ParabolicMirror(OpticalElement):
 
     .. math::
 
-        T(\boldsymbol{x}_\perp,\omega) = \exp(i\omega \sqrt{x^2+y^2}/2f)
+        T(\boldsymbol{x}_\perp,\omega) = \exp(i\omega \sqrt{x^2+y^2}/2cf)
 
     where
     :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
@@ -26,4 +27,5 @@ class ParabolicMirror(OpticalElement):
         self.f = f
 
     def amplitude_multiplier(self, x, y, omega):
-        return np.exp(1j*omega*(x**2 + y**2)/(2*self.f))
+        # TODO: add reference
+        return np.exp( -1j*omega*(x**2 + y**2)/(2*c*self.f) )
