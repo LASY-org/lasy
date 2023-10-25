@@ -2,6 +2,7 @@ from .optical_element import OpticalElement
 import numpy as np
 from scipy.constants import c
 
+
 class AxiParabolaWithDelay(OpticalElement):
     r"""
     Class that represents the combination of an axiparabola with
@@ -39,19 +40,17 @@ class AxiParabolaWithDelay(OpticalElement):
         # Assuming uniform intensity on the axiparabola, and in order to get
         # a z-independent intensity over the focal range, we need
         # (see Eq. 6 in Oubrerie et al.)
-        z_foc = lambda r: self.f0 + self.delta * (r/self.R)**2
+        z_foc = lambda r: self.f0 + self.delta * (r / self.R) ** 2
 
         # Solve Eq. 2 in Oubrerie et al. to find the sag function
 
     def amplitude_multiplier(self, x, y, omega):
-
-
         # Interpolation
         sag = np.zeros_like(x)
 
         # Calculate phase shift
-        T = np.exp( -2j*(omega/c)*sag )
+        T = np.exp(-2j * (omega / c) * sag)
         # Remove intensity beyond R
-        T[ x**2 + y**2 > self.R**2 ] = 0
+        T[x**2 + y**2 > self.R**2] = 0
 
         return T

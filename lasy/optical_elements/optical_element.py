@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class OpticalElement(object):
     """
     Base class to model thin optical elements.

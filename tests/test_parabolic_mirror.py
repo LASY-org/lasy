@@ -22,6 +22,7 @@ t_peak = 0.0e-15  # s
 tau = 30.0e-15  # s
 gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
+
 def get_w0(laser):
     # Calculate the laser waist
     if laser.dim == "xyt":
@@ -42,15 +43,17 @@ def get_w0(laser):
 
     return sigma
 
+
 def check_parabolic_mirror(laser):
     # Propagate laser after parabolic mirror + vacuum
-    f0 = 8. # focal distance in m
-    laser.propagate( f0, initial_optical_element=ParabolicMirror( f=f0 ) )
+    f0 = 8.0  # focal distance in m
+    laser.propagate(f0, initial_optical_element=ParabolicMirror(f=f0))
     # Check that the value is the expected one in the near field
     w0_num = get_w0(laser)
-    w0_theor = wavelength * f0 / (np.pi*w0)
+    w0_theor = wavelength * f0 / (np.pi * w0)
     err = 2 * np.abs(w0_theor - w0_num) / (w0_theor + w0_num)
     assert err < 1e-3
+
 
 def test_3D_case():
     # - 3D case
@@ -62,6 +65,7 @@ def test_3D_case():
 
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)
     check_parabolic_mirror(laser)
+
 
 def test_RT_case():
     # - Cylindrical case

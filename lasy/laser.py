@@ -139,8 +139,9 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def propagate(self, distance, initial_optical_element=None,
-                  nr_boundary=None, backend="NP"):
+    def propagate(
+        self, distance, initial_optical_element=None, nr_boundary=None, backend="NP"
+    ):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -201,10 +202,9 @@ class Laser:
         omega_shape = (1, 1, self.grid.field.shape[time_axis_indx])
 
         if self.dim == "rt":
-
-           # Apply optical element
+            # Apply optical element
             if initial_optical_element is not None:
-                r, w = np.meshgrid( self.grid.axes[0], omega, indexing="ij")
+                r, w = np.meshgrid(self.grid.axes[0], omega, indexing="ij")
                 # The line below assumes that amplitude_multiplier
                 # is cylindrically-symmetric, hence we pass
                 # `r` as `x` and 0 as `y`
@@ -232,11 +232,11 @@ class Laser:
                 self.prop[i_m].step(transform_data, distance, overwrite=True)
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
         else:
-
-           # Apply optical element
+            # Apply optical element
             if initial_optical_element is not None:
-                x, y, w = np.meshgrid(self.grid.axes[0], self.grid.axes[1],
-                                      omega, indexing="ij")
+                x, y, w = np.meshgrid(
+                    self.grid.axes[0], self.grid.axes[1], omega, indexing="ij"
+                )
                 field_fft *= initial_optical_element.amplitude_multiplier(x, y, w)
 
             # Construct the propagator (check if exists)

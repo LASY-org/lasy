@@ -2,6 +2,7 @@ from .optical_element import OpticalElement
 import numpy as np
 from scipy.constants import c
 
+
 class ParabolicMirror(OpticalElement):
     r"""
     Derived class for a parabolic mirror.
@@ -27,4 +28,4 @@ class ParabolicMirror(OpticalElement):
         self.f = f
 
     def amplitude_multiplier(self, x, y, omega):
-        return np.exp( -1j*omega*(x**2 + y**2)/(2*c*self.f) )
+        return np.exp(-1j * omega * (x**2 + y**2) / (2 * c * self.f))
