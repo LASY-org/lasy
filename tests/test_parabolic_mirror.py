@@ -7,8 +7,6 @@ the focal position ; we then check that the waist as the
 expected value in the far field (i.e. in the focal plane)
 """
 
-import pytest
-
 import numpy as np
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile

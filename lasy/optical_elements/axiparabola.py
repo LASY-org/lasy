@@ -4,7 +4,7 @@ from scipy.constants import c
 
 class AxiParabolaWithDelay(OpticalElement):
     r"""
-    Class that represents the combination of an axiparabola, with
+    Class that represents the combination of an axiparabola with
     an additional optical element that provides a radially-dependent
     delay (e.g. an optical echelon) to tune the group velocity.
 
@@ -47,6 +47,7 @@ class AxiParabolaWithDelay(OpticalElement):
 
 
         # Interpolation
+        sag = np.zeros_like(x)
 
         # Calculate phase shift
         T = np.exp( -2j*(omega/c)*sag )
