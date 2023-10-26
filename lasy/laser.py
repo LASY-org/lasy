@@ -213,7 +213,10 @@ class Laser:
             for i_m in range(self.grid.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
                 self.prop[i_m].step(
-                    transform_data, distance, overwrite=True, show_progress=show_progress
+                    transform_data,
+                    distance,
+                    overwrite=True,
+                    show_progress=show_progress,
                 )
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
         else:
@@ -231,7 +234,9 @@ class Laser:
                 )
             # Propagate the spectral image
             transform_data = np.transpose(field_fft).copy()
-            self.prop.step(transform_data, distance, overwrite=True, show_progress=show_progress)
+            self.prop.step(
+                transform_data, distance, overwrite=True, show_progress=show_progress
+            )
             field_fft[:, :, :] = np.transpose(transform_data).copy()
 
         # Choose the time translation assuming propagation at v=c
