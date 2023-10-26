@@ -286,7 +286,7 @@ class Laser:
         **kw: additional arguments to be passed to matplotlib's imshow command
         """
         if self.dim == "rt":
-            # Show field above and below axis, with proper sign
+            # Show field in the plane y=0, above and below axis, with proper sign for each mode
             E = [
                 np.concatenate(
                     ((-1) ** m * self.grid.field[0, ::-1], self.grid.field[0])
