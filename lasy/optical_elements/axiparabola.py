@@ -39,9 +39,14 @@ class AxiParabola(OpticalElement):
     def amplitude_multiplier(self, x, y, omega):
         # Implement Eq. 4 in Smatsev et al.
         r2 = x**2 + y**2
-        sag = (1./(4*self.f0)) * r2 \
-            - (self.delta / (8*self.f0**2*self.R**2) ) * r2**2 \
-            + self.delta * (self.R**2 + 8*self.f0*self.delta) / (96*self.f0**4*self.R**4) * r2**3
+        sag = (
+            (1.0 / (4 * self.f0)) * r2
+            - (self.delta / (8 * self.f0**2 * self.R**2)) * r2**2
+            + self.delta
+            * (self.R**2 + 8 * self.f0 * self.delta)
+            / (96 * self.f0**4 * self.R**4)
+            * r2**3
+        )
 
         # Calculate phase shift
         T = np.exp(-2j * (omega / c) * sag)
