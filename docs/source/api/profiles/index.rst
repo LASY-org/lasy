@@ -11,8 +11,8 @@ Typically a laser will be constructed through a combination of two classes ``Lon
    :hidden:
 
    gaussian
-   combined_profile
    from_array_profile
    from_openpmd_profile
+   combined_profile
    longitudinal/index
    transverse/index
