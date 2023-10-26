@@ -6,7 +6,7 @@ from lasy import __version__ as lasy_version
 
 
 def write_to_openpmd_file(
-    dim, file_prefix, file_format, grid, wavelength, pol, save_as_vector_potential=False
+    dim, iteration, distance, file_prefix, file_format, grid, wavelength, pol, save_as_vector_potential=False
 ):
     """
     Write the laser field into an openPMD file.
@@ -20,7 +20,13 @@ def write_to_openpmd_file(
                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
-
+                 
+    iteration: integer
+        Current iteration
+            
+    distance: scalar
+        Propagation distance (overall)
+ 
     file_prefix : string
         The file name will start with this prefix.
 
@@ -47,7 +53,7 @@ def write_to_openpmd_file(
     series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
     series.set_software("lasy", lasy_version)
 
-    i = series.iterations[0]
+    i = series.iterations[iteration]
 
     # Define the mesh
     m = i.meshes["laserEnvelope"]
@@ -66,6 +72,8 @@ def write_to_openpmd_file(
     # Store metadata needed to reconstruct the field
     m.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
     m.set_attribute("polarization", pol)
+    m.set_attribute('t', distance/c)
+    m.set_attribute('iteration', iteration)
     if save_as_vector_potential:
         m.set_attribute("envelopeField", "normalized_vector_potential")
         m.unit_dimension = {}
