@@ -13,11 +13,12 @@ class OpticalElement(object):
         pass
 
     def amplitude_multiplier(self, x, y, omega):
-        """
-        Return the complex number :math:`T` with which to multiply the
-        complex amplitude of the laser just before this thin element,
-        in order to obtain the complex amplitude output laser just
-        after this thin element:
+        r"""
+        Return the amplitude multiplier :math:`T`.
+
+        This number multiplies the complex amplitude of the laser
+        just before this thin element, in order to obtain the complex
+        amplitude output laser just after this thin element:
 
         .. math::
 

@@ -37,6 +37,21 @@ class AxiParabola(OpticalElement):
         self.R = R
 
     def amplitude_multiplier(self, x, y, omega):
+        """
+        Return the amplitude multiplier.
+
+        Parameters
+        ----------
+        x, y, omega: ndarrays of floats
+            Define points on which to evaluate the multiplier.
+            These arrays need to all have the same shape.
+
+        Returns
+        -------
+        multiplier: ndarray of complex numbers
+            Contains the value of the multiplier at the specified points
+            This array has the same shape as the arrays x, y, omega
+        """
         # Implement Eq. 4 in Smatsev et al.
         r2 = x**2 + y**2
         sag = (
