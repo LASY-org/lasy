@@ -277,8 +277,7 @@ class Laser:
             save_as_vector_potential,
         )
 
-
-    def show( self, **kw ):
+    def show(self, **kw):
         """
         Show a 2D image of the laser amplitude
 
@@ -289,21 +288,34 @@ class Laser:
         if self.dim == "rt":
             # Show field above and below axis, with proper sign
             E = [
-                np.concatenate( ( (-1)**m * self.grid.field[0,::-1], self.grid.field[0] ) ) \
+                np.concatenate(
+                    ((-1) ** m * self.grid.field[0, ::-1], self.grid.field[0])
+                )
                 for m in self.grid.azimuthal_modes
             ]
             E = sum(E)
-            extent = [self.grid.lo[-1], self.grid.hi[-1], -self.grid.hi[0], self.grid.hi[0]]
+            extent = [
+                self.grid.lo[-1],
+                self.grid.hi[-1],
+                -self.grid.hi[0],
+                self.grid.hi[0],
+            ]
 
         else:
             # In 3D show an image in the xt plane
-            i_slice = int(self.grid.field.shape[1]//2)
-            E = self.grid.field[:,i_slice,:]
-            extent=[self.grid.lo[-1], self.grid.hi[-1], self.grid.lo[0], self.grid.hi[0]]
+            i_slice = int(self.grid.field.shape[1] // 2)
+            E = self.grid.field[:, i_slice, :]
+            extent = [
+                self.grid.lo[-1],
+                self.grid.hi[-1],
+                self.grid.lo[0],
+                self.grid.hi[0],
+            ]
 
         import matplotlib.pyplot as plt
-        plt.imshow( abs(E), extent=extent, aspect='auto', origin='lower', **kw )
+
+        plt.imshow(abs(E), extent=extent, aspect="auto", origin="lower", **kw)
         cb = plt.colorbar()
-        cb.set_label('$|E_{envelope}|$ (V/m)')
-        plt.xlabel('t (s)')
-        plt.ylabel('x (m)')
+        cb.set_label("$|E_{envelope}|$ (V/m)")
+        plt.xlabel("t (s)")
+        plt.ylabel("x (m)")
