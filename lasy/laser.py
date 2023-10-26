@@ -279,9 +279,9 @@ class Laser:
 
     def show(self, **kw):
         """
-        Show a 2D image of the laser amplitude
+        Show a 2D image of the laser amplitude.
 
-        Parameters:
+        Parameters
         ----------
         **kw: additional arguments to be passed to matplotlib's imshow command
         """
