@@ -140,7 +140,7 @@ class Laser:
             raise ValueError(f'kind "{kind}" not recognized')
 
     def propagate(
-        self, distance, initial_optical_element=None, nr_boundary=None, backend="NP"
+        self, distance, initial_optical_element=None, nr_boundary=None, backend="NP", show_progress=True
     ):
         """
         Propagate the laser pulse by the distance specified.
@@ -162,6 +162,8 @@ class Laser:
 
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
+        show_progress : bool (optional)
+            Whether to show a progress bar when performing the computation
         """
         time_axis_indx = -1
 
@@ -229,7 +231,12 @@ class Laser:
             # Propagate the spectral image
             for i_m in range(self.grid.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
-                self.prop[i_m].step(transform_data, distance, overwrite=True)
+                self.prop[i_m].step(
+                    transform_data,
+                    distance,
+                    overwrite=True,
+                    show_progress=show_progress,
+                )
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
         else:
             # Apply optical element
@@ -253,7 +260,9 @@ class Laser:
                 )
             # Propagate the spectral image
             transform_data = np.transpose(field_fft).copy()
-            self.prop.step(transform_data, distance, overwrite=True)
+            self.prop.step(
+                transform_data, distance, overwrite=True, show_progress=show_progress
+            )
             field_fft[:, :, :] = np.transpose(transform_data).copy()
 
         # Choose the time translation assuming propagation at v=c

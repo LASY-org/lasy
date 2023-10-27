@@ -6,7 +6,7 @@
 LASY |release| Documentation
 ============================
 
-``lasy`` (LAser SYmple manipulator) is a Python library that facilitates the initialization of complex laser pulses, in simulations of laser-plasma interactions.
+``lasy`` (LAser manipulations made eaSY) is a Python library that facilitates the initialization of complex laser pulses, in simulations of laser-plasma interactions.
 
 More specifically, ``lasy`` offers many ways to define complex laser pulses (e.g. from commonly-known analytical formulas, from experimental measurements, etc.) and offers pre-processing functionalities (e.g. propagation, re-normalization, geometry conversion).
 The laser field is then exported in a standardized file, that can be read by external simulation codes.

@@ -27,13 +27,12 @@ The physical laser pulse parameters are defined in the laser :doc:`profile <../a
 This is typically constructed from a :doc:`combination <../api/profiles/combined_profile>` of two classes representing the :doc:`longitudinal <../api/profiles/longitudinal/index>` and :doc:`transverse <../api/profiles/transverse/index>` profiles of the laser.
 Alternatively, one can define the full 3D profile in a single function, for example the :doc:`GaussianProfile <../api/profiles/gaussian>`
 
-The data associated with a given laser pulse is stored on a :doc:`grid <../api/utils/grid>`.
-To create this grid and populate it with a laser pulse, we need to know something about the computational parmaeters being used.
+The data associated with a given laser pulse is stored on a grid. To create this grid and populate it with a laser pulse, we need to know something about the computational parameters being used.
 For example, the metadata associated with this grid such as the coordinate system being used, lower and higher ends of the computational domain and number of points etc.
-All of this information is also stored in the :doc:`grid <../api/utils/grid>` class.
+All of this information is passed when initializing the :doc:`laser <../api/laser>` object.
 
 Once a laser :doc:`laser <../api/laser>` object has been defined, we can then propagate it forwards and backwards to see how it evolves or to set it in the right place for the beginning of a subsequent simulation.
-The laser object can be :doc:`outputted <../api/utils/openpmd_output>` to a standard file format for these subsequent calculations. This allows for easy incorporation of standardised laser pulses to a range of different simulation tools.
+The laser object can be written to a standard file format for these subsequent calculations. This allows for easy incorporation of standardized laser pulses to a range of different simulation tools.
 
 Coordinate Systems
 ##################
