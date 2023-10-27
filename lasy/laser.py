@@ -140,7 +140,12 @@ class Laser:
             raise ValueError(f'kind "{kind}" not recognized')
 
     def propagate(
-        self, distance, initial_optical_element=None, nr_boundary=None, backend="NP", show_progress=True
+        self,
+        distance,
+        initial_optical_element=None,
+        nr_boundary=None,
+        backend="NP",
+        show_progress=True,
     ):
         """
         Propagate the laser pulse by the distance specified.
