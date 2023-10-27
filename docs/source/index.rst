@@ -80,4 +80,3 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
    code_overview/index
    api/index
    tutorials/index
-   utils/index
