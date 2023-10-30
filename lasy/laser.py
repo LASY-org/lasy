@@ -139,7 +139,9 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def propagate(self, distance, nr_boundary=None, backend="NP", grid=None, show_progress=True):
+    def propagate(
+        self, distance, nr_boundary=None, backend="NP", grid=None, show_progress=True
+    ):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -154,10 +156,10 @@ class Laser:
             Only used for ``'rt'``.
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
-            
+
         grid : Grid object (optional)
             Resample the field onto a new grid. Only works for ``'rt'``.
-            
+
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
         """
@@ -210,7 +212,7 @@ class Laser:
                 spatial_axes_n = (grid.axes[0],)
                 # Overwrite grid
                 self.grid = grid
-                self.prop = [] # Delete existing propagator
+                self.prop = []  # Delete existing propagator
                 # Create Propagator and pass resampled axis
                 for m in self.grid.azimuthal_modes:
                     self.prop.append(
@@ -249,7 +251,7 @@ class Laser:
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
             # Delete Propagator if resampling was done
             if grid is not None:
-                del self.prop  
+                del self.prop
         else:
             # Construct the propagator for non-rt case (check if exists)
             if not hasattr(self, "prop"):
@@ -290,7 +292,12 @@ class Laser:
         self.grid.field *= np.exp(1j * omega0 * distance / c)
 
     def write_to_file(
-        self, iteration, distance, file_prefix="laser", file_format="h5", save_as_vector_potential=False
+        self,
+        iteration,
+        distance,
+        file_prefix="laser",
+        file_format="h5",
+        save_as_vector_potential=False,
     ):
         """
         Write the laser profile + metadata to file.
@@ -299,10 +306,10 @@ class Laser:
         ----------
         iteration: integer
             Current iteration
-            
+
         distance: scalar
             Propagation distance(overall position of the laser)
-        
+
         file_prefix : string
             The file name will start with this prefix.
 
