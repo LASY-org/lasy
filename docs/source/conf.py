@@ -41,6 +41,7 @@ extensions = [
     "sphinx_design",
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
+    "nbsphinx",
 ]
 
 # Numpydoc settings
@@ -75,6 +76,7 @@ html_theme_options = {
             "icon": "fa-brands fa-github",
         },
     ],
+    "navigation_with_keys": False,
 }
 
 # Prevent panels extension from modifying page style.

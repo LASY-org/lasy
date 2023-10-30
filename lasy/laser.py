@@ -139,7 +139,7 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def propagate(self, distance, nr_boundary=None, backend="NP", grid=None):
+    def propagate(self, distance, nr_boundary=None, backend="NP", grid=None, show_progress=True):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -154,8 +154,12 @@ class Laser:
             Only used for ``'rt'``.
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
-        grid : 
-            a grid object: Grid(dim, lo, hi, npoints, n_azimuthal_modes), resampling option 
+            
+        grid : Grid object (optional)
+            Resample the field onto a new grid. Only works for ``'rt'``.
+            
+        show_progress : bool (optional)
+            Whether to show a progress bar when performing the computation
         """
         time_axis_indx = -1
 
@@ -236,7 +240,12 @@ class Laser:
             # Propagate the spectral image
             for i_m in range(self.grid.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
-                self.prop[i_m].step(transform_data, distance, overwrite=True)
+                self.prop[i_m].step(
+                    transform_data,
+                    distance,
+                    overwrite=True,
+                    show_progress=show_progress,
+                )
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
             # Delete Propagator if resampling was done
             if grid is not None:
@@ -256,7 +265,9 @@ class Laser:
                 )
             # Propagate the spectral image
             transform_data = np.transpose(field_fft).copy()
-            self.prop.step(transform_data, distance, overwrite=True)
+            self.prop.step(
+                transform_data, distance, overwrite=True, show_progress=show_progress
+            )
             field_fft[:, :, :] = np.transpose(transform_data).copy()
 
         # Choose the time translation assuming propagation at v=c

@@ -65,11 +65,11 @@ def gerchberg_saxton_algo(
     i = 0
     while breakout(cond):
         laser1.grid.field = amp1 * np.exp(1j * phase1)
-        laser1.propagate(dz)
+        laser1.propagate(dz, show_progress=False)
 
         phase2 = np.angle(laser1.grid.field)
         laser2.grid.field = amp2 * np.exp(1j * phase2)
-        laser2.propagate(-dz)
+        laser2.propagate(-dz, show_progress=False)
 
         phase1 = np.angle(laser2.grid.field)
         amp1_calc = np.abs(laser2.grid.field)
