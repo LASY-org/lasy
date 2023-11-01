@@ -87,7 +87,9 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     for i in range(n_x_max):
         for j in range(n_y_max):
             HGMode = HermiteGaussianTransverseProfile(w0, i, j)
-            coef = np.real(np.sum(field * HGMode.evaluate(X, Y)) * dx * dy)  # modalDecomposition
+            coef = np.real(
+                np.sum(field * HGMode.evaluate(X, Y)) * dx * dy
+            )  # modalDecomposition
             if math.isnan(coef):
                 coef = 0
             weights[(i, j)] = coef
