@@ -293,7 +293,7 @@ class Laser:
                 )
                 for m in self.grid.azimuthal_modes
             ]
-            E = sum(E) # Sum all the modes
+            E = sum(E)  # Sum all the modes
             extent = [
                 self.grid.lo[-1],
                 self.grid.hi[-1],
