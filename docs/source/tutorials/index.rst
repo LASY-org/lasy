@@ -5,3 +5,4 @@ Tutorials
    :maxdepth: 1
 
    gaussian_laser.ipynb
+   axiparabola.ipynb

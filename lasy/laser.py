@@ -139,7 +139,14 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
+    def propagate(
+        self,
+        distance,
+        initial_optical_element=None,
+        nr_boundary=None,
+        backend="NP",
+        show_progress=True,
+    ):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -148,10 +155,16 @@ class Laser:
         distance : scalar
             Distance by which the laser pulse should be propagated
 
+        initial_optical_element: an :class:`.OpticalElement` object (optional)
+            Represents a thin optical element, through which the laser
+            propagates, before propagating for `distance` in free space.
+            If this is `None`, no optical element is used.
+
         nr_boundary : integer (optional)
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
             Only used for ``'rt'``.
+
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
         show_progress : bool (optional)
@@ -191,10 +204,21 @@ class Laser:
         omega0 = self.profile.omega0
         Nt = self.grid.field.shape[time_axis_indx]
         omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+
         # make 3D shape for the frequency axis
         omega_shape = (1, 1, self.grid.field.shape[time_axis_indx])
 
         if self.dim == "rt":
+            # Apply optical element
+            if initial_optical_element is not None:
+                r, w = np.meshgrid(self.grid.axes[0], omega, indexing="ij")
+                # The line below assumes that amplitude_multiplier
+                # is cylindrically-symmetric, hence we pass
+                # `r` as `x` and 0 as `y`
+                multiplier = initial_optical_element.amplitude_multiplier(r, 0, w)
+                for i_m in range(self.grid.azimuthal_modes.size):
+                    field_fft[i_m, :, :] *= multiplier
+
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
                 spatial_axes = (self.grid.axes[0],)
@@ -220,6 +244,13 @@ class Laser:
                 )
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
         else:
+            # Apply optical element
+            if initial_optical_element is not None:
+                x, y, w = np.meshgrid(
+                    self.grid.axes[0], self.grid.axes[1], omega, indexing="ij"
+                )
+                field_fft *= initial_optical_element.amplitude_multiplier(x, y, w)
+
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
                 Nx, Ny, Nt = self.grid.field.shape
@@ -285,3 +316,46 @@ class Laser:
             self.profile.pol,
             save_as_vector_potential,
         )
+
+    def show(self, **kw):
+        """
+        Show a 2D image of the laser amplitude.
+
+        Parameters
+        ----------
+        **kw: additional arguments to be passed to matplotlib's imshow command
+        """
+        if self.dim == "rt":
+            # Show field in the plane y=0, above and below axis, with proper sign for each mode
+            E = [
+                np.concatenate(
+                    ((-1) ** m * self.grid.field[0, ::-1], self.grid.field[0])
+                )
+                for m in self.grid.azimuthal_modes
+            ]
+            E = sum(E)
+            extent = [
+                self.grid.lo[-1],
+                self.grid.hi[-1],
+                -self.grid.hi[0],
+                self.grid.hi[0],
+            ]
+
+        else:
+            # In 3D show an image in the xt plane
+            i_slice = int(self.grid.field.shape[1] // 2)
+            E = self.grid.field[:, i_slice, :]
+            extent = [
+                self.grid.lo[-1],
+                self.grid.hi[-1],
+                self.grid.lo[0],
+                self.grid.hi[0],
+            ]
+
+        import matplotlib.pyplot as plt
+
+        plt.imshow(abs(E), extent=extent, aspect="auto", origin="lower", **kw)
+        cb = plt.colorbar()
+        cb.set_label("$|E_{envelope}|$ (V/m)")
+        plt.xlabel("t (s)")
+        plt.ylabel("x (m)")
