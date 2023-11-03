@@ -285,3 +285,46 @@ class Laser:
             self.profile.pol,
             save_as_vector_potential,
         )
+
+    def show(self, **kw):
+        """
+        Show a 2D image of the laser amplitude.
+
+        Parameters
+        ----------
+        **kw: additional arguments to be passed to matplotlib's imshow command
+        """
+        if self.dim == "rt":
+            # Show field in the plane y=0, above and below axis, with proper sign for each mode
+            E = [
+                np.concatenate(
+                    ((-1) ** m * self.grid.field[0, ::-1], self.grid.field[0])
+                )
+                for m in self.grid.azimuthal_modes
+            ]
+            E = sum(E)  # Sum all the modes
+            extent = [
+                self.grid.lo[-1],
+                self.grid.hi[-1],
+                -self.grid.hi[0],
+                self.grid.hi[0],
+            ]
+
+        else:
+            # In 3D show an image in the xt plane
+            i_slice = int(self.grid.field.shape[1] // 2)
+            E = self.grid.field[:, i_slice, :]
+            extent = [
+                self.grid.lo[-1],
+                self.grid.hi[-1],
+                self.grid.lo[0],
+                self.grid.hi[0],
+            ]
+
+        import matplotlib.pyplot as plt
+
+        plt.imshow(abs(E), extent=extent, aspect="auto", origin="lower", **kw)
+        cb = plt.colorbar()
+        cb.set_label("$|E_{envelope}|$ (V/m)")
+        plt.xlabel("t (s)")
+        plt.ylabel("x (m)")
