@@ -56,7 +56,7 @@ class CosLongitudinalProfile(LongitudinalProfile):
 
         tn = (t - t_peak)/self.tau
 
-        envelope = np.cos(0.5*np.pi*tn)*np.theta(tn + 1)*np.theta(1 - tn)*
-            np.exp(+ 1.0j * (self.cep_phase + self.omega0 * self.t_peak))
+        envelope = np.cos(0.5*np.pi*tn)*np.theta(tn + 1)*np.theta(1 - tn)*np.exp(
+            + 1.0j * (self.cep_phase + self.omega0 * self.t_peak))
 
         return envelope
