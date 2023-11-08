@@ -1,0 +1,10 @@
+Cos Longitudinal Profile
+========================
+
+Used to define a truncated cosinus longitudinal laser profile (i.e., a profile described by the function :math:`\cos{\left( {\frac{\pi}{2} \frac{t - t_{peak}}{t_{fwhm}} } \right)}`,
+in the interval :math:`[t_{peak} - t_{fwhm}/2, t_{peak} + t_{fwhm}/2]`).
+
+------------
+
+.. autoclass:: lasy.profiles.longitudinal.gaussian_profile.CosLongitudinalProfile
+    :members:

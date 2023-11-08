@@ -1,5 +1,5 @@
 Gaussian Laser Profile
 ======================
 
-.. autoclass:: lasy.profiles.gaussian_profile.GaussianProfile
+.. autoclass:: lasy.profiles.GaussianProfile
     :members:

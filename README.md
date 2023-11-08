@@ -1,7 +1,5 @@
 # lasy
 
-**Warning: This library is currently in development, and it is, at this stage, only meant to be used/tested by developers. We plan on releasing the first version for general users (i.e. beta version) by summer 2023.**
-
 ## Overview
 
 `lasy` is a Python library that facilitates the initialization of complex laser pulses, in simulations of laser-plasma interactions.
@@ -48,12 +46,13 @@ Then, for each contribution:
 # Style conventions
 
 - Docstrings are written using the Numpy style.
+- Functions in `utils/laser_utils.py` only depend on standard types (Python & Numpy) and on the `Grid` class. That way, they are relatively stand-alone and can be used on different data structures. A simple Grid factory is provided for that purpose.
 - A PR should be open for any contribution: the description helps to explain the code and open dicussion.
 
 ## Install
 
 ```
-python3 -m pip install -v .
+python3 -m pip install lasy
 ```
 
 For tests, you need to have a few extra packages, such as `pytest` and `openpmd-viewer` installed:

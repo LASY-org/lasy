@@ -1,5 +1,5 @@
 import numpy as np
-import scipy.constants as scc
+from scipy.constants import c, pi
 
 
 class LongitudinalProfile(object):
@@ -12,7 +12,7 @@ class LongitudinalProfile(object):
 
     def __init__(self, wavelength):
         self.lambda0 = wavelength
-        self.omega0 = 2 * scc.pi * scc.c / self.lambda0
+        self.omega0 = 2 * pi * c / self.lambda0
 
     def evaluate(self, t):
         """

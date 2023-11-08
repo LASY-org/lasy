@@ -1,9 +1,10 @@
 # install this from the source root (!) directory like this:
 #   python -m pip install --upgrade -r docs/requirements.txt
 -e .
+jupyter
 matplotlib
+nbsphinx
 numpydoc
 pydata-sphinx-theme
-pydata-sphinx-theme
+sphinx-design
 sphinx-gallery
-sphinx-panels

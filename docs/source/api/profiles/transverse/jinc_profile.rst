@@ -11,5 +11,5 @@ The shape of the profile is characterised by the waist :math:`w_0`.
 
 ------------
 
-.. autoclass:: lasy.profiles.transverse.jinc_profile.JincTransverseProfile
+.. autoclass:: lasy.profiles.transverse.JincTransverseProfile
     :members:

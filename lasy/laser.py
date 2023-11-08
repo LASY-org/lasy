@@ -1,8 +1,8 @@
 import numpy as np
-import scipy.constants as scc
+from scipy.constants import c
+
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 
-from lasy.utils.box import Box
 from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
     normalize_energy,
@@ -93,28 +93,26 @@ class Laser:
     """
 
     def __init__(self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1):
-        box = Box(dim, lo, hi, npoints, n_azimuthal_modes)
-        self.box = box
-        self.field = Grid(dim, self.box)
+        self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
         self.dim = dim
         self.profile = profile
 
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
-            x, y, t = np.meshgrid(*box.axes, indexing="ij")
-            self.field.field[...] = profile.evaluate(x, y, t)
+            x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
+            self.grid.field[...] = profile.evaluate(x, y, t)
         elif self.dim == "rt":
             # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
             # theta, to evaluate the laser
-            n_theta = 2 * box.n_azimuthal_modes - 1
+            n_theta = 2 * self.grid.n_azimuthal_modes - 1
             theta1d = 2 * np.pi / n_theta * np.arange(n_theta)
-            theta, r, t = np.meshgrid(theta1d, *box.axes, indexing="ij")
+            theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
             x = r * np.cos(theta)
             y = r * np.sin(theta)
             # Evaluate the profile on the generated grid
             envelope = profile.evaluate(x, y, t)
             # Perform the azimuthal decomposition
-            self.field.field[...] = np.fft.ifft(envelope, axis=0)
+            self.grid.field[...] = np.fft.ifft(envelope, axis=0)
 
         # For profiles that define the energy, normalize the amplitude
         if hasattr(profile, "laser_energy"):
@@ -133,15 +131,15 @@ class Laser:
             Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
         if kind == "energy":
-            normalize_energy(self.dim, value, self.field)
+            normalize_energy(self.dim, value, self.grid)
         elif kind == "field":
-            normalize_peak_field_amplitude(value, self.field)
+            normalize_peak_field_amplitude(value, self.grid)
         elif kind == "intensity":
-            normalize_peak_intensity(value, self.field)
+            normalize_peak_intensity(value, self.grid)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def propagate(self, distance, nr_boundary=None, backend="NP"):
+    def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -154,6 +152,10 @@ class Laser:
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
             Only used for ``'rt'``.
+        backend : string (optional)
+            Backend used by axiprop (see axiprop documentation).
+        show_progress : bool (optional)
+            Whether to show a progress bar when performing the computation
         """
         time_axis_indx = -1
 
@@ -164,93 +166,101 @@ class Laser:
             absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
             absorb_layer_shape[-1] = 0.0
             if self.dim == "rt":
-                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
+                self.grid.field[:, -nr_boundary:, :] *= absorb_layer_shape[
                     None, :, None
                 ]
             else:
-                self.field.field[-nr_boundary:, :, :] *= absorb_layer_shape[
+                self.grid.field[-nr_boundary:, :, :] *= absorb_layer_shape[
                     :, None, None
                 ]
-                self.field.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
+                self.grid.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
                     :, None, None
                 ]
-                self.field.field[:, -nr_boundary:, :] *= absorb_layer_shape[
+                self.grid.field[:, -nr_boundary:, :] *= absorb_layer_shape[
                     None, :, None
                 ]
-                self.field.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
+                self.grid.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
                     None, :, None
                 ]
 
         # Transform the field from temporal to frequency domain
-        field_fft = np.fft.fft(self.field.field, axis=time_axis_indx, norm="forward")
+        field_fft = np.fft.ifft(self.grid.field, axis=time_axis_indx, norm="backward")
 
         # Create the frequency axis
-        dt = self.box.dx[time_axis_indx]
+        dt = self.grid.dx[time_axis_indx]
         omega0 = self.profile.omega0
-        Nt = self.field.field.shape[time_axis_indx]
+        Nt = self.grid.field.shape[time_axis_indx]
         omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+        # make 3D shape for the frequency axis
+        omega_shape = (1, 1, self.grid.field.shape[time_axis_indx])
 
         if self.dim == "rt":
-            # make 3D shape for the frequency axis
-            omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
-                spatial_axes = (self.box.axes[0],)
+                spatial_axes = (self.grid.axes[0],)
                 self.prop = []
-                for m in self.box.azimuthal_modes:
+                for m in self.grid.azimuthal_modes:
                     self.prop.append(
                         PropagatorResampling(
                             *spatial_axes,
-                            omega / scc.c,
+                            omega / c,
                             mode=m,
                             backend=backend,
                             verbose=False,
                         )
                     )
             # Propagate the spectral image
-            for i_m in range(self.box.azimuthal_modes.size):
+            for i_m in range(self.grid.azimuthal_modes.size):
                 transform_data = np.transpose(field_fft[i_m]).copy()
-                self.prop[i_m].step(transform_data, distance, overwrite=True)
+                self.prop[i_m].step(
+                    transform_data,
+                    distance,
+                    overwrite=True,
+                    show_progress=show_progress,
+                )
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
         else:
-            # make 3D shape for the frequency axis
-            omega_shape = (1, 1, self.field.field.shape[time_axis_indx])
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
-                Nx, Ny, Nt = self.field.field.shape
-                Lx = self.box.hi[0] - self.box.lo[0]
-                Ly = self.box.hi[1] - self.box.lo[1]
+                Nx, Ny, Nt = self.grid.field.shape
+                Lx = self.grid.hi[0] - self.grid.lo[0]
+                Ly = self.grid.hi[1] - self.grid.lo[1]
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
                 self.prop = PropagatorFFT2(
                     *spatial_axes,
-                    omega / scc.c,
+                    omega / c,
                     backend=backend,
                     verbose=False,
                 )
             # Propagate the spectral image
             transform_data = np.transpose(field_fft).copy()
-            self.prop.step(transform_data, distance, overwrite=True)
+            self.prop.step(
+                transform_data, distance, overwrite=True, show_progress=show_progress
+            )
             field_fft[:, :, :] = np.transpose(transform_data).copy()
 
         # Choose the time translation assuming propagation at v=c
-        translate_time = distance / scc.c
-        # Translate the box
-        self.box.lo[time_axis_indx] += translate_time
-        self.box.hi[time_axis_indx] += translate_time
-        self.box.axes[time_axis_indx] += translate_time
+        translate_time = distance / c
+
+        # Translate the domain
+        self.grid.lo[time_axis_indx] += translate_time
+        self.grid.hi[time_axis_indx] += translate_time
+        self.grid.axes[time_axis_indx] += translate_time
 
         # Translate the phase of spectral image
         field_fft *= np.exp(-1j * translate_time * omega.reshape(omega_shape))
 
         # Transform field from frequency to temporal domain
-        self.field.field[:, :, :] = np.fft.ifft(
-            field_fft, axis=time_axis_indx, norm="forward"
+        self.grid.field[:, :, :] = np.fft.fft(
+            field_fft, axis=time_axis_indx, norm="backward"
         )
 
         # Translate phase of the retrieved envelope by the distance
-        self.field.field *= np.exp(1j * self.profile.omega0 * distance / scc.c)
+        self.grid.field *= np.exp(1j * omega0 * distance / c)
 
-    def write_to_file(self, file_prefix="laser", file_format="h5"):
+    def write_to_file(
+        self, file_prefix="laser", file_format="h5", save_as_vector_potential=False
+    ):
         """
         Write the laser profile + metadata to file.
 
@@ -261,12 +271,60 @@ class Laser:
 
         file_format : string
             Format to be used for the output file. Options are ``"h5"`` and ``"bp"``.
+
+        save_as_vector_potential : bool (optional)
+            Whether the envelope is converted to normalized vector potential
+            before writing to file.
         """
         write_to_openpmd_file(
             self.dim,
             file_prefix,
             file_format,
-            self.field,
+            self.grid,
             self.profile.lambda0,
             self.profile.pol,
+            save_as_vector_potential,
         )
+
+    def show(self, **kw):
+        """
+        Show a 2D image of the laser amplitude.
+
+        Parameters
+        ----------
+        **kw: additional arguments to be passed to matplotlib's imshow command
+        """
+        if self.dim == "rt":
+            # Show field in the plane y=0, above and below axis, with proper sign for each mode
+            E = [
+                np.concatenate(
+                    ((-1) ** m * self.grid.field[0, ::-1], self.grid.field[0])
+                )
+                for m in self.grid.azimuthal_modes
+            ]
+            E = sum(E)  # Sum all the modes
+            extent = [
+                self.grid.lo[-1],
+                self.grid.hi[-1],
+                -self.grid.hi[0],
+                self.grid.hi[0],
+            ]
+
+        else:
+            # In 3D show an image in the xt plane
+            i_slice = int(self.grid.field.shape[1] // 2)
+            E = self.grid.field[:, i_slice, :]
+            extent = [
+                self.grid.lo[-1],
+                self.grid.hi[-1],
+                self.grid.lo[0],
+                self.grid.hi[0],
+            ]
+
+        import matplotlib.pyplot as plt
+
+        plt.imshow(abs(E), extent=extent, aspect="auto", origin="lower", **kw)
+        cb = plt.colorbar()
+        cb.set_label("$|E_{envelope}|$ (V/m)")
+        plt.xlabel("t (s)")
+        plt.ylabel("x (m)")

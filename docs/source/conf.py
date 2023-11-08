@@ -38,17 +38,15 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
-    "sphinx_panels",
+    "sphinx_design",
     "numpydoc",
     "matplotlib.sphinxext.plot_directive",
+    "nbsphinx",
 ]
 
 # Numpydoc settings
 numpydoc_show_class_members = False
 numpydoc_use_plots = True
-
-# Autodoc Settings
-add_module_names = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -75,9 +73,10 @@ html_theme_options = {
         {
             "name": "GitHub",
             "url": "https://github.com/LASY-org/lasy",
-            "icon": "fab fa-github-square",
+            "icon": "fa-brands fa-github",
         },
     ],
+    "navigation_with_keys": False,
 }
 
 # Prevent panels extension from modifying page style.

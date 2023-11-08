@@ -5,5 +5,5 @@ This class allows the user to import an experimentally measured transverse profi
 
 ------------
 
-.. autoclass:: lasy.profiles.transverse.transverse_profile_from_data.TransverseProfileFromData
+.. autoclass:: lasy.profiles.transverse.TransverseProfileFromData
     :members:

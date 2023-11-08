@@ -18,7 +18,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
     - id: trailing-whitespace
       args: [--markdown-linebreak-ext=md]
@@ -49,7 +49,7 @@ repos:
 
 # Changes tabs to spaces
 - repo: https://github.com/Lucas-C/pre-commit-hooks
-  rev: v1.5.1
+  rev: v1.5.4
   hooks:
   - id: remove-tabs
 
@@ -64,7 +64,7 @@ repos:
 
 # Autoremoves unused Python imports
 - repo: https://github.com/hadialqattan/pycln
-  rev: v2.1.3
+  rev: v2.3.0
   hooks:
   - id: pycln
     name: pycln (python)
@@ -101,15 +101,15 @@ repos:
 
 # Python Formatting
 - repo: https://github.com/psf/black
-  rev: 23.3.0 # Keep in sync with blacken-docs
+  rev: 23.10.1  # Keep in sync with blacken-docs
   hooks:
   - id: black
 - repo: https://github.com/asottile/blacken-docs
-  rev: 1.13.0
+  rev: 1.16.0
   hooks:
   - id: blacken-docs
     additional_dependencies:
-    - black==22.12.0 # keep in sync with black hook
+    - black==23.9.1  # keep in sync with black hook
   # TODO: black-jupyter
 
 # Jupyter Notebooks: clean up all cell outputs

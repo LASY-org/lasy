@@ -37,11 +37,11 @@ class CombinedLongitudinalTransverseProfile(Profile):
         field (:math:`E_0` in the above formula) is automatically
         calculated so that the pulse has the prescribed energy.
 
-    long_profile : an instance of `lasy`'s :class:LongitudinalProfile
+    long_profile : :class:`.LongitudinalProfile`
         Defines the longitudinal envelope of the laser, i.e. the
         function :math:`\mathcal{L}(t)` in the above formula.
 
-    transverse_profile : an instance of `lasy`'s :class:TransverseProfile
+    transverse_profile : :class:`.TransverseProfile`
         Defines the transverse envelope of the laser, i.e. the
         function :math:`\mathcal{T}(x, y)` in the above formula.
     """
