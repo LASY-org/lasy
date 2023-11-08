@@ -6,5 +6,5 @@ in the interval :math:`[t_{peak} - t_{fwhm}/2, t_{peak} + t_{fwhm}/2]`).
 
 ------------
 
-.. autoclass:: lasy.profiles.longitudinal.gaussian_profile.CosLongitudinalProfile
+.. autoclass:: lasy.profiles.longitudinal.cos_profile.CosLongitudinalProfile
     :members:
