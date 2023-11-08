@@ -13,23 +13,26 @@ class CosLongitudinalProfile(LongitudinalProfile):
 
     .. math::
 
-        \mathcal{L}(t) = \cos\left({ \frac{\pi}{2} \frac{t-t_{peak}}{tau_{fwhm}} }\right)
-            \theta( \frac{t-t_{peak}}{tau_{fwhm}} + 1 ) \theta( 1 - \frac{t-t_{peak}}{tau_{fwhm}} )
-            \exp\left({ + i\omega_0 t_{peak} }\right)
+        \mathcal{L}(t) = \cos\left({ \frac{\pi}{2} \frac{t-t_{peak}}{\tau_{fwhm}} }\right)
+            \theta\left({ \frac{t-t_{peak}}{\tau_{fwhm}} + 1 }\right)
+            \theta\left({ 1 - \frac{t-t_{peak}}{\tau_{fwhm}}} \right)
+            \exp\left({ + i (\phi_{cep} + \omega_0 t_{peak} ) }\right)
+
 
     Parameters
     ----------
     tau_fwhm : float (in second)
-        The Full-Width-Half-Maximum duration of the intensity distribution of the pulse.
+        The Full-Width-Half-Maximum duration of the intensity distribution of the pulse,
+        i.e. :math:`\tau_{fwhm}` in the above formula.
 
     t_peak : float (in second)
         The time at which the laser envelope reaches its maximum amplitude,
         i.e. :math:`t_{peak}` in the above formula.
 
     cep_phase : float (in radian), optional
-        The Carrier Enveloppe Phase (CEP) :math:`\phi_{cep}`
+        The Carrier Enveloppe Phase (CEP)
         (i.e. the phase of the laser oscillation, at the time where the
-        laser envelope is maximum)
+        laser envelope is maximum,  :math:`\phi_{cep}` in the above formula).
     """
 
     def __init__(self, wavelength, tau_fwhm, t_peak, cep_phase=0):
