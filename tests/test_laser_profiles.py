@@ -3,6 +3,7 @@
 import pytest
 import numpy as np
 from scipy.special import gamma as gamma
+from scipy.constants import c
 
 from lasy.laser import Laser
 from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
@@ -142,6 +143,7 @@ def test_longitudinal_profiles():
     tau_fwhm = 30.0e-15
     t_peak = 1.0*tau_fwhm
     cep_phase = 0.5*np.pi
+    omega_0 = 2.0 * np.pi * c / wavelength
 
     t = np.linspace(t_peak - 4 * tau_fwhm, t_peak + 4 * tau_fwhm, npoints)
 
@@ -162,7 +164,7 @@ def test_longitudinal_profiles():
     print("t_peak = ", t_peak_gaussian)
     assert np.abs(t_peak_gaussian - t_peak) / t_peak < 0.01
 
-    ff_gaussian = field_gaussian*np.exp(-1.0j*profile_cos.omega0*t)
+    ff_gaussian = field_gaussian*np.exp(-1.0j*omega0*t)
     cep_phase_gaussian = np.angle(ff_gaussian[np.argmax(np.abs(field_gaussian))])
     print("cep_phase_th = ", cep_phase)
     print("cep_phase = ", cep_phase_gaussian)
@@ -184,7 +186,7 @@ def test_longitudinal_profiles():
     print("t_peak = ", t_peak_cos)
     assert np.abs(t_peak_cos - t_peak) / t_peak < 0.01
 
-    ff_cos = field_cos*np.exp(-1.0j*profile_cos.omega0*t)
+    ff_cos = field_cos*np.exp(-1.0j*omega0*t)
     cep_phase_cos = np.angle(ff_cos[np.argmax(np.abs(field_cos))])
     print("cep_phase_th = ", cep_phase)
     print("cep_phase = ", cep_phase_cos)
