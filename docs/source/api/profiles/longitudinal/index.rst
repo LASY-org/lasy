@@ -8,5 +8,6 @@ Longitudinal Profiles
    :maxdepth: 4
    :hidden:
 
+   cos
    gaussian
    longitudinal_profile_from_data
