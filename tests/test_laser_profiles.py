@@ -164,7 +164,7 @@ def test_longitudinal_profiles():
     print("t_peak = ", t_peak_gaussian)
     assert np.abs(t_peak_gaussian - t_peak) / t_peak < 0.01
 
-    ff_gaussian = field_gaussian * np.exp(-1.0j * omega0 * t)
+    ff_gaussian = field_gaussian * np.exp(-1.0j * omega_0 * t)
     cep_phase_gaussian = np.angle(ff_gaussian[np.argmax(np.abs(field_gaussian))])
     print("cep_phase_th = ", cep_phase)
     print("cep_phase = ", cep_phase_gaussian)
@@ -186,7 +186,7 @@ def test_longitudinal_profiles():
     print("t_peak = ", t_peak_cos)
     assert np.abs(t_peak_cos - t_peak) / t_peak < 0.01
 
-    ff_cos = field_cos * np.exp(-1.0j * omega0 * t)
+    ff_cos = field_cos * np.exp(-1.0j * omega_0 * t)
     cep_phase_cos = np.angle(ff_cos[np.argmax(np.abs(field_cos))])
     print("cep_phase_th = ", cep_phase)
     print("cep_phase = ", cep_phase_cos)
