@@ -57,9 +57,13 @@ class CosLongitudinalProfile(LongitudinalProfile):
             specified points. This array has the same shape as the array t.
         """
 
-        tn = (t - self.t_peak)/self.tau_fwhm
+        tn = (t - self.t_peak) / self.tau_fwhm
 
-        envelope = np.cos(0.5*np.pi*tn)*(tn > -1)*(tn < 1)*np.exp(
-            + 1.0j * (self.cep_phase + self.omega0 * self.t_peak))
+        envelope = (
+            np.cos(0.5 * np.pi * tn)
+            * (tn > -1)
+            * (tn < 1)
+            * np.exp(+1.0j * (self.cep_phase + self.omega0 * self.t_peak))
+        )
 
         return envelope
