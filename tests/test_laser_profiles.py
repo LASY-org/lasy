@@ -136,59 +136,59 @@ def test_transverse_profiles_3d():
 
 
 def test_longitudinal_profiles():
-npoints = 10000
+    npoints = 10000
 
-wavelength = 800e-9
-tau_fwhm = 30.0e-15
-t_peak = 1.0*tau_fwhm
-cep_phase = 0.5*np.pi
+    wavelength = 800e-9
+    tau_fwhm = 30.0e-15
+    t_peak = 1.0*tau_fwhm
+    cep_phase = 0.5*np.pi
 
-t = np.linspace(t_peak - 4 * tau_fwhm, t_peak + 4 * tau_fwhm, npoints)
+    t = np.linspace(t_peak - 4 * tau_fwhm, t_peak + 4 * tau_fwhm, npoints)
 
-# GaussianLongitudinalProfile
-print("GaussianLongitudinalProfile")
-tau = tau_fwhm/np.sqrt(2*np.log(2))
-profile_gaussian = GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase)
-field_gaussian = profile_gaussian.evaluate(t)
+    # GaussianLongitudinalProfile
+    print("GaussianLongitudinalProfile")
+    tau = tau_fwhm/np.sqrt(2*np.log(2))
+    profile_gaussian = GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase)
+    field_gaussian = profile_gaussian.evaluate(t)
 
-std_gauss = np.sqrt(np.average((t-t_peak)**2, weights=np.abs(field_gaussian)))
-std_gauss_th = tau/np.sqrt(2.0)
-print("std_th = ", std_gauss_th)
-print("std = ", std_gauss)
-assert np.abs(std_gauss - std_gauss_th) / std_gauss_th < 0.01
+    std_gauss = np.sqrt(np.average((t-t_peak)**2, weights=np.abs(field_gaussian)))
+    std_gauss_th = tau/np.sqrt(2.0)
+    print("std_th = ", std_gauss_th)
+    print("std = ", std_gauss)
+    assert np.abs(std_gauss - std_gauss_th) / std_gauss_th < 0.01
 
-t_peak_gaussian = t[np.argmax(np.abs(field_gaussian))]
-print("t_peak_th = ", t_peak)
-print("t_peak = ", t_peak_gaussian)
-assert np.abs(t_peak_gaussian - t_peak) / t_peak < 0.01
+    t_peak_gaussian = t[np.argmax(np.abs(field_gaussian))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_gaussian)
+    assert np.abs(t_peak_gaussian - t_peak) / t_peak < 0.01
 
-ff_gaussian = field_gaussian*np.exp(-1.0j*profile_cos.omega0*t)
-cep_phase_gaussian = np.angle(ff_gaussian[np.argmax(np.abs(field_gaussian))])
-print("cep_phase_th = ", cep_phase)
-print("cep_phase = ", cep_phase_gaussian)
-assert np.abs(cep_phase_gaussian - cep_phase) / cep_phase < 0.02
+    ff_gaussian = field_gaussian*np.exp(-1.0j*profile_cos.omega0*t)
+    cep_phase_gaussian = np.angle(ff_gaussian[np.argmax(np.abs(field_gaussian))])
+    print("cep_phase_th = ", cep_phase)
+    print("cep_phase = ", cep_phase_gaussian)
+    assert np.abs(cep_phase_gaussian - cep_phase) / cep_phase < 0.02
 
-# CosLongitudinalProfile
-print("CosLongitudinalProfile")
-profile_cos = CosLongitudinalProfile(wavelength, tau_fwhm, t_peak, cep_phase)
-field_cos = profile_cos.evaluate(t)
+    # CosLongitudinalProfile
+    print("CosLongitudinalProfile")
+    profile_cos = CosLongitudinalProfile(wavelength, tau_fwhm, t_peak, cep_phase)
+    field_cos = profile_cos.evaluate(t)
 
-std_cos = np.sqrt(np.average((t-t_peak)**2, weights=np.abs(field_cos)))
-std_cos_th = tau_fwhm*np.sqrt(1- 8/np.pi**2)
-print("std_th = ", std_cos_th)
-print("std = ", std_cos)
-assert np.abs(std_cos - std_cos_th) / std_cos_th < 0.01
+    std_cos = np.sqrt(np.average((t-t_peak)**2, weights=np.abs(field_cos)))
+    std_cos_th = tau_fwhm*np.sqrt(1- 8/np.pi**2)
+    print("std_th = ", std_cos_th)
+    print("std = ", std_cos)
+    assert np.abs(std_cos - std_cos_th) / std_cos_th < 0.01
 
-t_peak_cos = t[np.argmax(np.abs(field_cos))]
-print("t_peak_th = ", t_peak)
-print("t_peak = ", t_peak_cos)
-assert np.abs(t_peak_cos - t_peak) / t_peak < 0.01
+    t_peak_cos = t[np.argmax(np.abs(field_cos))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_cos)
+    assert np.abs(t_peak_cos - t_peak) / t_peak < 0.01
 
-ff_cos = field_cos*np.exp(-1.0j*profile_cos.omega0*t)
-cep_phase_cos = np.angle(ff_cos[np.argmax(np.abs(field_cos))])
-print("cep_phase_th = ", cep_phase)
-print("cep_phase = ", cep_phase_cos)
-assert np.abs(cep_phase_cos - cep_phase) / cep_phase < 0.02
+    ff_cos = field_cos*np.exp(-1.0j*profile_cos.omega0*t)
+    cep_phase_cos = np.angle(ff_cos[np.argmax(np.abs(field_cos))])
+    print("cep_phase_th = ", cep_phase)
+    print("cep_phase = ", cep_phase_cos)
+    assert np.abs(cep_phase_cos - cep_phase) / cep_phase < 0.02
 
 
 def test_profile_gaussian_3d_cartesian(gaussian):
