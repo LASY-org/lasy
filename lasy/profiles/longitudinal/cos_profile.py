@@ -13,9 +13,9 @@ class CosLongitudinalProfile(LongitudinalProfile):
 
     .. math::
 
-        \mathcal{L}(t) = \cos\left({ \frac{\pi}{2} \frac{t-t_peak}{tau_fwhm} }\right)
-            \theta( \frac{t-t_peak}{tau_fwhm} + 1 ) \theta( 1 - \frac{t-t_peak}{tau_fwhm} )
-            \exp\left({ + i\omega_0t_{peak} }\right)
+        \mathcal{L}(t) = \cos\left({ \frac{\pi}{2} \frac{t-t_{peak}}{tau_{fwhm}} }\right)
+            \theta( \frac{t-t_{peak}}{tau_{fwhm}} + 1 ) \theta( 1 - \frac{t-t_{peak}}{tau_{fwhm}} )
+            \exp\left({ + i\omega_0 t_{peak} }\right)
 
     Parameters
     ----------
@@ -32,9 +32,9 @@ class CosLongitudinalProfile(LongitudinalProfile):
         laser envelope is maximum)
     """
 
-    def __init__(self, wavelength, tau, t_peak, cep_phase=0):
+    def __init__(self, wavelength, tau_fwhm, t_peak, cep_phase=0):
         super().__init__(wavelength)
-        self.tau = tau
+        self.tau_fwhm = tau_fwhm
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
@@ -54,9 +54,9 @@ class CosLongitudinalProfile(LongitudinalProfile):
             specified points. This array has the same shape as the array t.
         """
 
-        tn = (t - t_peak)/self.tau
+        tn = (t - self.t_peak)/self.tau_fwhm
 
-        envelope = np.cos(0.5*np.pi*tn)*np.theta(tn + 1)*np.theta(1 - tn)*np.exp(
+        envelope = np.cos(0.5*np.pi*tn)*(tn > -1)*(tn < 1)*np.exp(
             + 1.0j * (self.cep_phase + self.omega0 * self.t_peak))
 
         return envelope
