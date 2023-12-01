@@ -62,7 +62,7 @@ class SpaceTimeProfile(Profile):
         oscillation, at the time where the laser envelope is maximum)
     """
 
-    def __init__(self, wavelength, pol, laser_energy, w0, tau, sc, t_peak, cep_phase=0):
+    def __init__(self, wavelength, pol, laser_energy, w0, tau, b, t_peak, cep_phase=0):
         super().__init__(wavelength, pol)
         self.laser_energy = laser_energy
         self.w0 = w0
