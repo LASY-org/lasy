@@ -47,9 +47,10 @@ class SpaceTimeProfile(Profile):
     w0: float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
 
-    sc: spatial chirp, b in the above formula, that results in a mixing
-        of the longitudinal and transverse profiles. Must be in units
-        of [x/omega]. A representative real value is b = w0 * tau.
+    b: float (in meter.second)
+        Spatial chirp, i.e. :math:`b` in the above formula, that results in the laser frequency
+        varying as a function of `x`. A representative real value is b = w0 * tau.
+
 
     t_peak: float (in second)
         The time at which the laser envelope reaches its maximum amplitude,
