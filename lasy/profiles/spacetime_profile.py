@@ -67,7 +67,7 @@ class SpaceTimeProfile(Profile):
         self.laser_energy = laser_energy
         self.w0 = w0
         self.tau = tau
-        self.sc = sc
+        self.b = b
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
@@ -89,10 +89,10 @@ class SpaceTimeProfile(Profile):
         """
         transverse = np.exp(-(x**2 + y**2) / self.w0**2)
 
-        tau_eff = np.sqrt(self.tau**2 + (2 * self.sc / self.w0) ** 2)
+        tau_eff = np.sqrt(self.tau**2 + (2 * self.b / self.w0) ** 2)
 
         spacetime = np.exp(
-            -((t - self.t_peak + (2 * 1j * self.sc * x / self.w0**2)) ** 2)
+            -((t - self.t_peak + (2 * 1j * self.b * x / self.w0**2)) ** 2)
             / tau_eff**2
         )
 
