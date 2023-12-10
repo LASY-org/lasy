@@ -234,7 +234,9 @@ class Laser:
                 )
             # Propagate the spectral image
             transform_data = np.moveaxis(field_fft, -1, 0).copy()
-            self.prop.step(transform_data, distance, overwrite=True)
+            self.prop.step(
+                transform_data, distance, overwrite=True, show_progress=show_progress
+            )
             field_fft[:, :, :] = np.moveaxis(transform_data, 0, -1).copy()
 
         # Choose the time translation assuming propagation at v=c
