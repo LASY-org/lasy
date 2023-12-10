@@ -1,2 +1,0 @@
-Initialise a Gaussian Pulse
-===========================

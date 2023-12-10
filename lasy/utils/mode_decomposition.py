@@ -87,7 +87,9 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     for i in range(n_x_max):
         for j in range(n_y_max):
             HGMode = HermiteGaussianTransverseProfile(w0, i, j)
-            coef = np.sum(field * HGMode.evaluate(X, Y)) * dx * dy  # modalDecomposition
+            coef = np.real(
+                np.sum(field * HGMode.evaluate(X, Y)) * dx * dy
+            )  # modalDecomposition
             if math.isnan(coef):
                 coef = 0
             weights[(i, j)] = coef
@@ -137,7 +139,7 @@ def estimate_best_HG_waist(x, y, field):
         # create a gaussian
         HGMode = HermiteGaussianTransverseProfile(wTest, 0, 0)
         profile = HGMode.evaluate(X, Y)
-        coeffTest[i] = np.sum(profile * field)
+        coeffTest[i] = np.real(np.sum(profile * field))
     w0 = waistTest[np.argmax(coeffTest)]
 
     print("Estimated w0 = %.2f microns" % (w0Est * 1e6))

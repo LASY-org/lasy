@@ -2,6 +2,7 @@ import numpy as np
 import openpmd_api as io
 from scipy.constants import c
 from .laser_utils import field_to_vector_potential
+from lasy import __version__ as lasy_version
 
 
 def write_to_openpmd_file(
@@ -44,6 +45,8 @@ def write_to_openpmd_file(
 
     # Create file
     series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
+    series.set_software("lasy", lasy_version)
+
     i = series.iterations[0]
 
     # Define the mesh
@@ -103,8 +106,9 @@ def write_to_openpmd_file(
     # Define the dataset
     dataset = io.Dataset(data.dtype, data.shape)
     env = m[io.Mesh_Record_Component.SCALAR]
-    env.position = [0] * len(dim)
+    env.position = np.zeros(len(dim), dtype=np.float64)
     env.reset_dataset(dataset)
     env.store_chunk(data)
 
     series.flush()
+    series.close()

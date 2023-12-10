@@ -1,5 +1,5 @@
 Profile read from an openPMD file
 =================================
 
-.. autoclass:: lasy.profiles.from_openpmd_profile.FromOpenPMDProfile
+.. autoclass:: lasy.profiles.FromOpenPMDProfile
     :members:

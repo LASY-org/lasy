@@ -11,5 +11,5 @@ The modes can have azimuthally varying fields (for :math:`m > 0`) but any single
 
 ------------
 
-.. autoclass:: lasy.profiles.transverse.laguerre_gaussian_profile.LaguerreGaussianTransverseProfile
+.. autoclass:: lasy.profiles.transverse.LaguerreGaussianTransverseProfile
     :members:

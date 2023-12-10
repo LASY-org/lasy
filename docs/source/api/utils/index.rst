@@ -6,5 +6,4 @@ Utils
    :hidden:
 
    grid
-   laser_energy
-   openpmd_output
+   gerchberg_saxton

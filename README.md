@@ -1,7 +1,5 @@
 # lasy
 
-**Warning: This library is currently in development, and it is, at this stage, only meant to be used/tested by developers. We plan on releasing the first version for general users (i.e. beta version) by summer 2023.**
-
 ## Overview
 
 `lasy` is a Python library that facilitates the initialization of complex laser pulses, in simulations of laser-plasma interactions.
@@ -54,7 +52,7 @@ Then, for each contribution:
 ## Install
 
 ```
-python3 -m pip install -v .
+python3 -m pip install lasy
 ```
 
 For tests, you need to have a few extra packages, such as `pytest` and `openpmd-viewer` installed:
