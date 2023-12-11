@@ -99,6 +99,7 @@ class SummedTransverseProfile(TransverseProfile):
 
     def __init__(self, *transverse_profiles):
         """Initialize the summed profile."""
+        TransverseProfile.__init__(self)
         # Check that all transverse_profiles are TransverseProfile objects
         assert all(
             [isinstance(tp, TransverseProfile) for tp in transverse_profiles]
@@ -126,6 +127,7 @@ class ScaledTransverseProfile(TransverseProfile):
 
     def __init__(self, transverse_profile, factor):
         """Initialize the summed profile."""
+        TransverseProfile.__init__(self)
         # Check that the factor is a number
         assert isinstance(factor, (int, float, complex)), "The factor must be a number."
         # Check that the profile is a Profile object
