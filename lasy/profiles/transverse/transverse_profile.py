@@ -45,7 +45,7 @@ class TransverseProfile(object):
     def __rmul__(self, factor):
         """Return the scaled transverse profile."""
         return ScaledTransverseProfile(self, factor)
-    
+
     def evaluate(self, x, y):
         """
         Return the transverse envelope modified by any spatial offsets.
@@ -85,6 +85,7 @@ class TransverseProfile(object):
 
         return self
 
+
 class SummedTransverseProfile(TransverseProfile):
     """
     Base class for transverse profiles that are the sum of several other transverse profiles.
@@ -110,6 +111,7 @@ class SummedTransverseProfile(TransverseProfile):
         # Sum the fields of each profile
         return sum([tp.evaluate(x, y) for tp in self.transverse_profiles])
 
+
 class ScaledTransverseProfile(TransverseProfile):
     """
     Base class for transverse profiles that are scaled by a factor.
@@ -129,7 +131,9 @@ class ScaledTransverseProfile(TransverseProfile):
         # Check that the factor is a number
         assert isinstance(factor, (int, float, complex)), "The factor must be a number."
         # Check that the profile is a Profile object
-        assert isinstance(transverse_profile, TransverseProfile), "The profile must be a TransverseProfile object."
+        assert isinstance(
+            transverse_profile, TransverseProfile
+        ), "The profile must be a TransverseProfile object."
         self.transverse_profile = transverse_profile
         self.factor = factor
 
