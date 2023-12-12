@@ -764,9 +764,7 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
             verbose=False,
         )
         # Convert the spectral image to the spatial field representation
-        FieldAxprp.import_field(
-            np.moveaxis(grid.field, -1, 0).copy()
-        )
+        FieldAxprp.import_field(np.moveaxis(grid.field, -1, 0).copy())
         field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0)
         field_z = np.moveaxis(field_z, 0, -1)
         field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
@@ -855,7 +853,5 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         # Convert the spectral image to the spatial field representation
         transform_data = np.moveaxis(field_fft, -1, 0).copy()
         transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
-        grid.field = np.moveaxis(
-            prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1
-        )
+        grid.field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
         grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
