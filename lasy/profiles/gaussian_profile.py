@@ -117,7 +117,20 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     >>> plt.ylabel('r (µm)')
     """
 
-    def __init__(self, wavelength, pol, laser_energy, w0, a, b, tau, gdd, t_peak, cep_phase=0, z_foc=0):
+    def __init__(
+        self,
+        wavelength,
+        pol,
+        laser_energy,
+        w0,
+        a,
+        b,
+        tau,
+        gdd,
+        t_peak,
+        cep_phase=0,
+        z_foc=0,
+    ):
         super().__init__(wavelength, pol)
         self.laser_energy = laser_energy
         self.w0 = w0
@@ -147,10 +160,15 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
         """
         transverse = np.exp(-(x**2 + y**2) / self.w0**2)
 
-        tau_eff = np.sqrt(self.tau**2 + (2 * self.b / self.w0) ** 2 + 2 * 1j * self.gdd)
+        tau_eff = np.sqrt(
+            self.tau**2 + (2 * self.b / self.w0) ** 2 + 2 * 1j * self.gdd
+        )
 
         spacetime = np.exp(
-            -((t - self.t_peak - self.a * x + (2 * 1j * self.b * x / self.w0**2)) ** 2)
+            -(
+                (t - self.t_peak - self.a * x + (2 * 1j * self.b * x / self.w0**2))
+                ** 2
+            )
             / tau_eff**2
         )
 
