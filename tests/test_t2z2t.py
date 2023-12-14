@@ -24,9 +24,9 @@ def gaussian():
 
 
 def get_laser_z_analytic(profile, z_axis, r_axis):
-    w0 = profile.trans_profile.w0
-    tau = profile.long_profile.tau
-    omega0 = profile.long_profile.omega0
+    w0 = profile.w0
+    tau = profile.tau
+    omega0 = profile.omega0
     k0 = omega0 / c
     lambda0 = 2 * np.pi / k0
 
