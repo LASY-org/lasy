@@ -1,9 +1,9 @@
-from . import CombinedLongitudinalTransverseProfile
-from .longitudinal import GaussianLongitudinalProfile
-from .transverse import GaussianTransverseProfile
+import numpy as np
+
+from .profile import Profile
 
 
-class GaussianProfile(CombinedLongitudinalTransverseProfile):
+class GaussianProfile(Profile):
     r"""
     Derived class for the analytic profile of a Gaussian laser pulse.
 
