@@ -48,7 +48,7 @@ def check_gaussian_propagation(
     laser, propagation_distance=100e-6, propagation_step=10e-6
 ):
     # Do the propagation and check evolution of waist with theory
-    w0 = laser.profile.trans_profile.w0
+    w0 = laser.profile.w0
     L_R = np.pi * w0**2 / laser.profile.lambda0
 
     propagated_distance = 0.0
