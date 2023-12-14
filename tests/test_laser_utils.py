@@ -47,9 +47,7 @@ def test_laser_analysis_utils():
 
         # Check that laser duration agrees with the given one.
         tau_rms = get_duration(laser.grid, dim)
-        np.testing.assert_approx_equal(
-            2 * tau_rms, laser.profile.tau, significant=3
-        )
+        np.testing.assert_approx_equal(2 * tau_rms, laser.profile.tau, significant=3)
 
 
 if __name__ == "__main__":
