@@ -7,14 +7,16 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     r"""
     Derived class for the analytic profile of a Gaussian laser pulse.
 
+    This includes space-time couplings: pulse-front tilt and spatial chirp
+
     More precisely, the electric field corresponds to:
 
     .. math::
 
-        E_u(\boldsymbol{x}_\perp,t) = Re\left[ E_0\,
-        \exp\left( -\frac{\boldsymbol{x}_\perp^2}{w_0^2}
-        - \frac{(t-t_{peak})^2}{\tau^2} -i\omega_0(t-t_{peak})
-        + i\phi_{cep}\right) \times p_u \right]
+        E_u(\\boldsymbol{x}_\\perp,t) = Re\\left[ E_0\\,
+        \\exp\\left(-\\frac{\\boldsymbol{x}_\\perp^2}{w_0^2}
+        - \\frac{(t-t_{peak}-ax+2ibx/w_0^2)^2}{\\tau_{eff}^2}
+        - i\\omega_0(t-t_{peak}) + i\\phi_{cep}\\right) \\times p_u \\right]
 
     where :math:`u` is either :math:`x` or :math:`y`, :math:`p_u` is
     the polarization vector, :math:`Re` represent the real part, and
@@ -43,11 +45,23 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     w0 : float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
 
+    a: float (in second/meter)
+        Pulse-front tilt, i.e. :math:`a` in the above formula, that results in the laser arrival
+        time varying as a function of `x`. A representative real value is a = tau / w0.
+
+    b: float (in meter.second)
+        Spatial chirp, i.e. :math:`b` in the above formula, that results in the laser frequency
+        varying as a function of `x`. A representative real value is b = w0 * tau.
+
     tau : float (in second)
         The duration of the laser pulse, i.e. :math:`\tau` in the above
         formula. Note that :math:`\tau = \tau_{FWHM}/\sqrt{2\log(2)}`,
         where :math:`\tau_{FWHM}` is the Full-Width-Half-Maximum duration
         of the intensity distribution of the pulse.
+
+    GDD: float (in second.second)
+        Group-delay dispersion, i.e. :math:`gdd` in the formula for tau_eff, that results
+        in temporal chirp. A representative real value is gdd = tau * tau.
 
     t_peak : float (in second)
         The time at which the laser envelope reaches its maximum amplitude,
@@ -103,13 +117,45 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     >>> plt.ylabel('r (µm)')
     """
 
-    def __init__(
-        self, wavelength, pol, laser_energy, w0, tau, t_peak, cep_phase=0, z_foc=0
-    ):
-        super().__init__(
-            wavelength,
-            pol,
-            laser_energy,
-            GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase),
-            GaussianTransverseProfile(w0, z_foc, wavelength),
+    def __init__(self, wavelength, pol, laser_energy, w0, a, b, tau, gdd, t_peak, cep_phase=0, z_foc=0):
+        super().__init__(wavelength, pol)
+        self.laser_energy = laser_energy
+        self.w0 = w0
+        self.a = a
+        self.b = b
+        self.tau = tau
+        self.gdd = gdd
+        self.t_peak = t_peak
+        self.cep_phase = cep_phase
+        self.z_foc = z_foc
+
+    def evaluate(self, x, y, t):
+        """
+        Return the envelope field of the laser.
+
+        Parameters
+        ----------
+        x, y, t: ndarrays of floats
+            Define points on which to evaluate the envelope
+            These arrays need to all have the same shape.
+
+        Returns
+        -------
+        envelope: ndarray of complex numbers
+            Contains the value of the envelope at the specified points
+            This array has the same shape as the arrays x, y, t
+        """
+        transverse = np.exp(-(x**2 + y**2) / self.w0**2)
+
+        tau_eff = np.sqrt(self.tau**2 + (2 * self.b / self.w0) ** 2 + 2 * 1j * self.gdd)
+
+        spacetime = np.exp(
+            -((t - self.t_peak - self.a * x + (2 * 1j * self.b * x / self.w0**2)) ** 2)
+            / tau_eff**2
         )
+
+        oscillatory = np.exp(1.0j * (self.cep_phase - self.omega0 * (t - self.t_peak)))
+
+        envelope = transverse * spacetime * oscillatory
+
+        return envelope
