@@ -45,27 +45,27 @@ class GaussianProfile(Profile):
     w0 : float (in meter)
         The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
 
-    a: float (in second/meter)
-        Pulse-front tilt, i.e. :math:`a` in the above formula, that results in the laser arrival
-        time varying as a function of `x`. A representative real value is a = tau / w0.
-
-    b: float (in meter.second)
-        Spatial chirp, i.e. :math:`b` in the above formula, that results in the laser frequency
-        varying as a function of `x`. A representative real value is b = w0 * tau.
-
     tau : float (in second)
         The duration of the laser pulse, i.e. :math:`\tau` in the above
         formula. Note that :math:`\tau = \tau_{FWHM}/\sqrt{2\log(2)}`,
         where :math:`\tau_{FWHM}` is the Full-Width-Half-Maximum duration
         of the intensity distribution of the pulse.
 
-    GDD: float (in second.second)
-        Group-delay dispersion, i.e. :math:`gdd` in the formula for tau_eff, that results
-        in temporal chirp. A representative real value is gdd = tau * tau.
-
     t_peak : float (in second)
         The time at which the laser envelope reaches its maximum amplitude,
         i.e. :math:`t_{peak}` in the above formula.
+
+    a: float (in second/meter), optional
+        Pulse-front tilt, i.e. :math:`a` in the above formula, that results in the laser arrival
+        time varying as a function of `x`. A representative real value is a = tau / w0.
+
+    b: float (in meter.second), optional
+        Spatial chirp, i.e. :math:`b` in the above formula, that results in the laser frequency
+        varying as a function of `x`. A representative real value is b = w0 * tau.
+
+    GDD: float (in second.second), optional
+        Group-delay dispersion, i.e. :math:`gdd` in the formula for tau_eff, that results
+        in temporal chirp. A representative real value is gdd = tau * tau.
 
     cep_phase : float (in radian), optional
         The Carrier Envelope Phase (CEP), i.e. :math:`\phi_{cep}`
@@ -123,22 +123,22 @@ class GaussianProfile(Profile):
         pol,
         laser_energy,
         w0,
-        a,
-        b,
         tau,
-        gdd,
         t_peak,
+        a=0,
+        b=0,
+        gdd=0,
         cep_phase=0,
         z_foc=0,
     ):
         super().__init__(wavelength, pol)
         self.laser_energy = laser_energy
         self.w0 = w0
+        self.tau = tau
+        self.t_peak = t_peak
         self.a = a
         self.b = b
-        self.tau = tau
         self.gdd = gdd
-        self.t_peak = t_peak
         self.cep_phase = cep_phase
         self.z_foc = z_foc
 
