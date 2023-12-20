@@ -15,6 +15,9 @@ from lasy.profiles.transverse import (
     HermiteGaussianTransverseProfile,
     JincTransverseProfile,
     TransverseProfileFromData,
+    TransverseProfile,
+    SummedTransverseProfile,
+    ScaledTransverseProfile,
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
 
@@ -29,6 +32,17 @@ class MockProfile(Profile):
         self.value = value
 
     def evaluate(self, x, y, t):
+        return np.ones_like(x, dtype="complex128") * self.value
+    
+class MockTransverseProfile(TransverseProfile):
+    """
+    A mock TransverseProfile class that always returns a constant value.
+    """
+
+    def __init__(self,value):
+        self.value = value
+
+    def evaluate(self, x, y):
         return np.ones_like(x, dtype="complex128") * self.value
 
 
@@ -255,3 +269,42 @@ def test_scale_error_if_not_scalar():
         profile_1 * profile_1
     with pytest.raises(AssertionError):
         profile_1 * [1.0, 2.0]
+
+def test_add_transverse_profiles():
+    # Add the two profiles together
+    trans_profile_1 = MockTransverseProfile(1.0)
+    trans_profile_2 = MockTransverseProfile(2.0)
+    summed_trans_profile = trans_profile_1 + trans_profile_2
+    # Check that the result is a SummedTransverseProfile object
+    assert isinstance(summed_trans_profile, SummedTransverseProfile)
+    # Check that the profiles are stored correctly
+    assert summed_trans_profile.transverse_profiles[0] == trans_profile_1
+    assert summed_trans_profile.transverse_profiles[1] == trans_profile_2
+    # Check that the evaluate method works
+    assert np.allclose(summed_trans_profile.evaluate(0, 0), 3.0)
+
+def test_add_transverse_error_if_not_all_transverse_profiles():
+    trans_profile_1 = MockTransverseProfile(1.0)
+    with pytest.raises(AssertionError):
+        trans_profile_1 + 1.0
+
+def test_scale_transverse_profiles():
+    # Add the two profiles together
+    trans_profile_1 = MockTransverseProfile(1.0)
+    scaled_trans_profile = 2.0 * trans_profile_1
+    scaled_trans_profile_right = trans_profile_1 * 2.0
+    # Check that the result is a ScaledProfile object
+    assert isinstance(scaled_trans_profile, ScaledTransverseProfile)
+    # Check that the profiles are stored correctly
+    assert scaled_trans_profile.transverse_profile == trans_profile_1
+    # Check that the evaluate method works
+    assert np.allclose(scaled_trans_profile.evaluate(0, 0), 2.0)
+    assert np.allclose(scaled_trans_profile.evaluate(0, 0), 2.0)
+
+
+def test_scale_trans_error_if_not_scalar():
+    trans_profile_1 = MockTransverseProfile(1.0)
+    with pytest.raises(AssertionError):
+        trans_profile_1 * trans_profile_1
+    with pytest.raises(AssertionError):
+        trans_profile_1 * [1.0, 2.0]
