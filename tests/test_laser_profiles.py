@@ -33,13 +33,14 @@ class MockProfile(Profile):
 
     def evaluate(self, x, y, t):
         return np.ones_like(x, dtype="complex128") * self.value
-    
+
+
 class MockTransverseProfile(TransverseProfile):
     """
     A mock TransverseProfile class that always returns a constant value.
     """
 
-    def __init__(self,value):
+    def __init__(self, value):
         self.value = value
 
     def evaluate(self, x, y):
@@ -270,6 +271,7 @@ def test_scale_error_if_not_scalar():
     with pytest.raises(AssertionError):
         profile_1 * [1.0, 2.0]
 
+
 def test_add_transverse_profiles():
     # Add the two profiles together
     trans_profile_1 = MockTransverseProfile(1.0)
@@ -283,10 +285,12 @@ def test_add_transverse_profiles():
     # Check that the evaluate method works
     assert np.allclose(summed_trans_profile.evaluate(0, 0), 3.0)
 
+
 def test_add_transverse_error_if_not_all_transverse_profiles():
     trans_profile_1 = MockTransverseProfile(1.0)
     with pytest.raises(AssertionError):
         trans_profile_1 + 1.0
+
 
 def test_scale_transverse_profiles():
     # Add the two profiles together
