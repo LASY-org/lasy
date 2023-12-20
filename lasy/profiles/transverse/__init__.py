@@ -4,7 +4,12 @@ from .laguerre_gaussian_profile import LaguerreGaussianTransverseProfile
 from .super_gaussian_profile import SuperGaussianTransverseProfile
 from .jinc_profile import JincTransverseProfile
 from .transverse_profile_from_data import TransverseProfileFromData
-from .transverse_profile import TransverseProfile, SummedTransverseProfile, ScaledTransverseProfile
+from .transverse_profile import (
+    TransverseProfile,
+    SummedTransverseProfile,
+    ScaledTransverseProfile,
+)
+
 __all__ = [
     "GaussianTransverseProfile",
     "HermiteGaussianTransverseProfile",
@@ -14,5 +19,5 @@ __all__ = [
     "TransverseProfileFromData",
     "TransverseProfile",
     "SummedTransverseProfile",
-    "ScaledTransverseProfile"
+    "ScaledTransverseProfile",
 ]
