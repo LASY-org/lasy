@@ -8,7 +8,7 @@ from lasy.laser import Laser
 from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
 from lasy.profiles import GaussianProfile, FromArrayProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
-from lasy.profiles.transverse.transverse_profile import (
+from lasy.profiles.transverse import (
     GaussianTransverseProfile,
     LaguerreGaussianTransverseProfile,
     SuperGaussianTransverseProfile,
