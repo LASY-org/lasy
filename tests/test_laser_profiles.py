@@ -299,6 +299,7 @@ def test_scale_transverse_profiles():
     scaled_trans_profile_right = trans_profile_1 * 2.0
     # Check that the result is a ScaledProfile object
     assert isinstance(scaled_trans_profile, ScaledTransverseProfile)
+    assert isinstance(scaled_trans_profile_right, ScaledTransverseProfile)
     # Check that the profiles are stored correctly
     assert scaled_trans_profile.transverse_profile == trans_profile_1
     # Check that the evaluate method works
