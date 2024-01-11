@@ -9,7 +9,7 @@ class SpeckleProfile(Profile):
     r"""
     Derived class for the analytic profile of a speckle laser pulse.
 
-    
+
 
     More precisely, the electric field corresponds to:
 
@@ -144,7 +144,7 @@ class SpeckleProfile(Profile):
         # n_grid = [128, 128]
         # types of smoothing. valid options are:
         # 'FM SSD', 'GS RPM SSD', 'AR RPM SSD', 'GS ISI', 'AR ISI'
-        lsType = 'AR ISI'
+        lsType = "AR ISI"
         # if apply simple average to AR(1) to approximate Gaussian PSD
         if_sma = False
         # number of color cycles
@@ -194,11 +194,13 @@ class SpeckleProfile(Profile):
         # CPP
         phi_n = np.pi * np.random.uniform(-np.pi, np.pi, (n_beams[0], n_beams[1]))
         # x0, x1 are normalized to the beam aperture
-        x0, x1 = np.meshgrid(np.linspace(-0.5, 0.5, num=n_beams[0]),
-                            np.linspace(-0.5, 0.5, num=n_beams[1]))
-        
+        x0, x1 = np.meshgrid(
+            np.linspace(-0.5, 0.5, num=n_beams[0]),
+            np.linspace(-0.5, 0.5, num=n_beams[1]),
+        )
+
         def general_form_beamlets_2d(amp, trans_n, psi_n, ps_n):
-            """ General form of the beamlets (1d version).
+            """General form of the beamlets (1d version).
 
             E0(x,t)=amp \sum\limits_n e^{i \psi_n} \trans_n \exp[i \ps_n]
             :param amp: field amplitude of the beamlets
@@ -211,13 +213,12 @@ class SpeckleProfile(Profile):
             return beamlets
 
         def ssd_2d_fm(t):
-            """ Beamlets after SSD and before the final focal len (2d version).
+            """Beamlets after SSD and before the final focal len (2d version).
 
             :param t: current time
             :return: near field electric field amplitude of the full beam
             """
-            psi_n = beta * (np.sin(nu * (t + s[0] * x0)) +
-                            np.sin(nu * (t + s[1] * x1)))
+            psi_n = beta * (np.sin(nu * (t + s[0] * x0)) + np.sin(nu * (t + s[1] * x1)))
             return general_form_beamlets_2d(e0, epsilon_n, psi_n, phi_n)
 
         # time delay array for beamlets
@@ -226,48 +227,56 @@ class SpeckleProfile(Profile):
         # tn = np.long(0)
 
         dx = np.divide(2 * np.pi, n_grid)
-        xlp0, xlp1 = np.meshgrid(np.linspace(-0.5 * n_beams[0], 0.5 * n_beams[0],
-                                            num=n_beams[0]),
-                                np.linspace(-0.5 * n_beams[1], 0.5 * n_beams[1],
-                                            num=n_beams[1]))
-
+        xlp0, xlp1 = np.meshgrid(
+            np.linspace(-0.5 * n_beams[0], 0.5 * n_beams[0], num=n_beams[0]),
+            np.linspace(-0.5 * n_beams[1], 0.5 * n_beams[1], num=n_beams[1]),
+        )
 
         laser_smoothing_2d = ssd_2d_fm
         # pmPhase = None
 
         gn = n_grid
-        xfp0, xfp1 = np.meshgrid(np.linspace(-0.5 * gn[0], 0.5 * gn[0], num=gn[0]),
-                                np.linspace(-0.5 * gn[1], 0.5 * gn[1], num=gn[1]))
+        xfp0, xfp1 = np.meshgrid(
+            np.linspace(-0.5 * gn[0], 0.5 * gn[0], num=gn[0]),
+            np.linspace(-0.5 * gn[1], 0.5 * gn[1], num=gn[1]),
+        )
         # constant phase shift due to beam propagation
-        proPhase = np.exp(1j * (np.square(xfp0) + np.square(xfp1))
-                        * xdl * focal_length / beam_aperture * np.pi +
-                        2j * np.pi * focal_length / wave_length)
-        
-       
+        proPhase = np.exp(
+            1j
+            * (np.square(xfp0) + np.square(xfp1))
+            * xdl
+            * focal_length
+            / beam_aperture
+            * np.pi
+            + 2j * np.pi * focal_length / wave_length
+        )
+
         @jit()
-        def focal_len_expensive_part(beamlets, field,xbound,ybound):
-            for ibx in range(xbound[0],xbound[1]):
-                for iby in range(ybound[0],ybound[1]):
-                    field[ibx, iby] = np.sum(np.multiply(
-                        np.exp(1j * (ibx * dx[0] * xlp0 + iby * dx[1] * xlp1)),
-                        beamlets))
+        def focal_len_expensive_part(beamlets, field, xbound, ybound):
+            for ibx in range(xbound[0], xbound[1]):
+                for iby in range(ybound[0], ybound[1]):
+                    field[ibx, iby] = np.sum(
+                        np.multiply(
+                            np.exp(1j * (ibx * dx[0] * xlp0 + iby * dx[1] * xlp1)),
+                            beamlets,
+                        )
+                    )
                     # field[ibx,iby] = 1j
             return field
-        
+
         @jit()
         def focal_len_expensive_precompute(beamlets, field, xbound, ybound):
-
-            xmat = np.exp(1j*dx[0] * xlp0)
-            ymat = np.exp(1j*dx[1] * xlp1)
-            for ibx in range(xbound[0],xbound[1]):
-                for iby in range(ybound[0],ybound[1]):
-                    field[ibx, iby] = np.sum(np.multiply(
-                        np.power(xmat,ibx) * np.power(ymat,iby),
-                        beamlets))
+            xmat = np.exp(1j * dx[0] * xlp0)
+            ymat = np.exp(1j * dx[1] * xlp1)
+            for ibx in range(xbound[0], xbound[1]):
+                for iby in range(ybound[0], ybound[1]):
+                    field[ibx, iby] = np.sum(
+                        np.multiply(np.power(xmat, ibx) * np.power(ymat, iby), beamlets)
+                    )
             return field
-        
+
         def focal_len_2d(beamlets):
-            """ Use the diffraction integral to calculate the interference of beamlets on focal plane (2d version).
+            """Use the diffraction integral to calculate the interference of beamlets on focal plane (2d version).
 
             :param beamlets: electric field of full beam
             :return: far fields pattern on the focal plane
@@ -294,37 +303,36 @@ class SpeckleProfile(Profile):
                 #         field[ibx, iby] = np.sum(np.multiply(
                 #             np.power(xmat,ibx) * np.power(ymat,iby),
                 #             beamlets))
-                        
+
                 # trying numba
                 xbound = (int(-n_grid[0] / 2), int(n_grid[0] - n_grid[0] / 2))
-                ybound= (int(-n_grid[1] / 2), int(n_grid[1] - n_grid[1] / 2))
+                ybound = (int(-n_grid[1] / 2), int(n_grid[1] - n_grid[1] / 2))
                 field = focal_len_expensive_part(beamlets, field, xbound, ybound)
                 # field = focal_len_expensive_precompute(beamlets, field, xbound, ybound)
             field = np.multiply(proPhase, np.fft.fftshift(field))
             return field
 
         envelope = np.zeros(x.shape, dtype=complex)
-        for i, t_i in enumerate(t[0,0]):
+        for i, t_i in enumerate(t[0, 0]):
             if i % 100 == 0:
-                print(f'ti={t_i:.3e} s')
+                print(f"ti={t_i:.3e} s")
             t2 = time.time()
             beamlets = laser_smoothing_2d(t_i)
             t3 = time.time()
             fp_speckle = focal_len_2d(beamlets)
             t4 = time.time()
-            print(f'beamlet init took {t3-t2:.3e} s')
-            print(f'focal len took {t4-t3:.3e} s')
-            envelope[:,:,i] = fp_speckle
-
+            print(f"beamlet init took {t3-t2:.3e} s")
+            print(f"focal len took {t4-t3:.3e} s")
+            envelope[:, :, i] = fp_speckle
 
         ###############
 
         # it is possible we ignore this
-        spacetime = np.exp(-( (t - self.t_peak)** 2) / self.tau **2)
+        spacetime = np.exp(-((t - self.t_peak) ** 2) / self.tau**2)
 
         # not sure about this
-        oscillatory = np.exp(1.0j * (self.cep_phase - self.omega0 * (t - self.t_peak))) 
+        oscillatory = np.exp(1.0j * (self.cep_phase - self.omega0 * (t - self.t_peak)))
 
-        #envelope *= spacetime * oscillatory
+        # envelope *= spacetime * oscillatory
 
         return envelope

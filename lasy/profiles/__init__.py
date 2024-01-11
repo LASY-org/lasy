@@ -9,5 +9,5 @@ __all__ = [
     "GaussianProfile",
     "FromArrayProfile",
     "FromOpenPMDProfile",
-    "SpeckleProfile"
+    "SpeckleProfile",
 ]
