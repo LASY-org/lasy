@@ -458,6 +458,31 @@ def get_frequency(
     return omega, central_omega
 
 
+def get_t_peak(grid, dim):
+    """Get centraltime of the intensity of the envelope, measured as an average.
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the envelope to analyze.
+    dim : str
+        Dimensionality of the grid.
+
+    Returns
+    -------
+    float
+        average position of the envelope intensity in seconds.
+    """
+    # Calculate weights of each grid cell (amplitude of the field).
+    dV = get_grid_cell_volume(grid, dim)
+    if dim == "xyt":
+        weights = np.abs(grid.field) ** 2 * dV
+    else:  # dim == "rt":
+        weights = np.abs(grid.field) ** 2 * dV[np.newaxis, :, np.newaxis]
+    # project weights to longitudinal axes
+    weights = np.sum(weights, axis=(0, 1))
+    return np.average(grid.axes[-1], weights=weights)
+
 def get_duration(grid, dim):
     """Get duration of the intensity of the envelope, measured as RMS.
 
