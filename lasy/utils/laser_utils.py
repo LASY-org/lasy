@@ -483,6 +483,7 @@ def get_t_peak(grid, dim):
     weights = np.sum(weights, axis=(0, 1))
     return np.average(grid.axes[-1], weights=weights)
 
+
 def get_duration(grid, dim):
     """Get duration of the intensity of the envelope, measured as RMS.
 
