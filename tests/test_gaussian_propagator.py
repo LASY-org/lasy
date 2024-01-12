@@ -16,9 +16,7 @@ def gaussian():
     t_peak = 0.0e-15  # s
     tau = 30.0e-15  # s
     w0 = 5.0e-6  # m
-    profile = GaussianProfile(
-        wavelength, pol, laser_energy, w0, tau, t_peak, a=0, b=0, gdd=0
-    )
+    profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
     return profile
 
