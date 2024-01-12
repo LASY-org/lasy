@@ -125,11 +125,11 @@ class GaussianProfile(Profile):
         w0,
         tau,
         t_peak,
-        a=0,
-        b=0,
-        gdd=0,
-        cep_phase=0,
-        z_foc=0,
+        a=0.0,
+        b=0.0,
+        gdd=0.0,
+        cep_phase=0.0,
+        z_foc=0.0,
     ):
         super().__init__(wavelength, pol)
         self.laser_energy = laser_energy
