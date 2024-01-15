@@ -8,6 +8,7 @@ from lasy.utils.laser_utils import (
     compute_laser_energy,
     get_t_peak,
     get_duration,
+    get_frequency
 )
 
 
