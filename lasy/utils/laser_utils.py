@@ -459,7 +459,7 @@ def get_frequency(
 
 
 def get_t_peak(grid, dim):
-    """Get centraltime of the intensity of the envelope, measured as an average.
+    """Get central time of the intensity of the envelope, measured as an average.
 
     Parameters
     ----------
