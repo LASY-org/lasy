@@ -64,9 +64,9 @@ def check_gaussian_propagation(
 def test_3D_case(gaussian):
     # - 3D case
     dim = "xyt"
-    lo = (-25e-6, -25e-6, -100e-15)
-    hi = (+25e-6, +25e-6, +100e-15)
-    npoints = (100, 100, 200)
+    lo = (-25e-6, -25e-6, -60e-15)
+    hi = (+25e-6, +25e-6, +60e-15)
+    npoints = (100, 100, 100)
 
     laser = Laser(dim, lo, hi, npoints, gaussian)
     check_gaussian_propagation(laser)
@@ -75,9 +75,9 @@ def test_3D_case(gaussian):
 def test_RT_case(gaussian):
     # - Cylindrical case
     dim = "rt"
-    lo = (0e-6, -100e-15)
-    hi = (25e-6, +100e-15)
-    npoints = (100, 200)
+    lo = (0e-6, -60e-15)
+    hi = (25e-6, +60e-15)
+    npoints = (100, 100)
 
     laser = Laser(dim, lo, hi, npoints, gaussian)
     check_gaussian_propagation(laser)
