@@ -2,7 +2,12 @@ import numpy as np
 
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.laser_utils import get_spectrum, compute_laser_energy, get_t_peak, get_duration
+from lasy.utils.laser_utils import (
+    get_spectrum,
+    compute_laser_energy,
+    get_t_peak,
+    get_duration,
+)
 
 
 def get_gaussian_profile():
