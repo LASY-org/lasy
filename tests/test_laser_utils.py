@@ -2,7 +2,7 @@ import numpy as np
 
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.laser_utils import get_spectrum, compute_laser_energy, get_duration
+from lasy.utils.laser_utils import get_spectrum, compute_laser_energy, get_t_peak, get_duration
 
 
 def get_gaussian_profile():
@@ -44,6 +44,10 @@ def test_laser_analysis_utils():
         spectrum_energy = np.sum(spectrum) * d_omega
         energy = compute_laser_energy(dim, laser.grid)
         np.testing.assert_approx_equal(spectrum_energy, energy, significant=10)
+
+        # Check that laser duration agrees with the given one.
+        t_peak_rms = get_t_peak(laser.grid, dim)
+        np.testing.assert_approx_equal(t_peak_rms, laser.profile.t_peak, significant=3)
 
         # Check that laser duration agrees with the given one.
         tau_rms = get_duration(laser.grid, dim)
