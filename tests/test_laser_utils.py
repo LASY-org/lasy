@@ -23,6 +23,7 @@ def get_gaussian_profile():
 
     return profile
 
+
 def get_spatial_chirp_profile():
     # Cases with Gaussian laser
     wavelength = 0.8e-6
@@ -32,10 +33,11 @@ def get_spatial_chirp_profile():
     tau = 30.0e-15  # s
     w0 = 5.0e-6  # m
     a = 0.0
-    b = tau*w0/2  # m.s
+    b = tau * w0 / 2  # m.s
     profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak, a, b)
 
     return profile
+
 
 def get_angular_dispersion_profile():
     # Cases with Gaussian laser
@@ -45,10 +47,11 @@ def get_angular_dispersion_profile():
     t_peak = 0.0e-15  # s
     tau = 30.0e-15  # s
     w0 = 5.0e-6  # m
-    a = tau/w0  # s/m
+    a = tau / w0  # s/m
     profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak, a)
 
     return profile
+
 
 def get_gaussian_laser(dim):
     # - Cylindrical case
@@ -62,6 +65,7 @@ def get_gaussian_laser(dim):
         npoints = (100, 100, 200)
     return Laser(dim, lo, hi, npoints, get_gaussian_profile())
 
+
 def get_spatial_chirp_laser(dim):
     # - Cylindrical case
     if dim == "rt":
@@ -74,6 +78,7 @@ def get_spatial_chirp_laser(dim):
         npoints = (200, 200, 300)
     return Laser(dim, lo, hi, npoints, get_spatial_chirp_profile())
 
+
 def get_angular_dispersion_laser(dim):
     # - Cylindrical case
     if dim == "rt":
@@ -85,6 +90,7 @@ def get_angular_dispersion_laser(dim):
         hi = (+25e-6, +25e-6, +150e-15)
         npoints = (100, 100, 300)
     return Laser(dim, lo, hi, npoints, get_angular_dispersion_profile())
+
 
 def test_laser_analysis_utils():
     """Test the different laser analysis utilities in both geometries."""
@@ -111,14 +117,15 @@ def test_laser_analysis_utils():
         laser_sc = get_spatial_chirp_laser(dim)
         # Check that laser central time agrees with the given one with angular dispersion
         omega, freq_sc_rms = get_frequency(laser_sc.grid, dim)
-        omega0 = 2*np.pi*c/laser_sc.wavelength
+        omega0 = 2 * np.pi * c / laser_sc.wavelength
         # freq_sc_expected = 0.0
         # np.testing.assert_approx_equal(freq_sc_rms, freq_sc_expected, significant=3)
-        
+
         laser_ad = get_angular_dispersion_laser(dim)
         # Check that laser central time agrees with the given one with angular dispersion
         t_peak_ad_rms = get_t_peak(laser_ad.grid, dim)
         # np.testing.assert_approx_equal(t_peak_ad_rms, laser_ad.profile.a*laser_ad.profile.w0, significant=3)
+
 
 if __name__ == "__main__":
     test_laser_analysis_utils()
