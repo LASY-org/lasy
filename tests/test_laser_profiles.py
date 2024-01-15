@@ -42,11 +42,64 @@ def gaussian():
     tau = 30.0e-15  # s
     w0 = 5.0e-6  # m
     profile = GaussianProfile(
-        wavelength, pol, laser_energy, w0, tau, t_peak, a=0, b=0, gdd=0
+        wavelength, pol, laser_energy, w0, tau, t_peak, a=0.0, b=0.0, gdd=0.0
     )
 
     return profile
 
+def spatial_chirp():
+    # Cases with Gaussian laser having non-zero spatial chirp
+    wavelength = 0.8e-6
+    pol = (1, 0)
+    laser_energy = 1.0  # J
+    t_peak = 0.0e-15  # s
+    tau = 30.0e-15  # s
+    w0 = 5.0e-6  # m
+    b = w0*tau/2  # m.s
+    profile = GaussianProfile(
+        wavelength, pol, laser_energy, w0, tau, t_peak, a=0.0, b, gdd=0.0
+    )
+
+    return profile
+
+def test_profile_gaussian_spatial_chirp(spatial_chirp):
+    # - 3D Cartesian case
+    dim = "xyt"
+    lo = (-10e-6, -10e-6, -60e-15)
+    hi = (+10e-6, +10e-6, +60e-15)
+    npoints = (100, 100, 100)
+
+    laser = Laser(dim, lo, hi, npoints, spatial_chirp)
+    laser.write_to_file("gaussianlaserSC")
+    laser.propagate(1e-6)
+    laser.write_to_file("gaussianlaserSC")
+
+def angular_dispersion():
+    # Cases with Gaussian laser having non-zero angular dispersion
+    wavelength = 0.8e-6
+    pol = (1, 0)
+    laser_energy = 1.0  # J
+    t_peak = 0.0e-15  # s
+    tau = 30.0e-15  # s
+    w0 = 5.0e-6  # m
+    a = tau/w0  # s/m
+    profile = GaussianProfile(
+        wavelength, pol, laser_energy, w0, tau, t_peak, a, b=0.0, gdd=0.0
+    )
+
+    return profile
+
+def test_profile_gaussian_angular_dispersion(angular_dispersion):
+    # - 3D Cartesian case
+    dim = "xyt"
+    lo = (-10e-6, -10e-6, -60e-15)
+    hi = (+10e-6, +10e-6, +60e-15)
+    npoints = (100, 100, 100)
+
+    laser = Laser(dim, lo, hi, npoints, angular_dispersion)
+    laser.write_to_file("gaussianlaserAD")
+    laser.propagate(1e-6)
+    laser.write_to_file("gaussianlaserAD")
 
 def test_transverse_profiles_rt():
     npoints = 4000
