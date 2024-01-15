@@ -119,7 +119,9 @@ def test_laser_analysis_utils():
         omega, freq_sc_rms = get_frequency(laser_sc.grid, dim)
         omega0 = 2 * np.pi * c / laser_sc.wavelength
         # Expected central frequency, using the frequency gradient (Eq. 4 from Gu et al., Opt. Comm., 2004)
-        freq_sc_expected = omega0 + laser_sc.b / ( laser_sc.b**2 + ( laser_sc.tau * laser_sc.w0 / 2 )**2 )
+        freq_sc_expected = omega0 + laser_sc.b / (
+            laser_sc.b**2 + (laser_sc.tau * laser_sc.w0 / 2) ** 2
+        )
         # np.testing.assert_approx_equal(freq_sc_rms, freq_sc_expected, significant=3)
 
         laser_ad = get_angular_dispersion_laser(dim)
