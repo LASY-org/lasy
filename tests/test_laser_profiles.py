@@ -47,6 +47,7 @@ def gaussian():
 
     return profile
 
+
 @pytest.fixture(scope="function")
 def spatial_chirp():
     # Cases with Gaussian laser having non-zero spatial chirp (b)
@@ -64,6 +65,7 @@ def spatial_chirp():
 
     return profile
 
+
 @pytest.fixture(scope="function")
 def angular_dispersion():
     # Cases with Gaussian laser having non-zero angular dispersion (a)
@@ -80,6 +82,7 @@ def angular_dispersion():
     )
 
     return profile
+
 
 def test_transverse_profiles_rt():
     npoints = 4000
@@ -192,6 +195,7 @@ def test_profile_gaussian_cylindrical(gaussian):
     laser.propagate(1e-6)
     laser.write_to_file("gaussianlaserRZ")
 
+
 def test_profile_gaussian_spatial_chirp(spatial_chirp):
     # - 3D Cartesian case
     dim = "xyt"
@@ -216,6 +220,7 @@ def test_profile_gaussian_angular_dispersion(angular_dispersion):
     laser.write_to_file("gaussianlaserAD")
     laser.propagate(1e-6)
     laser.write_to_file("gaussianlaserAD")
+
 
 def test_from_array_profile():
     # Create a 3D numpy array, use it to create a LASY profile,
