@@ -50,7 +50,7 @@ def test_laser_analysis_utils():
         energy = compute_laser_energy(dim, laser.grid)
         np.testing.assert_approx_equal(spectrum_energy, energy, significant=10)
 
-        # Check that laser duration agrees with the given one.
+        # Check that laser central time agrees with the given one.
         t_peak_rms = get_t_peak(laser.grid, dim)
         np.testing.assert_approx_equal(t_peak_rms, laser.profile.t_peak, significant=3)
 
