@@ -30,8 +30,8 @@ def get_gaussian_laser(dim):
         hi = (25e-6, +100e-15)
         npoints = (100, 200)
     else:  # dim == "xyt":
-        lo = (-25e-6, -25e-6, -60e-15)
-        hi = (+25e-6, +25e-6, +60e-15)
+        lo = (-25e-6, -25e-6, -100e-15)
+        hi = (+25e-6, +25e-6, +100e-15)
         npoints = (100, 100, 200)
     return Laser(dim, lo, hi, npoints, get_gaussian_profile())
 
