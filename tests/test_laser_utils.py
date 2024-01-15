@@ -26,8 +26,8 @@ def get_gaussian_profile():
 def get_gaussian_laser(dim):
     # - Cylindrical case
     if dim == "rt":
-        lo = (0e-6, -60e-15)
-        hi = (25e-6, +60e-15)
+        lo = (0e-6, -100e-15)
+        hi = (25e-6, +100e-15)
         npoints = (100, 200)
     else:  # dim == "xyt":
         lo = (-25e-6, -25e-6, -60e-15)
