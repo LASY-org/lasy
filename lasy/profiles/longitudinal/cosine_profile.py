@@ -21,6 +21,9 @@ class CosineLongitudinalProfile(LongitudinalProfile):
 
     Parameters
     ----------
+    wavelength : float (in meter)
+        The main laser wavelength :math:`\lambda_0` of the laser.
+
     tau_fwhm : float (in second)
         The Full-Width-Half-Maximum duration of the intensity distribution of the pulse,
         i.e. :math:`\tau_{fwhm}` in the above formula.
