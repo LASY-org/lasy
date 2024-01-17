@@ -10,7 +10,7 @@ from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
 from lasy.profiles import GaussianProfile, FromArrayProfile
 from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
-    CosLongitudinalProfile,
+    CosineLongitudinalProfile,
 )
 from lasy.profiles.transverse import (
     GaussianTransverseProfile,
@@ -170,9 +170,9 @@ def test_longitudinal_profiles():
     print("cep_phase = ", cep_phase_gaussian)
     assert np.abs(cep_phase_gaussian - cep_phase) / cep_phase < 0.02
 
-    # CosLongitudinalProfile
-    print("CosLongitudinalProfile")
-    profile_cos = CosLongitudinalProfile(wavelength, tau_fwhm, t_peak, cep_phase)
+    # CosineLongitudinalProfile
+    print("CosineLongitudinalProfile")
+    profile_cos = CosineLongitudinalProfile(wavelength, tau_fwhm, t_peak, cep_phase)
     field_cos = profile_cos.evaluate(t)
 
     std_cos = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_cos)))

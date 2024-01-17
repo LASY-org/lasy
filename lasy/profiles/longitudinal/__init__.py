@@ -1,4 +1,4 @@
-from .cos_profile import CosLongitudinalProfile
+from .cosine_profile import CosineLongitudinalProfile
 from .gaussian_profile import GaussianLongitudinalProfile
 from .longitudinal_profile_from_data import LongitudinalProfileFromData
 
