@@ -94,7 +94,7 @@ def test_3D_case(gaussian):
     tau = gaussian.long_profile.tau
     lo = (-5 * w0, -5 * w0, -3.5 * tau)
     hi = (5 * w0, 5 * w0, 3.5 * tau)
-    npoints = (160, 160, 65)
+    npoints = (160, 164, 65)
 
     laser_t_in = Laser(dim, lo, hi, npoints, gaussian)
     laser_t_out = Laser(dim, lo, hi, npoints, gaussian)
