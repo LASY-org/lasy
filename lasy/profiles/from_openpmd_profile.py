@@ -45,7 +45,7 @@ class FromOpenPMDProfile(FromArrayProfile):
     prefix : string
         Prefix of the openPMD file from which the envelope is read.
         Only used when envelope=True.
-        The provided iteration is read from <path>/<prefix>_%T.h5.
+        The provided iteration is read from <path>/<prefix>.h5.
 
     theta : float or None, optional
         Only used if the openPMD input is in thetaMode geometry.
@@ -102,7 +102,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
             array = grid.field[0]
         else:
-            s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
+            s = io.Series(path + "/" + prefix + ".h5", io.Access.read_only)
             it = s.iterations[iteration]
             omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
             array = F
