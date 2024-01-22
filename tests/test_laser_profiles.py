@@ -6,8 +6,12 @@ from scipy.special import gamma as gamma
 from scipy.constants import c
 
 from lasy.laser import Laser
-from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import GaussianProfile, FromArrayProfile
+from lasy.profiles.profile import (
+    Profile, 
+    SummedProfile, 
+    ScaledProfile,
+    SpeckleProfile
+)
 from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
     CosineLongitudinalProfile,
@@ -273,6 +277,41 @@ def test_from_array_profile():
     print("Measured width: ", width)
     assert np.abs((width - wx) / wx) < 1.0e-5
 
+def test_speckle_profile():
+    print("SpeckledProfile")
+    wavelength     = 800e-9  # Laser wavelength in meters
+    polarization   = (1,0)   # Linearly polarized in the x direction
+    spot_size      = 25e-6   # Waist of the laser pulse in meters
+    pulse_duration = 30e-15  # Pulse duration of the laser in seconds
+    t_max          = 2.2e5
+    t_peak         = 0.0     # Location of the peak of the laser pulse in time
+    focal_length   = 7.7
+    beam_aperture  = 0.35
+    n_beams        = [64, 64]
+
+    profile = SpeckleProfile(
+        wavelength,
+        polarization,
+        spot_size,
+        pulse_duration,
+        t_peak,
+        focal_length,
+        beam_aperture,
+        n_beams)
+    
+    dimensions     = 'xyt'                              
+    lo             = (-5*spot_size,-5*spot_size,0)
+    hi             = (5*spot_size,5*spot_size,t_max)
+    npoints     = (300,300,20)
+    x = np.linspace(lo[0], hi[0], npoints[0])
+    y = np.linspace(lo[1], hi[1], npoints[1])
+    t = np.linspace(lo[2], hi[2], npoints[2])
+    X, Y, T = np.meshgrid(x, y, t, indexing="ij")
+    F = profile.evaluate(X, Y, T)
+
+    laser = Laser(dimensions,lo,hi,npoints,profile)
+    laser.write_to_file("speckledProfile")
+    
 
 def test_add_profiles():
     # Add the two profiles together

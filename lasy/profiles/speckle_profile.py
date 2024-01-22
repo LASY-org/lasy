@@ -7,7 +7,7 @@ from .profile import Profile
 
 class SpeckleProfile(Profile):
     r"""
-    Derived class for the analytic profile of a speckle laser pulse.
+    Derived class for the analytic profile of a speckled laser pulse.
 
 
 
@@ -104,14 +104,21 @@ class SpeckleProfile(Profile):
         w0,
         tau,
         t_peak,
+        focal_length,
+        beam_aperture,
+        n_beams,
         z_foc=0,
     ):
         super().__init__(wavelength, pol)
+        self.wavelength = wavelength
         self.w0 = w0
         self.tau = tau
         self.t_peak = t_peak
         self.z_foc = z_foc
         self.cep_phase = 0
+        self.focal_length = focal_length
+        self.beam_aperture = beam_aperture
+        self.n_beams = n_beams
 
     def evaluate(self, x, y, t):
         """
@@ -131,11 +138,11 @@ class SpeckleProfile(Profile):
         """
 
         # focal length of the final lens, in meter
-        focal_length = 7.7
+        focal_length = self.focal_length #7.7
         # diameter of the whole laser beam, in meter
-        beam_aperture = 0.35
+        beam_aperture = self.beam_aperture #0.35
         # laser wave length, in meter
-        wave_length = 0.351e-9
+        wave_length = self.wavelength #0.351e-6
         # number of beamlets
         n_beams = [64, 64]
         # grid points in each direction
@@ -251,29 +258,17 @@ class SpeckleProfile(Profile):
             + 2j * np.pi * focal_length / wave_length
         )
 
-        @jit()
-        def focal_len_expensive_part(beamlets, field, xbound, ybound):
-            for ibx in range(xbound[0], xbound[1]):
-                for iby in range(ybound[0], ybound[1]):
-                    field[ibx, iby] = np.sum(
-                        np.multiply(
-                            np.exp(1j * (ibx * dx[0] * xlp0 + iby * dx[1] * xlp1)),
-                            beamlets,
-                        )
-                    )
-                    # field[ibx,iby] = 1j
-            return field
+        
 
-        @jit()
-        def focal_len_expensive_precompute(beamlets, field, xbound, ybound):
-            xmat = np.exp(1j * dx[0] * xlp0)
-            ymat = np.exp(1j * dx[1] * xlp1)
-            for ibx in range(xbound[0], xbound[1]):
-                for iby in range(ybound[0], ybound[1]):
-                    field[ibx, iby] = np.sum(
-                        np.multiply(np.power(xmat, ibx) * np.power(ymat, iby), beamlets)
-                    )
-            return field
+        x_lower = int(-n_grid[0] / 2)
+        x_upper = int(n_grid[0] - n_grid[0] / 2)
+        y_lower = int(-n_grid[1] / 2)
+        y_upper = int(n_grid[1] - n_grid[1] / 2)
+        xl_vec = np.linspace(-0.5 * n_beams[0], 0.5 * n_beams[0], num=n_beams[0])
+        yl_vec = np.linspace(-0.5 * n_beams[1], 0.5 * n_beams[1], num=n_beams[1])
+
+        Amat = np.exp(1j*dx[0]*np.einsum('i,j',np.arange(x_lower,x_upper),yl_vec))
+        Cmat = np.exp(1j*dx[1]*np.einsum('i,j',np.arange(y_lower,y_upper),xl_vec))
 
         def focal_len_2d(beamlets):
             """Use the diffraction integral to calculate the interference of beamlets on focal plane (2d version).
@@ -286,8 +281,7 @@ class SpeckleProfile(Profile):
                 field = np.fft.fft2(beamlets)
             else:
                 # naive sum to calculate the Fourier transform
-                # field[:,:] = np.sum( np.multiply)
-
+ 
                 # original
                 # for ibx in range(int(-n_grid[0] / 2), int(n_grid[0] - n_grid[0] / 2)):
                 #     for iby in range(int(-n_grid[1] / 2), int(n_grid[1] - n_grid[1] / 2)):
@@ -295,20 +289,12 @@ class SpeckleProfile(Profile):
                 #             np.exp(1j * (ibx * dx[0] * xlp0 + iby * dx[1] * xlp1)),
                 #             beamlets))
 
-                # trying to precompute
-                # xmat = np.exp(1j*dx[0] * xlp0)
-                # ymat = np.exp(1j*dx[1] * xlp1)
-                # for ibx in range(int(-n_grid[0] / 2), int(n_grid[0] - n_grid[0] / 2)):
-                #     for iby in range(int(-n_grid[1] / 2), int(n_grid[1] - n_grid[1] / 2)):
-                #         field[ibx, iby] = np.sum(np.multiply(
-                #             np.power(xmat,ibx) * np.power(ymat,iby),
-                #             beamlets))
 
-                # trying numba
-                xbound = (int(-n_grid[0] / 2), int(n_grid[0] - n_grid[0] / 2))
-                ybound = (int(-n_grid[1] / 2), int(n_grid[1] - n_grid[1] / 2))
-                field = focal_len_expensive_part(beamlets, field, xbound, ybound)
-                # field = focal_len_expensive_precompute(beamlets, field, xbound, ybound)
+                field = np.zeros(n_grid, dtype=complex)
+                field = np.einsum('ij,kj->ik',Amat, np.einsum('ij,ki->kj',beamlets,Cmat))
+                field = np.fft.fftshift(field)
+            # what if we take out the two fftshifts here ^ and here \/
+            # and just have one fftshift if needed in the first half of the if statement?
             field = np.multiply(proPhase, np.fft.fftshift(field))
             return field
 
@@ -316,13 +302,13 @@ class SpeckleProfile(Profile):
         for i, t_i in enumerate(t[0, 0]):
             if i % 100 == 0:
                 print(f"ti={t_i:.3e} s")
-            t2 = time.time()
+            # t2 = time.time()
             beamlets = laser_smoothing_2d(t_i)
-            t3 = time.time()
+            # t3 = time.time()
             fp_speckle = focal_len_2d(beamlets)
-            t4 = time.time()
-            print(f"beamlet init took {t3-t2:.3e} s")
-            print(f"focal len took {t4-t3:.3e} s")
+            # t4 = time.time()
+            # print(f"beamlet init took {t3-t2:.3e} s")
+            # print(f"focal len took {t4-t3:.3e} s")
             envelope[:, :, i] = fp_speckle
 
         ###############
@@ -331,7 +317,7 @@ class SpeckleProfile(Profile):
         spacetime = np.exp(-((t - self.t_peak) ** 2) / self.tau**2)
 
         # not sure about this
-        oscillatory = np.exp(1.0j * (self.cep_phase - self.omega0 * (t - self.t_peak)))
+        oscillatory = np.exp(1.0j * (self.cep_phase))# - self.omega0 * (t - self.t_peak)))
 
         # envelope *= spacetime * oscillatory
 
