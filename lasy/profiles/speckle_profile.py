@@ -2,29 +2,45 @@ import numpy as np
 import time
 from numba import jit
 
+c = 2.998e8 # m/s
+
 from .profile import Profile
 
 
 class SpeckleProfile(Profile):
     r"""
-    Derived class for the analytic profile of a speckled laser pulse.
+    Derived class for the profile of a speckled laser pulse.
 
 
 
+    The speckles are created using with random (RPP) or continuous phase plates (CPP)
+    then either the Smoothing by spectral dispersion (SSD)
+    or Induced spatial incoherence methods.
     More precisely, the electric field corresponds to:
 
     .. math::
 
-        E_u(\\boldsymbol{x}_\\perp,t) = Re\\left[ E_0\\,
-        \\exp\\left(-\\frac{\\boldsymbol{x}_\\perp^2}{w_0^2}
-        - \\frac{(t-t_{peak}-ax+2ibx/w_0^2)^2}{\\tau_{eff}^2}
-        - i\\omega_0(t-t_{peak}) + i\\phi_{cep}\\right) \\times p_u \\right]
+        E_u(\boldsymbol{x}_\perp,t) &= Re\left[ E_0\,
+        \sum_{j=1}^{N_{bx}\times N_{by}} A_j
+        {\rm sinc}\left(\frac{\pi D_xx}{\lambda_0 f}\right)
+        {\rm sinc}\left(\frac{\pi D_yy}{\lambda_0 f}\right)\\\\
+        \exp\left(i\boldsymbol{k}_{\perp,j}\cdot\boldsymbol{x}_\perp
+        + i\phi_{{\rm RPP/CPP},j}+i\psi_{{\rm SSD/ISI},j}\right) \times p_u \right]
 
     where :math:`u` is either :math:`x` or :math:`y`, :math:`p_u` is
     the polarization vector, :math:`Re` represent the real part, and
-    :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
-    to the propagation direction). The other parameters in this formula
-    are defined below.
+    :math:`\boldsymbol{x}_\perp=(x,y)` is the transverse coordinate (orthogonal
+    to the propagation direction). 
+    Several quantities are computed internally to the code depending on the 
+    method of smoothing chosen, including the beamlet amplitude :math:`A_j`,
+    the beamlet wavenumber at focus :math:`k_{\perp,j}`, 
+    the phase contribution :math:`\phi_{{\rm RPP/CPP},j}` from the phase plate,
+    and the phase contribution :math:`\psi_{{\rm SSD/ISI},j}` from the smoothing.
+    The other parameters in this formula are defined below.
+
+    Notes
+    -----
+    This assumes a rectangular laser and so a rectangular grid of beamlets.
 
     Parameters
     ----------
@@ -52,49 +68,51 @@ class SpeckleProfile(Profile):
         The time at which the laser envelope reaches its maximum amplitude,
         i.e. :math:`t_{peak}` in the above formula.
 
+    focal_length : float (in meter)
+        Focal length of lens :math:`f` just after the RPP/CPP.
+    
+    beam_aperture : float or list of floats (in meters)
+        Beam width :math:`D_x,D_y` at the lens / size of the illuminated region of the RPP/CPP.
+        
+    n_beamlets : list of integers
+        Number of RPP/CPP elements :math:`N_{bx},N_{by}` in each direction.
+        
+    lsType : string
+        Which method for beamlet production and evolution is used. 
+        Can be 'FM SSD', 'GS RPM SSD', or 'GS ISI'
+
+        - 'FM SSD': frequency modulated (FM) Smoothing by Spectral Dispersion (SSD)
+        - 'GP RPM SSD': Gaussian process (GP) Random Phase Modulated (RPM) SSD
+
+        An idealized form of SSD where each beamlet has random phase 
+        determined by sampling from a Gaussian stochastic process. 
+
+        - 'GP ISI': GP Induced spatial incoherence (ISI)
+        An idealized form of ISI where each beamlet has random phase and amplitude 
+        sampled from a Gaussian stochastic process.
+
+    relative_laser_bandwidth : float (optional, default 0.005)
+        Bandwidth of laser pulse, relative to central frequency.
+        
+    phase_mod_amp : 2-tuple of floats, (optional, default (4.1,4.1))
+        Amplitude of phase modulation in each transverse direction.
+        Only used if `lsType` is `FM SSD`.
+
+    ncc : list of 2 floats, (optional, default [1.4, 1.0])
+        Number of color cycles of SSD spectrum to include in modulation
+        Only used if `lsType` is `FM SSD`.
+
+    ssd_distr: list of 2 floats, (optional, default [1.2, 1.])
+        Determines how much SSD is distributed in the `x` and `y` directions.
+        if `ssd_distr=[a,b]`, then the SSD frequency modulation is `a/sqrt(a^2+b^2)` in `x` and `b/sqrt(a^2+b^2)` in `y`.
+        Only used if `lsType` is `FM SSD`.
+
+    do_include_transverse_decay : boolean, (optional, default False)
+        Whether to include the transverse sinc envelope or not.
+        I.e. whether it is assumed to be close enough to the laser axis to neglect the transverse field decay.
+    
     z_foc : float (in meter), optional
         Position of the focal plane. (The laser pulse is initialized at `z=0`.)
-
-    Examples
-    --------
-    >>> import matplotlib.pyplot as plt
-    >>> from lasy.laser import Laser
-    >>> from lasy.profiles.gaussian_profile import GaussianProfile
-    >>> from lasy.utils.laser_utils import get_full_field
-    >>> # Create profile.
-    >>> profile = GaussianProfile(
-    ...     wavelength=0.6e-6,  # m
-    ...     pol=(1, 0),
-    ...     laser_energy=1.,  # J
-    ...     w0=5e-6,  # m
-    ...     tau=30e-15,  # s
-    ...     t_peak=0.  # s
-    ... )
-    >>> # Create laser with given profile in `rt` geometry.
-    >>> laser = Laser(
-    ...     dim="rt",
-    ...     lo=(0e-6, -60e-15),
-    ...     hi=(10e-6, +60e-15),
-    ...     npoints=(50, 400),
-    ...     profile=profile
-    ... )
-    >>> # Visualize field.
-    >>> E_rt, extent = get_full_field(laser)
-    >>> extent[2:] *= 1e6
-    >>> extent[:2] *= 1e15
-    >>> tmin, tmax, rmin, rmax = extent
-    >>> vmax = np.abs(E_rt).max()
-    >>> plt.imshow(
-    ...     E_rt,
-    ...     origin="lower",
-    ...     aspect="auto",
-    ...     vmax=vmax,
-    ...     vmin=-vmax,
-    ...     extent=[tmin, tmax, rmin, rmax],
-    ...     cmap='bwr',
-    ... )
-    >>> plt.xlabel('t (fs)')
-    >>> plt.ylabel('r (µm)')
     """
 
     def __init__(
@@ -106,7 +124,13 @@ class SpeckleProfile(Profile):
         t_peak,
         focal_length,
         beam_aperture,
-        n_beams,
+        n_beamlets,
+        lsType='FM SSD',
+        relative_laser_bandwidth=0.005,
+        phase_mod_amp=(4.1,4.1),
+        ncc = [1.4, 1.0],
+        ssd_distr = [1.2, 1.],
+        do_include_transverse_decay = False,
         z_foc=0,
     ):
         super().__init__(wavelength, pol)
@@ -117,8 +141,36 @@ class SpeckleProfile(Profile):
         self.z_foc = z_foc
         self.cep_phase = 0
         self.focal_length = focal_length
-        self.beam_aperture = beam_aperture
-        self.n_beams = n_beams
+        self.beam_aperture = np.array(beam_aperture, dtype='float')
+        self.n_beamlets = np.array(n_beamlets, dtype='int')
+        self.lsType = lsType
+        self.laser_bandwidth = relative_laser_bandwidth
+
+            # ======================== SSD parameters ========================= #
+        # Only support single FM for now
+        # the amplitude of phase along each direction
+        self.phase_mod_amp = phase_mod_amp
+        # number of color cycles
+        self.ncc = ncc
+        # bandwidth distributed with respect to the two transverse direction
+        self.ssd_distr = ssd_distr
+        #                                                                               #
+        # \                                                                           / #
+        # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ USER INPUT ENDS ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #
+        # time interval to update the speckle pattern, roughly update 50 time every bandwidth cycle
+        self.tu = 1 / self.laser_bandwidth / 50
+        self.do_include_transverse_decay = do_include_transverse_decay
+
+        # ================== Sanity checks on user inputs ===================== #
+        assert relative_laser_bandwidth > 0, 'laser_bandwidth must be greater than 0'
+        for q in (n_beamlets, phase_mod_amp, ncc, ssd_distr):
+            assert np.size(q) == 2, 'has to be a size 2 array'
+        for q in (ncc, ssd_distr, phase_mod_amp):
+            assert q[0] > 0 or q[1] > 0, 'cannot be all zeros'
+        supported_bandwidth = 'FM SSD', 'GS RPM SSD', 'GS ISI'
+        assert lsType.upper() in supported_bandwidth, 'Only support one of the following: ' + ', '.join(supported_bandwidth)
+
+
 
     def evaluate(self, x, y, t):
         """
@@ -137,188 +189,119 @@ class SpeckleProfile(Profile):
             This array has the same shape as the arrays x, y, t
         """
 
-        # focal length of the final lens, in meter
-        focal_length = self.focal_length #7.7
-        # diameter of the whole laser beam, in meter
-        beam_aperture = self.beam_aperture #0.35
-        # laser wave length, in meter
-        wave_length = self.wavelength #0.351e-6
-        # number of beamlets
-        n_beams = [64, 64]
-        # grid points in each direction
-        n_grid_x, n_grid_y, n_grid_t = x.shape
-        n_grid = [n_grid_x, n_grid_y]
-        # n_grid = [128, 128]
-        # types of smoothing. valid options are:
-        # 'FM SSD', 'GS RPM SSD', 'AR RPM SSD', 'GS ISI', 'AR ISI'
-        lsType = "AR ISI"
-        # if apply simple average to AR(1) to approximate Gaussian PSD
-        if_sma = False
-        # number of color cycles
-        ncc = [1.0, 1.0]
-        # (RMS value of) the amplitude of phase modulation
-        beta = 4
-        # bandwidth of the optics, normalized to laser frequency
-        nuTotal = 0.00117
-        # electric field amplitude of each beamlet, scalar or 1d numpy array
-        e0 = 1.0
-        # complex transform for each beamlet, scalar or 1d numpy array
-        epsilon_n = 1.0
-        # length of the movie, normalized to 1/omega0.
-        # tMaxMovie = 2.2e5
-        # time delay imposed by one echelon step in ISI, in 1/nuTotal
-        tDelay = 1.5
-        # delta time for the movie, in 1/omega_0, the code will round it so as
-        # to complete tMax with integer steps. Increasing dt can reduce calculation
-        # time. Does not apply to FM SSD in interactive plot
-        # dt = 200.0
-        # interactive plot or saving to files
-        interactive_plot = False
-        # ------------------------------------------------------------------------------
-        # input ends
+        # ======================== General parameters ==================== #
+        t_norm = t[0,0,:] * c / self.wavelength
+        tmax = t_norm[-1]
 
-        # XDL unit
-        xdl = wave_length / beam_aperture
-
-        ncc = np.array(ncc)
-        lsType = lsType.upper()
-        # length of the time series, normalized to 1/omega0.
-        # tMax = dt + tMaxMovie
-
-        nuTotal /= np.sqrt(2)
-        if beta > 0:
-            nu = 0.5 * nuTotal / beta
+        # # ================== Calculate auxiliary variables ================== #
+        if 'SSD' in self.lsType.upper():
+            phase_plate = np.random.uniform(-np.pi, np.pi, size=self.n_beamlets[0]*self.n_beamlets[1]).reshape(self.n_beamlets)
+        elif 'ISI' in self.lsType.upper():
+            phase_plate = np.zeros(self.n_beamlets)  # ISI does not require phase plates
         else:
-            nu = 0
-        # s is the parameter for gratings in SSD. equal to time delay in xdl units
-        if nu > 0:
-            s = np.divide(2 * np.pi * ncc, nu)
+            raise NotImplementedError
+
+        ssd_frac = np.sqrt(self.ssd_distr[0]**2 + self.ssd_distr[1]**2)
+        ssd_frac = self.ssd_distr[0] / ssd_frac, self.ssd_distr[1] / ssd_frac
+        phase_mod_freq = [self.laser_bandwidth * sf * 0.5 / pma for sf, pma in zip(ssd_frac, self.phase_mod_amp)]
+        x_lens_list = np.linspace(-0.5*(self.n_beamlets[0]-1), 0.5*(self.n_beamlets[0]-1), num=self.n_beamlets[0])
+        y_lens_list = np.linspace(-0.5*(self.n_beamlets[1]-1), 0.5*(self.n_beamlets[1]-1), num=self.n_beamlets[1])
+        Y_lens_matrix, X_lens_matrix = np.meshgrid(y_lens_list, x_lens_list)
+        Y_lens_index_matrix, X_lens_index_matrix = np.meshgrid(np.arange(self.n_beamlets[1],dtype=float), np.arange(self.n_beamlets[0],dtype=float))
+        phase_mod_phase = np.random.standard_normal(2) * np.pi
+        td = (self.ncc[0] / phase_mod_freq[0] if phase_mod_freq[0] > 0 else 0,
+            self.ncc[1] / phase_mod_freq[1] if phase_mod_freq[1] > 0 else 0)
+        stochastic_process_time = np.arange(0, tmax+self.tu, self.tu)
+
+        # ======================= Initialization ========================= #
+        def gen_gaussian_time_series(t_num, fwhm, rms_mean):
+            """ generate a discrete time series that has gaussian power spectrum
+
+            :param t_num: number of grid points in time
+            :param fwhm: full width half maximum of the power spectrum
+            :param rms_mean: root-mean-square average of the spectrum
+            :return: a time series array of complex numbers with shape [t_num]
+            """
+            if fwhm == 0.0:
+                return np.zeros((2, t_num))
+            omega = np.fft.fftshift(np.fft.fftfreq(t_num, d=self.tu))
+            # rand_ph = np.random.normal(scale=np.pi, size=t_num)
+            psd = np.exp(-np.log(2) * 0.5 * np.square(omega / fwhm * 2 * np.pi))
+            psd *= np.sqrt(t_num) / np.sqrt(np.mean(np.square(psd))) * rms_mean
+            pm_phase = np.array(psd) * (np.random.normal(size=t_num) +
+                                        1j * np.random.normal(size=t_num))
+            pm_phase = np.fft.ifftshift(np.fft.fft(np.fft.fftshift(pm_phase)))
+            pm_phase *= rms_mean / np.sqrt(np.mean(np.square(np.abs(pm_phase))))
+            return pm_phase
+
+
+        def init_GS_timeseries():
+            if 'SSD' in self.lsType.upper():
+                pm_phase0 = gen_gaussian_time_series(stochastic_process_time.size + int(np.sum(td) / self.tu) + 2,
+                                                    2 * np.pi * phase_mod_freq[0], self.phase_mod_amp[0])
+                pm_phase1 = gen_gaussian_time_series(stochastic_process_time.size + int(np.sum(td) / self.tu) + 2,
+                                                    2 * np.pi * phase_mod_freq[1], self.phase_mod_amp[1])
+                time_interp = np.arange(start=0, stop=stochastic_process_time[-1]+np.sum(td)+3*self.tu, step=self.tu)[:pm_phase0.size]
+                return (time_interp,
+                        [(np.real(pm_phase0) + np.imag(pm_phase0)) / np.sqrt(2),
+                        (np.real(pm_phase1) + np.imag(pm_phase1)) / np.sqrt(2)])
+            elif 'ISI' in self.lsType.upper():
+                complex_amp = np.stack([np.stack([gen_gaussian_time_series(stochastic_process_time.size, 2 * self.laser_bandwidth, 1)
+                                                for _i in range(self.n_beamlets[1])])
+                                        for _j in range(self.n_beamlets[0])])
+                return stochastic_process_time, complex_amp
+
+
+        if 'GP' in self.lsType.upper():
+            time_ext, timeSeries = init_GS_timeseries()
         else:
-            s = [0.0, 0.0]
+            time_ext, timeSeries = stochastic_process_time, None
 
-        # RPP
-        # phi_n = np.pi * np.random.binomial(1, 0.5, (n_beams[0], n_beams[1]))
-        # CPP
-        phi_n = np.pi * np.random.uniform(-np.pi, np.pi, (n_beams[0], n_beams[1]))
-        # x0, x1 are normalized to the beam aperture
-        x0, x1 = np.meshgrid(
-            np.linspace(-0.5, 0.5, num=n_beams[0]),
-            np.linspace(-0.5, 0.5, num=n_beams[1]),
-        )
 
-        def general_form_beamlets_2d(amp, trans_n, psi_n, ps_n):
-            """General form of the beamlets (1d version).
-
-            E0(x,t)=amp \sum\limits_n e^{i \psi_n} \trans_n \exp[i \ps_n]
-            :param amp: field amplitude of the beamlets
-            :param trans_n: quantities that define complex transformation for beamlets
-            :param psi_n: describe the phase and temporal bandwidth of each beamlet
-            :param ps_n: phase shift of each beamlet due to phase plate
-            :return: full beam consist of all beamlets
-            """
-            beamlets = amp * trans_n * np.exp(1j * (psi_n + ps_n))
-            return beamlets
-
-        def ssd_2d_fm(t):
-            """Beamlets after SSD and before the final focal len (2d version).
-
-            :param t: current time
-            :return: near field electric field amplitude of the full beam
-            """
-            psi_n = beta * (np.sin(nu * (t + s[0] * x0)) + np.sin(nu * (t + s[1] * x1)))
-            return general_form_beamlets_2d(e0, epsilon_n, psi_n, phi_n)
-
-        # time delay array for beamlets
-        # needed for phase modulation
-        # tn_d = np.arange(0.0, n_beams[0] * n_beams[1]).reshape(n_beams)
-        # tn = np.long(0)
-
-        dx = np.divide(2 * np.pi, n_grid)
-        xlp0, xlp1 = np.meshgrid(
-            np.linspace(-0.5 * n_beams[0], 0.5 * n_beams[0], num=n_beams[0]),
-            np.linspace(-0.5 * n_beams[1], 0.5 * n_beams[1], num=n_beams[1]),
-        )
-
-        laser_smoothing_2d = ssd_2d_fm
-        # pmPhase = None
-
-        gn = n_grid
-        xfp0, xfp1 = np.meshgrid(
-            np.linspace(-0.5 * gn[0], 0.5 * gn[0], num=gn[0]),
-            np.linspace(-0.5 * gn[1], 0.5 * gn[1], num=gn[1]),
-        )
-        # constant phase shift due to beam propagation
-        proPhase = np.exp(
-            1j
-            * (np.square(xfp0) + np.square(xfp1))
-            * xdl
-            * focal_length
-            / beam_aperture
-            * np.pi
-            + 2j * np.pi * focal_length / wave_length
-        )
-
-        
-
-        x_lower = int(-n_grid[0] / 2)
-        x_upper = int(n_grid[0] - n_grid[0] / 2)
-        y_lower = int(-n_grid[1] / 2)
-        y_upper = int(n_grid[1] - n_grid[1] / 2)
-        xl_vec = np.linspace(-0.5 * n_beams[0], 0.5 * n_beams[0], num=n_beams[0])
-        yl_vec = np.linspace(-0.5 * n_beams[1], 0.5 * n_beams[1], num=n_beams[1])
-
-        Amat = np.exp(1j*dx[0]*np.einsum('i,j',np.arange(x_lower,x_upper),yl_vec))
-        Cmat = np.exp(1j*dx[1]*np.einsum('i,j',np.arange(y_lower,y_upper),xl_vec))
-
-        def focal_len_2d(beamlets):
-            """Use the diffraction integral to calculate the interference of beamlets on focal plane (2d version).
-
-            :param beamlets: electric field of full beam
-            :return: far fields pattern on the focal plane
-            """
-            field = np.zeros(n_grid, dtype=complex)
-            if n_beams[0] == n_grid[0] and n_beams[1] == n_grid[1]:
-                field = np.fft.fft2(beamlets)
+        def beamlets_complex_amplitude(t_now, lsType='FM SSD'):
+            if lsType.upper() == 'FM SSD':
+                phase_t = (self.phase_mod_amp[0] * np.sin(phase_mod_phase[0] +
+                                                    2 * np.pi * phase_mod_freq[0] * (t_now - X_lens_matrix * td[0] / self.n_beamlets[0])) +
+                        self.phase_mod_amp[1] * np.sin(phase_mod_phase[1] +
+                                                    2 * np.pi * phase_mod_freq[1] * (t_now - Y_lens_matrix * td[1] / self.n_beamlets[1])))
+                return np.exp(1j * phase_t)
+            elif lsType.upper() == 'GP RPM SSD':
+                phase_t = (np.interp(t_now + X_lens_index_matrix * td[0] / self.n_beamlets[0], time_ext, timeSeries[0]) +
+                        np.interp(t_now + Y_lens_index_matrix * td[1] / self.n_beamlets[1], time_ext, timeSeries[1]))
+                return np.exp(1j * phase_t)
+            elif lsType.upper() == 'GP ISI':
+                return timeSeries[:, :, int(round(t_now/self.tu))]
             else:
-                # naive sum to calculate the Fourier transform
- 
-                # original
-                # for ibx in range(int(-n_grid[0] / 2), int(n_grid[0] - n_grid[0] / 2)):
-                #     for iby in range(int(-n_grid[1] / 2), int(n_grid[1] - n_grid[1] / 2)):
-                #         field[ibx, iby] = np.sum(np.multiply(
-                #             np.exp(1j * (ibx * dx[0] * xlp0 + iby * dx[1] * xlp1)),
-                #             beamlets))
+                raise NotImplementedError
 
 
-                field = np.zeros(n_grid, dtype=complex)
-                field = np.einsum('ij,kj->ik',Amat, np.einsum('ij,ki->kj',beamlets,Cmat))
-                field = np.fft.fftshift(field)
-            # what if we take out the two fftshifts here ^ and here \/
-            # and just have one fftshift if needed in the first half of the if statement?
-            field = np.multiply(proPhase, np.fft.fftshift(field))
-            return field
-
+        exp_phase_plate = np.exp(1j * phase_plate)
+        lambda_fnum = self.wavelength*self.focal_length/self.beam_aperture
+        X_focus_matrix = x[:,:,0] / lambda_fnum[0]
+        Y_focus_matrix = y[:,:,0] / lambda_fnum[1]
+        x_focus_list = X_focus_matrix[:,0]
+        y_focus_list = Y_focus_matrix[0,:]
+        x_phase_matrix = np.exp(-2*np.pi*1j/self.n_beamlets[0]*np.einsum('i,j',x_lens_list,x_focus_list))
+        y_phase_matrix = np.exp(-2*np.pi*1j/self.n_beamlets[1]*np.einsum('i,j',y_lens_list,y_focus_list))
+        
+        def generate_speckle_pattern(tnow):
+            bca = beamlets_complex_amplitude(tnow, lsType=self.lsType)
+            speckle_amp = np.einsum(
+                'jk,jl->kl',
+                np.einsum(
+                    'ij,ik->jk',
+                    bca*exp_phase_plate,
+                    x_phase_matrix),
+                y_phase_matrix)
+            if self.do_include_transverse_decay:
+                speckle_amp = np.sinc(X_focus_matrix/self.n_beamlets[0])*np.sinc(Y_focus_matrix/self.n_beamlets[1])*speckle_amp
+            return speckle_amp            
+        
         envelope = np.zeros(x.shape, dtype=complex)
-        for i, t_i in enumerate(t[0, 0]):
+        for i, t_i in enumerate(t_norm):
             if i % 100 == 0:
                 print(f"ti={t_i:.3e} s")
-            # t2 = time.time()
-            beamlets = laser_smoothing_2d(t_i)
-            # t3 = time.time()
-            fp_speckle = focal_len_2d(beamlets)
-            # t4 = time.time()
-            # print(f"beamlet init took {t3-t2:.3e} s")
-            # print(f"focal len took {t4-t3:.3e} s")
-            envelope[:, :, i] = fp_speckle
-
-        ###############
-
-        # it is possible we ignore this
-        spacetime = np.exp(-((t - self.t_peak) ** 2) / self.tau**2)
-
-        # not sure about this
-        oscillatory = np.exp(1.0j * (self.cep_phase))# - self.omega0 * (t - self.t_peak)))
-
-        # envelope *= spacetime * oscillatory
-
+            
+            envelope[:, :, i] = generate_speckle_pattern(t_i)
         return envelope
+
