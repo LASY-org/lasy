@@ -167,7 +167,7 @@ class SpeckleProfile(Profile):
             assert np.size(q) == 2, 'has to be a size 2 array'
         for q in (ncc, ssd_distr, phase_mod_amp):
             assert q[0] > 0 or q[1] > 0, 'cannot be all zeros'
-        supported_bandwidth = 'FM SSD', 'GS RPM SSD', 'GS ISI'
+        supported_bandwidth = 'FM SSD', 'GP RPM SSD', 'GP ISI'
         assert lsType.upper() in supported_bandwidth, 'Only support one of the following: ' + ', '.join(supported_bandwidth)
 
 
@@ -298,10 +298,7 @@ class SpeckleProfile(Profile):
             return speckle_amp            
         
         envelope = np.zeros(x.shape, dtype=complex)
-        for i, t_i in enumerate(t_norm):
-            if i % 100 == 0:
-                print(f"ti={t_i:.3e} s")
-            
+        for i, t_i in enumerate(t_norm):            
             envelope[:, :, i] = generate_speckle_pattern(t_i)
         return envelope
 

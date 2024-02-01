@@ -6,6 +6,7 @@ from scipy.special import gamma as gamma
 from scipy.constants import c
 
 from lasy.laser import Laser
+<<<<<<< HEAD
 from lasy.profiles.profile import (
     Profile, 
     SummedProfile, 
@@ -16,6 +17,11 @@ from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
     CosineLongitudinalProfile,
 )
+=======
+from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
+from lasy.profiles import GaussianProfile, FromArrayProfile, AltSpeckleProfile, SpeckleProfile
+from lasy.profiles.longitudinal import GaussianLongitudinalProfile
+>>>>>>> cb79119 (update speckle tests)
 from lasy.profiles.transverse import (
     GaussianTransverseProfile,
     LaguerreGaussianTransverseProfile,
@@ -289,7 +295,7 @@ def test_speckle_profile():
     beam_aperture  = 0.35
     n_beams        = [64, 64]
 
-    profile = SpeckleProfile(
+    profile = AltSpeckleProfile(
         wavelength,
         polarization,
         spot_size,
