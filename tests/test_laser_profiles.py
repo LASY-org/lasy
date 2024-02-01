@@ -19,7 +19,7 @@ from lasy.profiles.longitudinal import (
 )
 =======
 from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import GaussianProfile, FromArrayProfile, AltSpeckleProfile, SpeckleProfile
+from lasy.profiles import GaussianProfile, FromArrayProfile, SpeckleProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 >>>>>>> cb79119 (update speckle tests)
 from lasy.profiles.transverse import (
@@ -35,6 +35,7 @@ from lasy.profiles.transverse import (
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
 
+c = 2.998e8 # m/s
 
 class MockProfile(Profile):
     """
@@ -285,17 +286,23 @@ def test_from_array_profile():
 
 def test_speckle_profile():
     print("SpeckledProfile")
-    wavelength     = 800e-9  # Laser wavelength in meters
+    wavelength     = 0.351e-6  # Laser wavelength in meters
     polarization   = (1,0)   # Linearly polarized in the x direction
-    spot_size      = 25e-6   # Waist of the laser pulse in meters
+    spot_size      = 25.e-6   # Waist of the laser pulse in meters
     pulse_duration = 30e-15  # Pulse duration of the laser in seconds
-    t_max          = 2.2e5
     t_peak         = 0.0     # Location of the peak of the laser pulse in time
-    focal_length   = 7.7
-    beam_aperture  = 0.35
-    n_beams        = [64, 64]
+    ###
+    focal_length   = 3.5  # unit?
+    beam_aperture  = [0.35, 0.5] # unit?
+    n_beamlets        = [24, 32]
+    lsType         = 'GP ISI'
+    relative_laser_bandwidth= 0.005 # unit?
 
-    profile = AltSpeckleProfile(
+    phase_mod_amp=(4.1,4.5)
+    ncc = [1.4, 1.0]
+    ssd_distr = [1.8, 1.]
+
+    profile = SpeckleProfile(
         wavelength,
         polarization,
         spot_size,
@@ -303,12 +310,23 @@ def test_speckle_profile():
         t_peak,
         focal_length,
         beam_aperture,
-        n_beams)
-    
-    dimensions     = 'xyt'                              
-    lo             = (-5*spot_size,-5*spot_size,0)
-    hi             = (5*spot_size,5*spot_size,t_max)
-    npoints     = (300,300,20)
+        n_beamlets,
+        lsType = lsType,
+        relative_laser_bandwidth = relative_laser_bandwidth, #0.005
+        phase_mod_amp=phase_mod_amp,
+        ncc = ncc,
+        ssd_distr = ssd_distr,
+    )
+    dimensions     = 'xyt'          
+    dx = wavelength * focal_length / beam_aperture[0]
+    dy = wavelength * focal_length / beam_aperture[1]
+    Lx = 1.8*dx * n_beamlets[0]
+    Ly = 3.1 * dy * n_beamlets[1]  
+    nu_laser = c / wavelength
+    t_max = 50 / nu_laser                  
+    lo             = (0,0,0)
+    hi             = (Lx,Ly,t_max)
+    npoints     = (200,250,2)
     x = np.linspace(lo[0], hi[0], npoints[0])
     y = np.linspace(lo[1], hi[1], npoints[1])
     t = np.linspace(lo[2], hi[2], npoints[2])
