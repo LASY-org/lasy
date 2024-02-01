@@ -71,7 +71,7 @@ class SpeckleProfile(Profile):
     focal_length : float (in meter)
         Focal length of lens :math:`f` just after the RPP/CPP.
     
-    beam_aperture : float or list of floats (in meters)
+    beam_aperture : list of 2 floats (in meters)
         Beam width :math:`D_x,D_y` at the lens / size of the illuminated region of the RPP/CPP.
         
     n_beamlets : list of integers

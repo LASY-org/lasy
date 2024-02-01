@@ -140,6 +140,60 @@ def test_spatial_correlation():
     
     assert error_auto_correlation < 5.e-1
 
+def test_sinc_zeros():
+    # this test seems pretty robust to any smoothing technique or physical parameters
+    # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`
+    wavelength     = 0.351e-6  # Laser wavelength in meters
+    polarization   = (1,0)   # Linearly polarized in the x direction
+    spot_size      = 25.e-6   # Waist of the laser pulse in meters
+    pulse_duration = 30e-15  # Pulse duration of the laser in seconds
+    t_peak         = 0.0     # Location of the peak of the laser pulse in time
+    ###
+    focal_length   = 3.5  # unit?
+    beam_aperture  = [0.35, 0.35] # unit?
+    n_beamlets        = [24, 48]
+    lsType         = 'GP ISI'
+    relative_laser_bandwidth= 0.005 # unit?
+
+    phase_mod_amp=(4.1,4.5)
+    ncc = [1.4, 1.0]
+    ssd_distr = [1., 3.]
+
+    profile = SpeckleProfile(
+        wavelength,
+        polarization,
+        spot_size,
+        pulse_duration,
+        t_peak,
+        focal_length,
+        beam_aperture,
+        n_beamlets,
+        lsType = lsType,
+        relative_laser_bandwidth = relative_laser_bandwidth, #0.005
+        phase_mod_amp=phase_mod_amp,
+        ncc = ncc,
+        ssd_distr = ssd_distr,
+        do_include_transverse_decay = True,
+    )
+    dimensions     = 'xyt'          
+    dx = wavelength * focal_length / beam_aperture[0]
+    dy = wavelength * focal_length / beam_aperture[1]
+    Lx = dx * n_beamlets[0]
+    Ly = dy * n_beamlets[1]  
+    nu_laser = c / wavelength
+    tu = 1 / relative_laser_bandwidth / 50 / nu_laser
+    t_max = 200 * tu
+    lo             = (-Lx,-Ly,0)
+    hi             = (Lx,Ly,t_max)
+    num_points     = (300,300,10)
+
+    laser = Laser(dimensions,lo,hi,num_points,profile)
+    F = laser.grid.field
+
+    assert np.max(abs(F[0,:,:])) < 1.e-8
+    assert np.max(abs(F[-1,:,:])) < 1.e-8
+    assert np.max(abs(F[:,0,:])) < 1.e-8
+    assert np.max(abs(F[:,-1,:])) < 1.e-8
 
 def test_FM_SSD_periodicity():
 
