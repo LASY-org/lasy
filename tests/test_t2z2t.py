@@ -24,9 +24,9 @@ def gaussian():
 
 
 def get_laser_z_analytic(profile, z_axis, r_axis):
-    w0 = profile.trans_profile.w0
-    tau = profile.long_profile.tau
-    omega0 = profile.long_profile.omega0
+    w0 = profile.w0
+    tau = profile.tau
+    omega0 = profile.omega0
     k0 = omega0 / c
     lambda0 = 2 * np.pi / k0
 
@@ -67,8 +67,8 @@ def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
 
 def test_RT_case(gaussian):
     dim = "rt"
-    w0 = gaussian.trans_profile.w0
-    tau = gaussian.long_profile.tau
+    w0 = gaussian.w0
+    tau = gaussian.tau
     lo = (0, -3.5 * tau)
     hi = (5 * w0, 3.5 * tau)
     npoints = (128, 65)
@@ -90,8 +90,8 @@ def test_RT_case(gaussian):
 def test_3D_case(gaussian):
     # - 3D case
     dim = "xyt"
-    w0 = gaussian.trans_profile.w0
-    tau = gaussian.long_profile.tau
+    w0 = gaussian.w0
+    tau = gaussian.tau
     lo = (-5 * w0, -5 * w0, -3.5 * tau)
     hi = (5 * w0, 5 * w0, 3.5 * tau)
     npoints = (160, 164, 65)
