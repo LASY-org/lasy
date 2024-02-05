@@ -44,7 +44,7 @@ def write_to_openpmd_file(
     array = grid.field
 
     # Create file
-    series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
+    series = io.Series("{}.{}".format(file_prefix, file_format), io.Access.create)
     series.set_software("lasy", lasy_version)
 
     i = series.iterations[0]
