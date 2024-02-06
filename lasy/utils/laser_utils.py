@@ -682,6 +682,59 @@ def create_grid(array, axes, dim):
     return grid
 
 
+def get_container(dim, grid, omega0, transform=True, n_dump=0, backend="NP"):
+    """
+    Export field to axiprop container, clean, and trasnform to frequency.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains a ndarrays (V/m) with
+        the value of the envelope field and the associated metadata
+        that defines the points at which the laser is defined.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+
+    transform: bool
+        Whether to transform field to the spectral domain.
+
+    n_dump: int
+        Number of cells to be used for attenuating boundaries
+
+    backend : string (optional)
+        Backend used by axiprop (see AVAILABLE_BACKENDS in axiprop
+        documentation for more information).
+    """
+    time_axis_indx = -1
+
+    if dim == "rt":
+        # Make a list of containers for RT geometry
+        Container = []
+        for i_m in range(grid.azimuthal_modes.size):
+            t_axis = grid.axes[time_axis_indx].copy()
+            Container.append(
+                ScalarFieldEnvelope(omega0 / c, t_axis, n_dump=n_dump).import_field(
+                    grid.field[i_m].T, transform=transform, make_copy=True
+                )
+            )
+    else:
+        # Make a single 3D container for XYT geometry
+        t_axis = grid.axes[time_axis_indx].copy()
+        Container = ScalarFieldEnvelope(omega0 / c, t_axis, n_dump=n_dump).import_field(
+            np.moveaxis(grid.field, -1, 0), transform=transform, make_copy=True
+        )
+
+    return Container
+
+
 def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
     """
     Export laser pulse to spatial domain from temporal domain (internal LASY representation).
@@ -723,7 +776,8 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
     if z_axis is None:
         z_axis = t_axis * c
 
-    FieldAxprp = ScalarFieldEnvelope(omega0 / c, t_axis)
+    container = get_container(
+        dim, grid, omega0, backend=backend )
 
     if dim == "rt":
         # Construct the propagator
@@ -732,7 +786,7 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
             prop.append(
                 PropagatorResampling(
                     grid.axes[0],
-                    FieldAxprp.k_freq,
+                    container[0].k_freq,
                     mode=m,
                     backend=backend,
                     verbose=False,
@@ -746,9 +800,8 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
 
         # Convert the spectral image to the spatial field representation
         for i_m in range(grid.azimuthal_modes.size):
-            FieldAxprp.import_field(np.transpose(grid.field[i_m]).copy())
-
-            field_z[i_m] = prop[i_m].t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
+            field_z[i_m] = prop[i_m].t2z(
+                container[i_m].Field_ft, z_axis, z0=z0, t0=t0).T
 
             field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
     else:
@@ -759,13 +812,12 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
         prop = PropagatorFFT2(
             (Lx, Nx),
             (Ly, Ny),
-            FieldAxprp.k_freq,
+            container.k_freq,
             backend=backend,
             verbose=False,
         )
         # Convert the spectral image to the spatial field representation
-        FieldAxprp.import_field(np.moveaxis(grid.field, -1, 0).copy())
-        field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0)
+        field_z = prop.t2z(container.Field_ft, z_axis, z0=z0, t0=t0)
         field_z = np.moveaxis(field_z, 0, -1)
         field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
 
@@ -855,56 +907,3 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
         grid.field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
         grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
-
-
-def get_container(dim, grid, omega0, transform=True, n_dump=0, backend="NP"):
-    """
-    Export field to axiprop container, clean, and trasnform to frequency.
-
-    Parameters
-    ----------
-    dim : string
-        Dimensionality of the array. Options are:
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
-
-    grid : a Grid object.
-        It contains a ndarrays (V/m) with
-        the value of the envelope field and the associated metadata
-        that defines the points at which the laser is defined.
-
-    omega0 : scalar
-        Angular frequency at which the envelope is defined.
-
-    transform: bool
-        Whether to transform field to the spectral domain.
-
-    n_dump: int
-        Number of cells to be used for attenuating boundaries
-
-    backend : string (optional)
-        Backend used by axiprop (see AVAILABLE_BACKENDS in axiprop
-        documentation for more information).
-    """
-    time_axis_indx = -1
-
-    if dim == "rt":
-        #
-        Container = []
-        for i_m in range(grid.azimuthal_modes.size):
-            t_axis = grid.axes[time_axis_indx].copy()
-            Container.append(
-                ScalarFieldEnvelope(omega0 / c, t_axis, n_dump=n_dump).import_field(
-                    grid.field[i_m].T, transform=transform, make_copy=True
-                )
-            )
-    else:
-        #
-        t_axis = grid.axes[time_axis_indx].copy()
-        Container = ScalarFieldEnvelope(omega0 / c, t_axis, n_dump=n_dump).import_field(
-            np.moveaxis(grid.field, -1, 0), transform=transform, make_copy=True
-        )
-
-    return Container
