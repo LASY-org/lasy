@@ -776,8 +776,7 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
     if z_axis is None:
         z_axis = t_axis * c
 
-    container = get_container(
-        dim, grid, omega0, backend=backend )
+    container = get_container(dim, grid, omega0, backend=backend)
 
     if dim == "rt":
         # Construct the propagator
@@ -800,8 +799,9 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
 
         # Convert the spectral image to the spatial field representation
         for i_m in range(grid.azimuthal_modes.size):
-            field_z[i_m] = prop[i_m].t2z(
-                container[i_m].Field_ft, z_axis, z0=z0, t0=t0).T
+            field_z[i_m] = (
+                prop[i_m].t2z(container[i_m].Field_ft, z_axis, z0=z0, t0=t0).T
+            )
 
             field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
     else:
