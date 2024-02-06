@@ -2,7 +2,6 @@ import numpy as np
 from scipy.constants import c
 
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
-from axiprop.containers import ScalarFieldEnvelope
 
 from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
@@ -162,16 +161,17 @@ class Laser:
             Whether to show a progress bar when performing the computation
         """
         time_axis_indx = -1
-        # get the axiprop container for field transforms
-        self.container = get_container(
-            self.dim,
-            self.grid,
-            self.profile.omega0,
-            n_dump=nr_boundary,
-            backend=backend,
-        )
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / c
+        # get the axiprop container for field transforms
+        if not hasattr(self, "container"):
+            self.container = get_container(
+                self.dim,
+                self.grid,
+                self.profile.omega0,
+                n_dump=nr_boundary,
+                backend=backend,
+            )
 
         if self.dim == "rt":
             # Construct the propagator (check if exists)
