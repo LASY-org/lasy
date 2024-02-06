@@ -141,7 +141,6 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-
     def propagate(self, distance, nr_boundary=0, backend="NP", show_progress=True):
         """
         Propagate the laser pulse by the distance specified.
@@ -165,8 +164,11 @@ class Laser:
         time_axis_indx = -1
         # get the axiprop container for field transforms
         self.container = get_container(
-            self.dim, self.grid, self.profile.omega0, n_dump=nr_boundary,
-            backend=backend
+            self.dim,
+            self.grid,
+            self.profile.omega0,
+            n_dump=nr_boundary,
+            backend=backend,
         )
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / c
@@ -198,8 +200,7 @@ class Laser:
                 container_m.t += translate_time
                 container_m.t_loc += translate_time
                 container_m.frequency_to_time()
-                self.grid.field[i_m, :, :] = np.transpose(
-                    container_m.Field).copy()
+                self.grid.field[i_m, :, :] = np.transpose(container_m.Field).copy()
         else:
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
@@ -214,21 +215,20 @@ class Laser:
                     verbose=False,
                 )
             self.prop.step(
-                self.container.Field_ft, distance, overwrite=True,
-                show_progress=show_progress
+                self.container.Field_ft,
+                distance,
+                overwrite=True,
+                show_progress=show_progress,
             )
             self.container.t += translate_time
             self.container.t_loc += translate_time
             self.container.frequency_to_time()
-            self.grid.field[:, :, :] = np.moveaxis(
-                self.container.Field, 0, -1
-            ).copy()
+            self.grid.field[:, :, :] = np.moveaxis(self.container.Field, 0, -1).copy()
 
         # Translate the domain
         self.grid.lo[time_axis_indx] += translate_time
         self.grid.hi[time_axis_indx] += translate_time
         self.grid.axes[time_axis_indx] += translate_time
-
 
     def write_to_file(
         self, file_prefix="laser", file_format="h5", save_as_vector_potential=False

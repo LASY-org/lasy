@@ -856,9 +856,8 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         grid.field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
         grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
 
-def get_container(
-    dim, grid, omega0, transform=True, n_dump=0, backend="NP"
-    ):
+
+def get_container(dim, grid, omega0, transform=True, n_dump=0, backend="NP"):
     """
     Export laser pulse to axiprop container (or list of containers for 'rt'),
     and optionally cleans the boundaries and trasnforms it to frequency domain.
@@ -898,19 +897,15 @@ def get_container(
         for i_m in range(grid.azimuthal_modes.size):
             t_axis = grid.axes[time_axis_indx].copy()
             Container.append(
-                    ScalarFieldEnvelope(omega0 / c, t_axis, n_dump=n_dump) \
-                        .import_field(
-                            grid.field[i_m].T, transform=transform, make_copy=True
-                        )
+                ScalarFieldEnvelope(omega0 / c, t_axis, n_dump=n_dump).import_field(
+                    grid.field[i_m].T, transform=transform, make_copy=True
+                )
             )
     else:
         #
         t_axis = grid.axes[time_axis_indx].copy()
-        Container = ScalarFieldEnvelope(omega0 / c, t_axis, n_dump=n_dump). \
-            import_field(
-                np.moveaxis(grid.field, -1, 0), transform=transform,
-                make_copy=True
-            )
+        Container = ScalarFieldEnvelope(omega0 / c, t_axis, n_dump=n_dump).import_field(
+            np.moveaxis(grid.field, -1, 0), transform=transform, make_copy=True
+        )
 
     return Container
-
