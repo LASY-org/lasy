@@ -858,8 +858,8 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
 
 
 def get_container(dim, grid, omega0, transform=True, n_dump=0, backend="NP"):
-    """Export laser pulse to axiprop container (or list of containers for 'rt'),
-    and optionally cleans the boundaries and trasnforms it to frequency domain.
+    """
+    Export field to axiprop container, clean, and trasnform to frequency.
 
     Parameters
     ----------
