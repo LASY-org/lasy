@@ -140,7 +140,10 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def propagate(self, distance, nr_boundary=0, backend="NP", show_progress=True):
+    def propagate(
+            self, distance, nr_boundary=0, force_sync=True,
+            backend="NP", show_progress=True
+        ):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -164,7 +167,7 @@ class Laser:
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / c
         # get the axiprop container for field transforms
-        if not hasattr(self, "container"):
+        if not hasattr(self, "container") or force_sync:
             self.container = get_container(
                 self.dim,
                 self.grid,
@@ -223,7 +226,9 @@ class Laser:
             self.container.t += translate_time
             self.container.t_loc += translate_time
             self.container.frequency_to_time()
-            self.grid.field[:, :, :] = np.moveaxis(self.container.Field, 0, -1).copy()
+            self.grid.field[:, :, :] = np.moveaxis(
+                self.container.Field, 0, -1
+            ).copy()
 
         # Translate the domain
         self.grid.lo[time_axis_indx] += translate_time
