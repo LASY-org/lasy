@@ -9,8 +9,6 @@ class SpeckleProfile(Profile):
     r"""
     Derived class for the profile of a speckled laser pulse.
 
-
-
     The speckles are created using with random (RPP) or continuous phase plates (CPP)
     then either the Smoothing by spectral dispersion (SSD)
     or Induced spatial incoherence methods.
@@ -231,7 +229,7 @@ class SpeckleProfile(Profile):
 
         # ======================= Initialization ========================= #
         def gen_gaussian_time_series(t_num, fwhm, rms_mean):
-            """generate a discrete time series that has gaussian power spectrum
+            """Generate a discrete time series that has gaussian power spectrum.
 
             :param t_num: number of grid points in time
             :param fwhm: full width half maximum of the power spectrum
