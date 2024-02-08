@@ -1,5 +1,4 @@
 import numpy as np
-from numba import jit
 
 c = 2.998e8  # m/s
 
@@ -241,16 +240,17 @@ class SpeckleProfile(Profile):
             """
             if fwhm == 0.0:
                 return np.zeros((2, t_num))
-            omega = np.fft.fftshift(np.fft.fftfreq(t_num, d=self.tu))
-            # rand_ph = np.random.normal(scale=np.pi, size=t_num)
-            psd = np.exp(-np.log(2) * 0.5 * np.square(omega / fwhm * 2 * np.pi))
-            psd *= np.sqrt(t_num) / np.sqrt(np.mean(np.square(psd))) * rms_mean
-            pm_phase = np.array(psd) * (
-                np.random.normal(size=t_num) + 1j * np.random.normal(size=t_num)
-            )
-            pm_phase = np.fft.ifftshift(np.fft.fft(np.fft.fftshift(pm_phase)))
-            pm_phase *= rms_mean / np.sqrt(np.mean(np.square(np.abs(pm_phase))))
-            return pm_phase
+            else:
+                omega = np.fft.fftshift(np.fft.fftfreq(t_num, d=self.tu))
+                # rand_ph = np.random.normal(scale=np.pi, size=t_num)
+                psd = np.exp(-np.log(2) * 0.5 * np.square(omega / fwhm * 2 * np.pi))
+                psd *= np.sqrt(t_num) / np.sqrt(np.mean(np.square(psd))) * rms_mean
+                pm_phase = np.array(psd) * (
+                    np.random.normal(size=t_num) + 1j * np.random.normal(size=t_num)
+                )
+                pm_phase = np.fft.ifftshift(np.fft.fft(np.fft.fftshift(pm_phase)))
+                pm_phase *= rms_mean / np.sqrt(np.mean(np.square(np.abs(pm_phase))))
+                return pm_phase
 
         def init_GS_timeseries():
             if "SSD" in self.lsType.upper():

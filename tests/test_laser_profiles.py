@@ -319,11 +319,6 @@ def test_speckle_profile():
     lo = (0, 0, 0)
     hi = (Lx, Ly, t_max)
     npoints = (200, 250, 2)
-    x = np.linspace(lo[0], hi[0], npoints[0])
-    y = np.linspace(lo[1], hi[1], npoints[1])
-    t = np.linspace(lo[2], hi[2], npoints[2])
-    X, Y, T = np.meshgrid(x, y, t, indexing="ij")
-    F = profile.evaluate(X, Y, T)
 
     laser = Laser(dimensions, lo, hi, npoints, profile)
     laser.write_to_file("speckledProfile")
