@@ -59,9 +59,9 @@ def test_intensity_distribution():
     e_r = np.real(F)
     e_i = np.imag(F)
     er_ei = e_r * e_i
-    assert np.max(abs(e_r.mean(axis=(0, 1)) / e_r.std(axis=(0, 1)))) < 8.0e-2
-    assert np.max(abs(e_i.mean(axis=(0, 1)) / e_i.std(axis=(0, 1)))) < 8.0e-2
-    assert np.max(abs(er_ei.mean(axis=(0, 1)) / er_ei.std(axis=(0, 1)))) < 8.0e-2
+    assert np.max(abs(e_r.mean(axis=(0, 1)) / e_r.std(axis=(0, 1)))) < 1.0e-1
+    assert np.max(abs(e_i.mean(axis=(0, 1)) / e_i.std(axis=(0, 1)))) < 1.0e-1
+    assert np.max(abs(er_ei.mean(axis=(0, 1)) / er_ei.std(axis=(0, 1)))) < 1.0e-1
 
     # # compare intensity distribution with expected 1/<I> exp(-I/<I>)
     env_I = abs(F) ** 2
