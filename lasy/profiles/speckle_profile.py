@@ -84,6 +84,7 @@ class SpeckleProfile(Profile):
         determined by sampling from a Gaussian stochastic process.
 
         - 'GP ISI': GP Induced spatial incoherence (ISI)
+        
         An idealized form of ISI where each beamlet has random phase and amplitude
         sampled from a Gaussian stochastic process.
 
