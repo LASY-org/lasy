@@ -184,7 +184,6 @@ class SpeckleProfile(Profile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
         """
-
         # ======================== General parameters ==================== #
         t_norm = t[0, 0, :] * c / self.wavelength
         tmax = t_norm[-1]
