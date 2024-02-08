@@ -6,22 +6,12 @@ from scipy.special import gamma as gamma
 from scipy.constants import c
 
 from lasy.laser import Laser
-<<<<<<< HEAD
-from lasy.profiles.profile import (
-    Profile, 
-    SummedProfile, 
-    ScaledProfile,
-    SpeckleProfile
-)
+from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
+from lasy.profiles import GaussianProfile, FromArrayProfile, SpeckleProfile
 from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
     CosineLongitudinalProfile,
 )
-=======
-from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import GaussianProfile, FromArrayProfile, SpeckleProfile
-from lasy.profiles.longitudinal import GaussianLongitudinalProfile
->>>>>>> cb79119 (update speckle tests)
 from lasy.profiles.transverse import (
     GaussianTransverseProfile,
     LaguerreGaussianTransverseProfile,
