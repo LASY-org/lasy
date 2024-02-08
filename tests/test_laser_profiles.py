@@ -8,8 +8,8 @@ from scipy.constants import c
 from lasy.laser import Laser
 <<<<<<< HEAD
 from lasy.profiles.profile import (
-    Profile, 
-    SummedProfile, 
+    Profile,
+    SummedProfile,
     ScaledProfile,
     SpeckleProfile
 )
@@ -317,13 +317,13 @@ def test_speckle_profile():
         ncc = ncc,
         ssd_distr = ssd_distr,
     )
-    dimensions     = 'xyt'          
+    dimensions     = 'xyt'
     dx = wavelength * focal_length / beam_aperture[0]
     dy = wavelength * focal_length / beam_aperture[1]
     Lx = 1.8*dx * n_beamlets[0]
-    Ly = 3.1 * dy * n_beamlets[1]  
+    Ly = 3.1 * dy * n_beamlets[1]
     nu_laser = c / wavelength
-    t_max = 50 / nu_laser                  
+    t_max = 50 / nu_laser
     lo             = (0,0,0)
     hi             = (Lx,Ly,t_max)
     npoints     = (200,250,2)
@@ -335,7 +335,7 @@ def test_speckle_profile():
 
     laser = Laser(dimensions,lo,hi,npoints,profile)
     laser.write_to_file("speckledProfile")
-    
+
 
 def test_add_profiles():
     # Add the two profiles together
