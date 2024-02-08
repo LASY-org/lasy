@@ -25,7 +25,8 @@ from lasy.profiles.transverse import (
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
 
-c = 2.998e8 # m/s
+c = 2.998e8  # m/s
+
 
 class MockProfile(Profile):
     """
@@ -274,23 +275,24 @@ def test_from_array_profile():
     print("Measured width: ", width)
     assert np.abs((width - wx) / wx) < 1.0e-5
 
+
 def test_speckle_profile():
     print("SpeckledProfile")
-    wavelength     = 0.351e-6  # Laser wavelength in meters
-    polarization   = (1,0)   # Linearly polarized in the x direction
-    spot_size      = 25.e-6   # Waist of the laser pulse in meters
+    wavelength = 0.351e-6  # Laser wavelength in meters
+    polarization = (1, 0)  # Linearly polarized in the x direction
+    spot_size = 25.0e-6  # Waist of the laser pulse in meters
     pulse_duration = 30e-15  # Pulse duration of the laser in seconds
-    t_peak         = 0.0     # Location of the peak of the laser pulse in time
+    t_peak = 0.0  # Location of the peak of the laser pulse in time
     ###
-    focal_length   = 3.5  # unit?
-    beam_aperture  = [0.35, 0.5] # unit?
-    n_beamlets        = [24, 32]
-    lsType         = 'GP ISI'
-    relative_laser_bandwidth= 0.005 # unit?
+    focal_length = 3.5  # unit?
+    beam_aperture = [0.35, 0.5]  # unit?
+    n_beamlets = [24, 32]
+    lsType = "GP ISI"
+    relative_laser_bandwidth = 0.005  # unit?
 
-    phase_mod_amp=(4.1,4.5)
+    phase_mod_amp = (4.1, 4.5)
     ncc = [1.4, 1.0]
-    ssd_distr = [1.8, 1.]
+    ssd_distr = [1.8, 1.0]
 
     profile = SpeckleProfile(
         wavelength,
@@ -301,29 +303,29 @@ def test_speckle_profile():
         focal_length,
         beam_aperture,
         n_beamlets,
-        lsType = lsType,
-        relative_laser_bandwidth = relative_laser_bandwidth, #0.005
+        lsType=lsType,
+        relative_laser_bandwidth=relative_laser_bandwidth,  # 0.005
         phase_mod_amp=phase_mod_amp,
-        ncc = ncc,
-        ssd_distr = ssd_distr,
+        ncc=ncc,
+        ssd_distr=ssd_distr,
     )
-    dimensions     = 'xyt'
+    dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
     dy = wavelength * focal_length / beam_aperture[1]
-    Lx = 1.8*dx * n_beamlets[0]
+    Lx = 1.8 * dx * n_beamlets[0]
     Ly = 3.1 * dy * n_beamlets[1]
     nu_laser = c / wavelength
     t_max = 50 / nu_laser
-    lo             = (0,0,0)
-    hi             = (Lx,Ly,t_max)
-    npoints     = (200,250,2)
+    lo = (0, 0, 0)
+    hi = (Lx, Ly, t_max)
+    npoints = (200, 250, 2)
     x = np.linspace(lo[0], hi[0], npoints[0])
     y = np.linspace(lo[1], hi[1], npoints[1])
     t = np.linspace(lo[2], hi[2], npoints[2])
     X, Y, T = np.meshgrid(x, y, t, indexing="ij")
     F = profile.evaluate(X, Y, T)
 
-    laser = Laser(dimensions,lo,hi,npoints,profile)
+    laser = Laser(dimensions, lo, hi, npoints, profile)
     laser.write_to_file("speckledProfile")
 
 
