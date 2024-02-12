@@ -60,4 +60,3 @@ class FromInsightFile(FromArrayProfile):
             axes=axes,
             axes_order=["x", "y", "t"],
         )
-
