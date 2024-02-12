@@ -22,36 +22,36 @@ class FromInsightFile(FromArrayProfile):
     """
 
     def __init__(self, file_path, pol):
+        # read the data from H5 filed
         with h5py.File(file_path, "r") as hf:
             data = np.asanyarray(hf["data/Exyt_0"][()], dtype=np.complex128, order="C")
+            t = np.asanyarray(hf["scales/t"][()], dtype=np.float64, order="C")
+            x = np.asanyarray(hf["scales/x"][()], dtype=np.float64, order="C")
+            y = np.asanyarray(hf["scales/x"][()], dtype=np.float64, order="C")
 
-            t = 1e-15 * np.asanyarray(hf["scales/t"][()], dtype=np.float64, order="C")
+        # convert data and axes to SI units
+        t *= 1e-15
+        x *= 1e-3
+        y *= 1e-3
 
-            x = 1e-3 * np.asanyarray(hf["scales/x"][()], dtype=np.float64, order="C")
-
-            y = 1e-3 * np.asanyarray(hf["scales/x"][()], dtype=np.float64, order="C")
-
-        # get central frequency from the field on axis
+        # get central frequency from the field on axis,
         env = data[data.shape[0] // 2, data.shape[1] // 2, :]
         omega_array = np.gradient(np.unwrap(np.angle(env)), t)
-
-        # frequency at `t=0`
-        # omega0 = omega_array[np.abs(t).argmin()]
-
-        # "center of mass" frequency
-        ## omega0 = np.average(omega_array, weights=np.abs(env)**2)
-
-        # peak field frequency
+        # using peak field frequency
         omega0 = omega_array[np.abs(env).argmax()]
+        # or "center of mass" frequency
+        ## omega0 = np.average(omega_array, weights=np.abs(env)**2)
 
         wavelength = 2 * np.pi * c / omega0
 
+        # conjugarte for proper frequency sign convention
         data = np.conjugate(data)
+        # remove the envelope frequencey
         data *= np.exp(1j * omega0 * t[None, None, :])
 
+        # created LASY profile using FromArrayProfile class
         dim = "xyt"
         axes = {"x": x, "y": y, "t": t}
-
         super().__init__(
             wavelength=wavelength,
             pol=pol,
@@ -60,3 +60,4 @@ class FromInsightFile(FromArrayProfile):
             axes=axes,
             axes_order=["x", "y", "t"],
         )
+
