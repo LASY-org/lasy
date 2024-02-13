@@ -48,20 +48,12 @@ class FromArrayProfile(Profile):
             else:
                 self.array = array
 
-            self.field_abs_interp = RegularGridInterpolator(
+            self.combined_field_interp = RegularGridInterpolator(
                 (axes["x"], axes["y"], axes["t"]),
-                np.abs(array),
+                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )
-
-            self.field_angl_interp = RegularGridInterpolator(
-                (axes["x"], axes["y"], axes["t"]),
-                np.unwrap(np.angle(array), axis=-1),
-                bounds_error=False,
-                fill_value=0.0,
-            )
-
         else:  # dim = "rt"
             assert axes_order in [["r", "t"], ["t", "r"]]
 
@@ -76,16 +68,9 @@ class FromArrayProfile(Profile):
             r = np.concatenate((-axes["r"][::-1], axes["r"]))
             array = np.concatenate((array[::-1], array))
 
-            self.field_abs_interp = RegularGridInterpolator(
+            self.combined_field_interp = RegularGridInterpolator(
                 (r, axes["t"]),
-                np.abs(array),
-                bounds_error=False,
-                fill_value=0.0,
-            )
-
-            self.field_angl_interp = RegularGridInterpolator(
-                (r, axes["t"]),
-                np.unwrap(np.angle(array), axis=-1),
+                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )
@@ -93,11 +78,11 @@ class FromArrayProfile(Profile):
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
         if self.dim == "xyt":
-            phase = np.exp(1.0j * self.field_angl_interp((x, y, t)))
-            envelope = phase * self.field_abs_interp((x, y, t))
+            combined_field = self.combined_field_interp((x, y, t))
         else:
-            r = np.sqrt(x**2 + y**2)
-            phase = np.exp(1.0j * self.field_angl_interp((r, t)))
-            envelope = phase * self.field_abs_interp((r, t))
+            combined_field = self.combined_field_interp((np.sqrt(x**2 + y**2), t))
+
+        envelope = np.abs(np.real(combined_field)) \
+            * np.exp( 1.0j * np.imag(combined_field) )
 
         return envelope
