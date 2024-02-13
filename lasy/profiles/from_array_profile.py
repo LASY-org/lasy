@@ -48,9 +48,16 @@ class FromArrayProfile(Profile):
             else:
                 self.array = array
 
-            self.field_interp = RegularGridInterpolator(
+            self.field_abs_interp = RegularGridInterpolator(
                 (axes["x"], axes["y"], axes["t"]),
-                array,
+                np.abs(array),
+                bounds_error=False,
+                fill_value=0.0,
+            )
+
+            self.field_angl_interp = RegularGridInterpolator(
+                (axes["x"], axes["y"], axes["t"]),
+                np.unwrap(np.angle(array), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )
@@ -68,9 +75,19 @@ class FromArrayProfile(Profile):
             # field and axes along r.
             r = np.concatenate((-axes["r"][::-1], axes["r"]))
             array = np.concatenate((array[::-1], array))
-            self.field_interp = RegularGridInterpolator(
+
+
+
+            self.field_abs_interp = RegularGridInterpolator(
                 (r, axes["t"]),
-                array,
+                np.abs(array),
+                bounds_error=False,
+                fill_value=0.0,
+            )
+
+            self.field_angl_interp = RegularGridInterpolator(
+                (r, axes["t"]),
+                np.unwrap(np.angle(array), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )
@@ -78,7 +95,13 @@ class FromArrayProfile(Profile):
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
         if self.dim == "xyt":
-            envelope = self.field_interp((x, y, t))
+            phase = np.exp( 1.0j * self.field_angl_interp((x, y, t)))
+            envelope = self.field_abs_interp((x, y, t))
         else:
-            envelope = self.field_interp((np.sqrt(x**2 + y**2), t))
+            r = np.sqrt(x**2 + y**2)
+            phase = np.exp( 1.0j * self.field_angl_interp((r, t)))
+            envelope = self.field_abs_interp((r, t))
+
+        envelope *= phase
+
         return envelope
