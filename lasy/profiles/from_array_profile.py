@@ -96,12 +96,10 @@ class FromArrayProfile(Profile):
         """Return the envelope field of the scaled profile."""
         if self.dim == "xyt":
             phase = np.exp( 1.0j * self.field_angl_interp((x, y, t)))
-            envelope = self.field_abs_interp((x, y, t))
+            envelope = phase * self.field_abs_interp((x, y, t))
         else:
             r = np.sqrt(x**2 + y**2)
             phase = np.exp( 1.0j * self.field_angl_interp((r, t)))
-            envelope = self.field_abs_interp((r, t))
-
-        envelope *= phase
+            envelope = phase * self.field_abs_interp((r, t))
 
         return envelope
