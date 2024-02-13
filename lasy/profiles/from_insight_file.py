@@ -36,7 +36,7 @@ class FromInsightFile(FromArrayProfile):
 
         # get central frequency from the field on axis,
         env = data[data.shape[0] // 2, data.shape[1] // 2, :]
-        omega_array = np.gradient(np.unwrap(np.angle(env)), t)
+        omega_array = np.abs(np.gradient(np.unwrap(np.angle(env)), t))
         # using peak field frequency
         omega0 = omega_array[np.abs(env).argmax()]
         # or "center of mass" frequency
