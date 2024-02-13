@@ -76,8 +76,6 @@ class FromArrayProfile(Profile):
             r = np.concatenate((-axes["r"][::-1], axes["r"]))
             array = np.concatenate((array[::-1], array))
 
-
-
             self.field_abs_interp = RegularGridInterpolator(
                 (r, axes["t"]),
                 np.abs(array),
@@ -95,11 +93,11 @@ class FromArrayProfile(Profile):
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
         if self.dim == "xyt":
-            phase = np.exp( 1.0j * self.field_angl_interp((x, y, t)))
+            phase = np.exp(1.0j * self.field_angl_interp((x, y, t)))
             envelope = phase * self.field_abs_interp((x, y, t))
         else:
             r = np.sqrt(x**2 + y**2)
-            phase = np.exp( 1.0j * self.field_angl_interp((r, t)))
+            phase = np.exp(1.0j * self.field_angl_interp((r, t)))
             envelope = phase * self.field_abs_interp((r, t))
 
         return envelope
