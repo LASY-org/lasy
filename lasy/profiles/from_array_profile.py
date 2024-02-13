@@ -82,7 +82,8 @@ class FromArrayProfile(Profile):
         else:
             combined_field = self.combined_field_interp((np.sqrt(x**2 + y**2), t))
 
-        envelope = np.abs(np.real(combined_field)) \
-            * np.exp( 1.0j * np.imag(combined_field) )
+        envelope = np.abs(np.real(combined_field)) * np.exp(
+            1.0j * np.imag(combined_field)
+        )
 
         return envelope
