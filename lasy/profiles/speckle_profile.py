@@ -221,8 +221,12 @@ class SpeckleProfile(Profile):
                 spectral_amplitude = np.array(psd) * (
                     np.random.normal(size=t_num) + 1j * np.random.normal(size=t_num)
                 )
-                temporal_amplitude = np.fft.ifftshift(np.fft.fft(np.fft.fftshift(spectral_amplitude)))
-                temporal_amplitude *= rms_mean / np.sqrt(np.mean(np.square(np.abs(temporal_amplitude))))
+                temporal_amplitude = np.fft.ifftshift(
+                    np.fft.fft(np.fft.fftshift(spectral_amplitude))
+                )
+                temporal_amplitude *= rms_mean / np.sqrt(
+                    np.mean(np.square(np.abs(temporal_amplitude)))
+                )
                 return temporal_amplitude
 
         def init_GS_timeseries():
