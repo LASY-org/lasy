@@ -2,8 +2,7 @@ import numpy as np
 
 from lasy.laser import Laser
 from lasy.profiles.speckle_profile import SpeckleProfile
-
-c = 2.998e8  # m/s
+from scipy.constants import c
 
 
 def test_intensity_distribution():

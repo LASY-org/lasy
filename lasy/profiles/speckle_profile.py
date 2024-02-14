@@ -1,6 +1,5 @@
 import numpy as np
-
-c = 2.998e8  # m/s
+from scipy.constants import c
 
 from .profile import Profile
 
@@ -36,7 +35,7 @@ class SpeckleProfile(Profile):
 
     Notes
     -----
-    This assumes a rectangular laser and so a rectangular grid of beamlets.
+    This assumes a rectangular laser and so a rectangular arrangement of beamlets in the near-field.
 
     Parameters
     ----------
@@ -51,39 +50,26 @@ class SpeckleProfile(Profile):
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
 
-    w0 : float (in meter)
-        The waist of the laser pulse, i.e. :math:`w_0` in the above formula.
-
-    tau : float (in second)
-        The duration of the laser pulse, i.e. :math:`\tau` in the above
-        formula. Note that :math:`\tau = \tau_{FWHM}/\sqrt{2\log(2)}`,
-        where :math:`\tau_{FWHM}` is the Full-Width-Half-Maximum duration
-        of the intensity distribution of the pulse.
-
-    t_peak : float (in second)
-        The time at which the laser envelope reaches its maximum amplitude,
-        i.e. :math:`t_{peak}` in the above formula.
-
     focal_length : float (in meter)
         Focal length of lens :math:`f` just after the RPP/CPP.
 
     beam_aperture : list of 2 floats (in meters)
-        Beam width :math:`D_x,D_y` at the lens / size of the illuminated region of the RPP/CPP.
+        Width :math:`D_x,D_y` of the rectangular beam in the near-field, i.e., size of the illuminated region of the RPP/CPP.
 
     n_beamlets : list of integers
-        Number of RPP/CPP elements :math:`N_{bx},N_{by}` in each direction.
+        Number of RPP/CPP elements :math:`N_{bx},N_{by}` in each direction, in the near field.
 
     lsType : string
         Which method for beamlet production and evolution is used.
-        Can be 'FM SSD', 'GS RPM SSD', or 'GS ISI'
+        Can be ``'FM SSD'``, ``'GS RPM SSD'``, or ``'GS ISI'``
 
-        - 'FM SSD': frequency modulated (FM) Smoothing by Spectral Dispersion (SSD)
-        - 'GP RPM SSD': Gaussian process (GP) Random Phase Modulated (RPM) SSD
+        - ``'FM SSD'``: frequency modulated (FM) Smoothing by Spectral Dispersion (SSD)
+        - ``'GP RPM SSD'``: Gaussian process (GP) Random Phase Modulated (RPM) SSD
 
         An idealized form of SSD where each beamlet has random phase
         determined by sampling from a Gaussian stochastic process.
 
-        - 'GP ISI': GP Induced spatial incoherence (ISI)
+        - ``'GP ISI'``: GP Induced spatial incoherence (ISI)
 
         An idealized form of ISI where each beamlet has random phase and amplitude
         sampled from a Gaussian stochastic process.
@@ -104,21 +90,15 @@ class SpeckleProfile(Profile):
         if `ssd_distr=[a,b]`, then the SSD frequency modulation is `a/sqrt(a^2+b^2)` in `x` and `b/sqrt(a^2+b^2)` in `y`.
         Only used if `lsType` is `FM SSD`.
 
-    do_include_transverse_decay : boolean, (optional, default False)
+    do_include_transverse_envelope : boolean, (optional, default False)
         Whether to include the transverse sinc envelope or not.
         I.e. whether it is assumed to be close enough to the laser axis to neglect the transverse field decay.
-
-    z_foc : float (in meter), optional
-        Position of the focal plane. (The laser pulse is initialized at `z=0`.)
     """
 
     def __init__(
         self,
         wavelength,
         pol,
-        w0,
-        tau,
-        t_peak,
         focal_length,
         beam_aperture,
         n_beamlets,
@@ -128,11 +108,9 @@ class SpeckleProfile(Profile):
         ncc=[1.4, 1.0],
         ssd_distr=[1.2, 1.0],
         do_include_transverse_decay=False,
-        z_foc=0,
     ):
         super().__init__(wavelength, pol)
         self.wavelength = wavelength
-        self.w0 = w0
         self.tau = tau
         self.t_peak = t_peak
         self.z_foc = z_foc
@@ -151,9 +129,6 @@ class SpeckleProfile(Profile):
         self.ncc = ncc
         # bandwidth distributed with respect to the two transverse direction
         self.ssd_distr = ssd_distr
-        #                                                                               #
-        # \                                                                           / #
-        # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ USER INPUT ENDS ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #
         # time interval to update the speckle pattern, roughly update 50 time every bandwidth cycle
         self.tu = 1 / self.laser_bandwidth / 50
         self.do_include_transverse_decay = do_include_transverse_decay
@@ -199,8 +174,8 @@ class SpeckleProfile(Profile):
         else:
             raise NotImplementedError
 
-        ssd_frac = np.sqrt(self.ssd_distr[0] ** 2 + self.ssd_distr[1] ** 2)
-        ssd_frac = self.ssd_distr[0] / ssd_frac, self.ssd_distr[1] / ssd_frac
+        ssd_normalization = np.sqrt(self.ssd_distr[0] ** 2 + self.ssd_distr[1] ** 2)
+        ssd_frac = self.ssd_distr[0] / ssd_frac, self.ssd_distr[1] / ssd_normalization
         phase_mod_freq = [
             self.laser_bandwidth * sf * 0.5 / pma
             for sf, pma in zip(ssd_frac, self.phase_mod_amp)
@@ -243,12 +218,12 @@ class SpeckleProfile(Profile):
                 # rand_ph = np.random.normal(scale=np.pi, size=t_num)
                 psd = np.exp(-np.log(2) * 0.5 * np.square(omega / fwhm * 2 * np.pi))
                 psd *= np.sqrt(t_num) / np.sqrt(np.mean(np.square(psd))) * rms_mean
-                pm_phase = np.array(psd) * (
+                spectral_amplitude = np.array(psd) * (
                     np.random.normal(size=t_num) + 1j * np.random.normal(size=t_num)
                 )
-                pm_phase = np.fft.ifftshift(np.fft.fft(np.fft.fftshift(pm_phase)))
-                pm_phase *= rms_mean / np.sqrt(np.mean(np.square(np.abs(pm_phase))))
-                return pm_phase
+                temporal_amplitude = np.fft.ifftshift(np.fft.fft(np.fft.fftshift(spectral_amplitude)))
+                temporal_amplitude *= rms_mean / np.sqrt(np.mean(np.square(np.abs(temporal_amplitude))))
+                return temporal_amplitude
 
         def init_GS_timeseries():
             if "SSD" in self.lsType.upper():
