@@ -128,13 +128,24 @@ class SpeckleProfile(Profile):
         # number of color cycles
         self.ssd_number_color_cycles = ssd_number_color_cycles
         # bandwidth distributed with respect to the two transverse direction
-        self.ssd_transverse_bandwidth_distribution = ssd_transverse_bandwidth_distribution
+        self.ssd_transverse_bandwidth_distribution = (
+            ssd_transverse_bandwidth_distribution
+        )
 
         # ================== Sanity checks on user inputs ===================== #
         assert relative_laser_bandwidth > 0, "laser_bandwidth must be greater than 0"
-        for q in (n_beamlets, ssd_phase_modulation_amplitude, ssd_number_color_cycles, ssd_transverse_bandwidth_distribution):
+        for q in (
+            n_beamlets,
+            ssd_phase_modulation_amplitude,
+            ssd_number_color_cycles,
+            ssd_transverse_bandwidth_distribution,
+        ):
             assert np.size(q) == 2, "has to be a size 2 array"
-        for q in (ssd_number_color_cycles, ssd_transverse_bandwidth_distribution, ssd_phase_modulation_amplitude):
+        for q in (
+            ssd_number_color_cycles,
+            ssd_transverse_bandwidth_distribution,
+            ssd_phase_modulation_amplitude,
+        ):
             assert q[0] > 0 or q[1] > 0, "cannot be all zeros"
         self.supported_bandwidth = "FM SSD", "GP RPM SSD", "GP ISI"
         assert (
@@ -171,8 +182,14 @@ class SpeckleProfile(Profile):
         else:
             raise NotImplementedError
 
-        ssd_normalization = np.sqrt(self.ssd_transverse_bandwidth_distribution[0] ** 2 + self.ssd_transverse_bandwidth_distribution[1] ** 2)
-        ssd_frac = self.ssd_transverse_bandwidth_distribution[0] / ssd_frac, self.ssd_transverse_bandwidth_distribution[1] / ssd_normalization
+        ssd_normalization = np.sqrt(
+            self.ssd_transverse_bandwidth_distribution[0] ** 2
+            + self.ssd_transverse_bandwidth_distribution[1] ** 2
+        )
+        ssd_frac = (
+            self.ssd_transverse_bandwidth_distribution[0] / ssd_frac,
+            self.ssd_transverse_bandwidth_distribution[1] / ssd_normalization,
+        )
         phase_mod_freq = [
             self.laser_bandwidth * sf * 0.5 / pma
             for sf, pma in zip(ssd_frac, self.ssd_phase_modulation_amplitude)
@@ -194,8 +211,12 @@ class SpeckleProfile(Profile):
         )
         phase_mod_phase = np.random.standard_normal(2) * np.pi
         td = (
-            self.ssd_number_color_cycles[0] / phase_mod_freq[0] if phase_mod_freq[0] > 0 else 0,
-            self.ssd_number_color_cycles[1] / phase_mod_freq[1] if phase_mod_freq[1] > 0 else 0,
+            self.ssd_number_color_cycles[0] / phase_mod_freq[0]
+            if phase_mod_freq[0] > 0
+            else 0,
+            self.ssd_number_color_cycles[1] / phase_mod_freq[1]
+            if phase_mod_freq[1] > 0
+            else 0,
         )
         stochastic_process_time = np.arange(0, t_max + self.dt_update, self.dt_update)
 
@@ -327,7 +348,9 @@ class SpeckleProfile(Profile):
         )
 
         def generate_speckle_pattern(tnow):
-            bca = beamlets_complex_amplitude(tnow, temporal_smoothing_type=self.temporal_smoothing_type)
+            bca = beamlets_complex_amplitude(
+                tnow, temporal_smoothing_type=self.temporal_smoothing_type
+            )
             speckle_amp = np.einsum(
                 "jk,jl->kl",
                 np.einsum("ij,ik->jk", bca * exp_phase_plate, x_phase_matrix),
