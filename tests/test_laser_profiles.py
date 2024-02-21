@@ -10,6 +10,7 @@ from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
 from lasy.profiles import GaussianProfile, FromArrayProfile
 from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
+    SuperGaussianLongitudinalProfile,
     CosineLongitudinalProfile,
 )
 from lasy.profiles.transverse import (
@@ -186,6 +187,30 @@ def test_longitudinal_profiles():
     print("cep_phase = ", cep_phase_gaussian)
     assert np.abs(cep_phase_gaussian - cep_phase) / cep_phase < 0.02
 
+    # SuperGaussianLongitudinalProfile
+    print("SuperGaussianLongitudinalProfile")
+    n_order = 2 # ordinary gaussian
+    tau = tau_fwhm / np.sqrt(2 * np.power(np.log(2),n_order/2))
+    profile_super_gaussian = SuperGaussianLongitudinalProfile(wavelength, tau, t_peak, n_order, cep_phase)
+    field_super_gaussian = profile_super_gaussian.evaluate(t)
+
+    std_super_gauss = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_super_gaussian)))
+    std_super_gauss_th = tau / np.sqrt(2.0)
+    print("std_th = ", std_super_gauss_th)
+    print("std = ", std_super_gauss)
+    assert np.abs(std_super_gauss - std_super_gauss_th) / std_super_gauss_th < 0.01
+
+    t_peak_super_gaussian = t[np.argmax(np.abs(field_super_gaussian))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_super_gaussian)
+    assert np.abs(t_peak_super_gaussian - t_peak) / t_peak < 0.01
+
+    ff_super_gaussian = field_super_gaussian * np.exp(-1.0j * omega_0 * t)
+    cep_phase_super_gaussian = np.angle(ff_super_gaussian[np.argmax(np.abs(field_super_gaussian))])
+    print("cep_phase_th = ", cep_phase)
+    print("cep_phase = ", cep_phase_super_gaussian)
+    assert np.abs(cep_phase_super_gaussian - cep_phase) / cep_phase < 0.02
+    
     # CosineLongitudinalProfile
     print("CosineLongitudinalProfile")
     profile_cos = CosineLongitudinalProfile(wavelength, tau_fwhm, t_peak, cep_phase)
