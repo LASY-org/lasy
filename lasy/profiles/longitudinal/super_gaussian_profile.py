@@ -67,5 +67,3 @@ class SuperGaussianLongitudinalProfile(LongitudinalProfile):
         )
 
         return envelope
-
-
