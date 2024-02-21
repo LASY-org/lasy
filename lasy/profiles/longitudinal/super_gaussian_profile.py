@@ -13,14 +13,14 @@ class SuperGaussianLongitudinalProfile(LongitudinalProfile):
 
     .. math::
 
-        \mathcal{L}(t) = \exp\left( -\left({\frac{(t-t_{peak})^2}{\tau^2}\right)^{\dfrac{n}{2}}
+        \mathcal{L}(t) = \exp\left( -\left(\frac{(t-t_{peak})^2}{\tau^2}\right)^{n/2}
                         + i\omega_0t_{peak} \right)
 
     Parameters
     ----------
     tau : float (in second)
         The duration of the laser pulse, i.e. :math:`\tau` in the above
-        formula. Note that :math:`\tau = \tau_{FWHM}/\sqrt{2\log(2)}`,
+        formula. Note that :math:`\tau = \tau_{FWHM}/(\sqrt{2}\log(2)^{1/n})`,
         where :math:`\tau_{FWHM}` is the Full-Width-Half-Maximum duration
         of the intensity distribution of the pulse.
 
