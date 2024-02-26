@@ -139,7 +139,9 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
+    def propagate(
+        self, distance, nr_boundary=None, backend="NP", grid=None, show_progress=True
+    ):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -154,6 +156,10 @@ class Laser:
             Only used for ``'rt'``.
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
+
+        grid : Grid object (optional)
+            Resample the field onto a new grid. Only works for ``'rt'``.
+
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
         """
@@ -195,8 +201,32 @@ class Laser:
         omega_shape = (1, 1, self.grid.field.shape[time_axis_indx])
 
         if self.dim == "rt":
-            # Construct the propagator (check if exists)
-            if not hasattr(self, "prop"):
+            # Construct new propagator with resampling if grid is passed
+            if grid is not None:
+                # Overwrite time information from current grid
+                grid.lo[time_axis_indx] = self.grid.lo[time_axis_indx]
+                grid.hi[time_axis_indx] = self.grid.hi[time_axis_indx]
+                grid.axes[time_axis_indx] = self.grid.axes[time_axis_indx]
+                # Get current and resampled axis
+                spatial_axes = (self.grid.axes[0],)
+                spatial_axes_n = (grid.axes[0],)
+                # Overwrite grid
+                self.grid = grid
+                self.prop = []  # Delete existing propagator
+                # Create Propagator and pass resampled axis
+                for m in self.grid.azimuthal_modes:
+                    self.prop.append(
+                        PropagatorResampling(
+                            *spatial_axes,
+                            omega / c,
+                            *spatial_axes_n,
+                            mode=m,
+                            backend=backend,
+                            verbose=False,
+                        )
+                    )
+            # Construct the propagator for non-resampled case (check if exists)
+            elif not hasattr(self, "prop"):
                 spatial_axes = (self.grid.axes[0],)
                 self.prop = []
                 for m in self.grid.azimuthal_modes:
@@ -219,8 +249,11 @@ class Laser:
                     show_progress=show_progress,
                 )
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
+            # Delete Propagator if resampling was done
+            if grid is not None:
+                del self.prop
         else:
-            # Construct the propagator (check if exists)
+            # Construct the propagator for non-rt case (check if exists)
             if not hasattr(self, "prop"):
                 Nx, Ny, Nt = self.grid.field.shape
                 Lx = self.grid.hi[0] - self.grid.lo[0]
