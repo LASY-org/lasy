@@ -254,9 +254,7 @@ class SpeckleProfile(Profile):
                 return np.zeros((2, t_num))
             else:
                 omega = np.fft.fftshift(np.fft.fftfreq(t_num, d=self.dt_update))
-                # rand_ph = np.random.normal(scale=np.pi, size=t_num)
                 psd = np.exp(-np.log(2) * 0.5 * np.square(omega / fwhm * 2 * np.pi))
-                psd *= np.sqrt(t_num) / np.sqrt(np.mean(np.square(psd))) * rms_mean
                 spectral_amplitude = np.array(psd) * (
                     np.random.normal(size=t_num) + 1j * np.random.normal(size=t_num)
                 )
