@@ -9,34 +9,28 @@ def test_intensity_distribution():
     # this test seems pretty robust to any smoothing technique or physical parameters
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    spot_size = 25.0e-6  # Waist of the laser pulse in meters
-    pulse_duration = 30e-15  # Pulse duration of the laser in seconds
-    t_peak = 0.0  # Location of the peak of the laser pulse in time
     ###
-    focal_length = 3.5  # unit?
-    beam_aperture = [0.35, 0.5]  # unit?
+    focal_length = 3.5  # m
+    beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
-    lsType = "GP ISI"
-    relative_laser_bandwidth = 0.005  # unit?
+    temporal_smoothing_type = "GP ISI"
+    relative_laser_bandwidth = 0.005
 
-    phase_mod_amp = (4.1, 4.5)
-    ncc = [1.4, 1.0]
-    ssd_distr = [1.8, 1.0]
+    ssd_phase_modulation_amplitude = (4.1, 4.5)
+    ssd_number_color_cycles = [1.4, 1.0]
+    ssd_transverse_bandwidth_distribution = [1.8, 1.0]
 
     profile = SpeckleProfile(
         wavelength,
         polarization,
-        spot_size,
-        pulse_duration,
-        t_peak,
         focal_length,
         beam_aperture,
         n_beamlets,
-        lsType=lsType,
-        relative_laser_bandwidth=relative_laser_bandwidth,  # 0.005
-        phase_mod_amp=phase_mod_amp,
-        ncc=ncc,
-        ssd_distr=ssd_distr,
+        temporal_smoothing_type=temporal_smoothing_type,
+        relative_laser_bandwidth=relative_laser_bandwidth,
+        ssd_phase_modulation_amplitude=ssd_phase_modulation_amplitude,
+        ssd_number_color_cycles=ssd_number_color_cycles,
+        ssd_transverse_bandwidth_distribution=ssd_transverse_bandwidth_distribution,
     )
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
@@ -78,34 +72,28 @@ def test_spatial_correlation():
     # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    spot_size = 25.0e-6  # Waist of the laser pulse in meters
-    pulse_duration = 30e-15  # Pulse duration of the laser in seconds
-    t_peak = 0.0  # Location of the peak of the laser pulse in time
     ###
-    focal_length = 3.5  # unit?
-    beam_aperture = [0.35, 0.35]  # unit?
+    focal_length = 3.5  # m
+    beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 32]
-    lsType = "FM SSD"
-    relative_laser_bandwidth = 0.005  # unit?
+    temporal_smoothing_type = "FM SSD"
+    relative_laser_bandwidth = 0.005
 
-    phase_mod_amp = (4.1, 4.1)
-    ncc = [1.4, 1.0]
-    ssd_distr = [1.0, 1.0]
+    ssd_phase_modulation_amplitude = (4.1, 4.1)
+    ssd_number_color_cycles = [1.4, 1.0]
+    ssd_transverse_bandwidth_distribution = [1.0, 1.0]
 
     profile = SpeckleProfile(
         wavelength,
         polarization,
-        spot_size,
-        pulse_duration,
-        t_peak,
         focal_length,
         beam_aperture,
         n_beamlets,
-        lsType=lsType,
+        temporal_smoothing_type=temporal_smoothing_type,
         relative_laser_bandwidth=relative_laser_bandwidth,  # 0.005
-        phase_mod_amp=phase_mod_amp,
-        ncc=ncc,
-        ssd_distr=ssd_distr,
+        ssd_phase_modulation_amplitude=ssd_phase_modulation_amplitude,
+        ssd_number_color_cycles=ssd_number_color_cycles,
+        ssd_transverse_bandwidth_distribution=ssd_transverse_bandwidth_distribution,
     )
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
@@ -149,35 +137,22 @@ def test_sinc_zeros():
     # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    spot_size = 25.0e-6  # Waist of the laser pulse in meters
-    pulse_duration = 30e-15  # Pulse duration of the laser in seconds
-    t_peak = 0.0  # Location of the peak of the laser pulse in time
     ###
-    focal_length = 3.5  # unit?
-    beam_aperture = [0.35, 0.35]  # unit?
+    focal_length = 3.5  # m
+    beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 48]
-    lsType = "GP ISI"
-    relative_laser_bandwidth = 0.005  # unit?
-
-    phase_mod_amp = (4.1, 4.5)
-    ncc = [1.4, 1.0]
-    ssd_distr = [1.0, 3.0]
+    temporal_smoothing_type = "GP ISI"
+    relative_laser_bandwidth = 0.005
 
     profile = SpeckleProfile(
         wavelength,
         polarization,
-        spot_size,
-        pulse_duration,
-        t_peak,
         focal_length,
         beam_aperture,
         n_beamlets,
-        lsType=lsType,
-        relative_laser_bandwidth=relative_laser_bandwidth,  # 0.005
-        phase_mod_amp=phase_mod_amp,
-        ncc=ncc,
-        ssd_distr=ssd_distr,
-        do_include_transverse_decay=True,
+        temporal_smoothing_type=temporal_smoothing_type,
+        relative_laser_bandwidth=relative_laser_bandwidth,
+        do_include_transverse_envelope=True,
     )
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
@@ -207,37 +182,34 @@ def test_FM_SSD_periodicity():
     pulse_duration = 30e-15  # Pulse duration of the laser in seconds
     t_peak = 0.0  # Location of the peak of the laser pulse in time
     ###
-    focal_length = 3.5  # unit?
-    beam_aperture = [0.35, 0.35]  # unit?
+    focal_length = 3.5  # m
+    beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 32]
-    lsType = "FM SSD"
-    relative_laser_bandwidth = 0.005  # unit?
+    temporal_smoothing_type = "FM SSD"
+    relative_laser_bandwidth = 0.005
 
-    phase_mod_amp = (4.1, 4.1)
-    ncc = [1.4, 1.0]
-    ssd_distr = [1.0, 1.0]
+    ssd_phase_modulation_amplitude = [4.1, 4.1]
+    ssd_number_color_cycles = [1.4, 1.0]
+    ssd_transverse_bandwidth_distribution = [1.0, 1.0]
 
     laser_profile = SpeckleProfile(
         wavelength,
         polarization,
-        spot_size,
-        pulse_duration,
-        t_peak,
         focal_length,
         beam_aperture,
         n_beamlets,
-        lsType=lsType,
-        relative_laser_bandwidth=relative_laser_bandwidth,  # 0.005
-        phase_mod_amp=phase_mod_amp,
-        ncc=ncc,
-        ssd_distr=ssd_distr,
+        temporal_smoothing_type=temporal_smoothing_type,
+        relative_laser_bandwidth=relative_laser_bandwidth,
+        ssd_phase_modulation_amplitude=ssd_phase_modulation_amplitude,
+        ssd_number_color_cycles=ssd_number_color_cycles,
+        ssd_transverse_bandwidth_distribution=ssd_transverse_bandwidth_distribution,
     )
     nu_laser = c / wavelength
-    ssd_frac = np.sqrt(ssd_distr[0] ** 2 + ssd_distr[1] ** 2)
-    ssd_frac = ssd_distr[0] / ssd_frac, ssd_distr[1] / ssd_frac
+    ssd_frac = np.sqrt(ssd_transverse_bandwidth_distribution[0] ** 2 + ssd_transverse_bandwidth_distribution[1] ** 2)
+    ssd_frac = ssd_transverse_bandwidth_distribution[0] / ssd_frac, ssd_transverse_bandwidth_distribution[1] / ssd_frac
     phase_mod_freq = [
         relative_laser_bandwidth * sf * 0.5 / pma
-        for sf, pma in zip(ssd_frac, phase_mod_amp)
+        for sf, pma in zip(ssd_frac, ssd_phase_modulation_amplitude)
     ]
     t_max = 1.0 / phase_mod_freq[0] / nu_laser
 

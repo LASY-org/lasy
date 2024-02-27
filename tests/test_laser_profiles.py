@@ -280,34 +280,28 @@ def test_speckle_profile():
     print("SpeckledProfile")
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    spot_size = 25.0e-6  # Waist of the laser pulse in meters
-    pulse_duration = 30e-15  # Pulse duration of the laser in seconds
-    t_peak = 0.0  # Location of the peak of the laser pulse in time
     ###
-    focal_length = 3.5  # unit?
-    beam_aperture = [0.35, 0.5]  # unit?
+    focal_length = 3.5  # m
+    beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
-    lsType = "GP ISI"
-    relative_laser_bandwidth = 0.005  # unit?
+    temporal_smoothing_type = "GP ISI"
+    relative_laser_bandwidth = 0.005
 
-    phase_mod_amp = (4.1, 4.5)
-    ncc = [1.4, 1.0]
-    ssd_distr = [1.8, 1.0]
+    ssd_phase_modulation_amplitude = [4.1, 4.5]
+    ssd_number_color_cycles = [1.4, 1.0]
+    ssd_transverse_bandwidth_distribution = [1.8, 1.0]
 
     profile = SpeckleProfile(
         wavelength,
         polarization,
-        spot_size,
-        pulse_duration,
-        t_peak,
         focal_length,
         beam_aperture,
         n_beamlets,
-        lsType=lsType,
-        relative_laser_bandwidth=relative_laser_bandwidth,  # 0.005
-        phase_mod_amp=phase_mod_amp,
-        ncc=ncc,
-        ssd_distr=ssd_distr,
+        temporal_smoothing_type=temporal_smoothing_type,
+        relative_laser_bandwidth=relative_laser_bandwidth,
+        ssd_phase_modulation_amplitude=ssd_phase_modulation_amplitude,
+        ssd_number_color_cycles=ssd_number_color_cycles,
+        ssd_transverse_bandwidth_distribution=ssd_transverse_bandwidth_distribution,
     )
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
