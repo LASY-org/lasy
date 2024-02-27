@@ -9,12 +9,12 @@ class SpeckleProfile(Profile):
     Derived class for the profile of a speckled laser pulse.
 
     Speckled lasers are used to mitigate laser-plasma interactions in fusion and ion acceleration contexts.
-    More on the subject can be found in chapter 9 of `Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__. 
+    More on the subject can be found in chapter 9 of `Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__.
     A speckled laser beam is a laser that is deliberately divided transversely into several beamlets in the near-field.
-    This is done with a near-field phase plate divided into 
+    This is done with a near-field phase plate divided into
     The phase plate provides a different phase to each beamlet, which then propagate incoherently and combine in the far field.
     This profile admits several options for calculating the amplitudes and phases of the beamlets:
-    
+
     * Continuous phase plates (CPP)
     * CPP + Smoothing by spectral dispersion (SSD)
     * CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases
@@ -25,13 +25,13 @@ class SpeckleProfile(Profile):
     .. math::
 
         \begin{aligned}
-        E_u(\boldsymbol{x}_\perp,t) &= Re\left[ E_0 
-        \sum_{j=1}^{N_{bx}\times N_{by}} A_j 
+        E_u(\boldsymbol{x}_\perp,t) &= Re\left[ E_0
+        \sum_{j=1}^{N_{bx}\times N_{by}} A_j
         {\rm sinc}\left(\frac{\pi D_xx}{\lambda_0 f}\right)
-        {\rm sinc}\left(\frac{\pi D_yy}{\lambda_0 f}\right) 
+        {\rm sinc}\left(\frac{\pi D_yy}{\lambda_0 f}\right)
         \right.
         \\
-        & \left. \times\exp\left(i\boldsymbol{k}_{\perp,j}\cdot\boldsymbol{x}_\perp 
+        & \left. \times\exp\left(i\boldsymbol{k}_{\perp,j}\cdot\boldsymbol{x}_\perp
         + i\phi_{{\rm RPP/CPP},j}+i\psi_{{\rm SSD/ISI},j}(t)\right) \times p_u
         \right]
         \end{aligned}
@@ -155,14 +155,18 @@ class SpeckleProfile(Profile):
             temporal_smoothing_type.upper() in self.supported_bandwidth
         ), "Only support one of the following: " + ", ".join(self.supported_bandwidth)
         assert relative_laser_bandwidth > 0, "laser_bandwidth must be greater than 0"
-        for q in (
-            n_beamlets,
-        ):
+        for q in (n_beamlets,):
             assert np.size(q) == 2, "has to be a size 2 array"
         if "SSD" in self.temporal_smoothing_type.upper():
-            assert ssd_number_color_cycles is not None, "must supply `ssd_number_color_cycles` to use SSD"
-            assert ssd_transverse_bandwidth_distribution is not None, "must supply `ssd_transverse_bandwidth_distribution` to use SSD"
-            assert ssd_phase_modulation_amplitude is not None, "must supply `ssd_phase_modulation_amplitude` to use SSD"
+            assert (
+                ssd_number_color_cycles is not None
+            ), "must supply `ssd_number_color_cycles` to use SSD"
+            assert (
+                ssd_transverse_bandwidth_distribution is not None
+            ), "must supply `ssd_transverse_bandwidth_distribution` to use SSD"
+            assert (
+                ssd_phase_modulation_amplitude is not None
+            ), "must supply `ssd_phase_modulation_amplitude` to use SSD"
             for q in (
                 ssd_number_color_cycles,
                 ssd_transverse_bandwidth_distribution,
@@ -269,18 +273,24 @@ class SpeckleProfile(Profile):
         def init_gaussian_time_series():
             if "SSD" in self.temporal_smoothing_type.upper():
                 pm_phase0 = gen_gaussian_time_series(
-                    stochastic_process_time.size + int(np.sum(ssd_time_delay) / self.dt_update) + 2,
+                    stochastic_process_time.size
+                    + int(np.sum(ssd_time_delay) / self.dt_update)
+                    + 2,
                     2 * np.pi * ssd_phase_modulation_frequency[0],
                     self.ssd_phase_modulation_amplitude[0],
                 )
                 pm_phase1 = gen_gaussian_time_series(
-                    stochastic_process_time.size + int(np.sum(ssd_time_delay) / self.dt_update) + 2,
+                    stochastic_process_time.size
+                    + int(np.sum(ssd_time_delay) / self.dt_update)
+                    + 2,
                     2 * np.pi * ssd_phase_modulation_frequency[1],
                     self.ssd_phase_modulation_amplitude[1],
                 )
                 time_interp = np.arange(
                     start=0,
-                    stop=stochastic_process_time[-1] + np.sum(ssd_time_delay) + 3 * self.dt_update,
+                    stop=stochastic_process_time[-1]
+                    + np.sum(ssd_time_delay)
+                    + 3 * self.dt_update,
                     step=self.dt_update,
                 )[: pm_phase0.size]
                 return (
@@ -317,23 +327,27 @@ class SpeckleProfile(Profile):
             if temporal_smoothing_type.upper() == "FM SSD":
                 phase_t = self.ssd_phase_modulation_amplitude[0] * np.sin(
                     phase_plate_phase_modulation[0]
-                    + 2 * np.pi
+                    + 2
+                    * np.pi
                     * ssd_phase_modulation_frequency[0]
                     * (t_now - X_lens_matrix * ssd_time_delay[0] / self.n_beamlets[0])
                 ) + self.ssd_phase_modulation_amplitude[1] * np.sin(
                     phase_plate_phase_modulation[1]
-                    + 2 * np.pi
+                    + 2
+                    * np.pi
                     * ssd_phase_modulation_frequency[1]
                     * (t_now - Y_lens_matrix * ssd_time_delay[1] / self.n_beamlets[1])
                 )
                 return np.exp(1j * phase_t)
             elif temporal_smoothing_type.upper() == "GP RPM SSD":
                 phase_t = np.interp(
-                    t_now + X_lens_index_matrix * ssd_time_delay[0] / self.n_beamlets[0],
+                    t_now
+                    + X_lens_index_matrix * ssd_time_delay[0] / self.n_beamlets[0],
                     time_ext,
                     timeSeries[0],
                 ) + np.interp(
-                    t_now + Y_lens_index_matrix * ssd_time_delay[1] / self.n_beamlets[1],
+                    t_now
+                    + Y_lens_index_matrix * ssd_time_delay[1] / self.n_beamlets[1],
                     time_ext,
                     timeSeries[1],
                 )
@@ -350,12 +364,16 @@ class SpeckleProfile(Profile):
         x_focus_list = X_focus_matrix[:, 0]
         y_focus_list = Y_focus_matrix[0, :]
         x_phase_matrix = np.exp(
-            -2 * np.pi * 1j
+            -2
+            * np.pi
+            * 1j
             / self.n_beamlets[0]
             * np.einsum("i,j", x_lens_list, x_focus_list)
         )
         y_phase_matrix = np.exp(
-            -2 * np.pi * 1j
+            -2
+            * np.pi
+            * 1j
             / self.n_beamlets[1]
             * np.einsum("i,j", y_lens_list, y_focus_list)
         )

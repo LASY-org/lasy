@@ -205,8 +205,14 @@ def test_FM_SSD_periodicity():
         ssd_transverse_bandwidth_distribution=ssd_transverse_bandwidth_distribution,
     )
     nu_laser = c / wavelength
-    ssd_frac = np.sqrt(ssd_transverse_bandwidth_distribution[0] ** 2 + ssd_transverse_bandwidth_distribution[1] ** 2)
-    ssd_frac = ssd_transverse_bandwidth_distribution[0] / ssd_frac, ssd_transverse_bandwidth_distribution[1] / ssd_frac
+    ssd_frac = np.sqrt(
+        ssd_transverse_bandwidth_distribution[0] ** 2
+        + ssd_transverse_bandwidth_distribution[1] ** 2
+    )
+    ssd_frac = (
+        ssd_transverse_bandwidth_distribution[0] / ssd_frac,
+        ssd_transverse_bandwidth_distribution[1] / ssd_frac,
+    )
     phase_mod_freq = [
         relative_laser_bandwidth * sf * 0.5 / pma
         for sf, pma in zip(ssd_frac, ssd_phase_modulation_amplitude)
