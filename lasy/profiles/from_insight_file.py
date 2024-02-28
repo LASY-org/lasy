@@ -7,7 +7,7 @@ from .from_array_profile import FromArrayProfile
 
 class FromInsightFile(FromArrayProfile):
     r"""
-    Profile defined from numpy array directly.
+    Profile defined from insight measurement.
 
     Parameters
     ----------
@@ -27,7 +27,7 @@ class FromInsightFile(FromArrayProfile):
             data = np.asanyarray(hf["data/Exyt_0"][()], dtype=np.complex128, order="C")
             t = np.asanyarray(hf["scales/t"][()], dtype=np.float64, order="C")
             x = np.asanyarray(hf["scales/x"][()], dtype=np.float64, order="C")
-            y = np.asanyarray(hf["scales/x"][()], dtype=np.float64, order="C")
+            y = np.asanyarray(hf["scales/y"][()], dtype=np.float64, order="C")
 
         # convert data and axes to SI units
         t *= 1e-15
