@@ -42,10 +42,10 @@ class FromInsightFile(FromArrayProfile):
         ## omega0 = np.average(omega_array, weights=np.abs(env)**2)
 
         # check the complex field convention and correct if needed
-        if omega0<0:
+        if omega0 < 0:
             omega0 *= -1
             data = np.conj(data)
-            print('Warning: input field will be conjugated')
+            print("Warning: input field will be conjugated")
 
         # remove the envelope frequencey
         data *= np.exp(1j * omega0 * t[None, None, :])
