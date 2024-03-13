@@ -575,7 +575,7 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
         is_hilbert=True,
         phase_unwrap_nd=phase_unwrap_nd,
     )
-    grid.field *= np.exp(1j * omg0_h * grid.axes[-1]) * np.exp(1j * np.pi/2)
+    grid.field *= np.exp(1j * omg0_h * grid.axes[-1])
 
     return grid, omg0_h
 
@@ -667,7 +667,7 @@ def create_grid(array, axes, dim):
         grid = Grid(dim, lo, hi, npoints)
         assert np.all(grid.axes[0] == axes["x"])
         assert np.all(grid.axes[1] == axes["y"])
-        assert np.allclose(grid.axes[2] == axes["t"], rtol=1.0e-14)
+        assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
         assert grid.field.shape == array.shape
         grid.field = array
     else:  # dim == "rt":
