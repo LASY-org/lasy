@@ -667,7 +667,7 @@ def create_grid(array, axes, dim):
         grid = Grid(dim, lo, hi, npoints)
         assert np.all(grid.axes[0] == axes["x"])
         assert np.all(grid.axes[1] == axes["y"])
-        assert np.all(grid.axes[2] == axes["t"])
+        assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
         assert grid.field.shape == array.shape
         grid.field = array
     else:  # dim == "rt":
