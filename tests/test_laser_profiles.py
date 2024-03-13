@@ -7,7 +7,7 @@ from scipy.constants import c
 
 from lasy.laser import Laser
 from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import GaussianProfile, FromArrayProfile
+from lasy.profiles import GaussianProfile, FromArrayProfile, SpeckleProfile
 from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
     CosineLongitudinalProfile,
@@ -24,6 +24,8 @@ from lasy.profiles.transverse import (
     ScaledTransverseProfile,
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
+
+c = 2.998e8  # m/s
 
 
 class MockProfile(Profile):
@@ -272,6 +274,48 @@ def test_from_array_profile():
     print("theory width  : ", wx)
     print("Measured width: ", width)
     assert np.abs((width - wx) / wx) < 1.0e-5
+
+
+def test_speckle_profile():
+    print("SpeckledProfile")
+    wavelength = 0.351e-6  # Laser wavelength in meters
+    polarization = (1, 0)  # Linearly polarized in the x direction
+    ###
+    focal_length = 3.5  # m
+    beam_aperture = [0.35, 0.5]  # m
+    n_beamlets = [24, 32]
+    temporal_smoothing_type = "GP ISI"
+    relative_laser_bandwidth = 0.005
+
+    ssd_phase_modulation_amplitude = [4.1, 4.5]
+    ssd_number_color_cycles = [1.4, 1.0]
+    ssd_transverse_bandwidth_distribution = [1.8, 1.0]
+
+    profile = SpeckleProfile(
+        wavelength,
+        polarization,
+        focal_length,
+        beam_aperture,
+        n_beamlets,
+        temporal_smoothing_type=temporal_smoothing_type,
+        relative_laser_bandwidth=relative_laser_bandwidth,
+        ssd_phase_modulation_amplitude=ssd_phase_modulation_amplitude,
+        ssd_number_color_cycles=ssd_number_color_cycles,
+        ssd_transverse_bandwidth_distribution=ssd_transverse_bandwidth_distribution,
+    )
+    dimensions = "xyt"
+    dx = wavelength * focal_length / beam_aperture[0]
+    dy = wavelength * focal_length / beam_aperture[1]
+    Lx = 1.8 * dx * n_beamlets[0]
+    Ly = 3.1 * dy * n_beamlets[1]
+    nu_laser = c / wavelength
+    t_max = 50 / nu_laser
+    lo = (0, 0, 0)
+    hi = (Lx, Ly, t_max)
+    npoints = (200, 250, 2)
+
+    laser = Laser(dimensions, lo, hi, npoints, profile)
+    laser.write_to_file("speckledProfile")
 
 
 def test_add_profiles():
