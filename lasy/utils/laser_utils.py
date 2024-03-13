@@ -575,7 +575,7 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
         is_hilbert=True,
         phase_unwrap_nd=phase_unwrap_nd,
     )
-    grid.field *= np.exp(1j * omg0_h * grid.axes[-1])
+    grid.field *= np.exp(1j * omg0_h * grid.axes[-1]) * np.exp(1j * np.pi/2)
 
     return grid, omg0_h
 
@@ -667,7 +667,7 @@ def create_grid(array, axes, dim):
         grid = Grid(dim, lo, hi, npoints)
         assert np.all(grid.axes[0] == axes["x"])
         assert np.all(grid.axes[1] == axes["y"])
-        assert np.all(grid.axes[2] == axes["t"])
+        assert np.allclose(grid.axes[2] == axes["t"], rtol=1.0e-14)
         assert grid.field.shape == array.shape
         grid.field = array
     else:  # dim == "rt":
@@ -764,9 +764,8 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
             verbose=False,
         )
         # Convert the spectral image to the spatial field representation
-        FieldAxprp.import_field(np.moveaxis(grid.field, -1, 0).copy())
-        field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0)
-        field_z = np.moveaxis(field_z, 0, -1)
+        FieldAxprp.import_field(np.transpose(grid.field).copy())
+        field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
         field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
 
     return field_z
@@ -851,7 +850,7 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
             verbose=False,
         )
         # Convert the spectral image to the spatial field representation
-        transform_data = np.moveaxis(field_fft, -1, 0).copy()
+        transform_data = np.transpose(field_fft).copy()
         transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
-        grid.field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
+        grid.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
         grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
