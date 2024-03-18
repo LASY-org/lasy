@@ -7,5 +7,5 @@ __all__ = [
     "CosineLongitudinalProfile",
     "GaussianLongitudinalProfile",
     "LongitudinalProfileFromData",
-    "LongitudinalProfile"
+    "LongitudinalProfile",
 ]
