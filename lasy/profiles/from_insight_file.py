@@ -26,7 +26,7 @@ class FromInsightFile(FromArrayProfile):
         corresponding to the peak field.
     """
 
-    def __init__(self, file_path, pol, omega0='barycenter'):
+    def __init__(self, file_path, pol, omega0="barycenter"):
         # read the data from H5 filed
         with h5py.File(file_path, "r") as hf:
             data = np.asanyarray(hf["data/Exyt_0"][()], dtype=np.complex128, order="C")
@@ -44,14 +44,14 @@ class FromInsightFile(FromArrayProfile):
         omega_array = -np.gradient(np.unwrap(np.angle(field_onaxis)), t)
 
         # choose the central frequency
-        if omega0 == 'peak':
+        if omega0 == "peak":
             # using peak field frequency
             omega0 = omega_array[np.abs(field_onaxis).argmax()]
-        elif omega0 == 'barycenter':
+        elif omega0 == "barycenter":
             # or "center of mass" frequency
-            omega0 = np.average(omega_array, weights=np.abs(env)**2)
+            omega0 = np.average(omega_array, weights=np.abs(env) ** 2)
         else:
-            assert( type(omega)==float )
+            assert type(omega) == float
 
         # check the complex field convention and correct if needed
         if omega0 < 0:
