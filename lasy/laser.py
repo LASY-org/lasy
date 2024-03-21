@@ -141,7 +141,7 @@ class Laser:
             raise ValueError(f'kind "{kind}" not recognized')
 
     def propagate(
-        self, distance, nr_boundary=0, force_sync=True, backend="NP", show_progress=True
+        self, distance, nr_boundary=0, backend="NP", show_progress=True, force_sync=True
     ):
         """
         Propagate the laser pulse by the distance specified.
@@ -161,6 +161,10 @@ class Laser:
 
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
+
+        force_sync : bool (optional)
+            If True, the field in the frequency domain will be reinitialized,
+            otherwise, and if the frequency domain exists it will be used.
         """
         time_axis_indx = -1
         # Choose the time translation assuming propagation at v=c
