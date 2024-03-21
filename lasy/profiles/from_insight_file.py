@@ -49,9 +49,9 @@ class FromInsightFile(FromArrayProfile):
             omega0 = omega_array[np.abs(field_onaxis).argmax()]
         elif omega0 == 'barycenter':
             # or "center of mass" frequency
-            omega0 = np.average(omega_array, weights=np.abs(env)**2)
+            omega0 = np.average(omega_array, weights=np.abs(field_onaxis)**2)
         else:
-            assert( type(omega)==float )
+            assert( type(omega0)==float )
 
         # check the complex field convention and correct if needed
         if omega0 < 0:
