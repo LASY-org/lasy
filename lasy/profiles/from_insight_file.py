@@ -11,16 +11,22 @@ class FromInsightFile(FromArrayProfile):
     Parameters
     ----------
     file_path: string
-        Path to the file created by insight ....
+        Path to the file created by insight which contains full field (e.g. Exyt_0.h5)
 
     pol : list of 2 complex numbers (dimensionless)
         Polarization vector. It corresponds to :math:`p_u` in the above
         formula ; :math:`p_x` is the first element of the list and
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
+
+    omega0: string or float
+        Set central frequency for the envelope constrauction. Can be a float value
+        in [1/s], or a string defining the method for automatic frequency detection:
+        "barycenter" frequency is averaged over the power profile, "peak" frequency
+        corresponding to the peak field.
     """
 
-    def __init__(self, file_path, pol):
+    def __init__(self, file_path, pol, omega0='barycenter'):
         # read the data from H5 filed
         with h5py.File(file_path, "r") as hf:
             data = np.asanyarray(hf["data/Exyt_0"][()], dtype=np.complex128, order="C")
@@ -33,13 +39,19 @@ class FromInsightFile(FromArrayProfile):
         x *= 1e-3
         y *= 1e-3
 
-        # get central frequency from the field on axis,
+        # get the field on axis and local frequencies
         field_onaxis = data[data.shape[0] // 2, data.shape[1] // 2, :]
         omega_array = -np.gradient(np.unwrap(np.angle(field_onaxis)), t)
-        # using peak field frequency
-        omega0 = omega_array[np.abs(field_onaxis).argmax()]
-        # or "center of mass" frequency
-        ## omega0 = np.average(omega_array, weights=np.abs(env)**2)
+
+        # choose the central frequency
+        if omega0 == 'peak':
+            # using peak field frequency
+            omega0 = omega_array[np.abs(field_onaxis).argmax()]
+        elif omega0 == 'barycenter':
+            # or "center of mass" frequency
+            omega0 = np.average(omega_array, weights=np.abs(env)**2)
+        else:
+            assert( type(omega)==float )
 
         # check the complex field convention and correct if needed
         if omega0 < 0:
