@@ -8,6 +8,7 @@ from lasy.utils.laser_utils import (
     normalize_energy,
     normalize_peak_field_amplitude,
     normalize_peak_intensity,
+    compute_laser_energy,
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
@@ -116,7 +117,10 @@ class Laser:
 
         # For profiles that define the energy, normalize the amplitude
         if hasattr(profile, "laser_energy"):
-            self.normalize(profile.laser_energy, kind="energy")
+            if compute_laser_energy(self.dim, self.grid)==0.0:
+                print ("Field is zero everywhere, normalization will be skipped")
+            else:
+                self.normalize(profile.laser_energy, kind="energy")
 
     def normalize(self, value, kind="energy"):
         """
