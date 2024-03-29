@@ -117,8 +117,8 @@ class Laser:
 
         # For profiles that define the energy, normalize the amplitude
         if hasattr(profile, "laser_energy"):
-            if compute_laser_energy(self.dim, self.grid)==0.0:
-                print ("Field is zero everywhere, normalization will be skipped")
+            if compute_laser_energy(self.dim, self.grid) == 0.0:
+                print("Field is zero everywhere, normalization will be skipped")
             else:
                 self.normalize(profile.laser_energy, kind="energy")
 
