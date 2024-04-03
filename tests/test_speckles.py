@@ -2,10 +2,11 @@ import numpy as np
 
 from lasy.laser import Laser
 from lasy.profiles.speckle_profile import SpeckleProfile
+import pytest
 from scipy.constants import c
 
-
-def test_intensity_distribution():
+@pytest.mark.parametrize("temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"])
+def test_intensity_distribution(temporal_smoothing_type):
     # this test seems pretty robust to any smoothing technique or physical parameters
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
@@ -13,7 +14,6 @@ def test_intensity_distribution():
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
-    temporal_smoothing_type = "GP ISI"
     relative_laser_bandwidth = 0.005
 
     ssd_phase_modulation_amplitude = (4.1, 4.5)
@@ -67,7 +67,8 @@ def test_intensity_distribution():
     assert error_I_dist < 2.0e-4
 
 
-def test_spatial_correlation():
+@pytest.mark.parametrize("temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"])
+def test_spatial_correlation(temporal_smoothing_type):
     # this test seems pretty robust to any smoothing technique or physical parameters
     # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`
     wavelength = 0.351e-6  # Laser wavelength in meters
@@ -76,7 +77,6 @@ def test_spatial_correlation():
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 32]
-    temporal_smoothing_type = "FM SSD"
     relative_laser_bandwidth = 0.005
 
     ssd_phase_modulation_amplitude = (4.1, 4.1)
@@ -132,7 +132,8 @@ def test_spatial_correlation():
     assert error_auto_correlation < 5.0e-1
 
 
-def test_sinc_zeros():
+@pytest.mark.parametrize("temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"])
+def test_sinc_zeros(temporal_smoothing_type):
     # this test seems pretty robust to any smoothing technique or physical parameters
     # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`
     wavelength = 0.351e-6  # Laser wavelength in meters
@@ -141,8 +142,10 @@ def test_sinc_zeros():
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 48]
-    temporal_smoothing_type = "GP ISI"
     relative_laser_bandwidth = 0.005
+    ssd_phase_modulation_amplitude = (4.1, 4.1)
+    ssd_number_color_cycles = [1.4, 1.0]
+    ssd_transverse_bandwidth_distribution = [1.0, 1.0]
 
     profile = SpeckleProfile(
         wavelength,
@@ -152,6 +155,9 @@ def test_sinc_zeros():
         n_beamlets,
         temporal_smoothing_type=temporal_smoothing_type,
         relative_laser_bandwidth=relative_laser_bandwidth,
+        ssd_phase_modulation_amplitude=ssd_phase_modulation_amplitude,
+        ssd_number_color_cycles=ssd_number_color_cycles,
+        ssd_transverse_bandwidth_distribution=ssd_transverse_bandwidth_distribution,
         do_include_transverse_envelope=True,
     )
     dimensions = "xyt"
@@ -178,10 +184,6 @@ def test_sinc_zeros():
 def test_FM_SSD_periodicity():
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    spot_size = 25.0e-6  # Waist of the laser pulse in meters
-    pulse_duration = 30e-15  # Pulse duration of the laser in seconds
-    t_peak = 0.0  # Location of the peak of the laser pulse in time
-    ###
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 32]
