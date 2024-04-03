@@ -5,7 +5,10 @@ from lasy.profiles.speckle_profile import SpeckleProfile
 import pytest
 from scipy.constants import c
 
-@pytest.mark.parametrize("temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"])
+
+@pytest.mark.parametrize(
+    "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
+)
 def test_intensity_distribution(temporal_smoothing_type):
     # this test seems pretty robust to any smoothing technique or physical parameters
     wavelength = 0.351e-6  # Laser wavelength in meters
@@ -67,7 +70,9 @@ def test_intensity_distribution(temporal_smoothing_type):
     assert error_I_dist < 2.0e-4
 
 
-@pytest.mark.parametrize("temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"])
+@pytest.mark.parametrize(
+    "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
+)
 def test_spatial_correlation(temporal_smoothing_type):
     # this test seems pretty robust to any smoothing technique or physical parameters
     # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`
@@ -132,7 +137,9 @@ def test_spatial_correlation(temporal_smoothing_type):
     assert error_auto_correlation < 5.0e-1
 
 
-@pytest.mark.parametrize("temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"])
+@pytest.mark.parametrize(
+    "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
+)
 def test_sinc_zeros(temporal_smoothing_type):
     # this test seems pretty robust to any smoothing technique or physical parameters
     # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`

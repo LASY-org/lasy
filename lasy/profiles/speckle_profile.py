@@ -33,6 +33,7 @@ def gen_gaussian_time_series(t_num, dt, fwhm, rms_mean):
         )
     return temporal_amplitude
 
+
 class SpeckleProfile(Profile):
     r"""
     Derived class for the profile of a speckled laser pulse.
@@ -174,7 +175,6 @@ class SpeckleProfile(Profile):
         self.dt_update = 1 / self.laser_bandwidth / 50
         self.do_include_transverse_envelope = do_include_transverse_envelope
 
-
         self.x_lens_list = np.linspace(
             -0.5 * (self.n_beamlets[0] - 1),
             0.5 * (self.n_beamlets[0] - 1),
@@ -185,7 +185,9 @@ class SpeckleProfile(Profile):
             0.5 * (self.n_beamlets[1] - 1),
             num=self.n_beamlets[1],
         )
-        self.Y_lens_matrix, self.X_lens_matrix = np.meshgrid(self.y_lens_list, self.x_lens_list)
+        self.Y_lens_matrix, self.X_lens_matrix = np.meshgrid(
+            self.y_lens_list, self.x_lens_list
+        )
         self.Y_lens_index_matrix, self.X_lens_index_matrix = np.meshgrid(
             np.arange(self.n_beamlets[1], dtype=float),
             np.arange(self.n_beamlets[0], dtype=float),
@@ -216,18 +218,26 @@ class SpeckleProfile(Profile):
                 for sf, pma in zip(ssd_frac, self.ssd_phase_modulation_amplitude)
             ]
             self.ssd_time_delay = (
-                self.ssd_number_color_cycles[0] / self.ssd_phase_modulation_frequency[0]
-                if self.ssd_phase_modulation_frequency[0] > 0
-                else 0,
-                self.ssd_number_color_cycles[1] / self.ssd_phase_modulation_frequency[1]
-                if self.ssd_phase_modulation_frequency[1] > 0
-                else 0,
+                (
+                    self.ssd_number_color_cycles[0]
+                    / self.ssd_phase_modulation_frequency[0]
+                    if self.ssd_phase_modulation_frequency[0] > 0
+                    else 0
+                ),
+                (
+                    self.ssd_number_color_cycles[1]
+                    / self.ssd_phase_modulation_frequency[1]
+                    if self.ssd_phase_modulation_frequency[1] > 0
+                    else 0
+                ),
             )
 
         # ================== Sanity checks on user inputs ===================== #
         assert (
             temporal_smoothing_type.upper() in SpeckleProfile.supported_smoothing
-        ), "Only support one of the following: " + ", ".join(SpeckleProfile.supported_smoothing)
+        ), "Only support one of the following: " + ", ".join(
+            SpeckleProfile.supported_smoothing
+        )
         assert relative_laser_bandwidth > 0, "laser_bandwidth must be greater than 0"
         for q in (n_beamlets,):
             assert np.size(q) == 2, "has to be a size 2 array"
@@ -253,8 +263,8 @@ class SpeckleProfile(Profile):
         self.phase_plate_phase_modulation = np.random.standard_normal(2) * np.pi
 
     def init_gaussian_time_series(
-            self, 
-            series_time, 
+        self,
+        series_time,
     ):
         """Initialize time series sampled from Gaussian process
 
@@ -293,13 +303,11 @@ class SpeckleProfile(Profile):
             )
             time_interp = np.arange(
                 start=0,
-                stop=series_time[-1]
-                + np.sum(self.ssd_time_delay)
-                + 3 * self.dt_update,
+                stop=series_time[-1] + np.sum(self.ssd_time_delay) + 3 * self.dt_update,
                 step=self.dt_update,
             )[: pm_phase0.size]
             return (
-                time_interp, 
+                time_interp,
                 [
                     (np.real(pm_phase0) + np.imag(pm_phase0)) / np.sqrt(2),
                     (np.real(pm_phase1) + np.imag(pm_phase1)) / np.sqrt(2),
@@ -323,51 +331,66 @@ class SpeckleProfile(Profile):
                 ]
             )
             return series_time, complex_amp
-        
-    
-    def beamlets_complex_amplitude(self, t_now, series_time, time_series, temporal_smoothing_type="FM SSD"):
+
+    def beamlets_complex_amplitude(
+        self, t_now, series_time, time_series, temporal_smoothing_type="FM SSD"
+    ):
         """Calculate complex amplitude of the beamlets in the near-field, before propagating to the focal plane
 
         If the temporal smoothing type is "RPP" or "CPP", this returns a matrix of ones, giving no modification to the amplitude
         If the temporal smoothing type is "FM SSD", this returns the complex phases as calculated in, for example, Introduction to Laser-Plasma Interactions eqn. 9.87.
-        If the temporal smoothing type is "GP RPM FM ", this returns complex phases modeled as random variables 
+        If the temporal smoothing type is "GP RPM FM ", this returns complex phases modeled as random variables
         If the temporal smoothing type is "ISI", this returns an array of random complex numbers that gives both amplitude and phase of the beamlets
-        
+
         Parameters
         ----------
         t_now: float, time at which to calculate the complex amplitude of the beamlets
-        series_time: 1d array of times at which the stochastic process was sampled to generate the time series 
+        series_time: 1d array of times at which the stochastic process was sampled to generate the time series
         time_series: array of random phase and/or amplitudes as determined by the smoothing type
-        temporal_smoothing_type: string, what type of temporal smoothing to perform.  
+        temporal_smoothing_type: string, what type of temporal smoothing to perform.
 
         Returns
         -------
         array of complex numbers giving beamlet amplitude and phases in the near-field
         """
-        if any(rpp_type in temporal_smoothing_type.upper() for rpp_type in ["RPP", "CPP"]):
+        if any(
+            rpp_type in temporal_smoothing_type.upper() for rpp_type in ["RPP", "CPP"]
+        ):
             return np.ones_like(self.X_lens_matrix)
         if temporal_smoothing_type.upper() == "FM SSD":
             phase_t = self.ssd_phase_modulation_amplitude[0] * np.sin(
                 self.phase_plate_phase_modulation[0]
-                + 2 * np.pi
+                + 2
+                * np.pi
                 * self.ssd_phase_modulation_frequency[0]
-                * (t_now - self.X_lens_matrix * self.ssd_time_delay[0] / self.n_beamlets[0])
+                * (
+                    t_now
+                    - self.X_lens_matrix * self.ssd_time_delay[0] / self.n_beamlets[0]
+                )
             ) + self.ssd_phase_modulation_amplitude[1] * np.sin(
                 self.phase_plate_phase_modulation[1]
-                + 2 * np.pi
+                + 2
+                * np.pi
                 * self.ssd_phase_modulation_frequency[1]
-                * (t_now - self.Y_lens_matrix * self.ssd_time_delay[1] / self.n_beamlets[1])
+                * (
+                    t_now
+                    - self.Y_lens_matrix * self.ssd_time_delay[1] / self.n_beamlets[1]
+                )
             )
             return np.exp(1j * phase_t)
         elif temporal_smoothing_type.upper() == "GP RPM SSD":
             phase_t = np.interp(
                 t_now
-                + self.X_lens_index_matrix * self.ssd_time_delay[0] / self.n_beamlets[0],
+                + self.X_lens_index_matrix
+                * self.ssd_time_delay[0]
+                / self.n_beamlets[0],
                 series_time,
                 time_series[0],
             ) + np.interp(
                 t_now
-                + self.Y_lens_index_matrix * self.ssd_time_delay[1] / self.n_beamlets[1],
+                + self.Y_lens_index_matrix
+                * self.ssd_time_delay[1]
+                / self.n_beamlets[1],
                 series_time,
                 time_series[1],
             )
@@ -377,7 +400,9 @@ class SpeckleProfile(Profile):
         else:
             raise NotImplementedError
 
-    def generate_speckle_pattern(self, t_now, exp_phase_plate, x, y, series_time, time_series):
+    def generate_speckle_pattern(
+        self, t_now, exp_phase_plate, x, y, series_time, time_series
+    ):
         """Calculate the speckle pattern in the focal plane
 
         Calculates the complex envelope defining the laser pulse in the focal plane at time `t=t_now`.
@@ -397,23 +422,29 @@ class SpeckleProfile(Profile):
         -------
         speckle_amp: 2D array of complex numbers defining the laser envelope at focus at time `t_now`
         """
-            
+
         lambda_fnum = self.wavelength * self.focal_length / self.beam_aperture
         X_focus_matrix = x[:, :, 0] / lambda_fnum[0]
         Y_focus_matrix = y[:, :, 0] / lambda_fnum[1]
         x_focus_list = X_focus_matrix[:, 0]
         y_focus_list = Y_focus_matrix[0, :]
         x_phase_matrix = np.exp(
-            -2 * np.pi * 1j / self.n_beamlets[0]
+            -2
+            * np.pi
+            * 1j
+            / self.n_beamlets[0]
             * np.einsum("i,j", self.x_lens_list, x_focus_list)
         )
         y_phase_matrix = np.exp(
-            -2 * np.pi * 1j / self.n_beamlets[1]
+            -2
+            * np.pi
+            * 1j
+            / self.n_beamlets[1]
             * np.einsum("i,j", self.y_lens_list, y_focus_list)
         )
 
         bca = self.beamlets_complex_amplitude(
-            t_now, 
+            t_now,
             series_time=series_time,
             time_series=time_series,
             temporal_smoothing_type=self.temporal_smoothing_type,
@@ -454,7 +485,10 @@ class SpeckleProfile(Profile):
         # # ================== Calculate auxiliary variables ================== #
         if "RPP" == self.temporal_smoothing_type.upper():
             phase_plate = np.random.choice([0, np.pi], self.n_beamlets)
-        elif any(cpp_smoothing_type in self.temporal_smoothing_type.upper() for cpp_smoothing_type in ["CPP", "SSD"]):
+        elif any(
+            cpp_smoothing_type in self.temporal_smoothing_type.upper()
+            for cpp_smoothing_type in ["CPP", "SSD"]
+        ):
             phase_plate = np.random.uniform(
                 -np.pi, np.pi, size=self.n_beamlets[0] * self.n_beamlets[1]
             ).reshape(self.n_beamlets)
@@ -475,10 +509,11 @@ class SpeckleProfile(Profile):
         envelope = np.zeros(x.shape, dtype=complex)
         for i, t_i in enumerate(t_norm):
             envelope[:, :, i] = self.generate_speckle_pattern(
-                t_i, 
-                exp_phase_plate=exp_phase_plate, 
-                x=x, 
+                t_i,
+                exp_phase_plate=exp_phase_plate,
+                x=x,
                 y=y,
                 series_time=new_series_time,
-                time_series=time_series)
+                time_series=time_series,
+            )
         return envelope
