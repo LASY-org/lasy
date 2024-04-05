@@ -18,7 +18,7 @@ def gen_gaussian_time_series(t_num, dt, fwhm, rms_mean):
     temporal_amplitude: a time series array of complex numbers with shape [t_num]
     """
     if fwhm == 0.0:
-        temporal_amplitude = np.zeros( t_num, dtype=np.complex128 )
+        temporal_amplitude = np.zeros(t_num, dtype=np.complex128)
     else:
         omega = np.fft.fftshift(np.fft.fftfreq(t_num, d=dt))
         psd = np.exp(-np.log(2) * 0.5 * np.square(omega / fwhm * 2 * np.pi))
