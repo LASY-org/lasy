@@ -285,10 +285,6 @@ def test_speckle_profile():
     temporal_smoothing_type = "GP ISI"
     relative_laser_bandwidth = 0.005
 
-    ssd_phase_modulation_amplitude = [4.1, 4.5]
-    ssd_number_color_cycles = [1.4, 1.0]
-    ssd_transverse_bandwidth_distribution = [1.8, 1.0]
-
     profile = SpeckleProfile(
         wavelength,
         polarization,
@@ -297,9 +293,6 @@ def test_speckle_profile():
         n_beamlets,
         temporal_smoothing_type=temporal_smoothing_type,
         relative_laser_bandwidth=relative_laser_bandwidth,
-        ssd_phase_modulation_amplitude=ssd_phase_modulation_amplitude,
-        ssd_number_color_cycles=ssd_number_color_cycles,
-        ssd_transverse_bandwidth_distribution=ssd_transverse_bandwidth_distribution,
     )
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
