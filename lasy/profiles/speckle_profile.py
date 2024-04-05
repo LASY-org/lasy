@@ -42,7 +42,7 @@ class SpeckleProfile(Profile):
     More on the subject can be found in chapter 9 of `Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__.
     A speckled laser beam is a laser that is deliberately divided transversely into several beamlets in the near-field.
     This is done with a near-field phase plate divided into
-    The phase plate provides a different phase to each beamlet, which then propagate incoherently and combine in the far field.
+    The phase plate provides a different phase to each beamlet, which then propagate to the far field where they combine incoherently.
 
     The electric field corresponds to:
 
@@ -66,7 +66,7 @@ class SpeckleProfile(Profile):
     to the propagation direction).
     Several quantities are computed internally to the code depending on the
     method of smoothing chosen, including the beamlet amplitude :math:`A_j`,
-    the beamlet wavenumber at focus :math:`k_{\perp,j}`,
+    the beamlet wavenumber :math:`k_{\perp,j}`,
     the phase contribution :math:`\phi_{{\rm RPP/CPP},j}` from the phase plate,
     and the phase contribution :math:`\psi_{{\rm SSD/ISI},j}(t)` from the smoothing.
     The other parameters in this formula are defined below.
@@ -232,8 +232,7 @@ class SpeckleProfile(Profile):
             SpeckleProfile.supported_smoothing
         )
         assert relative_laser_bandwidth > 0, "laser_bandwidth must be greater than 0"
-        for q in (n_beamlets,):
-            assert np.size(q) == 2, "has to be a size 2 array"
+        assert np.size(n_beamlets) == 2, "has to be a size 2 array"
         if "SSD" in self.temporal_smoothing_type.upper():
             assert (
                 ssd_number_color_cycles is not None
