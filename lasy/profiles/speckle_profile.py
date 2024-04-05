@@ -77,8 +77,8 @@ class SpeckleProfile(Profile):
     * Random phase plates (RPP): Here the phase plate contribution is :math:`\phi_{{\rm RPP},j}\in\{0,\pi\}`, :math:`\psi_{{\rm SSD/ISI},j}(t)=0`, and :math:`A_j=1`
     * Continuous phase plates (CPP):  :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD},j}(t)=0`, and :math:`A_j=1`
     * CPP + Smoothing by spectral dispersion (SSD):  :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD},j}(t)=\delta_m \sin(\omega_m t + )`, and :math:`A_j=1`
-    * CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD},j}(t)=FILL THIS IN`, and :math:`A_j=1`
-    * Induced spatial incoherence (ISI), which has temporal stochastic variation in the beamlet phases and amplitudes; that is, :math:`\phi_{{\rm CPP},j}=0` and :math:`\psi_{{\rm SSD},j}(t)=0`, and :math:`A_j` are sampled from a Gaussian stochastic process to simulate the random phase difference and amplitude of the ISI process
+    * CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD},j}(t)` is sampled from a Gaussian stochastic process, and :math:`A_j=1`
+    * Induced spatial incoherence (ISI), which has temporal stochastic variation in the beamlet phases and amplitudes; that is, :math:`\phi_{{\rm CPP},j}=0`, and :math:`\psi_{{\rm SSD},j}(t)` and :math:`A_j` are sampled from a Gaussian stochastic process to simulate the random phase difference and amplitude of the ISI process
 
     This is an adapation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
 
@@ -111,7 +111,7 @@ class SpeckleProfile(Profile):
 
     temporal_smoothing_type : string
         Which method for beamlet production and evolution is used.
-        Can be ``'RPP'``, ``'CPP'``, ``'FM SSD'``, ``'GS RPM SSD'``, or ``'GS ISI'``
+        Can be ``'RPP'``, ``'CPP'``, ``'FM SSD'``, ``'GS RPM SSD'``, or ``'GS ISI'``.
 
         - ``'RPP'``: beamlets have near-field phases sampled from uniform distribution on the set :math:`\{0,\pi\}` and do not evolve temporally
         - ``'CPP'``: beamlets have near-field phases sampled from uniform distribution on the interval :math:`[0,\pi]` and do not evolve temporally
@@ -260,18 +260,20 @@ class SpeckleProfile(Profile):
                 assert q[0] > 0 or q[1] > 0, "cannot be all zeros"
 
     def set_phase_plate_phase_modulation(self):
+        """Does something strange.
+        """
         self.phase_plate_phase_modulation = np.random.standard_normal(2) * np.pi
 
     def init_gaussian_time_series(
         self,
         series_time,
     ):
-        """Initialize time series sampled from Gaussian process
+        """Initialize time series sampled from Gaussian process.
 
         At every time specified by the input `series_time`, calculate the random phase and/or amplitudes as determined by the smoothing type.
 
-        If the smoothing type is "SSD", then this function returns a time series with random phase offsets in x and y at each time
-        If the smoothing type is "ISI", this function returns a time series with complex numbers defining beamlet phase and amplitude
+        If the smoothing type is "SSD", then this function returns a time series with random phase offsets in x and y at each time.
+        If the smoothing type is "ISI", this function returns a time series with complex numbers defining beamlet phase and amplitude.
 
         Parameters
         ----------
@@ -335,12 +337,12 @@ class SpeckleProfile(Profile):
     def beamlets_complex_amplitude(
         self, t_now, series_time, time_series, temporal_smoothing_type="FM SSD"
     ):
-        """Calculate complex amplitude of the beamlets in the near-field, before propagating to the focal plane
+        """Calculate complex amplitude of the beamlets in the near-field, before propagating to the focal plane.
 
-        If the temporal smoothing type is "RPP" or "CPP", this returns a matrix of ones, giving no modification to the amplitude
+        If the temporal smoothing type is "RPP" or "CPP", this returns a matrix of ones, giving no modification to the amplitude.
         If the temporal smoothing type is "FM SSD", this returns the complex phases as calculated in, for example, Introduction to Laser-Plasma Interactions eqn. 9.87.
-        If the temporal smoothing type is "GP RPM FM ", this returns complex phases modeled as random variables
-        If the temporal smoothing type is "ISI", this returns an array of random complex numbers that gives both amplitude and phase of the beamlets
+        If the temporal smoothing type is "GP RPM FM ", this returns complex phases modeled as random variables.
+        If the temporal smoothing type is "ISI", this returns an array of random complex numbers that gives both amplitude and phase of the beamlets.
 
         Parameters
         ----------
@@ -360,21 +362,17 @@ class SpeckleProfile(Profile):
         if temporal_smoothing_type.upper() == "FM SSD":
             phase_t = self.ssd_phase_modulation_amplitude[0] * np.sin(
                 self.phase_plate_phase_modulation[0]
-                + 2
-                * np.pi
+                + 2 * np.pi
                 * self.ssd_phase_modulation_frequency[0]
                 * (
-                    t_now
-                    - self.X_lens_matrix * self.ssd_time_delay[0] / self.n_beamlets[0]
+                    t_now - self.X_lens_matrix * self.ssd_time_delay[0] / self.n_beamlets[0]
                 )
             ) + self.ssd_phase_modulation_amplitude[1] * np.sin(
                 self.phase_plate_phase_modulation[1]
-                + 2
-                * np.pi
+                + 2 * np.pi
                 * self.ssd_phase_modulation_frequency[1]
                 * (
-                    t_now
-                    - self.Y_lens_matrix * self.ssd_time_delay[1] / self.n_beamlets[1]
+                    t_now - self.Y_lens_matrix * self.ssd_time_delay[1] / self.n_beamlets[1]
                 )
             )
             return np.exp(1j * phase_t)
@@ -403,7 +401,7 @@ class SpeckleProfile(Profile):
     def generate_speckle_pattern(
         self, t_now, exp_phase_plate, x, y, series_time, time_series
     ):
-        """Calculate the speckle pattern in the focal plane
+        """Calculate the speckle pattern in the focal plane.
 
         Calculates the complex envelope defining the laser pulse in the focal plane at time `t=t_now`.
         This function first gets the beamlet complex amplitudes and phases with the function `beamlets_complex_amplitude`
@@ -429,17 +427,11 @@ class SpeckleProfile(Profile):
         x_focus_list = X_focus_matrix[:, 0]
         y_focus_list = Y_focus_matrix[0, :]
         x_phase_matrix = np.exp(
-            -2
-            * np.pi
-            * 1j
-            / self.n_beamlets[0]
+            -2 * np.pi * 1j / self.n_beamlets[0]
             * np.einsum("i,j", self.x_lens_list, x_focus_list)
         )
         y_phase_matrix = np.exp(
-            -2
-            * np.pi
-            * 1j
-            / self.n_beamlets[1]
+            -2 * np.pi * 1j / self.n_beamlets[1]
             * np.einsum("i,j", self.y_lens_list, y_focus_list)
         )
 

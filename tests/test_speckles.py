@@ -10,10 +10,14 @@ from scipy.constants import c
     "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
 )
 def test_intensity_distribution(temporal_smoothing_type):
-    # this test seems pretty robust to any smoothing technique or physical parameters
+    """Test whether the spatial intensity distribution and statisticis are correct.
+
+    The distribution should be exponential, 1/<I> exp(-I/<I>).
+    The real and imaginary parts of the envelope and their product should all be 0 on average.
+    """
+
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    ###
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
@@ -74,8 +78,12 @@ def test_intensity_distribution(temporal_smoothing_type):
     "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
 )
 def test_spatial_correlation(temporal_smoothing_type):
-    # this test seems pretty robust to any smoothing technique or physical parameters
-    # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`
+    """Tests whether the speckles have the correct shape.
+
+    The speckle shape is measured over one period, since the spatial profile is periodic.
+    The correct speckle shape for a rectangular laser, 
+    determined by the autocorrelation, is the product of sinc functions.
+    """
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
     ###
@@ -141,8 +149,8 @@ def test_spatial_correlation(temporal_smoothing_type):
     "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
 )
 def test_sinc_zeros(temporal_smoothing_type):
-    # this test seems pretty robust to any smoothing technique or physical parameters
-    # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`
+    """Test whether the transverse sinc envelope has the correct width
+    """
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
     ###
@@ -189,6 +197,9 @@ def test_sinc_zeros(temporal_smoothing_type):
 
 
 def test_FM_SSD_periodicity():
+    """Test that the frequency modulated Smoothing by spectral dispersion (SSD) has the correct temporal frequency.
+    """
+    # T
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
     focal_length = 3.5  # m

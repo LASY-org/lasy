@@ -25,8 +25,6 @@ from lasy.profiles.transverse import (
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
 
-c = 2.998e8  # m/s
-
 
 class MockProfile(Profile):
     """
@@ -277,10 +275,10 @@ def test_from_array_profile():
 
 
 def test_speckle_profile():
+    # - speckled laser case
     print("SpeckledProfile")
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    ###
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
