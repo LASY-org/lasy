@@ -13,7 +13,6 @@ def test_intensity_distribution(temporal_smoothing_type):
     # this test seems pretty robust to any smoothing technique or physical parameters
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    ###
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
@@ -78,7 +77,6 @@ def test_spatial_correlation(temporal_smoothing_type):
     # provided that `Lx = dx * n_beamlets[0]` and `Ly = dy * n_beamlets[1]`
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    ###
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 32]
@@ -241,7 +239,3 @@ def test_FM_SSD_periodicity():
     F = laser.grid.field
     period_error = np.max(abs(F[:, :, 0] - F[:, :, -1]))
     assert period_error < 1.0e-8
-
-
-def test_temporal_correlation_ssd():
-    pass
