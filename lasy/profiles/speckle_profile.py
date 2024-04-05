@@ -73,11 +73,16 @@ class SpeckleProfile(Profile):
 
     This profile admits several options for calculating the amplitudes and phases of the beamlets:
 
-    * Random phase plates (RPP) / ``'RPP'``: Here the phase plate contribution is :math:`\phi_{{\rm RPP},j}\in\{0,\pi\}` (drawn randomly for each :math:`j`), :math:`\psi_{{\rm SSD/ISI},j}(t)=0`, and :math:`A_j=1`
-    * Continuous phase plates (CPP) / ``'CPP'``:  :math:`\phi_{{\rm CPP},j}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`j`), :math:`\psi_{{\rm SSD},j}(t)=0`, and :math:`A_j=1`
-    * CPP + Smoothing by spectral dispersion (SSD) / ``'FM SSD'``:  :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD},j}(t)=\delta_m \sin(\omega_m t + )`, and :math:`A_j=1`
-    * Gaussian Process Randomly phase-modulated SSD / ``'GP RPM SSD'``: CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD/ISI},j}(t)` is sampled from a Gaussian stochastic process, and :math:`A_j=1`
-    * Induced spatial incoherence (ISI) / ``'GP RPM SSD'``: a smoothing technique with temporal stochastic variation in the beamlet phases and amplitudes; that is, :math:`\phi_{{\rm CPP},j}=0`, and :math:`\psi_{{\rm SSD/ISI},j}(t)` and :math:`A_j` are sampled from a Gaussian stochastic process to simulate the random phase difference and amplitude of the ISI process
+    * Random phase plates (RPP) / ``'RPP'``:
+        Here the phase plate contribution is :math:`\phi_{{\rm RPP},j}\in\{0,\pi\}` (drawn randomly for each :math:`j`), :math:`\psi_{{\rm SSD/ISI},j}(t)=0`, and :math:`A_j=1`
+    * Continuous phase plates (CPP) / ``'CPP'``:
+        :math:`\phi_{{\rm CPP},j}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`j`), :math:`\psi_{{\rm SSD},j}(t)=0`, and :math:`A_j=1`
+    * CPP + Smoothing by spectral dispersion (SSD) / ``'FM SSD'``:
+        :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD},j}(t)=\delta_m \sin(\omega_m t + )`, and :math:`A_j=1`
+    * Gaussian Process Randomly phase-modulated SSD / ``'GP RPM SSD'``:
+        CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD/ISI},j}(t)` is sampled from a Gaussian stochastic process, and :math:`A_j=1`
+    * Induced spatial incoherence (ISI) / ``'GS ISI'``:
+        a smoothing technique with temporal stochastic variation in the beamlet phases and amplitudes; that is, :math:`\phi_{{\rm CPP},j}=0`, and :math:`\psi_{{\rm SSD/ISI},j}(t)` and :math:`A_j` are sampled from a Gaussian stochastic process to simulate the random phase difference and amplitude of the ISI process
 
     This is an adapation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
 
