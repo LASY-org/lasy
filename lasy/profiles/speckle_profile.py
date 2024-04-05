@@ -126,6 +126,7 @@ class SpeckleProfile(Profile):
 
     relative_laser_bandwidth : float
         Bandwidth of laser pulse, relative to central frequency.
+        Only used if ``temporal_smoothing_type`` is ``'FM SSD'``, ``'GS RPM SSD'`` or ``'GS ISI'``.
 
     ssd_phase_modulation_amplitude :list of 2 floats
         Amplitude of phase modulation in each transverse direction.
@@ -191,7 +192,6 @@ class SpeckleProfile(Profile):
             np.arange(self.n_beamlets[1], dtype=float),
             np.arange(self.n_beamlets[0], dtype=float),
         )
-        self.set_phase_plate_phase_modulation()
 
         if "SSD" in self.temporal_smoothing_type.upper():
             # Initialize SSD parameters
@@ -255,10 +255,6 @@ class SpeckleProfile(Profile):
             ):
                 assert np.size(q) == 2, "has to be a size 2 array"
                 assert q[0] > 0 or q[1] > 0, "cannot be all zeros"
-
-    def set_phase_plate_phase_modulation(self):
-        """Set random phase offset for SSD."""
-        self.phase_plate_phase_modulation = np.random.standard_normal(2) * np.pi
 
     def init_gaussian_time_series(
         self,
@@ -357,7 +353,7 @@ class SpeckleProfile(Profile):
             return np.ones_like(self.X_lens_matrix)
         if temporal_smoothing_type.upper() == "FM SSD":
             phase_t = self.ssd_phase_modulation_amplitude[0] * np.sin(
-                self.phase_plate_phase_modulation[0]
+                self.ssd_x_y_dephasing[0]
                 + 2
                 * np.pi
                 * self.ssd_phase_modulation_frequency[0]
@@ -366,7 +362,7 @@ class SpeckleProfile(Profile):
                     - self.X_lens_matrix * self.ssd_time_delay[0] / self.n_beamlets[0]
                 )
             ) + self.ssd_phase_modulation_amplitude[1] * np.sin(
-                self.phase_plate_phase_modulation[1]
+                self.ssd_x_y_dephasing[1]
                 + 2
                 * np.pi
                 * self.ssd_phase_modulation_frequency[1]
@@ -494,7 +490,8 @@ class SpeckleProfile(Profile):
         else:
             raise NotImplementedError
         exp_phase_plate = np.exp(1j * phase_plate)
-        self.set_phase_plate_phase_modulation()
+        if self.temporal_smoothing_type.upper() == "FM SSD":
+            self.ssd_x_y_dephasing = np.random.standard_normal(2) * np.pi
 
         series_time = np.arange(0, t_max + self.dt_update, self.dt_update)
 
