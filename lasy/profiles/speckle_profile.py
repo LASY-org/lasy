@@ -100,6 +100,11 @@ class SpeckleProfile(Profile):
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
 
+    laser_energy : float (in Joule)
+        The total energy of the laser pulse. The amplitude of the laser
+        field (:math:`E_0` in the above formula) is automatically
+        calculated so that the pulse has the prescribed energy.
+
     focal_length : float (in meter)
         Focal length of lens :math:`f` just after the RPP/CPP.
 
@@ -140,6 +145,7 @@ class SpeckleProfile(Profile):
         self,
         wavelength,
         pol,
+        laser_energy,
         focal_length,
         beam_aperture,
         n_beamlets,
@@ -151,7 +157,7 @@ class SpeckleProfile(Profile):
         do_include_transverse_envelope=False,
     ):
         super().__init__(wavelength, pol)
-        self.wavelength = wavelength
+        self.laser_energy = laser_energy
         self.focal_length = focal_length
         self.beam_aperture = np.array(beam_aperture, dtype="float")
         self.n_beamlets = np.array(n_beamlets, dtype="int")
@@ -410,7 +416,7 @@ class SpeckleProfile(Profile):
         -------
         speckle_amp: 2D array of complex numbers defining the laser envelope at focus at time `t_now`
         """
-        lambda_fnum = self.wavelength * self.focal_length / self.beam_aperture
+        lambda_fnum = self.lambda0 * self.focal_length / self.beam_aperture
         X_focus_matrix = x[:, :, 0] / lambda_fnum[0]
         Y_focus_matrix = y[:, :, 0] / lambda_fnum[1]
         x_focus_list = X_focus_matrix[:, 0]
@@ -466,7 +472,7 @@ class SpeckleProfile(Profile):
             This array has the same shape as the arrays x, y, t
         """
         # ======================== General parameters ==================== #
-        t_norm = t[0, 0, :] * c / self.wavelength
+        t_norm = t[0, 0, :] * c / self.lambda0
         t_max = t_norm[-1]
 
         # # ================== Calculate auxiliary variables ================== #
