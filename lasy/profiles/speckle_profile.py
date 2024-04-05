@@ -187,9 +187,9 @@ class SpeckleProfile(Profile):
         )
         self.set_phase_plate_phase_modulation()
 
+
         if "SSD" in self.temporal_smoothing_type.upper():
-            # ======================== SSD parameters ========================= #
-            # Only support single FM for now
+            # Initialize SSD parameters
             # the amplitude of phase along each direction
             self.ssd_phase_modulation_amplitude = ssd_phase_modulation_amplitude
             # number of color cycles
@@ -225,7 +225,7 @@ class SpeckleProfile(Profile):
                 ),
             )
 
-        # ================== Sanity checks on user inputs ===================== #
+        # Check user input
         assert (
             temporal_smoothing_type.upper() in SpeckleProfile.supported_smoothing
         ), "Only support one of the following: " + ", ".join(
@@ -470,11 +470,11 @@ class SpeckleProfile(Profile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
         """
-        # ======================== General parameters ==================== #
+        # General parameters
         t_norm = t[0, 0, :] * c / self.lambda0
         t_max = t_norm[-1]
 
-        # # ================== Calculate auxiliary variables ================== #
+        # Calculate auxiliary parameters
         if "RPP" == self.temporal_smoothing_type.upper():
             phase_plate = np.random.choice([0, np.pi], self.n_beamlets)
         elif any(
