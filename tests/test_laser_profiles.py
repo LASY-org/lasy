@@ -279,7 +279,7 @@ def test_speckle_profile():
     print("SpeckledProfile")
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    laser_energy = 1. # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
+    laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]

@@ -22,7 +22,7 @@ def test_intensity_distribution(temporal_smoothing_type):
     beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
     relative_laser_bandwidth = 0.005
-    laser_energy = 1. # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
+    laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
 
     ssd_phase_modulation_amplitude = (4.1, 4.5)
     ssd_number_color_cycles = [1.4, 1.0]
@@ -88,7 +88,7 @@ def test_spatial_correlation(temporal_smoothing_type):
     """
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    laser_energy = 1. # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
+    laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 32]
@@ -155,7 +155,7 @@ def test_sinc_zeros(temporal_smoothing_type):
     """Test whether the transverse sinc envelope has the correct width"""
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    laser_energy = 1. # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
+    laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 48]
@@ -194,9 +194,9 @@ def test_sinc_zeros(temporal_smoothing_type):
     F = laser.grid.field
 
     assert abs(F[0, :, :]).max() / abs(F).max() < 1.0e-8
-    assert abs(F[-1, :, :]).max() / abs(F).max()  < 1.0e-8
-    assert abs(F[:, 0, :]).max() / abs(F).max()  < 1.0e-8
-    assert abs(F[:, -1, :]).max() / abs(F).max()  < 1.0e-8
+    assert abs(F[-1, :, :]).max() / abs(F).max() < 1.0e-8
+    assert abs(F[:, 0, :]).max() / abs(F).max() < 1.0e-8
+    assert abs(F[:, -1, :]).max() / abs(F).max() < 1.0e-8
 
 
 def test_FM_SSD_periodicity():
@@ -204,7 +204,7 @@ def test_FM_SSD_periodicity():
     # T
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
-    laser_energy = 1. # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
+    laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 32]
