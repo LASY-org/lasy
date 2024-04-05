@@ -260,8 +260,7 @@ class SpeckleProfile(Profile):
                 assert q[0] > 0 or q[1] > 0, "cannot be all zeros"
 
     def set_phase_plate_phase_modulation(self):
-        """Does something strange.
-        """
+        """Does something strange."""
         self.phase_plate_phase_modulation = np.random.standard_normal(2) * np.pi
 
     def init_gaussian_time_series(
@@ -362,17 +361,21 @@ class SpeckleProfile(Profile):
         if temporal_smoothing_type.upper() == "FM SSD":
             phase_t = self.ssd_phase_modulation_amplitude[0] * np.sin(
                 self.phase_plate_phase_modulation[0]
-                + 2 * np.pi
+                + 2
+                * np.pi
                 * self.ssd_phase_modulation_frequency[0]
                 * (
-                    t_now - self.X_lens_matrix * self.ssd_time_delay[0] / self.n_beamlets[0]
+                    t_now
+                    - self.X_lens_matrix * self.ssd_time_delay[0] / self.n_beamlets[0]
                 )
             ) + self.ssd_phase_modulation_amplitude[1] * np.sin(
                 self.phase_plate_phase_modulation[1]
-                + 2 * np.pi
+                + 2
+                * np.pi
                 * self.ssd_phase_modulation_frequency[1]
                 * (
-                    t_now - self.Y_lens_matrix * self.ssd_time_delay[1] / self.n_beamlets[1]
+                    t_now
+                    - self.Y_lens_matrix * self.ssd_time_delay[1] / self.n_beamlets[1]
                 )
             )
             return np.exp(1j * phase_t)
@@ -427,11 +430,17 @@ class SpeckleProfile(Profile):
         x_focus_list = X_focus_matrix[:, 0]
         y_focus_list = Y_focus_matrix[0, :]
         x_phase_matrix = np.exp(
-            -2 * np.pi * 1j / self.n_beamlets[0]
+            -2
+            * np.pi
+            * 1j
+            / self.n_beamlets[0]
             * np.einsum("i,j", self.x_lens_list, x_focus_list)
         )
         y_phase_matrix = np.exp(
-            -2 * np.pi * 1j / self.n_beamlets[1]
+            -2
+            * np.pi
+            * 1j
+            / self.n_beamlets[1]
             * np.einsum("i,j", self.y_lens_list, y_focus_list)
         )
 

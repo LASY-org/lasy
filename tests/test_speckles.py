@@ -81,7 +81,7 @@ def test_spatial_correlation(temporal_smoothing_type):
     """Tests whether the speckles have the correct shape.
 
     The speckle shape is measured over one period, since the spatial profile is periodic.
-    The correct speckle shape for a rectangular laser, 
+    The correct speckle shape for a rectangular laser,
     determined by the autocorrelation, is the product of sinc functions.
     """
     wavelength = 0.351e-6  # Laser wavelength in meters
@@ -148,8 +148,7 @@ def test_spatial_correlation(temporal_smoothing_type):
     "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
 )
 def test_sinc_zeros(temporal_smoothing_type):
-    """Test whether the transverse sinc envelope has the correct width
-    """
+    """Test whether the transverse sinc envelope has the correct width"""
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
     ###
@@ -196,8 +195,7 @@ def test_sinc_zeros(temporal_smoothing_type):
 
 
 def test_FM_SSD_periodicity():
-    """Test that the frequency modulated Smoothing by spectral dispersion (SSD) has the correct temporal frequency.
-    """
+    """Test that the frequency modulated Smoothing by spectral dispersion (SSD) has the correct temporal frequency."""
     # T
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
