@@ -192,7 +192,6 @@ class SpeckleProfile(Profile):
         )
         self.set_phase_plate_phase_modulation()
 
-
         if "SSD" in self.temporal_smoothing_type.upper():
             # Initialize SSD parameters
             # the amplitude of phase along each direction
