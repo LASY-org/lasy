@@ -78,7 +78,8 @@ class SpeckleProfile(Profile):
     * Continuous phase plates (CPP) / ``'CPP'``:
         :math:`\phi_{{\rm CPP},j}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`j`), :math:`\psi_{{\rm SSD},j}(t)=0`, and :math:`A_j=1`
     * CPP + Smoothing by spectral dispersion (SSD) / ``'FM SSD'``:
-        :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD},j}(t)=\delta_m \sin(\omega_m t + )`, and :math:`A_j=1`
+        :math:`\phi_{{\rm CPP},j}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`j`), :math:`\psi_{{\rm SSD},j}(t)=\delta_m \sin(\omega_m t + )`, and :math:`A_j=1`.
+
     * Gaussian Process Randomly phase-modulated SSD / ``'GP RPM SSD'``:
         CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD/ISI},j}(t)` is sampled from a Gaussian stochastic process, and :math:`A_j=1`
     * Induced spatial incoherence (ISI) / ``'GS ISI'``:
@@ -115,7 +116,7 @@ class SpeckleProfile(Profile):
     beam_aperture : list of 2 floats (in meters)
         Width :math:`D_x,D_y` of the rectangular beam in the near-field, i.e., size of the illuminated region of the RPP/CPP.
 
-    n_beamlets : list of integers
+    n_beamlets : list of 2 integers
         Number of RPP/CPP elements :math:`N_{bx},N_{by}` in each direction, in the near field.
 
     temporal_smoothing_type : string
@@ -126,18 +127,18 @@ class SpeckleProfile(Profile):
     relative_laser_bandwidth : float
         Bandwidth of laser pulse, relative to central frequency.
 
-    ssd_phase_modulation_amplitude : 2-tuple of floats
+    ssd_phase_modulation_amplitude :list of 2 floats
         Amplitude of phase modulation in each transverse direction.
-        Only used if `temporal_smoothing_type` is `FM SSD`.
+        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GS RPM SSD'``.
 
     ssd_number_color_cycles : list of 2 floats
         Number of color cycles of SSD spectrum to include in modulation
-        Only used if `temporal_smoothing_type` is `FM SSD`.
+        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GS RPM SSD'``.
 
     ssd_transverse_bandwidth_distribution: list of 2 floats
         Determines how much SSD is distributed in the `x` and `y` directions.
         if `ssd_transverse_bandwidth_distribution=[a,b]`, then the SSD frequency modulation is `a/sqrt(a^2+b^2)` in `x` and `b/sqrt(a^2+b^2)` in `y`.
-        Only used if `temporal_smoothing_type` is `FM SSD`.
+        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GS RPM SSD'``.
 
     do_include_transverse_envelope : boolean, (optional, default False)
         Whether to include the transverse sinc envelope or not.
