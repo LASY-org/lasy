@@ -40,9 +40,8 @@ class SpeckleProfile(Profile):
 
     Speckled lasers are used to mitigate laser-plasma interactions in fusion and ion acceleration contexts.
     More on the subject can be found in chapter 9 of `Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__.
-    A speckled laser beam is a laser that is deliberately divided transversely into several beamlets in the near-field.
-    This is done with a near-field phase plate divided into
-    The phase plate provides a different phase to each beamlet, which then propagate to the far field where they combine incoherently.
+    A speckled laser beam is a laser that is deliberately divided transversely into :math:`N_{bx}\times N_{by}` beamlets in the near-field.
+    The phase plate provides a different phase to each beamlet, which then propagate to the far field and combine incoherently.
 
     The electric field corresponds to:
 
@@ -74,8 +73,8 @@ class SpeckleProfile(Profile):
 
     This profile admits several options for calculating the amplitudes and phases of the beamlets:
 
-    * Random phase plates (RPP) / ``'RPP'``: Here the phase plate contribution is :math:`\phi_{{\rm RPP},j}\in\{0,\pi\}`, :math:`\psi_{{\rm SSD/ISI},j}(t)=0`, and :math:`A_j=1`
-    * Continuous phase plates (CPP) / ``'CPP'``:  :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD},j}(t)=0`, and :math:`A_j=1`
+    * Random phase plates (RPP) / ``'RPP'``: Here the phase plate contribution is :math:`\phi_{{\rm RPP},j}\in\{0,\pi\}` (drawn randomly for each :math:`j`), :math:`\psi_{{\rm SSD/ISI},j}(t)=0`, and :math:`A_j=1`
+    * Continuous phase plates (CPP) / ``'CPP'``:  :math:`\phi_{{\rm CPP},j}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`j`), :math:`\psi_{{\rm SSD},j}(t)=0`, and :math:`A_j=1`
     * CPP + Smoothing by spectral dispersion (SSD) / ``'FM SSD'``:  :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD},j}(t)=\delta_m \sin(\omega_m t + )`, and :math:`A_j=1`
     * Gaussian Process Randomly phase-modulated SSD / ``'GP RPM SSD'``: CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD/ISI},j}(t)` is sampled from a Gaussian stochastic process, and :math:`A_j=1`
     * Induced spatial incoherence (ISI) / ``'GP RPM SSD'``: a smoothing technique with temporal stochastic variation in the beamlet phases and amplitudes; that is, :math:`\phi_{{\rm CPP},j}=0`, and :math:`\psi_{{\rm SSD/ISI},j}(t)` and :math:`A_j` are sampled from a Gaussian stochastic process to simulate the random phase difference and amplitude of the ISI process
@@ -117,6 +116,7 @@ class SpeckleProfile(Profile):
     temporal_smoothing_type : string
         Which method for beamlet production and evolution is used.
         Can be ``'RPP'``, ``'CPP'``, ``'FM SSD'``, ``'GS RPM SSD'``, or ``'GS ISI'``.
+        (See the above bullet list for an explanation of each of these methods.)
 
     relative_laser_bandwidth : float
         Bandwidth of laser pulse, relative to central frequency.
