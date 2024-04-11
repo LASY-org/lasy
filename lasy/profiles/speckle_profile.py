@@ -5,7 +5,7 @@ from .profile import Profile
 
 
 def gen_gaussian_time_series(t_num, dt, fwhm, rms_mean):
-    """Generate a discrete time series that has gaussian power spectrum.
+    r"""Generate a discrete time series that has gaussian power spectrum.
 
     Parameters
     ----------
