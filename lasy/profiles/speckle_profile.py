@@ -43,11 +43,11 @@ class SpeckleProfile(Profile):
     A speckled laser beam is a laser that is deliberately divided transversely into :math:`N_{bx}\times N_{by}` beamlets in the near-field.
     The phase plate provides a different phase to each beamlet, with index :math:`ml`, which then propagate to the far field and combine incoherently.
 
-    The electric field in the focal plane, as a function of time :math:`t` and the coordinates 
+    The electric field in the focal plane, as a function of time :math:`t` and the coordinates
     :math:`\boldsymbol{x}_\perp=(x,y)` transverse to the direction of propagation, is:
-    
+
     .. math::
-    
+
         \begin{aligned}
         E_u(\boldsymbol{x}_\perp,t) &= Re\left[ E_0
         {\rm sinc}\left(\frac{\pi x}{\Delta x}\right)
@@ -56,7 +56,7 @@ class SpeckleProfile(Profile):
         \\
         & \times\sum_{m,l=1}^{N_{bx}, N_{by}} A_{ml}
         \exp\left(i\boldsymbol{k}_{\perp ml}\cdot\boldsymbol{x}_\perp
-        + i\phi_{{\rm RPP/CPP},ml}+i\psi_{{\rm SSD/ISI},ml}(t)\right) 
+        + i\phi_{{\rm RPP/CPP},ml}+i\psi_{{\rm SSD/ISI},ml}(t)\right)
         \Bigg]
         \end{aligned}
 
@@ -78,23 +78,23 @@ class SpeckleProfile(Profile):
     * Continuous phase plates (CPP), ``'CPP'``:
         :math:`\phi_{{\rm CPP},ml}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`m,l`), :math:`\psi_{{\rm SSD},ml}(t)=0`, and :math:`A_{ml}=1`
     * CPP + Smoothing by spectral dispersion (SSD), ``'FM SSD'``:
-        :math:`\phi_{{\rm CPP},ml}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`m,l`), 
+        :math:`\phi_{{\rm CPP},ml}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`m,l`),
 
         .. math::
-        
+
             \begin{aligned}
             \psi_{{\rm SSD},ml}(t)&=\delta_{x} \sin\left(\omega_{x} t + 2\pi\frac{mN_{cc,x}}{N_{bx}}\right)\\
             &+\delta_{y} \sin\left(\omega_{y} t + 2\pi\frac{lN_{cc,y}}{N_{by}}\right),
             \end{aligned}
-        
-        and :math:`A_{ml}=1`.  The modulation frequencies :math:`\omega_x,\omega_y` are determined by the 
+
+        and :math:`A_{ml}=1`.  The modulation frequencies :math:`\omega_x,\omega_y` are determined by the
         laser bandwidth and modulation amplitudes by the relation
 
         .. math::
 
             \omega_x = \frac{\Delta_\nu r }{2\delta_x}
-        
-        where :math:`\Delta_\nu` is the relative bandwidth of the laser pulse and :math:`r` is an additional rotation factor 
+
+        where :math:`\Delta_\nu` is the relative bandwidth of the laser pulse and :math:`r` is an additional rotation factor
         supplied by the user that determines how much of the modulation is in x and how much is in y. [Michel, Eqn. 9.69]
 
     * Gaussian Process Randomly phase-modulated SSD, ``'GP RPM SSD'``:
@@ -286,7 +286,7 @@ class SpeckleProfile(Profile):
             :math:`\delta_{x},\delta_{y}`, with distribution FWHM ``ssd_phase_modulation_frequency``.
 
         If the smoothing type is "ISI", this function returns a time series with complex numbers defining beamlet phase and amplitude.
-            Each beamlet has a complex number whose magnitude is the amplitude of the beamlet and 
+            Each beamlet has a complex number whose magnitude is the amplitude of the beamlet and
             whose phase gives the beamlet phase offset.
             The complex numbers have mean 1 and FWHM given by twice the laser bandwidth
 

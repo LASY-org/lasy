@@ -153,19 +153,19 @@ def test_spatial_correlation(temporal_smoothing_type):
 )
 def test_sinc_zeros(temporal_smoothing_type):
     """Test whether the transverse sinc envelope has the correct width
-    
+
     The transverse envelope for the rectangular laser has the form
-    
+
     ..math::
-        
+
         {\rm sinc}\left(\frac{\pi x}{\Delta x}\right)
         {\rm sinc}\left(\frac{\pi y}{\Delta y}\right)
 
     [Michel, Eqns. 9.11, 87, 94].
-    This has widths 
-    
+    This has widths
+
     ..math::
-    
+
         \Delta x=\lambda_0fN_{bx}/D_x,
         \Delta y=\lambda_0fN_{by}/D_y
     """
