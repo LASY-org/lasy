@@ -39,51 +39,68 @@ class SpeckleProfile(Profile):
     Derived class for the profile of a speckled laser pulse.
 
     Speckled lasers are used to mitigate laser-plasma interactions in fusion and ion acceleration contexts.
-    More on the subject can be found in chapter 9 of `Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__.
+    More on the subject can be found in chapter 9 of `P. Michel, Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__.
     A speckled laser beam is a laser that is deliberately divided transversely into :math:`N_{bx}\times N_{by}` beamlets in the near-field.
-    The phase plate provides a different phase to each beamlet, which then propagate to the far field and combine incoherently.
+    The phase plate provides a different phase to each beamlet, with index :math:`ml`, which then propagate to the far field and combine incoherently.
 
-    The electric field corresponds to:
-
+    The electric field in the focal plane, as a function of time :math:`t` and the coordinates 
+    :math:`\boldsymbol{x}_\perp=(x,y)` transverse to the direction of propagation, is:
+    
     .. math::
-
+    
         \begin{aligned}
         E_u(\boldsymbol{x}_\perp,t) &= Re\left[ E_0
-        \sum_{j=1}^{N_{bx}\times N_{by}} A_j
-        {\rm sinc}\left(\frac{\pi D_xx}{\lambda_0 f}\right)
-        {\rm sinc}\left(\frac{\pi D_yy}{\lambda_0 f}\right)
+        {\rm sinc}\left(\frac{\pi x}{\Delta x}\right)
+        {\rm sinc}\left(\frac{\pi y}{\Delta y}\right)\times p_u
         \right.
         \\
-        & \left. \times\exp\left(i\boldsymbol{k}_{\perp,j}\cdot\boldsymbol{x}_\perp
-        + i\phi_{{\rm RPP/CPP},j}+i\psi_{{\rm SSD/ISI},j}(t)\right) \times p_u
-        \right]
+        & \times\sum_{m,l=1}^{N_{bx}, N_{by}} A_{ml}
+        \exp\left(i\boldsymbol{k}_{\perp ml}\cdot\boldsymbol{x}_\perp
+        + i\phi_{{\rm RPP/CPP},ml}+i\psi_{{\rm SSD/ISI},ml}(t)\right) 
+        \Bigg]
         \end{aligned}
 
     where :math:`u` is either :math:`x` or :math:`y`, :math:`p_u` is
-    the polarization vector, :math:`Re` represent the real part, and
-    :math:`\boldsymbol{x}_\perp=(x,y)` is the transverse coordinate (orthogonal
-    to the propagation direction).
+    the polarization vector, and :math:`Re` represent the real part [Michel, Eqns. 9.11, 87, 94].
     Several quantities are computed internally to the code depending on the
-    method of smoothing chosen, including the beamlet amplitude :math:`A_j`,
-    the beamlet wavenumber :math:`k_{\perp,j}`,
-    the phase contribution :math:`\phi_{{\rm RPP/CPP},j}` from the phase plate,
-    and the phase contribution :math:`\psi_{{\rm SSD/ISI},j}(t)` from the smoothing.
-    The other parameters in this formula are defined below.
-
+    method of smoothing chosen, including the beamlet amplitude :math:`A_{ml}`,
+    the beamlet wavenumber :math:`k_{\perp ml}`,
+    the relative phase contribution :math:`\phi_{{\rm RPP/CPP},ml}` of beamlet :math:`ml` induced by the phase plate,
+    and the phase contribution to beamlet :math:`ml`, :math:`\psi_{{\rm SSD/ISI},ml}(t)`, from the temporal smoothing.
+    The beam widths are :math:`\Delta x=\frac{\lambda_0fN_{bx}}{D_{x}}`,
+    :math:`\Delta y=\frac{\lambda_0fN_{by}}{D_{y}}`.
+    The other parameters in these formulas are defined below.
 
     This profile admits several options for calculating the amplitudes and phases of the beamlets:
 
-    * Random phase plates (RPP) / ``'RPP'``:
-        Here the phase plate contribution is :math:`\phi_{{\rm RPP},j}\in\{0,\pi\}` (drawn randomly for each :math:`j`), :math:`\psi_{{\rm SSD/ISI},j}(t)=0`, and :math:`A_j=1`
-    * Continuous phase plates (CPP) / ``'CPP'``:
-        :math:`\phi_{{\rm CPP},j}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`j`), :math:`\psi_{{\rm SSD},j}(t)=0`, and :math:`A_j=1`
-    * CPP + Smoothing by spectral dispersion (SSD) / ``'FM SSD'``:
-        :math:`\phi_{{\rm CPP},j}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`j`), :math:`\psi_{{\rm SSD},j}(t)=\delta_m \sin(\omega_m t + )`, and :math:`A_j=1`.
+    * Random phase plates (RPP), ``'RPP'``:
+        Here the phase plate contribution to the phase of beamlet :math:`ml` is :math:`\phi_{{\rm RPP},ml}\in\{0,\pi\}` (drawn randomly for each :math:`m,l`), :math:`\psi_{{\rm SSD/ISI},ml}(t)=0`, and :math:`A_{ml}=1`
+    * Continuous phase plates (CPP), ``'CPP'``:
+        :math:`\phi_{{\rm CPP},ml}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`m,l`), :math:`\psi_{{\rm SSD},ml}(t)=0`, and :math:`A_{ml}=1`
+    * CPP + Smoothing by spectral dispersion (SSD), ``'FM SSD'``:
+        :math:`\phi_{{\rm CPP},ml}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`m,l`), 
 
-    * Gaussian Process Randomly phase-modulated SSD / ``'GP RPM SSD'``:
-        CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},j}\in[0,\pi]`, :math:`\psi_{{\rm SSD/ISI},j}(t)` is sampled from a Gaussian stochastic process, and :math:`A_j=1`
-    * Induced spatial incoherence (ISI) / ``'GS ISI'``:
-        a smoothing technique with temporal stochastic variation in the beamlet phases and amplitudes; that is, :math:`\phi_{{\rm CPP},j}=0`, and :math:`\psi_{{\rm SSD/ISI},j}(t)` and :math:`A_j` are sampled from a Gaussian stochastic process to simulate the random phase difference and amplitude of the ISI process
+        .. math::
+        
+            \begin{aligned}
+            \psi_{{\rm SSD},ml}(t)&=\delta_{x} \sin\left(\omega_{x} t + 2\pi\frac{mN_{cc,x}}{N_{bx}}\right)\\
+            &+\delta_{y} \sin\left(\omega_{y} t + 2\pi\frac{lN_{cc,y}}{N_{by}}\right),
+            \end{aligned}
+        
+        and :math:`A_{ml}=1`.  The modulation frequencies :math:`\omega_x,\omega_y` are determined by the 
+        laser bandwidth and modulation amplitudes by the relation
+
+        .. math::
+
+            \omega_x = \frac{\Delta_\nu r }{2\delta_x}
+        
+        where :math:`\Delta_\nu` is the relative bandwidth of the laser pulse and :math:`r` is an additional rotation factor 
+        supplied by the user that determines how much of the modulation is in x and how much is in y. [Michel, Eqn. 9.69]
+
+    * Gaussian Process Randomly phase-modulated SSD, ``'GP RPM SSD'``:
+        CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},ml}\in[0,\pi]`, :math:`\psi_{{\rm SSD/ISI},ml}(t)` is sampled from a Gaussian stochastic process, and :math:`A_{ml}=1`
+    * Induced spatial incoherence (ISI), ``'GP ISI'``:
+        a smoothing technique with temporal stochastic variation in the beamlet phases and amplitudes; that is, :math:`\phi_{{\rm CPP},ml}=0`, and :math:`\psi_{{\rm SSD/ISI},ml}(t)` and :math:`A_{ml}` are sampled from a Gaussian stochastic process to simulate the random phase differences and amplitudes the beamlets pick up passing through the ISI echelons
 
     This is an adapation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
 
@@ -94,7 +111,7 @@ class SpeckleProfile(Profile):
 
     Parameters
     ----------
-    wavelength : float (in meter)
+    wavelength : float (in meters)
         The main laser wavelength :math:`\lambda_0` of the laser, which
         defines :math:`\omega_0` in the above formula, according to
         :math:`\omega_0 = 2\pi c/\lambda_0`.
@@ -105,41 +122,41 @@ class SpeckleProfile(Profile):
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
 
-    laser_energy : float (in Joule)
+    laser_energy : float (in Joules)
         The total energy of the laser pulse. The amplitude of the laser
         field (:math:`E_0` in the above formula) is automatically
         calculated so that the pulse has the prescribed energy.
 
-    focal_length : float (in meter)
+    focal_length : float (in meters)
         Focal length of lens :math:`f` just after the RPP/CPP.
 
     beam_aperture : list of 2 floats (in meters)
-        Width :math:`D_x,D_y` of the rectangular beam in the near-field, i.e., size of the illuminated region of the RPP/CPP.
+        Widths :math:`D_x,D_y` of the rectangular beam in the near-field, i.e., size of the illuminated region of the RPP/CPP.
 
     n_beamlets : list of 2 integers
         Number of RPP/CPP elements :math:`N_{bx},N_{by}` in each direction, in the near field.
 
     temporal_smoothing_type : string
         Which method for beamlet production and evolution is used.
-        Can be ``'RPP'``, ``'CPP'``, ``'FM SSD'``, ``'GS RPM SSD'``, or ``'GS ISI'``.
+        Can be ``'RPP'``, ``'CPP'``, ``'FM SSD'``, ``'GP RPM SSD'``, or ``'GP ISI'``.
         (See the above bullet list for an explanation of each of these methods.)
 
     relative_laser_bandwidth : float
-        Bandwidth of laser pulse, relative to central frequency.
-        Only used if ``temporal_smoothing_type`` is ``'FM SSD'``, ``'GS RPM SSD'`` or ``'GS ISI'``.
+        Bandwidth :math:`\Delta_\nu` of the laser pulse, relative to central frequency.
+        Only used if ``temporal_smoothing_type`` is ``'FM SSD'``, ``'GP RPM SSD'`` or ``'GP ISI'``.
 
     ssd_phase_modulation_amplitude :list of 2 floats
-        Amplitude of phase modulation in each transverse direction.
-        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GS RPM SSD'``.
+        Amplitudes :math:`\delta_{x},\delta_{y}` of phase modulation in each transverse direction.
+        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.
 
     ssd_number_color_cycles : list of 2 floats
-        Number of color cycles of SSD spectrum to include in modulation
-        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GS RPM SSD'``.
+        Number of color cycles :math:`N_{cc,x},N_{cc,y}` of SSD spectrum to include in modulation
+        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.
 
     ssd_transverse_bandwidth_distribution: list of 2 floats
-        Determines how much SSD is distributed in the `x` and `y` directions.
-        if `ssd_transverse_bandwidth_distribution=[a,b]`, then the SSD frequency modulation is `a/sqrt(a^2+b^2)` in `x` and `b/sqrt(a^2+b^2)` in `y`.
-        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GS RPM SSD'``.
+        Determines how much SSD is distributed in the :math:`x` and :math:`y` directions.
+        if `ssd_transverse_bandwidth_distribution=[a,b]`, then the SSD frequency modulation is :math:`a/\sqrt{a^2+b^2}` in :math:`x` and :math:`b/\sqrt{a^2+b^2}` in :math:`y`.
+        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.
 
     do_include_transverse_envelope : boolean, (optional, default False)
         Whether to include the transverse sinc envelope or not.
@@ -260,12 +277,18 @@ class SpeckleProfile(Profile):
         self,
         series_time,
     ):
-        """Initialize time series sampled from Gaussian process.
+        """Initialize a time series sampled from a Gaussian process.
 
         At every time specified by the input `series_time`, calculate the random phase and/or amplitudes as determined by the smoothing type.
 
-        If the smoothing type is "SSD", then this function returns a time series with random phase offsets in x and y at each time.
+        * If the smoothing type is "SSD", then this function returns a time series with random phase offsets in x and y at each time.
+            The phase offsets are real-valued and centered around the user supplied ``ssd_phase_modulation_amplitude``
+            :math:`\delta_{x},\delta_{y}`, with distribution FWHM ``ssd_phase_modulation_frequency``.
+
         If the smoothing type is "ISI", this function returns a time series with complex numbers defining beamlet phase and amplitude.
+            Each beamlet has a complex number whose magnitude is the amplitude of the beamlet and 
+            whose phase gives the beamlet phase offset.
+            The complex numbers have mean 1 and FWHM given by twice the laser bandwidth
 
         Parameters
         ----------

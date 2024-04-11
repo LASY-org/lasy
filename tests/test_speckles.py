@@ -12,8 +12,8 @@ from scipy.constants import c
 def test_intensity_distribution(temporal_smoothing_type):
     """Test whether the spatial intensity distribution and statisticis are correct.
 
-    The distribution should be exponential, 1/<I> exp(-I/<I>).
-    The real and imaginary parts of the envelope and their product should all be 0 on average.
+    The distribution should be exponential, 1/<I> exp(-I/<I>) [Michel, 9.35].
+    The real and imaginary parts of the envelope [Michel, Eqn. 9.26] and their product [9.30] should all be 0 on average.
     """
 
     wavelength = 0.351e-6  # Laser wavelength in meters
@@ -84,7 +84,7 @@ def test_spatial_correlation(temporal_smoothing_type):
 
     The speckle shape is measured over one period, since the spatial profile is periodic.
     The correct speckle shape for a rectangular laser,
-    determined by the autocorrelation, is the product of sinc functions.
+    determined by the autocorrelation, is the product of sinc functions [Michel, Eqn. 9.16].
     """
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
@@ -152,7 +152,23 @@ def test_spatial_correlation(temporal_smoothing_type):
     "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
 )
 def test_sinc_zeros(temporal_smoothing_type):
-    """Test whether the transverse sinc envelope has the correct width"""
+    """Test whether the transverse sinc envelope has the correct width
+    
+    The transverse envelope for the rectangular laser has the form
+    
+    ..math::
+        
+        {\rm sinc}\left(\frac{\pi x}{\Delta x}\right)
+        {\rm sinc}\left(\frac{\pi y}{\Delta y}\right)
+
+    [Michel, Eqns. 9.11, 87, 94].
+    This has widths 
+    
+    ..math::
+    
+        \Delta x=\lambda_0fN_{bx}/D_x,
+        \Delta y=\lambda_0fN_{by}/D_y
+    """
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
     laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
@@ -201,7 +217,6 @@ def test_sinc_zeros(temporal_smoothing_type):
 
 def test_FM_SSD_periodicity():
     """Test that the frequency modulated Smoothing by spectral dispersion (SSD) has the correct temporal frequency."""
-    # T
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
     laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
