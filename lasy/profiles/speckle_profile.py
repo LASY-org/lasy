@@ -483,7 +483,6 @@ class SpeckleProfile(Profile):
             )
         return speckle_amp
 
-
     def _generate_phase_plate_phases(self):
         """
         Return a 2D array containing the exponential of the phase plate phases, i.e.
@@ -511,7 +510,6 @@ class SpeckleProfile(Profile):
             raise NotImplementedError
         # Evaluate the exponential
         return np.exp(1j * phase_plate)
-
 
     def evaluate(self, x, y, t):
         """
