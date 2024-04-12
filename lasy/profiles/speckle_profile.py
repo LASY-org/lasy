@@ -377,8 +377,9 @@ class SpeckleProfile(Profile):
         ):
             return np.ones_like(self.X_lens_matrix)
         if temporal_smoothing_type.upper() == "FM SSD":
+            ssd_x_y_dephasing = np.random.standard_normal(2) * np.pi
             phase_t = self.ssd_phase_modulation_amplitude[0] * np.sin(
-                self.ssd_x_y_dephasing[0]
+                ssd_x_y_dephasing[0]
                 + 2
                 * np.pi
                 * self.ssd_phase_modulation_frequency[0]
@@ -387,7 +388,7 @@ class SpeckleProfile(Profile):
                     - self.X_lens_matrix * self.ssd_time_delay[0] / self.n_beamlets[0]
                 )
             ) + self.ssd_phase_modulation_amplitude[1] * np.sin(
-                self.ssd_x_y_dephasing[1]
+                ssd_x_y_dephasing[1]
                 + 2
                 * np.pi
                 * self.ssd_phase_modulation_frequency[1]
@@ -482,6 +483,36 @@ class SpeckleProfile(Profile):
             )
         return speckle_amp
 
+
+    def _generate_phase_plate_phases(self):
+        """
+        Return a 2D array containing the exponential of the phase plate phases, i.e.
+        :math:`exp(i\phi_{{\rm RPP/CPP},ml})`, where the exact value of the phases
+        depend on the chosen temporal smoothing type.
+
+        Returns
+        -------
+        exp_phase_plate: 2darray of complexs
+            Array of size n_beamlets[0], n_beamlets[1]
+        """
+        # Draw random phases, according to the chosen smoothing type
+        if "RPP" == self.temporal_smoothing_type.upper():
+            phase_plate = np.random.choice([0, np.pi], self.n_beamlets)
+        elif any(
+            cpp_smoothing_type in self.temporal_smoothing_type.upper()
+            for cpp_smoothing_type in ["CPP", "SSD"]
+        ):
+            phase_plate = np.random.uniform(
+                -np.pi, np.pi, size=self.n_beamlets[0] * self.n_beamlets[1]
+            ).reshape(self.n_beamlets)
+        elif "ISI" in self.temporal_smoothing_type.upper():
+            phase_plate = np.zeros(self.n_beamlets)  # ISI does not require phase plates
+        else:
+            raise NotImplementedError
+        # Evaluate the exponential
+        return np.exp(1j * phase_plate)
+
+
     def evaluate(self, x, y, t):
         """
         Return the envelope field of the laser.
@@ -502,23 +533,8 @@ class SpeckleProfile(Profile):
         t_norm = t[0, 0, :] * c / self.lambda0
         t_max = t_norm[-1]
 
-        # Calculate auxiliary parameters
-        if "RPP" == self.temporal_smoothing_type.upper():
-            phase_plate = np.random.choice([0, np.pi], self.n_beamlets)
-        elif any(
-            cpp_smoothing_type in self.temporal_smoothing_type.upper()
-            for cpp_smoothing_type in ["CPP", "SSD"]
-        ):
-            phase_plate = np.random.uniform(
-                -np.pi, np.pi, size=self.n_beamlets[0] * self.n_beamlets[1]
-            ).reshape(self.n_beamlets)
-        elif "ISI" in self.temporal_smoothing_type.upper():
-            phase_plate = np.zeros(self.n_beamlets)  # ISI does not require phase plates
-        else:
-            raise NotImplementedError
-        exp_phase_plate = np.exp(1j * phase_plate)
-        if self.temporal_smoothing_type.upper() == "FM SSD":
-            self.ssd_x_y_dephasing = np.random.standard_normal(2) * np.pi
+        # Draw random phases for each phase plate
+        exp_phase_plate = self._generate_phase_plate_phases()
 
         series_time = np.arange(0, t_max + self.dt_update, self.dt_update)
 
