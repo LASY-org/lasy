@@ -5,7 +5,7 @@ from .profile import Profile
 
 
 def gen_gaussian_time_series(t_num, dt, fwhm, rms_mean):
-    r"""Generate a discrete time series that has gaussian power spectrum.
+    """Generate a discrete time series that has gaussian power spectrum.
 
     Parameters
     ----------
@@ -56,7 +56,7 @@ class SpeckleProfile(Profile):
         \\
         & \times\sum_{m,l=1}^{N_{bx}, N_{by}} A_{ml}
         \exp\left(i\boldsymbol{k}_{\perp ml}\cdot\boldsymbol{x}_\perp
-        + i\phi_{{\rm RPP/CPP},ml}+i\psi_{{\rm SSD/ISI},ml}(t)\right)
+        + i\phi_{{\rm RPP/CPP},ml}+i\psi_{{\rm SSD},ml}(t)\right)
         \Bigg]
         \end{aligned}
 
@@ -66,7 +66,7 @@ class SpeckleProfile(Profile):
     method of smoothing chosen, including the beamlet amplitude :math:`A_{ml}`,
     the beamlet wavenumber :math:`k_{\perp ml}`,
     the relative phase contribution :math:`\phi_{{\rm RPP/CPP},ml}` of beamlet :math:`ml` induced by the phase plate,
-    and the phase contribution to beamlet :math:`ml`, :math:`\psi_{{\rm SSD/ISI},ml}(t)`, from the temporal smoothing.
+    and the phase contribution to beamlet :math:`ml`, :math:`\psi_{{\rm SSD},ml}(t)`, from the temporal smoothing.
     The beam widths are :math:`\Delta x=\frac{\lambda_0fN_{bx}}{D_{x}}`,
     :math:`\Delta y=\frac{\lambda_0fN_{by}}{D_{y}}`.
     The other parameters in these formulas are defined below.
@@ -74,7 +74,7 @@ class SpeckleProfile(Profile):
     This profile admits several options for calculating the amplitudes and phases of the beamlets:
 
     * Random phase plates (RPP), ``'RPP'``:
-        Here the phase plate contribution to the phase of beamlet :math:`ml` is :math:`\phi_{{\rm RPP},ml}\in\{0,\pi\}` (drawn randomly for each :math:`m,l`), :math:`\psi_{{\rm SSD/ISI},ml}(t)=0`, and :math:`A_{ml}=1`
+        Here the phase plate contribution to the phase of beamlet :math:`ml` is :math:`\phi_{{\rm RPP},ml}\in\{0,\pi\}` (drawn randomly for each :math:`m,l`), :math:`\psi_{{\rm SSD},ml}(t)=0`, and :math:`A_{ml}=1`
     * Continuous phase plates (CPP), ``'CPP'``:
         :math:`\phi_{{\rm CPP},ml}\in[0,\pi]` (drawn randomly with uniform probability between :math:`0` and :math:`\pi`, for each :math:`m,l`), :math:`\psi_{{\rm SSD},ml}(t)=0`, and :math:`A_{ml}=1`
     * CPP + Smoothing by spectral dispersion (SSD), ``'FM SSD'``:
@@ -98,9 +98,9 @@ class SpeckleProfile(Profile):
         supplied by the user that determines how much of the modulation is in x and how much is in y. [Michel, Eqn. 9.69]
 
     * Gaussian Process Randomly phase-modulated SSD, ``'GP RPM SSD'``:
-        CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},ml}\in[0,\pi]`, :math:`\psi_{{\rm SSD/ISI},ml}(t)` is sampled from a Gaussian stochastic process, and :math:`A_{ml}=1`
+        CPP + a generalization of SSD that has temporal stochastic variation in the beamlet phases; that is, :math:`\phi_{{\rm CPP},ml}\in[0,\pi]`, :math:`\psi_{{\rm SSD},ml}(t)` is sampled from a Gaussian stochastic process, and :math:`A_{ml}=1`
     * Induced spatial incoherence (ISI), ``'GP ISI'``:
-        a smoothing technique with temporal stochastic variation in the beamlet phases and amplitudes; that is, :math:`\phi_{{\rm CPP},ml}=0`, and :math:`\psi_{{\rm SSD/ISI},ml}(t)` and :math:`A_{ml}` are sampled from a Gaussian stochastic process to simulate the random phase differences and amplitudes the beamlets pick up passing through the ISI echelons
+        a smoothing technique with temporal stochastic variation in the beamlet phases and amplitudes; that is, :math:`\phi_{{\rm CPP},ml}=0`, :math:`\psi_{{\rm SSD},ml}(t)=0`, and the :math:`A_{ml}` are complex amplitudes sampled from a Gaussian stochastic process to simulate the random phase differences and amplitudes the beamlets pick up when passing through the ISI echelons
 
     This is an adapation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
 
@@ -277,7 +277,7 @@ class SpeckleProfile(Profile):
         self,
         series_time,
     ):
-        """Initialize a time series sampled from a Gaussian process.
+        r"""Initialize a time series sampled from a Gaussian process.
 
         At every time specified by the input `series_time`, calculate the random phase and/or amplitudes as determined by the smoothing type.
 
@@ -303,17 +303,13 @@ class SpeckleProfile(Profile):
         """
         if "SSD" in self.temporal_smoothing_type.upper():
             pm_phase0 = gen_gaussian_time_series(
-                series_time.size
-                + int(np.sum(self.ssd_time_delay) / self.dt_update)
-                + 2,
+                series_time.size + int(np.sum(self.ssd_time_delay) / self.dt_update) + 2,
                 self.dt_update,
                 2 * np.pi * self.ssd_phase_modulation_frequency[0],
                 self.ssd_phase_modulation_amplitude[0],
             )
             pm_phase1 = gen_gaussian_time_series(
-                series_time.size
-                + int(np.sum(self.ssd_time_delay) / self.dt_update)
-                + 2,
+                series_time.size + int(np.sum(self.ssd_time_delay) / self.dt_update) + 2,
                 self.dt_update,
                 2 * np.pi * self.ssd_phase_modulation_frequency[1],
                 self.ssd_phase_modulation_amplitude[1],
@@ -376,19 +372,14 @@ class SpeckleProfile(Profile):
             return np.ones_like(self.X_lens_matrix)
         if temporal_smoothing_type.upper() == "FM SSD":
             phase_t = self.ssd_phase_modulation_amplitude[0] * np.sin(
-                self.ssd_x_y_dephasing[0]
-                + 2
-                * np.pi
-                * self.ssd_phase_modulation_frequency[0]
+                self.ssd_x_y_dephasing[0] + 2 * np.pi * self.ssd_phase_modulation_frequency[0]
                 * (
                     t_now
                     - self.X_lens_matrix * self.ssd_time_delay[0] / self.n_beamlets[0]
                 )
             ) + self.ssd_phase_modulation_amplitude[1] * np.sin(
                 self.ssd_x_y_dephasing[1]
-                + 2
-                * np.pi
-                * self.ssd_phase_modulation_frequency[1]
+                + 2 * np.pi * self.ssd_phase_modulation_frequency[1]
                 * (
                     t_now
                     - self.Y_lens_matrix * self.ssd_time_delay[1] / self.n_beamlets[1]
