@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.constants import c
 
-from .profile import Profile
+from ..profile import Profile
 
 
 def gen_gaussian_time_series(t_num, dt, fwhm, rms_mean):
