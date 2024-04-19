@@ -2,13 +2,14 @@ import numpy as np
 from .speckle_profile import SpeckleProfile
 from .stochastic_process_utilities import gen_gaussian_time_series
 
+
 class GP_ISI_Profile(SpeckleProfile):
     r"""Generate a speckled laser profile with smoothing inspired by Induced Spatial Incoherence (ISI).
 
     This is a smoothing technique with temporal stochastic variation in the beamlet phases and amplitudes
-    to simulate the random phase differences and amplitudes the beamlets pick up when passing through ISI echelons. 
+    to simulate the random phase differences and amplitudes the beamlets pick up when passing through ISI echelons.
     In this case, :math:`\phi_{ml}(t)` and :math:`A_{ml}(t)` are chosen randomly.
-    Practically, this is done by drawing the complex amplitudes :math:\tilde A_{ml}(t)` 
+    Practically, this is done by drawing the complex amplitudes :math:\tilde A_{ml}(t)`
     from a stochastic process with Guassian power spectral density having mean of 1 and FWHM of twice the laser bandwidth.
 
     Parameters
@@ -18,14 +19,17 @@ class GP_ISI_Profile(SpeckleProfile):
         Bandwidth :math:`\Delta_\nu` of the incoming laser pulse, relative to the central frequency.
 
     """
-    def __init__(self, *speckle_args, 
+
+    def __init__(
+        self,
+        *speckle_args,
         relative_laser_bandwidth,
     ):
         super().__init__(*speckle_args)
         self.laser_bandwidth = relative_laser_bandwidth
         self.dt_update = 1 / self.laser_bandwidth / 50
         return
-    
+
     def init_gaussian_time_series(
         self,
         series_time,
@@ -76,9 +80,10 @@ class GP_ISI_Profile(SpeckleProfile):
 
         self.time_series = self.init_gaussian_time_series(series_time)
         return
-    
+
     def beamlets_complex_amplitude(
-        self, t_now,
+        self,
+        t_now,
     ):
         """Calculate complex amplitude of the beamlets in the near-field, before propagating to the focal plane.
 
@@ -91,4 +96,3 @@ class GP_ISI_Profile(SpeckleProfile):
         """
 
         return self.time_series[:, :, int(round(t_now / self.dt_update))]
-    

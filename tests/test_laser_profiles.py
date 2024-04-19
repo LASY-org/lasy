@@ -284,7 +284,7 @@ def test_speckle_profile():
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
-    do_sinc_profile=False
+    do_sinc_profile = False
     relative_laser_bandwidth = 0.005
 
     profile = GP_ISI_Profile(

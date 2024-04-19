@@ -1,11 +1,12 @@
 import numpy as np
 from .speckle_profile import SpeckleProfile
 
+
 class PhasePlateProfile(SpeckleProfile):
     """Generate a speckled laser profile with a random phase plate.
 
     This has no temporal smoothing.
-    The amplitude of the beamlets is always :math:`A_{ml}(t)=1` and 
+    The amplitude of the beamlets is always :math:`A_{ml}(t)=1` and
     the relative phases of the beamlets, resulting from the randomly sized phase plate sections,
     are assigned randomly.
     If the user specifies Random Phase Plate (RPP: `rpp`), the beamlet phases are drawn with equal probabilities from the set :math:`{0,2\pi}`.
@@ -15,12 +16,14 @@ class PhasePlateProfile(SpeckleProfile):
     ----------
     rpp_cpp: string, keyword only, can be 'rpp' or 'cpp', whether to assign beamlet phases according to RPP or CPP scheme
     """
+
     def __init__(self, *speckle_args, rpp_cpp):
         super().__init__(*speckle_args)
         self.rpp_cpp = rpp_cpp
 
     def beamlets_complex_amplitude(
-        self, t_now,
+        self,
+        t_now,
     ):
         """Calculate complex amplitude of the beamlets in the near-field, before propagating to the focal plane.
 
@@ -39,4 +42,3 @@ class PhasePlateProfile(SpeckleProfile):
             ).reshape(self.n_beamlets)
         exp_phase_plate = np.exp(1j * phase_plate)
         return exp_phase_plate
-    
