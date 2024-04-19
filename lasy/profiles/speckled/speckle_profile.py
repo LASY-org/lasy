@@ -45,7 +45,7 @@ class SpeckleProfile(Profile):
     Notes
     -----
     This assumes a flat-top rectangular laser and so a rectangular arrangement of beamlets in the near-field.
-    The longitudinal profile is currently applied to the beamlets 
+    The longitudinal profile is currently applied to the beamlets
     individually in the near-field before they are propagated to the focal plane.
 
     Parameters
@@ -101,7 +101,6 @@ class SpeckleProfile(Profile):
         self.n_beamlets = np.array(n_beamlets, dtype="int")
         self.do_include_transverse_envelope = do_include_transverse_envelope
         self.long_profile = long_profile
-
 
         self.x_lens_list = np.linspace(
             -0.5 * (self.n_beamlets[0] - 1),
@@ -170,14 +169,24 @@ class SpeckleProfile(Profile):
         x_focus_list = X_focus_matrix[:, 0]
         y_focus_list = Y_focus_matrix[0, :]
         x_phase_focus_matrix = np.exp(
-            -2 * np.pi * 1j / self.n_beamlets[0] * self.x_lens_list[:, np.newaxis] * x_focus_list[np.newaxis, :]
+            -2
+            * np.pi
+            * 1j
+            / self.n_beamlets[0]
+            * self.x_lens_list[:, np.newaxis]
+            * x_focus_list[np.newaxis, :]
         )
         y_phase_focus_matrix = np.exp(
-            -2 * np.pi * 1j / self.n_beamlets[1] * self.y_lens_list[:, np.newaxis] * y_focus_list[np.newaxis, :]
+            -2
+            * np.pi
+            * 1j
+            / self.n_beamlets[1]
+            * self.y_lens_list[:, np.newaxis]
+            * y_focus_list[np.newaxis, :]
         )
         bca = self.beamlets_complex_amplitude(t_now)
         if self.long_profile is not None:
-             # have to unnormalize t_now to evaluate in longitudinal profile
+            # have to unnormalize t_now to evaluate in longitudinal profile
             bca = bca * self.long_profile.evaluate(t_now / c * self.lambda0)
         speckle_amp = np.einsum(
             "jk,jl->kl",
