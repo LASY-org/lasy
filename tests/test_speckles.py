@@ -27,6 +27,7 @@ def test_intensity_distribution(temporal_smoothing_type):
     beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
     do_sinc_profile = False
+    long_profile = None
     speckle_args = (
         wavelength,
         polarization,
@@ -35,6 +36,7 @@ def test_intensity_distribution(temporal_smoothing_type):
         beam_aperture,
         n_beamlets,
         do_sinc_profile,
+        long_profile,
     )
 
     relative_laser_bandwidth = 0.005
@@ -119,6 +121,7 @@ def test_spatial_correlation(temporal_smoothing_type):
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 32]
     do_sinc_profile = False
+    long_profile = None
     speckle_args = (
         wavelength,
         polarization,
@@ -127,6 +130,7 @@ def test_spatial_correlation(temporal_smoothing_type):
         beam_aperture,
         n_beamlets,
         do_sinc_profile,
+        long_profile,
     )
 
     relative_laser_bandwidth = 0.005
@@ -224,6 +228,7 @@ def test_sinc_zeros(temporal_smoothing_type):
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 48]
     do_sinc_profile = True
+    long_profile = None
     speckle_args = (
         wavelength,
         polarization,
@@ -232,6 +237,7 @@ def test_sinc_zeros(temporal_smoothing_type):
         beam_aperture,
         n_beamlets,
         do_sinc_profile,
+        long_profile,
     )
 
     relative_laser_bandwidth = 0.005
@@ -294,6 +300,7 @@ def test_FM_periodicity():
     beam_aperture = [0.35, 0.35]  # m
     n_beamlets = [24, 32]
     do_sinc_profile = False
+    long_profile = None
     speckle_args = (
         wavelength,
         polarization,
@@ -302,6 +309,7 @@ def test_FM_periodicity():
         beam_aperture,
         n_beamlets,
         do_sinc_profile,
+        long_profile,
     )
 
     relative_laser_bandwidth = 0.005
