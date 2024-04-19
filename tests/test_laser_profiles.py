@@ -7,7 +7,7 @@ from scipy.constants import c
 
 from lasy.laser import Laser
 from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import GaussianProfile, FromArrayProfile, SpeckleProfile
+from lasy.profiles import GaussianProfile, FromArrayProfile
 from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
     CosineLongitudinalProfile,
@@ -23,6 +23,7 @@ from lasy.profiles.transverse import (
     SummedTransverseProfile,
     ScaledTransverseProfile,
 )
+from lasy.profiles.speckled import GP_ISI_Profile
 from lasy.utils.exp_data_utils import find_center_of_mass
 
 
@@ -283,17 +284,17 @@ def test_speckle_profile():
     focal_length = 3.5  # m
     beam_aperture = [0.35, 0.5]  # m
     n_beamlets = [24, 32]
-    temporal_smoothing_type = "GP ISI"
+    do_sinc_profile=False
     relative_laser_bandwidth = 0.005
 
-    profile = SpeckleProfile(
+    profile = GP_ISI_Profile(
         wavelength,
         polarization,
         laser_energy,
         focal_length,
         beam_aperture,
         n_beamlets,
-        temporal_smoothing_type=temporal_smoothing_type,
+        do_sinc_profile,
         relative_laser_bandwidth=relative_laser_bandwidth,
     )
     dimensions = "xyt"

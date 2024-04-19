@@ -1,14 +1,17 @@
 import numpy as np
-
 from lasy.laser import Laser
-from lasy.profiles.speckled import PhasePlateProfile
-from lasy.profiles.speckled import FMSSDProfile
+from lasy.profiles.speckled import (
+    FM_SSD_Profile,
+    GP_ISI_Profile,
+    GP_RPM_SSD_Profile,
+    PhasePlateProfile,
+)
 import pytest
 from scipy.constants import c
 
 
 @pytest.mark.parametrize(
-    "temporal_smoothing_type", ["RPP", "CPP", "FM SSD"]
+    "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
 )
 def test_intensity_distribution(temporal_smoothing_type):
     """Test whether the spatial intensity distribution and statisticis are correct.
@@ -30,17 +33,32 @@ def test_intensity_distribution(temporal_smoothing_type):
     phase_modulation_amplitude = (4.1, 4.5)
     number_color_cycles = [1.4, 1.0]
     transverse_bandwidth_distribution = [1.8, 1.0]
+    ssd_args = {
+        "relative_laser_bandwidth":relative_laser_bandwidth,
+        "phase_modulation_amplitude":phase_modulation_amplitude,
+        "number_color_cycles":number_color_cycles,
+        "transverse_bandwidth_distribution":transverse_bandwidth_distribution,
+    }
 
     if temporal_smoothing_type.upper() in ["RPP", "CPP"]:
         profile = PhasePlateProfile(*speckle_args,rpp_cpp=temporal_smoothing_type)
-    elif temporal_smoothing_type == "FM SSD":
-        profile = FMSSDProfile(
+    elif temporal_smoothing_type.upper() == "FM SSD":
+        profile = FM_SSD_Profile(
+            *speckle_args,
+            **ssd_args,
+        )
+    elif temporal_smoothing_type.upper() == "GP RPM SSD":
+        profile = GP_RPM_SSD_Profile(
+            *speckle_args,
+            **ssd_args,
+        )
+    elif temporal_smoothing_type.upper() == "GP ISI":
+        profile = GP_ISI_Profile(
             *speckle_args,
             relative_laser_bandwidth=relative_laser_bandwidth,
-            phase_modulation_amplitude=phase_modulation_amplitude,
-            number_color_cycles=number_color_cycles,
-            transverse_bandwidth_distribution=transverse_bandwidth_distribution,
         )
+    else:
+        print('invalid smoothing type provided')
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
     dy = wavelength * focal_length / beam_aperture[1]
@@ -77,7 +95,7 @@ def test_intensity_distribution(temporal_smoothing_type):
 
 
 @pytest.mark.parametrize(
-    "temporal_smoothing_type", ["RPP", "CPP", "FM SSD"] #, "GP RPM SSD", "GP ISI"]
+    "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
 )
 def test_spatial_correlation(temporal_smoothing_type):
     """Tests whether the speckles have the correct shape.
@@ -99,17 +117,32 @@ def test_spatial_correlation(temporal_smoothing_type):
     phase_modulation_amplitude = (4.1, 4.1)
     number_color_cycles = [1.4, 1.0]
     transverse_bandwidth_distribution = [1.0, 1.0]
+    ssd_args = {
+        "relative_laser_bandwidth":relative_laser_bandwidth,
+        "phase_modulation_amplitude":phase_modulation_amplitude,
+        "number_color_cycles":number_color_cycles,
+        "transverse_bandwidth_distribution":transverse_bandwidth_distribution,
+    }
 
     if temporal_smoothing_type.upper() in ["RPP", "CPP"]:
         profile = PhasePlateProfile(*speckle_args,rpp_cpp=temporal_smoothing_type)
-    elif temporal_smoothing_type == "FM SSD":
-        profile = FMSSDProfile(
+    elif temporal_smoothing_type.upper() == "FM SSD":
+        profile = FM_SSD_Profile(
+            *speckle_args,
+            **ssd_args,
+        )
+    elif temporal_smoothing_type.upper() == "GP RPM SSD":
+        profile = GP_RPM_SSD_Profile(
+            *speckle_args,
+            **ssd_args,
+        )
+    elif temporal_smoothing_type.upper() == "GP ISI":
+        profile = GP_ISI_Profile(
             *speckle_args,
             relative_laser_bandwidth=relative_laser_bandwidth,
-            phase_modulation_amplitude=phase_modulation_amplitude,
-            number_color_cycles=number_color_cycles,
-            transverse_bandwidth_distribution=transverse_bandwidth_distribution,
         )
+    else:
+        print('invalid smoothing type provided')
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
     dy = wavelength * focal_length / beam_aperture[1]
@@ -148,7 +181,7 @@ def test_spatial_correlation(temporal_smoothing_type):
 
 
 @pytest.mark.parametrize(
-    "temporal_smoothing_type", ["RPP", "CPP", "FM SSD"]#, "GP RPM SSD", "GP ISI"]
+    "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
 )
 def test_sinc_zeros(temporal_smoothing_type):
     """Test whether the transverse sinc envelope has the correct width
@@ -181,17 +214,32 @@ def test_sinc_zeros(temporal_smoothing_type):
     phase_modulation_amplitude = (4.1, 4.1)
     number_color_cycles = [1.4, 1.0]
     transverse_bandwidth_distribution = [1.0, 1.0]
+    ssd_args = {
+        "relative_laser_bandwidth":relative_laser_bandwidth,
+        "phase_modulation_amplitude":phase_modulation_amplitude,
+        "number_color_cycles":number_color_cycles,
+        "transverse_bandwidth_distribution":transverse_bandwidth_distribution,
+    }
 
     if temporal_smoothing_type.upper() in ["RPP", "CPP"]:
         profile = PhasePlateProfile(*speckle_args,rpp_cpp=temporal_smoothing_type)
-    elif temporal_smoothing_type == "FM SSD":
-        profile = FMSSDProfile(
+    elif temporal_smoothing_type.upper() == "FM SSD":
+        profile = FM_SSD_Profile(
+            *speckle_args,
+            **ssd_args,
+        )
+    elif temporal_smoothing_type.upper() == "GP RPM SSD":
+        profile = GP_RPM_SSD_Profile(
+            *speckle_args,
+            **ssd_args,
+        )
+    elif temporal_smoothing_type.upper() == "GP ISI":
+        profile = GP_ISI_Profile(
             *speckle_args,
             relative_laser_bandwidth=relative_laser_bandwidth,
-            phase_modulation_amplitude=phase_modulation_amplitude,
-            number_color_cycles=number_color_cycles,
-            transverse_bandwidth_distribution=transverse_bandwidth_distribution,
         )
+    else:
+        print('invalid smoothing type provided')
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
     dy = wavelength * focal_length / beam_aperture[1]
@@ -229,7 +277,7 @@ def test_FM_periodicity():
     number_color_cycles = [1.4, 1.0]
     transverse_bandwidth_distribution = [1.0, 1.0]
 
-    laser_profile = FMSSDProfile(
+    laser_profile = FM_SSD_Profile(
         *speckle_args,
         relative_laser_bandwidth=relative_laser_bandwidth,
         phase_modulation_amplitude=phase_modulation_amplitude,

@@ -5,10 +5,15 @@ class PhasePlateProfile(SpeckleProfile):
     """Generate a speckled laser profile with a random phase plate.
 
     This has no temporal smoothing.
+    The amplitude of the beamlets is always :math:`A_{ml}(t)=1` and 
+    the relative phases of the beamlets, resulting from the randomly sized phase plate sections,
+    are assigned randomly.
+    If the user specifies Random Phase Plate (RPP: `rpp`), the beamlet phases are drawn with equal probabilities from the set :math:`{0,2\pi}`.
+    If the user specifies Continuous Phase Plate (CPP: `cpp`), the beamlet phases are drawn from a uniform distribution on the interval :math:`[0,2\pi]`.
 
     Parameters
     ----------
-    rpp_cpp: string, keyword only, can be 'rpp' or 'cpp'
+    rpp_cpp: string, keyword only, can be 'rpp' or 'cpp', whether to assign beamlet phases according to RPP or CPP scheme
     """
     def __init__(self, *speckle_args, rpp_cpp):
         super().__init__(*speckle_args)
