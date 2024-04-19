@@ -69,8 +69,7 @@ class GP_ISI_Profile(SpeckleProfile):
         return complex_amp
 
     def setup_for_evaluation(self, t_norm):
-        """Create or update data used in evaluation.
-        """
+        """Create or update data used in evaluation."""
         self.x_y_dephasing = np.random.standard_normal(2) * np.pi
         self.phase_plate = np.random.uniform(
             -np.pi, np.pi, size=self.n_beamlets[0] * self.n_beamlets[1]

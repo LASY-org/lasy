@@ -133,8 +133,7 @@ class SpeckleProfile(Profile):
         return np.ones_like(self.X_lens_matrix)
 
     def setup_for_evaluation(self, t_norm):
-        """Create or update data used in evaluation.
-        """
+        """Create or update data used in evaluation."""
         pass
 
     def generate_speckle_pattern(self, t_now, x, y):
