@@ -1,7 +1,7 @@
 Smoothing by Induced Spatial Incoherence (ISI) Laser Profile
 ============================================================
 
-.. autoclass:: lasy.profiles.SpeckleProfile
+.. autoclass:: lasy.profiles.speckled.SpeckleProfile
     :no-index:
     :members:
 

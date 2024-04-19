@@ -1,7 +1,7 @@
 RPP/CPP only Laser Profile
 ==========================
 
-.. autoclass:: lasy.profiles.SpeckleProfile
+.. autoclass:: lasy.profiles.speckled.SpeckleProfile
     :no-index:
     :members:
 
