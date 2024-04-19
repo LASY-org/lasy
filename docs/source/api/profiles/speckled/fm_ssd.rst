@@ -1,7 +1,7 @@
 Frequency-modulated Smoothing by Spectral Dispersion (FM-SSD) Laser Profile
 ===========================================================================
 
-.. autoclass:: lasy.profiles.SpeckleProfile
+.. autoclass:: lasy.profiles.speckled.SpeckleProfile
     :no-index:
     :members:
 
