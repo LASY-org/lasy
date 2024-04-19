@@ -14,7 +14,6 @@ class GP_ISI_Profile(SpeckleProfile):
 
     Parameters
     ----------
-
     relative_laser_bandwidth : float
         Bandwidth :math:`\Delta_\nu` of the incoming laser pulse, relative to the central frequency.
 
@@ -70,6 +69,8 @@ class GP_ISI_Profile(SpeckleProfile):
         return complex_amp
 
     def setup_for_evaluation(self, t_norm):
+        """Create or update data used in evaluation.
+        """
         self.x_y_dephasing = np.random.standard_normal(2) * np.pi
         self.phase_plate = np.random.uniform(
             -np.pi, np.pi, size=self.n_beamlets[0] * self.n_beamlets[1]
@@ -89,10 +90,10 @@ class GP_ISI_Profile(SpeckleProfile):
 
         Parameters
         ----------
+        t_now: float, time at which to evaluate complex amplitude
 
         Returns
         -------
         array of complex numbers giving beamlet amplitude and phases in the near-field
         """
-
         return self.time_series[:, :, int(round(t_now / self.dt_update))]

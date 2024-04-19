@@ -34,7 +34,6 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
 
     Parameters
     ----------
-
     relative_laser_bandwidth : float
         Bandwidth :math:`\Delta_\nu` of the laser pulse, relative to central frequency.
         Only used if ``temporal_smoothing_type`` is ``'FM SSD'``, ``'GP RPM SSD'`` or ``'GP ISI'``.
@@ -146,6 +145,8 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
         )
 
     def setup_for_evaluation(self, t_norm):
+        """Create or update data used in evaluation.
+        """
         self.x_y_dephasing = np.random.standard_normal(2) * np.pi
         self.phase_plate = np.random.uniform(
             -np.pi, np.pi, size=self.n_beamlets[0] * self.n_beamlets[1]
@@ -165,6 +166,7 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
 
         Parameters
         ----------
+        t_now: float, time at which to evaluate complex amplitude
 
         Returns
         -------
