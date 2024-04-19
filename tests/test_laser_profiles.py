@@ -286,6 +286,7 @@ def test_speckle_profile():
     n_beamlets = [24, 32]
     do_sinc_profile = False
     relative_laser_bandwidth = 0.005
+    long_profile = None
 
     profile = GP_ISI_Profile(
         wavelength,
@@ -295,6 +296,7 @@ def test_speckle_profile():
         beam_aperture,
         n_beamlets,
         do_sinc_profile,
+        long_profile,
         relative_laser_bandwidth=relative_laser_bandwidth,
     )
     dimensions = "xyt"
