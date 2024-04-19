@@ -1,31 +1,55 @@
 import numpy as np
 from .speckle_profile import SpeckleProfile
 
-class FMSSDProfile(SpeckleProfile):
-    """Generate a speckled laser profile with smoothing by spectral dispersion (SSD).
+class FM_SSD_Profile(SpeckleProfile):
+    r"""Generate a speckled laser profile with smoothing by frequency modulated (FM) spectral dispersion (SSD).
 
-    This has temporal smoothing.
+    In frequency-modulated smoothing by spectral dispersion, or FM-SSD, the amplitude of the beamlets is always :math:`A_{ml}(t)=1`.
+    There are two contributions to the phase :math:`\phi_{ml}` of each beamlet:
+    
+    .. math::
+    
+        \phi_{ml}(t)=\phi_{PP,ml}+\phi_{SSD,ml}.
+
+    The phase plate part :math:`\phi_{PP,ml}` is the initial phase delay from the randomly sized phase plate sections,
+    drawn from uniform distribution on the interval :math:`[0,2\pi]`. 
+    The temporal smoothing is from the SSD term:
+
+    .. math::
+
+        \begin{aligned}
+        \phi_{SSD,ml}(t)&=\delta_{x} \sin\left(\omega_{x} t + 2\pi\frac{mN_{cc,x}}{N_{bx}}\right)\\
+        &+\delta_{y} \sin\left(\omega_{y} t + 2\pi\frac{lN_{cc,y}}{N_{by}}\right).
+        \end{aligned}
+    
+    The modulation frequencies :math:`\omega_x,\omega_y` are determined by the
+    laser bandwidth and modulation amplitudes according to the relation
+
+    .. math::
+
+        \omega_x = \frac{\Delta_\nu r_x }{2\delta_x},
+        \omega_y = \frac{\Delta_\nu r_y }{2\delta_y},
+
+    where :math:`\Delta_\nu` is the relative bandwidth of the laser pulse 
+    and :math:`r_x, r_y` are additional rotation factors supplied by the user 
+    in the `transverse_bandwidth_distribution` parameter that determine 
+    how much of the modulation is in x and how much is in y. [Michel, Eqn. 9.69]
 
     Parameters
     ----------
 
     relative_laser_bandwidth : float
-        Bandwidth :math:`\Delta_\nu` of the laser pulse, relative to central frequency.
-        Only used if ``temporal_smoothing_type`` is ``'FM SSD'``, ``'GP RPM SSD'`` or ``'GP ISI'``.
+        Resulting bandwidth :math:`\Delta_\nu` of the laser pulse, relative to central frequency, due to the frequency modulation.
 
     phase_modulation_amplitude :list of 2 floats
         Amplitudes :math:`\delta_{x},\delta_{y}` of phase modulation in each transverse direction.
-        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.
 
     number_color_cycles : list of 2 floats
         Number of color cycles :math:`N_{cc,x},N_{cc,y}` of SSD spectrum to include in modulation
-        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.
 
     transverse_bandwidth_distribution: list of 2 floats
         Determines how much SSD is distributed in the :math:`x` and :math:`y` directions.
-        if `transverse_bandwidth_distribution=[a,b]`, then the SSD frequency modulation is :math:`a/\sqrt{a^2+b^2}` in :math:`x` and :math:`b/\sqrt{a^2+b^2}` in :math:`y`.
-        Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.
-
+        if `transverse_bandwidth_distribution=[a,b]`, then the SSD frequency modulation is :math:`r_x=a/\sqrt{a^2+b^2}` in :math:`x` and :math:`r_y=b/\sqrt{a^2+b^2}` in :math:`y`.
     """
     def __init__(self, *speckle_args, 
         relative_laser_bandwidth,
@@ -70,6 +94,9 @@ class FMSSDProfile(SpeckleProfile):
             ),
         )
         self.x_y_dephasing = np.random.standard_normal(2) * np.pi
+        self.phase_plate = np.random.uniform(
+            -np.pi, np.pi, size=self.n_beamlets[0] * self.n_beamlets[1]
+        ).reshape(self.n_beamlets)
         
     def beamlets_complex_amplitude(
         self, t_now,
@@ -83,9 +110,6 @@ class FMSSDProfile(SpeckleProfile):
         -------
         array of complex numbers giving beamlet amplitude and phases in the near-field
         """
-        phase_plate = np.random.uniform(
-            -np.pi, np.pi, size=self.n_beamlets[0] * self.n_beamlets[1]
-        ).reshape(self.n_beamlets)
 
         phase_t = self.phase_modulation_amplitude[0] * np.sin(
             self.x_y_dephasing[0]
@@ -100,5 +124,5 @@ class FMSSDProfile(SpeckleProfile):
                 t_now - self.Y_lens_matrix * self.time_delay[1] / self.n_beamlets[1]
             )
         )
-        return np.exp(1j * (phase_plate + phase_t))
+        return np.exp(1j * (self.phase_plate + phase_t))
     

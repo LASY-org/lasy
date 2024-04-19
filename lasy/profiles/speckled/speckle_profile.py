@@ -1,15 +1,6 @@
 import numpy as np
 from scipy.constants import c
-
 from ..profile import Profile
-
-###NOTES###
-# would be good to discuss bandwidth meanings in ISI vs SSM
-# how to include doc strings of parent class
-# reference r in doc string
-# temporal envelope 
-# should all arguments be specified for every class?  Should non-base arguments be kw only arguments?
-###########
 
 class SpeckleProfile(Profile):
     r"""
@@ -31,7 +22,7 @@ class SpeckleProfile(Profile):
         {\rm sinc}\left(\frac{\pi y}{\Delta y}\right)\times p_u
         \right.
         \\
-        & \times\sum_{m,l=1}^{N_{bx}, N_{by}} A_{ml}
+        & \times\sum_{m,l=1}^{N_{bx}, N_{by}} A_{ml}(t)
         \exp\left(i\boldsymbol{k}_{\perp ml}\cdot\boldsymbol{x}_\perp
         + i\phi_{ml}(t)\right)
         \Bigg]
@@ -40,14 +31,14 @@ class SpeckleProfile(Profile):
     where :math:`u` is either :math:`x` or :math:`y`, :math:`p_u` is
     the polarization vector, and :math:`Re` represent the real part [Michel, Eqns. 9.11, 87, 94].
     Several quantities are computed internally to the code depending on the
-    method of smoothing chosen, including the beamlet amplitude :math:`A_{ml}`,
+    method of smoothing chosen, including the beamlet amplitude :math:`A_{ml}(t)`,
     the beamlet wavenumber :math:`k_{\perp ml}`,
     the relative phase contribution :math:`\phi_{ml}(t)` of beamlet :math:`ml` induced by the phase plate and temporal smoothing.
     The beam widths are :math:`\Delta x=\frac{\lambda_0fN_{bx}}{D_{x}}`,
     :math:`\Delta y=\frac{\lambda_0fN_{by}}{D_{y}}`.
     The other parameters in these formulas are defined below.
 
-    This is an adapation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
+    This is an adaptation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
 
 
     Notes
@@ -126,15 +117,22 @@ class SpeckleProfile(Profile):
         self, t_now,
     ):
         """Calculate complex amplitude of the beamlets in the near-field, before propagating to the focal plane.
+        This function can be overwritten to define custom speckled laser objects.
 
         Parameters
         ----------
+        t_now: float, time at which to evaluate complex amplitude
 
         Returns
         -------
         array of complex numbers giving beamlet amplitude and phases in the near-field
         """
         return np.ones_like(self.X_lens_matrix)
+    
+    def setup_for_evaluation(self, t_norm):
+        val = 20
+        print("Im setting up for evaluation!!")
+        return val + 5
 
     def generate_speckle_pattern(self, t_now, x, y):
         """Calculate the speckle pattern in the focal plane.
@@ -200,6 +198,7 @@ class SpeckleProfile(Profile):
         """
         # General parameters
         t_norm = t[0, 0, :] * c / self.lambda0
+        self.setup_for_evaluation(t_norm)
 
         envelope = np.zeros(x.shape, dtype=complex)
         for i, t_i in enumerate(t_norm):
