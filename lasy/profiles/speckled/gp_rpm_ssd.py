@@ -2,20 +2,21 @@ import numpy as np
 from .speckle_profile import SpeckleProfile
 from .stochastic_process_utilities import gen_gaussian_time_series
 
+
 class GP_RPM_SSD_Profile(SpeckleProfile):
     r"""Generate a speckled laser profile with smoothing by a random phase modulated (RPM) spectral dispersion (SSD).
 
-    This provides a version of smoothing by spectral dispersion (SSD) where the phases are randomly modulated. 
+    This provides a version of smoothing by spectral dispersion (SSD) where the phases are randomly modulated.
     Here the amplitude of the beamlets is always :math:`A_{ml}(t)=1`.
     There are two contributions to the phase :math:`\phi_{ml}` of each beamlet:
-    
+
     ..math::
-    
+
         \phi_{ml}(t) = \phi_{PP,ml} + \phi_{SSD,ml}.
 
     The phase plate part :math:`\phi_{PP,ml}` is the initial phase delay from the randomly sized phase plate sections,
-    drawn from uniform distribution on the interval :math:`[0,2\pi]`. 
-    The phases :math:`\phi_{SSD,ml}(t)` are drawn from a stochastic process 
+    drawn from uniform distribution on the interval :math:`[0,2\pi]`.
+    The phases :math:`\phi_{SSD,ml}(t)` are drawn from a stochastic process
     with Gaussian power spectrum with means :math:`\delta_x,\delta_y` given by the `phase_modulation_amplitude` argument
     and FWHM given by the modulation frequencies :math:`\omega_x,\omega_y`.
     The modulation frequencies :math:`\omega_x,\omega_y` are determined by the
@@ -26,9 +27,9 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
             \omega_x = \frac{\Delta_\nu r_x }{2\delta_x},
             \omega_y = \frac{\Delta_\nu r_y }{2\delta_y},
 
-    where :math:`\Delta_\nu` is the resulting relative bandwidth of the laser pulse 
-    and :math:`r_x, r_y` are additional rotation factors supplied by the user 
-    in the `transverse_bandwidth_distribution` parameter that determine 
+    where :math:`\Delta_\nu` is the resulting relative bandwidth of the laser pulse
+    and :math:`r_x, r_y` are additional rotation factors supplied by the user
+    in the `transverse_bandwidth_distribution` parameter that determine
     how much of the modulation is in x and how much is in y. [Michel, Eqn. 9.69]
 
     Parameters
@@ -51,7 +52,10 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
         if `transverse_bandwidth_distribution=[a,b]`, then the SSD frequency modulation is :math:`a/\sqrt{a^2+b^2}` in :math:`x` and :math:`b/\sqrt{a^2+b^2}` in :math:`y`.
         Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.
     """
-    def __init__(self, *speckle_args, 
+
+    def __init__(
+        self,
+        *speckle_args,
         relative_laser_bandwidth,
         phase_modulation_amplitude,
         number_color_cycles,
@@ -64,9 +68,7 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
         # number of color cycles
         self.number_color_cycles = number_color_cycles
         # bandwidth distributed with respect to the two transverse direction
-        self.transverse_bandwidth_distribution = (
-            transverse_bandwidth_distribution
-        )
+        self.transverse_bandwidth_distribution = transverse_bandwidth_distribution
         normalization = np.sqrt(
             self.transverse_bandwidth_distribution[0] ** 2
             + self.transverse_bandwidth_distribution[1] ** 2
@@ -81,21 +83,19 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
         ]
         self.time_delay = (
             (
-                self.number_color_cycles[0]
-                / self.phase_modulation_frequency[0]
+                self.number_color_cycles[0] / self.phase_modulation_frequency[0]
                 if self.phase_modulation_frequency[0] > 0
                 else 0
             ),
             (
-                self.number_color_cycles[1]
-                / self.phase_modulation_frequency[1]
+                self.number_color_cycles[1] / self.phase_modulation_frequency[1]
                 if self.phase_modulation_frequency[1] > 0
                 else 0
             ),
         )
         self.dt_update = 1 / self.laser_bandwidth / 50
         return
-        
+
     def init_gaussian_time_series(
         self,
         series_time,
@@ -156,9 +156,10 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
 
         self.series_time, self.time_series = self.init_gaussian_time_series(series_time)
         return
-    
+
     def beamlets_complex_amplitude(
-        self, t_now,
+        self,
+        t_now,
     ):
         """Calculate complex amplitude of the beamlets in the near-field, before propagating to the focal plane.
 
@@ -179,4 +180,3 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
             self.time_series[1],
         )
         return np.exp(1j * (self.phase_plate + phase_t))
-    

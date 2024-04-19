@@ -2,6 +2,7 @@ import numpy as np
 from scipy.constants import c
 from ..profile import Profile
 
+
 class SpeckleProfile(Profile):
     r"""
     Derived class for the profile of a speckled laser pulse.
@@ -114,7 +115,8 @@ class SpeckleProfile(Profile):
         )
 
     def beamlets_complex_amplitude(
-        self, t_now,
+        self,
+        t_now,
     ):
         """Calculate complex amplitude of the beamlets in the near-field, before propagating to the focal plane.
         This function can be overwritten to define custom speckled laser objects.
@@ -128,7 +130,7 @@ class SpeckleProfile(Profile):
         array of complex numbers giving beamlet amplitude and phases in the near-field
         """
         return np.ones_like(self.X_lens_matrix)
-    
+
     def setup_for_evaluation(self, t_norm):
         val = 20
         print("Im setting up for evaluation!!")
@@ -160,10 +162,20 @@ class SpeckleProfile(Profile):
         x_focus_list = X_focus_matrix[:, 0]
         y_focus_list = Y_focus_matrix[0, :]
         x_phase_focus_matrix = np.exp(
-            -2 * np.pi * 1j / self.n_beamlets[0] * self.x_lens_list[:, np.newaxis] * x_focus_list[np.newaxis, :]
+            -2
+            * np.pi
+            * 1j
+            / self.n_beamlets[0]
+            * self.x_lens_list[:, np.newaxis]
+            * x_focus_list[np.newaxis, :]
         )
         y_phase_focus_matrix = np.exp(
-            -2 * np.pi * 1j / self.n_beamlets[1] * self.y_lens_list[:, np.newaxis] * y_focus_list[np.newaxis, :]
+            -2
+            * np.pi
+            * 1j
+            / self.n_beamlets[1]
+            * self.y_lens_list[:, np.newaxis]
+            * y_focus_list[np.newaxis, :]
         )
 
         bca = self.beamlets_complex_amplitude(t_now)
