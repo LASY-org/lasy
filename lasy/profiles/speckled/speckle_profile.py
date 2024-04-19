@@ -119,6 +119,7 @@ class SpeckleProfile(Profile):
         t_now,
     ):
         """Calculate complex amplitude of the beamlets in the near-field, before propagating to the focal plane.
+
         This function can be overwritten to define custom speckled laser objects.
 
         Parameters
@@ -132,9 +133,9 @@ class SpeckleProfile(Profile):
         return np.ones_like(self.X_lens_matrix)
 
     def setup_for_evaluation(self, t_norm):
-        val = 20
-        print("Im setting up for evaluation!!")
-        return val + 5
+        """Create or update data used in evaluation.
+        """
+        pass
 
     def generate_speckle_pattern(self, t_now, x, y):
         """Calculate the speckle pattern in the focal plane.

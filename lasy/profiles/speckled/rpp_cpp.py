@@ -3,7 +3,7 @@ from .speckle_profile import SpeckleProfile
 
 
 class PhasePlateProfile(SpeckleProfile):
-    """Generate a speckled laser profile with a random phase plate.
+    r"""Generate a speckled laser profile with a random phase plate.
 
     This has no temporal smoothing.
     The amplitude of the beamlets is always :math:`A_{ml}(t)=1` and
@@ -29,6 +29,7 @@ class PhasePlateProfile(SpeckleProfile):
 
         Parameters
         ----------
+        t_now: float, time at which to evaluate complex amplitude
 
         Returns
         -------

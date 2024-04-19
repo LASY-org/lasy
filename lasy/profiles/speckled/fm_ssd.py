@@ -38,7 +38,6 @@ class FM_SSD_Profile(SpeckleProfile):
 
     Parameters
     ----------
-
     relative_laser_bandwidth : float
         Resulting bandwidth :math:`\Delta_\nu` of the laser pulse, relative to central frequency, due to the frequency modulation.
 
@@ -106,12 +105,12 @@ class FM_SSD_Profile(SpeckleProfile):
 
         Parameters
         ----------
+        t_now: float, time at which to evaluate complex amplitude
 
         Returns
         -------
         array of complex numbers giving beamlet amplitude and phases in the near-field
         """
-
         phase_t = self.phase_modulation_amplitude[0] * np.sin(
             self.x_y_dephasing[0]
             + 2
