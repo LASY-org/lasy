@@ -1,12 +1,13 @@
-from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.laser import Laser
-from lasy.utils.phase_retrieval import gerchberg_saxton_algo
+import copy
+
 import matplotlib.pyplot as plt
 import numpy as np
-from lasy.utils.zernike import zernike
-import copy
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+from lasy.laser import Laser
+from lasy.profiles.gaussian_profile import GaussianProfile
+from lasy.utils.phase_retrieval import gerchberg_saxton_algo
+from lasy.utils.zernike import zernike
 
 # DEFINE PHYSICAL PARAMETERS & CREATE LASER PROFILE
 wavelength = 800e-9

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import numpy as np
 import pytest
 
-import numpy as np
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
 

@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import pytest
+import copy
 
 import numpy as np
+import pytest
+
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.zernike import zernike
 from lasy.utils.phase_retrieval import gerchberg_saxton_algo
-import copy
+from lasy.utils.zernike import zernike
 
 w0 = 25.0e-6  # m
 

@@ -1,28 +1,28 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 import numpy as np
-from scipy.special import gamma as gamma
+import pytest
 from scipy.constants import c
+from scipy.special import gamma as gamma
 
 from lasy.laser import Laser
-from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import GaussianProfile, FromArrayProfile, SpeckleProfile
+from lasy.profiles import FromArrayProfile, GaussianProfile, SpeckleProfile
 from lasy.profiles.longitudinal import (
+    CosineLongitudinalProfile,
     GaussianLongitudinalProfile,
     SuperGaussianLongitudinalProfile,
-    CosineLongitudinalProfile,
 )
+from lasy.profiles.profile import Profile, ScaledProfile, SummedProfile
 from lasy.profiles.transverse import (
     GaussianTransverseProfile,
-    LaguerreGaussianTransverseProfile,
-    SuperGaussianTransverseProfile,
     HermiteGaussianTransverseProfile,
     JincTransverseProfile,
-    TransverseProfileFromData,
-    TransverseProfile,
-    SummedTransverseProfile,
+    LaguerreGaussianTransverseProfile,
     ScaledTransverseProfile,
+    SummedTransverseProfile,
+    SuperGaussianTransverseProfile,
+    TransverseProfile,
+    TransverseProfileFromData,
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
 
