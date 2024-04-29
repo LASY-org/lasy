@@ -6,4 +6,5 @@ add-ignore = ["D100", "D104"]
 
 
 [tool.isort]
+known_first_party = ["lasy"]
 profile = "black"
