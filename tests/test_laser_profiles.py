@@ -3,7 +3,6 @@
 import numpy as np
 import pytest
 from scipy.constants import c
-from scipy.special import gamma as gamma
 
 from lasy.laser import Laser
 from lasy.profiles import FromArrayProfile, GaussianProfile, SpeckleProfile
