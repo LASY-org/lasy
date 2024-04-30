@@ -6,7 +6,7 @@ from .longitudinal_profile import LongitudinalProfile
 
 class LongitudinalProfileFromData(LongitudinalProfile):
     """
-    Derived class for longitudinal laser profile created using data.
+    Class for longitudinal laser profile created using data.
 
     The data used can either come from an experimental measurement
     or from the output of another code. This data is then used to

@@ -8,7 +8,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
     r"""
     High-order Gaussian laser pulse expressed in the Laguerre-Gaussian formalism.
 
-    Derived class for an analytic profile.
+    Class for an analytic profile.
     More precisely, at focus (`z_foc=0`), the transverse envelope (to be used in the
     :class:`.CombinedLongitudinalTransverseLaser` class) corresponds to:
 

@@ -5,7 +5,7 @@ from .longitudinal_profile import LongitudinalProfile
 
 class CosineLongitudinalProfile(LongitudinalProfile):
     r"""
-    Derived class for the analytic longitudinal truncated cosine profile of a laser pulse.
+    Class for the analytic longitudinal truncated cosine profile of a laser pulse.
 
     More precisely, the longitudinal envelope
     (to be used in the :class:CombinedLongitudinalTransverseProfile class)
