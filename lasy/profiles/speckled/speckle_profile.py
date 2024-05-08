@@ -2,10 +2,8 @@ import numpy as np
 from scipy.constants import c
 from ..profile import Profile
 
-
 class SpeckleProfile(Profile):
-    r"""
-    Derived class for the profile of a speckled laser pulse.
+    r"""Derived class for the profile of a speckled laser pulse.
 
     Speckled lasers are used to mitigate laser-plasma interactions in fusion and ion acceleration contexts.
     More on the subject can be found in chapter 9 of `P. Michel, Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__.
@@ -48,8 +46,8 @@ class SpeckleProfile(Profile):
     The longitudinal profile is currently applied to the beamlets
     individually in the near-field before they are propagated to the focal plane.
 
-    Parameters
-    ----------
+    Base Parameters
+    ---------------
     wavelength : float (in meters)
         The main laser wavelength :math:`\lambda_0` of the laser, which
         defines :math:`\omega_0` in the above formula, according to
@@ -75,11 +73,11 @@ class SpeckleProfile(Profile):
     n_beamlets : list of 2 integers
         Number of RPP/CPP elements :math:`N_{bx},N_{by}` in each direction, in the near field.
 
-    do_include_transverse_envelope : boolean
+    do_include_transverse_envelope : boolean, optional, default True
         Whether to include the transverse sinc envelope or not.
         I.e. whether it is assumed to be close enough to the laser axis to neglect the transverse field decay.
 
-    long_profile : Lasy Longitudinal laser object (or None).
+    long_profile : Lasy Longitudinal laser object, optional, default None.
         If this is not None, the longitudinal profile is applied individually to the beamlets in the near-field.
     """
 
@@ -91,8 +89,8 @@ class SpeckleProfile(Profile):
         focal_length,
         beam_aperture,
         n_beamlets,
-        do_include_transverse_envelope,
-        long_profile,
+        do_include_transverse_envelope=True,
+        long_profile=None,
     ):
         super().__init__(wavelength, pol)
         self.laser_energy = laser_energy

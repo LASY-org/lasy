@@ -5,7 +5,6 @@ Speckled Laser Profiles
    :maxdepth: 4
    :hidden:
 
-   speckled
    rpp_cpp
    fm_ssd
    gp_rpm_ssd

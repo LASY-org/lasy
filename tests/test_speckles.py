@@ -28,44 +28,65 @@ def test_intensity_distribution(temporal_smoothing_type):
     n_beamlets = [24, 32]
     do_sinc_profile = False
     long_profile = None
-    speckle_args = (
-        wavelength,
-        polarization,
-        laser_energy,
-        focal_length,
-        beam_aperture,
-        n_beamlets,
-        do_sinc_profile,
-        long_profile,
-    )
 
     relative_laser_bandwidth = 0.005
     phase_modulation_amplitude = (4.1, 4.5)
     number_color_cycles = [1.4, 1.0]
     transverse_bandwidth_distribution = [1.8, 1.0]
-    ssd_args = {
-        "relative_laser_bandwidth": relative_laser_bandwidth,
-        "phase_modulation_amplitude": phase_modulation_amplitude,
-        "number_color_cycles": number_color_cycles,
-        "transverse_bandwidth_distribution": transverse_bandwidth_distribution,
-    }
 
     if temporal_smoothing_type.upper() in ["RPP", "CPP"]:
-        profile = PhasePlateProfile(*speckle_args, rpp_cpp=temporal_smoothing_type)
+        profile = PhasePlateProfile(
+            wavelength,
+            polarization,
+            laser_energy,
+            focal_length,
+            beam_aperture,
+            n_beamlets,
+            rpp_cpp=temporal_smoothing_type,
+            do_include_transverse_envelope=do_sinc_profile,
+            long_profile=long_profile,
+        )
     elif temporal_smoothing_type.upper() == "FM SSD":
         profile = FM_SSD_Profile(
-            *speckle_args,
-            **ssd_args,
+            wavelength,
+            polarization,
+            laser_energy,
+            focal_length,
+            beam_aperture,
+            n_beamlets,
+            relative_laser_bandwidth,
+            phase_modulation_amplitude,
+            number_color_cycles,
+            transverse_bandwidth_distribution,
+            do_include_transverse_envelope=do_sinc_profile,
+            long_profile=long_profile,
         )
     elif temporal_smoothing_type.upper() == "GP RPM SSD":
         profile = GP_RPM_SSD_Profile(
-            *speckle_args,
-            **ssd_args,
+            wavelength,
+            polarization,
+            laser_energy,
+            focal_length,
+            beam_aperture,
+            n_beamlets,
+            relative_laser_bandwidth,
+            phase_modulation_amplitude,
+            number_color_cycles,
+            transverse_bandwidth_distribution,
+            do_include_transverse_envelope=do_sinc_profile,
+            long_profile=long_profile,
         )
     elif temporal_smoothing_type.upper() == "GP ISI":
         profile = GP_ISI_Profile(
-            *speckle_args,
+            wavelength,
+            polarization,
+            laser_energy,
+            focal_length,
+            beam_aperture,
+            n_beamlets,
             relative_laser_bandwidth=relative_laser_bandwidth,
+            do_include_transverse_envelope=do_sinc_profile,
+            long_profile=long_profile,
         )
     else:
         print("invalid smoothing type provided")
@@ -129,37 +150,44 @@ def test_spatial_correlation(temporal_smoothing_type):
         focal_length,
         beam_aperture,
         n_beamlets,
-        do_sinc_profile,
-        long_profile,
     )
 
     relative_laser_bandwidth = 0.005
     phase_modulation_amplitude = (4.1, 4.1)
     number_color_cycles = [1.4, 1.0]
     transverse_bandwidth_distribution = [1.0, 1.0]
-    ssd_args = {
-        "relative_laser_bandwidth": relative_laser_bandwidth,
-        "phase_modulation_amplitude": phase_modulation_amplitude,
-        "number_color_cycles": number_color_cycles,
-        "transverse_bandwidth_distribution": transverse_bandwidth_distribution,
-    }
+    ssd_args = (
+        relative_laser_bandwidth,
+        phase_modulation_amplitude,
+        number_color_cycles,
+        transverse_bandwidth_distribution,
+    )
 
     if temporal_smoothing_type.upper() in ["RPP", "CPP"]:
-        profile = PhasePlateProfile(*speckle_args, rpp_cpp=temporal_smoothing_type)
+        new_args = [*speckle_args, temporal_smoothing_type]
+        profile = PhasePlateProfile(
+            *new_args, 
+            do_include_transverse_envelope=do_sinc_profile, 
+            long_profile=long_profile
+        )
     elif temporal_smoothing_type.upper() == "FM SSD":
         profile = FM_SSD_Profile(
-            *speckle_args,
-            **ssd_args,
+            *[*speckle_args, *ssd_args],
+            do_include_transverse_envelope=do_sinc_profile, 
+            long_profile=long_profile,
         )
     elif temporal_smoothing_type.upper() == "GP RPM SSD":
         profile = GP_RPM_SSD_Profile(
-            *speckle_args,
-            **ssd_args,
+            *[*speckle_args, *ssd_args],
+            do_include_transverse_envelope=do_sinc_profile, 
+            long_profile=long_profile,
         )
     elif temporal_smoothing_type.upper() == "GP ISI":
         profile = GP_ISI_Profile(
             *speckle_args,
             relative_laser_bandwidth=relative_laser_bandwidth,
+            do_include_transverse_envelope=do_sinc_profile, 
+            long_profile=long_profile
         )
     else:
         print("invalid smoothing type provided")
@@ -236,37 +264,42 @@ def test_sinc_zeros(temporal_smoothing_type):
         focal_length,
         beam_aperture,
         n_beamlets,
-        do_sinc_profile,
-        long_profile,
     )
+    opt_args = {
+        'do_include_transverse_envelope': do_sinc_profile,
+        'long_profile': long_profile,
+    }
 
     relative_laser_bandwidth = 0.005
     phase_modulation_amplitude = (4.1, 4.1)
     number_color_cycles = [1.4, 1.0]
     transverse_bandwidth_distribution = [1.0, 1.0]
-    ssd_args = {
-        "relative_laser_bandwidth": relative_laser_bandwidth,
-        "phase_modulation_amplitude": phase_modulation_amplitude,
-        "number_color_cycles": number_color_cycles,
-        "transverse_bandwidth_distribution": transverse_bandwidth_distribution,
-    }
+    ssd_args = (
+        relative_laser_bandwidth,
+        phase_modulation_amplitude,
+        number_color_cycles,
+        transverse_bandwidth_distribution,
+    )
 
     if temporal_smoothing_type.upper() in ["RPP", "CPP"]:
-        profile = PhasePlateProfile(*speckle_args, rpp_cpp=temporal_smoothing_type)
-    elif temporal_smoothing_type.upper() == "FM SSD":
+        profile = PhasePlateProfile(
+            *[*speckle_args, temporal_smoothing_type],
+            **opt_args
+        )
+    elif temporal_smoothing_type.upper() in "FM SSD":
         profile = FM_SSD_Profile(
-            *speckle_args,
-            **ssd_args,
+            *[*speckle_args,*ssd_args],
+            **opt_args,
         )
     elif temporal_smoothing_type.upper() == "GP RPM SSD":
         profile = GP_RPM_SSD_Profile(
-            *speckle_args,
-            **ssd_args,
+            *[*speckle_args,*ssd_args],
+            **opt_args,
         )
     elif temporal_smoothing_type.upper() == "GP ISI":
         profile = GP_ISI_Profile(
-            *speckle_args,
-            relative_laser_bandwidth=relative_laser_bandwidth,
+            *[*speckle_args, relative_laser_bandwidth],
+            **opt_args,
         )
     else:
         print("invalid smoothing type provided")
@@ -308,9 +341,11 @@ def test_FM_periodicity():
         focal_length,
         beam_aperture,
         n_beamlets,
-        do_sinc_profile,
-        long_profile,
     )
+    opt_args = {
+        'do_include_transverse_envelope': do_sinc_profile,
+        'long_profile': long_profile,
+    }
 
     relative_laser_bandwidth = 0.005
     phase_modulation_amplitude = [4.1, 4.1]
@@ -318,11 +353,13 @@ def test_FM_periodicity():
     transverse_bandwidth_distribution = [1.0, 1.0]
 
     laser_profile = FM_SSD_Profile(
-        *speckle_args,
-        relative_laser_bandwidth=relative_laser_bandwidth,
-        phase_modulation_amplitude=phase_modulation_amplitude,
-        number_color_cycles=number_color_cycles,
-        transverse_bandwidth_distribution=transverse_bandwidth_distribution,
+        *[*speckle_args,
+        relative_laser_bandwidth,
+        phase_modulation_amplitude,
+        number_color_cycles,
+        transverse_bandwidth_distribution,
+        ],
+        **opt_args,
     )
     nu_laser = c / wavelength
     frac = np.sqrt(
