@@ -41,9 +41,6 @@ class SpeckleProfile(Profile):
 
     This is an adaptation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
 
-
-    Notes
-    -----
     This assumes a flat-top rectangular laser and so a rectangular arrangement of beamlets in the near-field.
     The longitudinal profile is currently applied to the beamlets
     individually in the near-field before they are propagated to the focal plane.
