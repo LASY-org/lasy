@@ -1,4 +1,4 @@
-Random Phase Modulated (RPM) Smoothing by Spectral Dispersion (FM-SSD) Laser Profile
+Random Phase Modulated (RPM) Smoothing by Spectral Dispersion (RPM-SSD) Laser Profile
 ====================================================================================
 
 .. autoclass:: lasy.profiles.speckled.GP_RPM_SSD_Profile

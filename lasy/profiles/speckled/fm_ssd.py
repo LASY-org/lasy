@@ -1,9 +1,10 @@
 import numpy as np
 from .speckle_profile import SpeckleProfile
+from .documentation_splice import _DocumentedMetaClass
 
 
-class FM_SSD_Profile(SpeckleProfile):
-    r"""Generate a speckled laser profile with smoothing by frequency modulated (FM) spectral dispersion (SSD).
+class FM_SSD_Profile(SpeckleProfile, metaclass=_DocumentedMetaClass):
+    r"""Specific speckled laser profile information for smoothing by frequency modulated (FM) spectral dispersion (SSD).
 
     In frequency-modulated smoothing by spectral dispersion, or FM-SSD, the amplitude of the beamlets is always :math:`A_{ml}(t)=1`.
     There are two contributions to the phase :math:`\phi_{ml}` of each beamlet:
@@ -41,13 +42,13 @@ class FM_SSD_Profile(SpeckleProfile):
     relative_laser_bandwidth : float
         Resulting bandwidth :math:`\Delta_\nu` of the laser pulse, relative to central frequency, due to the frequency modulation.
 
-    phase_modulation_amplitude :list of 2 floats
+    phase_modulation_amplitude : list of 2 floats
         Amplitudes :math:`\delta_{x},\delta_{y}` of phase modulation in each transverse direction.
 
     number_color_cycles : list of 2 floats
         Number of color cycles :math:`N_{cc,x},N_{cc,y}` of SSD spectrum to include in modulation
 
-    transverse_bandwidth_distribution: list of 2 floats
+    transverse_bandwidth_distribution : list of 2 floats
         Determines how much SSD is distributed in the :math:`x` and :math:`y` directions.
         if `transverse_bandwidth_distribution=[a,b]`, then the SSD frequency modulation is :math:`r_x=a/\sqrt{a^2+b^2}` in :math:`x` and :math:`r_y=b/\sqrt{a^2+b^2}` in :math:`y`.
     """

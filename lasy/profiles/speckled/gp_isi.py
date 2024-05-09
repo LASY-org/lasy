@@ -1,10 +1,11 @@
 import numpy as np
 from .speckle_profile import SpeckleProfile
 from .stochastic_process_utilities import gen_gaussian_time_series
+from .documentation_splice import _DocumentedMetaClass
 
 
-class GP_ISI_Profile(SpeckleProfile):
-    r"""Generate a speckled laser profile with smoothing inspired by Induced Spatial Incoherence (ISI).
+class GP_ISI_Profile(SpeckleProfile, metaclass=_DocumentedMetaClass):
+    r"""Specific speckled laser profile information for smoothing inspired by Induced Spatial Incoherence (ISI).
 
     This is a smoothing technique with temporal stochastic variation in the beamlet phases and amplitudes
     to simulate the random phase differences and amplitudes the beamlets pick up when passing through ISI echelons.

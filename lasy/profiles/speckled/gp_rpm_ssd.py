@@ -1,10 +1,11 @@
 import numpy as np
 from .speckle_profile import SpeckleProfile
 from .stochastic_process_utilities import gen_gaussian_time_series
+from .documentation_splice import _DocumentedMetaClass
 
 
-class GP_RPM_SSD_Profile(SpeckleProfile):
-    r"""Generate a speckled laser profile with smoothing by a random phase modulated (RPM) spectral dispersion (SSD).
+class GP_RPM_SSD_Profile(SpeckleProfile, metaclass=_DocumentedMetaClass):
+    r"""Specific speckled laser profile information for smoothing by a random phase modulated (RPM) spectral dispersion (SSD).
 
     This provides a version of smoothing by spectral dispersion (SSD) where the phases are randomly modulated.
     Here the amplitude of the beamlets is always :math:`A_{ml}(t)=1`.
@@ -38,7 +39,7 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
         Bandwidth :math:`\Delta_\nu` of the laser pulse, relative to central frequency.
         Only used if ``temporal_smoothing_type`` is ``'FM SSD'``, ``'GP RPM SSD'`` or ``'GP ISI'``.
 
-    phase_modulation_amplitude :list of 2 floats
+    phase_modulation_amplitude : list of 2 floats
         Amplitudes :math:`\delta_{x},\delta_{y}` of phase modulation in each transverse direction.
         Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.
 
@@ -46,7 +47,7 @@ class GP_RPM_SSD_Profile(SpeckleProfile):
         Number of color cycles :math:`N_{cc,x},N_{cc,y}` of SSD spectrum to include in modulation
         Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.
 
-    transverse_bandwidth_distribution: list of 2 floats
+    transverse_bandwidth_distribution : list of 2 floats
         Determines how much SSD is distributed in the :math:`x` and :math:`y` directions.
         if `transverse_bandwidth_distribution=[a,b]`, then the SSD frequency modulation is :math:`a/\sqrt{a^2+b^2}` in :math:`x` and :math:`b/\sqrt{a^2+b^2}` in :math:`y`.
         Only used if ``temporal_smoothing_type`` is ``'FM SSD'`` or ``'GP RPM SSD'``.

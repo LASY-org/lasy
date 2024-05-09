@@ -1,46 +1,9 @@
 import numpy as np
 from .speckle_profile import SpeckleProfile
-
-class _DocumentedMetaClass(type):
-    """This is used as a metaclass that combines the __doc__ of the picmistandard base and of the implementation"""
-    def __new__(cls, name, bases, attrs):
-        # "if bases" skips this for the _ClassWithInit (which has no bases)
-        # "if bases[0].__doc__ is not None" skips this for the picmistandard classes since their bases[0] (i.e. _ClassWithInit)
-        # has no __doc__.
-        if bases and bases[0].__doc__ is not None:
-            implementation_doc = attrs.get('__doc__', '')
-            # print('implementation doc',implementation_doc)
-            base_doc = bases[0].__doc__
-            param_delimiter = 'Parameters\n    ----------\n'
-            opt_param_delimiter = 'do_include_transverse_envelope'
-
-            if implementation_doc:
-                # The format of the added string is intentional.
-                # The double return "\n\n" is needed to start a new section in the documentation.
-                # Then the four spaces matches the standard level of indentation for doc strings
-                # (assuming PEP8 formatting).
-                # The final return "\n" assumes that the implementation doc string begins with a return,
-                # i.e. a line with only three quotes, """.
-                implementation_notes, implementation_params = implementation_doc.split(param_delimiter)
-                # print('implementation intro',implementation_notes)
-                # print('implementation params', implementation_params)
-                base_doc_notes, base_doc_params = base_doc.split(param_delimiter)
-                base_doc_needed_params, base_doc_opt_params = base_doc_params.split(opt_param_delimiter)
-                # print('base doc notes', base_doc_notes)
-                # print('base doc needed params', base_doc_needed_params)
-                # print('base doc opt params',base_doc_opt_params)
-                print('implementation params',repr(implementation_params))
-                attrs['__doc__'] = base_doc_notes + implementation_notes + param_delimiter + base_doc_needed_params# + implementation_params
-                # attrs['__doc__'] = base_doc_notes + implementation_notes + param_delimiter + base_doc_needed_params + '\n' + implementation_params + '\n    ' + opt_param_delimiter + base_doc_opt_params
-                # attrs['__doc__'] = bases[0].__doc__ + """\n\n    Implementation specific documentation\n""" + implementation_doc
-                print('New doc:\n--------')
-                print(repr(attrs['__doc__']))
-            else:
-                attrs['__doc__'] = base_doc
-        return super(_DocumentedMetaClass, cls).__new__(cls, name, bases, attrs)
+from .documentation_splice import _DocumentedMetaClass
     
 class PhasePlateProfile(SpeckleProfile, metaclass=_DocumentedMetaClass):
-    r"""Generate a speckled laser profile with a random phase plate.
+    r"""Specific speckled laser profile information for random phase plate class.
 
     This has no temporal smoothing.
     The amplitude of the beamlets is always :math:`A_{ml}(t)=1` and

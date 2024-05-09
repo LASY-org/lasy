@@ -5,7 +5,7 @@ from ..profile import Profile
 
 class SpeckleProfile(Profile):
     r"""
-    Derived class for the profile of a speckled laser pulse.
+    Profile of a speckled laser pulse.
 
     Speckled lasers are used to mitigate laser-plasma interactions in fusion and ion acceleration contexts.
     More on the subject can be found in chapter 9 of `P. Michel, Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__.
@@ -39,12 +39,6 @@ class SpeckleProfile(Profile):
     :math:`\Delta y=\frac{\lambda_0fN_{by}}{D_{y}}`.
     The other parameters in these formulas are defined below.
 
-    This is an adaptation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
-
-    This assumes a flat-top rectangular laser and so a rectangular arrangement of beamlets in the near-field.
-    The longitudinal profile is currently applied to the beamlets
-    individually in the near-field before they are propagated to the focal plane.
-
     Parameters
     ----------
     wavelength : float (in meters)
@@ -72,12 +66,21 @@ class SpeckleProfile(Profile):
     n_beamlets : list of 2 integers
         Number of RPP/CPP elements :math:`N_{bx},N_{by}` in each direction, in the near field.
 
-    do_include_transverse_envelope : boolean
+    do_include_transverse_envelope : boolean (optional, default: False)
         Whether to include the transverse sinc envelope or not.
         I.e. whether it is assumed to be close enough to the laser axis to neglect the transverse field decay.
 
-    long_profile : Lasy Longitudinal laser object (or None).
+    long_profile : Lasy Longitudinal laser object (optional, default: None).
         If this is not None, the longitudinal profile is applied individually to the beamlets in the near-field.
+
+    Notes
+    -----
+
+    This is an adaptation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
+
+    This assumes a flat-top rectangular laser and so a rectangular arrangement of beamlets in the near-field.
+    The longitudinal profile is currently applied to the beamlets
+    individually in the near-field before they are propagated to the focal plane.
     """
 
     def __init__(
