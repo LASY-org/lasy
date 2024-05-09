@@ -16,9 +16,29 @@ class PhasePlateProfile(SpeckleProfile):
     ----------
     rpp_cpp: string, keyword only, can be 'rpp' or 'cpp', whether to assign beamlet phases according to RPP or CPP scheme
     """
-
-    def __init__(self, *speckle_args, rpp_cpp):
-        super().__init__(*speckle_args)
+    
+    def __init__(
+        self,
+        wavelength,
+        pol,
+        laser_energy,
+        focal_length,
+        beam_aperture,
+        n_beamlets,
+        rpp_cpp,
+        do_include_transverse_envelope=True,
+        long_profile=None
+    ):
+        super().__init__(
+            wavelength,
+            pol,
+            laser_energy,
+            focal_length,
+            beam_aperture,
+            n_beamlets,
+            do_include_transverse_envelope,
+            long_profile,
+        )
         self.rpp_cpp = rpp_cpp
 
     def beamlets_complex_amplitude(

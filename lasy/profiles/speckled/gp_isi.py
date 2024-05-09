@@ -21,10 +21,26 @@ class GP_ISI_Profile(SpeckleProfile):
 
     def __init__(
         self,
-        *speckle_args,
+        wavelength,
+        pol,
+        laser_energy,
+        focal_length,
+        beam_aperture,
+        n_beamlets,
         relative_laser_bandwidth,
+        do_include_transverse_envelope=True,
+        long_profile=None,
     ):
-        super().__init__(*speckle_args)
+        super().__init__(
+            wavelength,
+            pol,
+            laser_energy,
+            focal_length,
+            beam_aperture,
+            n_beamlets,
+            do_include_transverse_envelope,
+            long_profile,
+        )
         self.laser_bandwidth = relative_laser_bandwidth
         self.dt_update = 1 / self.laser_bandwidth / 50
         return

@@ -326,9 +326,9 @@ def test_speckle_profile():
         focal_length,
         beam_aperture,
         n_beamlets,
+        relative_laser_bandwidth,
         do_sinc_profile,
         long_profile,
-        relative_laser_bandwidth=relative_laser_bandwidth,
     )
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]

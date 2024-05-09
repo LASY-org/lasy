@@ -54,13 +54,29 @@ class FM_SSD_Profile(SpeckleProfile):
 
     def __init__(
         self,
-        *speckle_args,
+        wavelength,
+        pol,
+        laser_energy,
+        focal_length,
+        beam_aperture,
+        n_beamlets,
         relative_laser_bandwidth,
         phase_modulation_amplitude,
         number_color_cycles,
         transverse_bandwidth_distribution,
+        do_include_transverse_envelope=True,
+        long_profile=None,
     ):
-        super().__init__(*speckle_args)
+        super().__init__(
+            wavelength,
+            pol,
+            laser_energy,
+            focal_length,
+            beam_aperture,
+            n_beamlets,
+            do_include_transverse_envelope,
+            long_profile,
+        )
         self.laser_bandwidth = relative_laser_bandwidth
         # the amplitude of phase along each direction
         self.phase_modulation_amplitude = phase_modulation_amplitude
