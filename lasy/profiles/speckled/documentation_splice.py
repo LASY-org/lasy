@@ -1,5 +1,5 @@
 class _DocumentedMetaClass(type):
-    """This is used as a metaclass that combines the __doc__ of the picmistandard base and of the implementation"""
+    """Metaclass that combines the __doc__ of the SpeckleProfile base and of the implementation."""
 
     def __new__(cls, name, bases, attrs):
         # "if bases" skips this for the _ClassWithInit (which has no bases)

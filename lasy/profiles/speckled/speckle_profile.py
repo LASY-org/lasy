@@ -4,8 +4,7 @@ from ..profile import Profile
 
 
 class SpeckleProfile(Profile):
-    r"""
-    Profile of a speckled laser pulse.
+    r"""Profile of a speckled laser pulse.
 
     Speckled lasers are used to mitigate laser-plasma interactions in fusion and ion acceleration contexts.
     More on the subject can be found in chapter 9 of `P. Michel, Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__.
@@ -75,7 +74,6 @@ class SpeckleProfile(Profile):
 
     Notes
     -----
-
     This is an adaptation of work by `Han Wen <https://github.com/Wen-Han/LasersSmoothing2d>`__ to LASY.
 
     This assumes a flat-top rectangular laser and so a rectangular arrangement of beamlets in the near-field.
