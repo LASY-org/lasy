@@ -1,7 +1,8 @@
 import numpy as np
 from .speckle_profile import SpeckleProfile
 from .documentation_splice import _DocumentedMetaClass
-    
+
+
 class PhasePlateProfile(SpeckleProfile, metaclass=_DocumentedMetaClass):
     r"""Specific speckled laser profile information for random phase plate class.
 
@@ -17,7 +18,7 @@ class PhasePlateProfile(SpeckleProfile, metaclass=_DocumentedMetaClass):
     rpp_cpp: string, can be 'rpp' or 'cpp'
         Whether to assign beamlet phases according to RPP or CPP scheme
     """
-    
+
     def __init__(
         self,
         wavelength,
@@ -28,7 +29,7 @@ class PhasePlateProfile(SpeckleProfile, metaclass=_DocumentedMetaClass):
         n_beamlets,
         rpp_cpp,
         do_include_transverse_envelope=True,
-        long_profile=None
+        long_profile=None,
     ):
         super().__init__(
             wavelength,

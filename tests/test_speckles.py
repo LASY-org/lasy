@@ -9,11 +9,12 @@ from lasy.profiles.speckled import (
 import pytest
 from scipy.constants import c
 
+
 def _get_arg_string(
-        temporal_smoothing_type,
-        speckle_args,
-        ssd_args=None,
-        isi_args=None,
+    temporal_smoothing_type,
+    speckle_args,
+    ssd_args=None,
+    isi_args=None,
 ):
     if temporal_smoothing_type.upper() in ["RPP", "CPP"]:
         args = [*speckle_args, temporal_smoothing_type]
@@ -31,6 +32,7 @@ def _get_arg_string(
         raise ValueError(f"Invalid smoothing type provided: {temporal_smoothing_type}")
     return args
 
+
 def _get_laser_profile(
     temporal_smoothing_type,
     *args,
@@ -47,6 +49,7 @@ def _get_laser_profile(
     else:
         raise ValueError(f"Invalid smoothing type provided: {temporal_smoothing_type}")
     return profile
+
 
 @pytest.mark.parametrize(
     "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
@@ -75,8 +78,8 @@ def test_intensity_distribution(temporal_smoothing_type):
         n_beamlets,
     )
     opt_args = {
-        'do_include_transverse_envelope': do_sinc_profile,
-        'long_profile': long_profile,
+        "do_include_transverse_envelope": do_sinc_profile,
+        "long_profile": long_profile,
     }
 
     relative_laser_bandwidth = 0.005
@@ -91,7 +94,7 @@ def test_intensity_distribution(temporal_smoothing_type):
     )
     isi_args = (relative_laser_bandwidth,)
 
-    args = _get_arg_string(temporal_smoothing_type,speckle_args,ssd_args,isi_args)
+    args = _get_arg_string(temporal_smoothing_type, speckle_args, ssd_args, isi_args)
     profile = _get_laser_profile(temporal_smoothing_type, *args, **opt_args)
 
     dimensions = "xyt"
@@ -156,8 +159,8 @@ def test_spatial_correlation(temporal_smoothing_type):
         n_beamlets,
     )
     opt_args = {
-        'do_include_transverse_envelope': do_sinc_profile,
-        'long_profile': long_profile,
+        "do_include_transverse_envelope": do_sinc_profile,
+        "long_profile": long_profile,
     }
 
     relative_laser_bandwidth = 0.005
@@ -172,7 +175,7 @@ def test_spatial_correlation(temporal_smoothing_type):
     )
     isi_args = (relative_laser_bandwidth,)
 
-    args = _get_arg_string(temporal_smoothing_type,speckle_args,ssd_args,isi_args)
+    args = _get_arg_string(temporal_smoothing_type, speckle_args, ssd_args, isi_args)
     profile = _get_laser_profile(temporal_smoothing_type, *args, **opt_args)
 
     dimensions = "xyt"
@@ -250,8 +253,8 @@ def test_sinc_zeros(temporal_smoothing_type):
         n_beamlets,
     )
     opt_args = {
-        'do_include_transverse_envelope': do_sinc_profile,
-        'long_profile': long_profile,
+        "do_include_transverse_envelope": do_sinc_profile,
+        "long_profile": long_profile,
     }
 
     relative_laser_bandwidth = 0.005
@@ -265,8 +268,8 @@ def test_sinc_zeros(temporal_smoothing_type):
         transverse_bandwidth_distribution,
     )
     isi_args = (relative_laser_bandwidth,)
-    
-    args = _get_arg_string(temporal_smoothing_type,speckle_args,ssd_args,isi_args)
+
+    args = _get_arg_string(temporal_smoothing_type, speckle_args, ssd_args, isi_args)
     profile = _get_laser_profile(temporal_smoothing_type, *args, **opt_args)
     dimensions = "xyt"
     dx = wavelength * focal_length / beam_aperture[0]
@@ -291,7 +294,7 @@ def test_sinc_zeros(temporal_smoothing_type):
 
 def test_FM_periodicity():
     """Test that the frequency modulated Smoothing by spectral dispersion (SSD) has the correct temporal frequency."""
-    temporal_smoothing_type = 'FM SSD'
+    temporal_smoothing_type = "FM SSD"
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
     laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
@@ -309,8 +312,8 @@ def test_FM_periodicity():
         n_beamlets,
     )
     opt_args = {
-        'do_include_transverse_envelope': do_sinc_profile,
-        'long_profile': long_profile,
+        "do_include_transverse_envelope": do_sinc_profile,
+        "long_profile": long_profile,
     }
 
     relative_laser_bandwidth = 0.005
