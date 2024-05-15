@@ -62,18 +62,22 @@ class FromArrayProfile(Profile):
             else:
                 self.array = array
 
-            # The first point is at dr/2.
-            # To make correct interpolation within the first cell, mirror
-            # field and axes along r.
-            r = np.concatenate((-axes["r"][::-1], axes["r"]))
-            array = np.concatenate((array[::-1], array))
+            if axes['r'][0] != 0:
+                # The first point is at dr/2.
+                # To make correct interpolation within the first cell, mirror
+                # field and axes along r.
+                r = np.concatenate((-axes["r"][::-1], axes["r"]))
+                array = np.concatenate((array[::-1], array))
+            else:
+                r = np.concatenate((-axes["r"][::-1], axes["r"][1:]))
+                array = np.concatenate((array[::-1], array[1:]))
 
             self.combined_field_interp = RegularGridInterpolator(
-                (r, axes["t"]),
-                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
-                bounds_error=False,
-                fill_value=0.0,
-            )
+                    (r, axes["t"]),
+                    np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
+                    bounds_error=False,
+                    fill_value=0.0,
+                )
 
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
