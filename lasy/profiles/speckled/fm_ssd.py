@@ -4,7 +4,7 @@ from .documentation_splice import _DocumentedMetaClass
 
 
 class FM_SSD_Profile(SpeckleProfile, metaclass=_DocumentedMetaClass):
-    r"""Specific speckled laser profile information for smoothing by frequency modulated (FM) spectral dispersion (SSD).
+    r"""Speckled laser profile information specific to smoothing by frequency modulated (FM) spectral dispersion (SSD).
 
     In frequency-modulated smoothing by spectral dispersion, or FM-SSD, the amplitude of the beamlets is always :math:`A_{ml}(t)=1`.
     There are two contributions to the phase :math:`\phi_{ml}` of each beamlet:

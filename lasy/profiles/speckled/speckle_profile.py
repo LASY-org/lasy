@@ -167,18 +167,12 @@ class SpeckleProfile(Profile):
         x_focus_list = X_focus_matrix[:, 0]
         y_focus_list = Y_focus_matrix[0, :]
         x_phase_focus_matrix = np.exp(
-            -2
-            * np.pi
-            * 1j
-            / self.n_beamlets[0]
+            -2 * np.pi * 1j / self.n_beamlets[0]
             * self.x_lens_list[:, np.newaxis]
             * x_focus_list[np.newaxis, :]
         )
         y_phase_focus_matrix = np.exp(
-            -2
-            * np.pi
-            * 1j
-            / self.n_beamlets[1]
+            -2 * np.pi * 1j / self.n_beamlets[1]
             * self.y_lens_list[:, np.newaxis]
             * y_focus_list[np.newaxis, :]
         )
@@ -186,6 +180,7 @@ class SpeckleProfile(Profile):
         if self.long_profile is not None:
             # have to unnormalize t_now to evaluate in longitudinal profile
             bca = bca * self.long_profile.evaluate(t_now / c * self.lambda0)
+        # propagate from near-field to focus
         speckle_amp = np.einsum(
             "jk,jl->kl",
             np.einsum("ij,ik->jk", bca, x_phase_focus_matrix),

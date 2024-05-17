@@ -5,7 +5,7 @@ from .documentation_splice import _DocumentedMetaClass
 
 
 class GP_RPM_SSD_Profile(SpeckleProfile, metaclass=_DocumentedMetaClass):
-    r"""Specific speckled laser profile information for smoothing by a random phase modulated (RPM) spectral dispersion (SSD).
+    r"""Speckled laser profile information specific to smoothing by a random phase modulated (RPM) spectral dispersion (SSD).
 
     This provides a version of smoothing by spectral dispersion (SSD) where the phases are randomly modulated.
     Here the amplitude of the beamlets is always :math:`A_{ml}(t)=1`.

@@ -4,14 +4,14 @@ from .documentation_splice import _DocumentedMetaClass
 
 
 class PhasePlateProfile(SpeckleProfile, metaclass=_DocumentedMetaClass):
-    r"""Specific speckled laser profile information for random phase plate class.
+    r"""Laser profile information for the random phase plate / continuous phase plate class of speckled lasers.
 
     This has no temporal smoothing.
     The amplitude of the beamlets is always :math:`A_{ml}(t)=1` and
     the relative phases of the beamlets, resulting from the randomly sized phase plate sections,
     are assigned randomly.
-    If the user specifies Random Phase Plate (RPP: `rpp`), the beamlet phases are drawn with equal probabilities from the set :math:`{0,2\pi}`.
-    If the user specifies Continuous Phase Plate (CPP: `cpp`), the beamlet phases are drawn from a uniform distribution on the interval :math:`[0,2\pi]`.
+    If the user specifies Random Phase Plate (RPP: `rpp`), the beamlet phases :math:`\phi_{ml}(t)` are drawn with equal probabilities from the set :math:`{0,2\pi}`.
+    If the user specifies Continuous Phase Plate (CPP: `cpp`), the beamlet phases :math:`\phi_{ml}(t)` are drawn from a uniform distribution on the interval :math:`[0,2\pi]`.
 
     Parameters
     ----------
