@@ -62,8 +62,9 @@ class LongitudinalProfileFromData(LongitudinalProfile):
         if data["datatype"] == "spectral":
             # First find central frequency
             wavelength = data["axis"]
-            assert np.all(np.diff(wavelength) > 0), \
-                'data["axis"] must be in monotonously increasing order.'
+            assert np.all(
+                np.diff(wavelength) > 0
+            ), 'data["axis"] must be in monotonously increasing order.'
             spectral_intensity = data["intensity"]
             if data.get("phase") is None:
                 spectral_phase = np.zeros_like(wavelength)
