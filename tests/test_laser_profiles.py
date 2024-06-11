@@ -7,9 +7,10 @@ from scipy.constants import c
 
 from lasy.laser import Laser
 from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import GaussianProfile, FromArrayProfile
+from lasy.profiles import GaussianProfile, FromArrayProfile, SpeckleProfile
 from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
+    SuperGaussianLongitudinalProfile,
     CosineLongitudinalProfile,
 )
 from lasy.profiles.transverse import (
@@ -186,6 +187,36 @@ def test_longitudinal_profiles():
     print("cep_phase = ", cep_phase_gaussian)
     assert np.abs(cep_phase_gaussian - cep_phase) / cep_phase < 0.02
 
+    # SuperGaussianLongitudinalProfile
+    print("SuperGaussianLongitudinalProfile")
+    n_order = 2  # ordinary gaussian
+    tau = tau_fwhm / np.sqrt(2 * np.power(np.log(2), n_order / 2))
+    profile_super_gaussian = SuperGaussianLongitudinalProfile(
+        wavelength, tau, t_peak, n_order, cep_phase
+    )
+    field_super_gaussian = profile_super_gaussian.evaluate(t)
+
+    std_super_gauss = np.sqrt(
+        np.average((t - t_peak) ** 2, weights=np.abs(field_super_gaussian))
+    )
+    std_super_gauss_th = tau / np.sqrt(2.0)
+    print("std_th = ", std_super_gauss_th)
+    print("std = ", std_super_gauss)
+    assert np.abs(std_super_gauss - std_super_gauss_th) / std_super_gauss_th < 0.01
+
+    t_peak_super_gaussian = t[np.argmax(np.abs(field_super_gaussian))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_super_gaussian)
+    assert np.abs(t_peak_super_gaussian - t_peak) / t_peak < 0.01
+
+    ff_super_gaussian = field_super_gaussian * np.exp(-1.0j * omega_0 * t)
+    cep_phase_super_gaussian = np.angle(
+        ff_super_gaussian[np.argmax(np.abs(field_super_gaussian))]
+    )
+    print("cep_phase_th = ", cep_phase)
+    print("cep_phase = ", cep_phase_super_gaussian)
+    assert np.abs(cep_phase_super_gaussian - cep_phase) / cep_phase < 0.02
+
     # CosineLongitudinalProfile
     print("CosineLongitudinalProfile")
     profile_cos = CosineLongitudinalProfile(wavelength, tau_fwhm, t_peak, cep_phase)
@@ -272,6 +303,43 @@ def test_from_array_profile():
     print("theory width  : ", wx)
     print("Measured width: ", width)
     assert np.abs((width - wx) / wx) < 1.0e-5
+
+
+def test_speckle_profile():
+    # - speckled laser case
+    print("SpeckledProfile")
+    wavelength = 0.351e-6  # Laser wavelength in meters
+    polarization = (1, 0)  # Linearly polarized in the x direction
+    laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
+    focal_length = 3.5  # m
+    beam_aperture = [0.35, 0.5]  # m
+    n_beamlets = [24, 32]
+    temporal_smoothing_type = "GP ISI"
+    relative_laser_bandwidth = 0.005
+
+    profile = SpeckleProfile(
+        wavelength,
+        polarization,
+        laser_energy,
+        focal_length,
+        beam_aperture,
+        n_beamlets,
+        temporal_smoothing_type=temporal_smoothing_type,
+        relative_laser_bandwidth=relative_laser_bandwidth,
+    )
+    dimensions = "xyt"
+    dx = wavelength * focal_length / beam_aperture[0]
+    dy = wavelength * focal_length / beam_aperture[1]
+    Lx = 1.8 * dx * n_beamlets[0]
+    Ly = 3.1 * dy * n_beamlets[1]
+    nu_laser = c / wavelength
+    t_max = 50 / nu_laser
+    lo = (0, 0, 0)
+    hi = (Lx, Ly, t_max)
+    npoints = (200, 250, 2)
+
+    laser = Laser(dimensions, lo, hi, npoints, profile)
+    laser.write_to_file("speckledProfile")
 
 
 def test_add_profiles():

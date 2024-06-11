@@ -3,6 +3,7 @@ from .gaussian_profile import GaussianProfile
 from .from_array_profile import FromArrayProfile
 from .from_openpmd_profile import FromOpenPMDProfile
 from .from_insight_file import FromInsightFile
+from .speckle_profile import SpeckleProfile
 
 __all__ = [
     "CombinedLongitudinalTransverseProfile",
@@ -10,4 +11,5 @@ __all__ = [
     "FromArrayProfile",
     "FromOpenPMDProfile",
     "FromInsightFile",
+    "SpeckleProfile",
 ]

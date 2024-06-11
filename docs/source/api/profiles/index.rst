@@ -10,3 +10,4 @@ Laser Profiles
    combined_profile
    longitudinal/index
    transverse/index
+   speckled

@@ -50,8 +50,6 @@ class TransverseProfile(object):
         """
         Return the transverse envelope modified by any spatial offsets.
 
-        This is the public facing evaluate method, it calls the _evaluate function of the derived class.
-
         Parameters
         ----------
         x, y: ndarrays of floats
