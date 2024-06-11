@@ -28,10 +28,10 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             are 'spectral' and 'temporal'
 
         axis : ndarrays of floats
-            The horizontal axis of the pulse duration measurement
-            When datatype is 'spectral' axis is wavelength in
-            meters
-            When datatype is 'temporal' axis is time in seconds
+            The horizontal axis of the pulse duration measurement.
+            The array must be monotonously increasing.
+            When datatype is 'spectral' axis is wavelength in meters.
+            When datatype is 'temporal' axis is time in seconds.
 
         intensity : ndarrays of floats
             The vertical axis of the pulse duration measurement.
@@ -62,6 +62,8 @@ class LongitudinalProfileFromData(LongitudinalProfile):
         if data["datatype"] == "spectral":
             # First find central frequency
             wavelength = data["axis"]
+            assert np.all(np.diff(wavelength) > 0), \
+                'data["axis"] must be in monotonously increasing order.'
             spectral_intensity = data["intensity"]
             if data.get("phase") is None:
                 spectral_phase = np.zeros_like(wavelength)
