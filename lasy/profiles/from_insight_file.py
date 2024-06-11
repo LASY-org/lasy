@@ -11,19 +11,19 @@ class FromInsightFile(FromArrayProfile):
     Parameters
     ----------
     file_path: string
-        Path to the file created by insight which contains full field (e.g. Exyt_0.h5)
+        Path to the file created by INSIGHT that contains the full field (e.g. Exyt_0.h5)
 
-    pol : list of 2 complex numbers (dimensionless)
+    pol: list of 2 complex numbers (dimensionless)
         Polarization vector. It corresponds to :math:`p_u` in the above
         formula ; :math:`p_x` is the first element of the list and
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
 
     omega0: string or float
-        Set central frequency for the envelope constrauction. Can be a float value
-        in [1/s], or a string defining the method for automatic frequency detection:
+        Set the central frequency for the envelope construction. Can be a float value
+        in [rad/s], or a string defining the method for automatic frequency detection:
         "barycenter" frequency is averaged over the power profile, "peak" frequency
-        corresponding to the peak field.
+        corresponding to the location of the maximum of the on-axis spectrum.
     """
 
     def __init__(self, file_path, pol, omega0="barycenter"):
@@ -59,7 +59,7 @@ class FromInsightFile(FromArrayProfile):
             data = np.conj(data)
             print("Warning: input field will be conjugated")
 
-        # remove the envelope frequencey
+        # remove the envelope frequency
         data *= np.exp(1j * omega0 * t[None, None, :])
 
         # created LASY profile using FromArrayProfile class
