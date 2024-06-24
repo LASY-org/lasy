@@ -103,7 +103,9 @@ class Laser:
     >>>         axes[step].set(ylabel='r (µm)')
     """
 
-    def __init__(self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1, n_theta_evals=None):
+    def __init__(
+        self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1, n_theta_evals=None
+    ):
         self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
         self.dim = dim
         self.profile = profile
@@ -119,7 +121,7 @@ class Laser:
                 n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
             # Make sure that there are enough points to resolve the azimuthal modes
             assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
-            theta1d = 2 * np.pi / n_theta * np.arange(n_theta_evals)
+            theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
             theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
             x = r * np.cos(theta)
             y = r * np.sin(theta)
@@ -129,7 +131,9 @@ class Laser:
             azimuthal_modes = np.fft.ifft(envelope, axis=0)
             self.grid.field[:n_azimuthal_modes] = azimuthal_modes[:n_azimuthal_modes]
             if n_azimuthal_modes > 1:
-                self.grid.field[-n_azimuthal_modes+1:] = azimuthal_modes[-n_azimuthal_modes+1:]
+                self.grid.field[-n_azimuthal_modes + 1 :] = azimuthal_modes[
+                    -n_azimuthal_modes + 1 :
+                ]
 
         # For profiles that define the energy, normalize the amplitude
         if hasattr(profile, "laser_energy"):
