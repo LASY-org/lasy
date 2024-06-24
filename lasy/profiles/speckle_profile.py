@@ -36,7 +36,7 @@ def gen_gaussian_time_series(t_num, dt, fwhm, rms_mean):
 
 class SpeckleProfile(Profile):
     r"""
-    Derived class for the profile of a speckled laser pulse.
+    Class for the profile of a speckled laser pulse.
 
     Speckled lasers are used to mitigate laser-plasma interactions in fusion and ion acceleration contexts.
     More on the subject can be found in chapter 9 of `P. Michel, Introduction to Laser-Plasma Interactions <https://link.springer.com/book/10.1007/978-3-031-23424-8>`__.

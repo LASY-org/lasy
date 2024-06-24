@@ -8,7 +8,7 @@ from .transverse_profile import TransverseProfile
 
 class TransverseProfileFromData(TransverseProfile):
     """
-    Derived class for transverse laser profile.
+    Class for transverse laser profile.
 
     Created using data from an experimental measurement or from
     the output of another code.

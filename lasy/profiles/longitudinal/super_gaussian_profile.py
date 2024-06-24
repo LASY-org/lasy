@@ -5,7 +5,7 @@ from .longitudinal_profile import LongitudinalProfile
 
 class SuperGaussianLongitudinalProfile(LongitudinalProfile):
     r"""
-    Derived class for the analytic profile of a longitudinally-super-Gaussian laser pulse.
+    Class for the analytic profile of a longitudinally-super-Gaussian laser pulse.
 
     More precisely, the longitudinal envelope
     (to be used in the :class:`.CombinedLongitudinalTransverseProfile` class)

@@ -63,11 +63,13 @@ class FromArrayProfile(Profile):
             else:
                 self.array = array
 
-            # The first point is at dr/2.
-            # To make correct interpolation within the first cell, mirror
-            # field and axes along r.
-            r = np.concatenate((-axes["r"][::-1], axes["r"]))
-            array = np.concatenate((array[::-1], array))
+            # If the first point of radial axis is not 0, we "mirror" it,
+            # to make correct interpolation within the first cell
+            if axes["r"][0] != 0.0:
+                r = np.concatenate(([-axes["r"][0]], axes["r"]))
+                array = np.concatenate(([array[0]], array))
+            else:
+                r = axes["r"]
 
             self.combined_field_interp = RegularGridInterpolator(
                 (r, axes["t"]),

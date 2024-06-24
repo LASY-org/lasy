@@ -10,7 +10,6 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
     r"""
     A high-order Gaussian laser pulse expressed in the Hermite-Gaussian formalism.
 
-    Derived class for an analytic profile.
     More precisely, the transverse envelope (to be used in the
     :class:`.CombinedLongitudinalTransverseLaser` class) corresponds to:
 
