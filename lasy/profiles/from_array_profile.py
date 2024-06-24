@@ -29,7 +29,7 @@ class FromArrayProfile(Profile):
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
 
-    array : 3darray of complexs
+    array : 3darray of complex numbers
         Contains the values of the envelope, defined as :math:`\mathcal{E}` in the above formula.
 
     axes : Python dictionary containing the axes vectors.
