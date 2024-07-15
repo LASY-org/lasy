@@ -79,8 +79,11 @@ def normalize_energy(dim, energy, grid):
         return
 
     current_energy = compute_laser_energy(dim, grid)
-    norm_factor = (energy / current_energy) ** 0.5
-    grid.field *= norm_factor
+    if current_energy == 0.0:
+        print("Field is zero everywhere, normalization will be skipped")
+    else:
+        norm_factor = (energy / current_energy) ** 0.5
+        grid.field *= norm_factor
 
 
 def normalize_peak_field_amplitude(amplitude, grid):
@@ -95,9 +98,11 @@ def normalize_peak_field_amplitude(amplitude, grid):
     grid : a Grid object
         Contains value of the laser envelope and metadata.
     """
-    if amplitude is None:
-        return
-    grid.field *= amplitude / np.abs(grid.field).max()
+    if amplitude is not None:
+        if np.abs(grid.field).max() == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            grid.field *= amplitude / np.abs(grid.field).max()
 
 
 def normalize_peak_intensity(peak_intensity, grid):
@@ -112,12 +117,13 @@ def normalize_peak_intensity(peak_intensity, grid):
     grid : a Grid object
         Contains value of the laser envelope and metadata.
     """
-    if peak_intensity is None:
-        return
-    intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
-    input_peak_intensity = intensity.max()
-
-    grid.field *= np.sqrt(peak_intensity / input_peak_intensity)
+    if peak_intensity is not None:
+        intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
+        input_peak_intensity = intensity.max()
+        if input_peak_intensity == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            grid.field *= np.sqrt(peak_intensity / input_peak_intensity)
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
