@@ -684,7 +684,7 @@ def create_grid(array, axes, dim):
 
 def get_container(dim, grid, omega0, transform=True, n_dump=0, backend="NP"):
     """
-    Export field to axiprop container, clean, and trasnform to frequency.
+    Export field to axiprop container, clean, and transform to frequency.
 
     Parameters
     ----------
