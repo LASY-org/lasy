@@ -160,14 +160,48 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def propagate(
-        self,
-        distance,
-        initial_optical_element=None,
-        nr_boundary=None,
-        backend="NP",
-        show_progress=True,
-    ):
+    def apply_optics( self, optical_element ):
+        """
+        Propagate the laser pulse through a thin optical element.
+
+        Parameter
+        ---------
+        optical_element: an :class:`.OpticalElement` object (optional)
+            Represents a thin optical element, through which the laser
+            propagates.
+        """
+        # Transform the field from temporal to frequency domain
+        time_axis_indx = -1
+        field_fft = np.fft.ifft(self.grid.field, axis=time_axis_indx, norm="backward")
+
+        # Create the frequency axis
+        dt = self.grid.dx[time_axis_indx]
+        omega0 = self.profile.omega0
+        Nt = self.grid.field.shape[time_axis_indx]
+        omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+
+        # Apply optical element
+        if self.dim == "rt":
+            r, w = np.meshgrid(self.grid.axes[0], omega, indexing="ij")
+            # The line below assumes that amplitude_multiplier
+            # is cylindrically-symmetric, hence we pass
+            # `r` as `x` and 0 as `y`
+            multiplier = optical_element.amplitude_multiplier(r, 0, w)
+            for i_m in range(self.grid.azimuthal_modes.size):
+                field_fft[i_m, :, :] *= multiplier
+        else:
+            x, y, w = np.meshgrid(
+                self.grid.axes[0], self.grid.axes[1], omega, indexing="ij"
+            )
+            field_fft *= optical_element.amplitude_multiplier(x, y, w)
+
+        # Transform field from frequency to temporal domain
+        self.grid.field[:, :, :] = np.fft.fft(
+            field_fft, axis=time_axis_indx, norm="backward"
+        )
+
+
+    def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -230,16 +264,6 @@ class Laser:
         omega_shape = (1, 1, self.grid.field.shape[time_axis_indx])
 
         if self.dim == "rt":
-            # Apply optical element
-            if initial_optical_element is not None:
-                r, w = np.meshgrid(self.grid.axes[0], omega, indexing="ij")
-                # The line below assumes that amplitude_multiplier
-                # is cylindrically-symmetric, hence we pass
-                # `r` as `x` and 0 as `y`
-                multiplier = initial_optical_element.amplitude_multiplier(r, 0, w)
-                for i_m in range(self.grid.azimuthal_modes.size):
-                    field_fft[i_m, :, :] *= multiplier
-
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
                 spatial_axes = (self.grid.axes[0],)
@@ -265,13 +289,6 @@ class Laser:
                 )
                 field_fft[i_m, :, :] = np.transpose(transform_data).copy()
         else:
-            # Apply optical element
-            if initial_optical_element is not None:
-                x, y, w = np.meshgrid(
-                    self.grid.axes[0], self.grid.axes[1], omega, indexing="ij"
-                )
-                field_fft *= initial_optical_element.amplitude_multiplier(x, y, w)
-
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
                 Nx, Ny, Nt = self.grid.field.shape
