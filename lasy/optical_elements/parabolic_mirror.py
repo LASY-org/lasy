@@ -5,7 +5,7 @@ from scipy.constants import c
 
 class ParabolicMirror(OpticalElement):
     r"""
-    Derived class for a parabolic mirror.
+    Class for a parabolic mirror.
 
     More precisely, the amplitude multiplier corresponds to:
 
