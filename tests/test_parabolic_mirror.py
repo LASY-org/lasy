@@ -47,7 +47,7 @@ def get_w0(laser):
 def check_parabolic_mirror(laser):
     # Propagate laser after parabolic mirror + vacuum
     f0 = 8.0  # focal distance in m
-    laser.apply_optics( ParabolicMirror(f=f0) )
+    laser.apply_optics(ParabolicMirror(f=f0))
     laser.propagate(f0)
     # Check that the value is the expected one in the near field
     w0_num = get_w0(laser)
