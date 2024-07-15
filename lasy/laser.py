@@ -160,7 +160,7 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def apply_optics( self, optical_element ):
+    def apply_optics(self, optical_element):
         """
         Propagate the laser pulse through a thin optical element.
 
@@ -199,7 +199,6 @@ class Laser:
         self.grid.field[:, :, :] = np.fft.fft(
             field_fft, axis=time_axis_indx, norm="backward"
         )
-
 
     def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
         """
