@@ -66,7 +66,7 @@ def test_3D_case(gaussian):
     dim = "xyt"
     lo = (-25e-6, -25e-6, -60e-15)
     hi = (+25e-6, +25e-6, +60e-15)
-    npoints = (100, 100, 100)
+    npoints = (100, 102, 100)
 
     laser = Laser(dim, lo, hi, npoints, gaussian)
     check_gaussian_propagation(laser)
@@ -80,4 +80,18 @@ def test_RT_case(gaussian):
     npoints = (100, 100)
 
     laser = Laser(dim, lo, hi, npoints, gaussian)
+    check_gaussian_propagation(laser)
+
+
+def test_RT_case_multimode(gaussian):
+    # - Cylindrical case
+    dim = "rt"
+    lo = (0e-6, -60e-15)
+    hi = (25e-6, +60e-15)
+    npoints = (100, 100)
+
+    # Note: using 3 modes and 20 points is unnecessary here,
+    # since the profile is purely cylindrical. This is
+    # done here only to make sure that the code is robust.
+    laser = Laser(dim, lo, hi, npoints, gaussian, n_azimuthal_modes=3, n_theta_evals=20)
     check_gaussian_propagation(laser)

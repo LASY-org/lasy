@@ -5,7 +5,7 @@ from .transverse_profile import TransverseProfile
 
 class SuperGaussianTransverseProfile(TransverseProfile):
     r"""
-    Derived class for the analytic profile of a super-Gaussian laser pulse.
+    Class for the analytic profile of a super-Gaussian laser pulse.
 
     More precisely, the transverse envelope corresponds to:
 

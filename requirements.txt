@@ -1,4 +1,4 @@
-axiprop==0.5.1
+axiprop
 numpy
 openpmd-api
 openpmd-viewer

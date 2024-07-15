@@ -7,12 +7,21 @@ class FromArrayProfile(Profile):
     r"""
     Profile defined from numpy array directly.
 
+    The numpy array contains the envelope of the electric field of the laser pulse, defined as :math:`\mathcal{E}` in:
+
+    .. math::
+        \begin{aligned}
+        E_x(x,y,t) = \operatorname{Re} \left( \mathcal{E}(x,y,t) e^{-i \omega_0t}p_x \right)\\
+        E_y(x,y,t) = \operatorname{Re} \left( \mathcal{E}(x,y,t) e^{-i \omega_0t}p_y \right)\end{aligned}
+
+    where :math:`\operatorname{Re}` stands for real part, :math:`E_x` (resp. :math:`E_y`) is the laser electric field in the :math:`x` (resp. :math:`y`) direction.
+
     Parameters
     ----------
     wavelength : float (in meter)
-        The main laser wavelength :math:`\\lambda_0` of the laser, which
-        defines :math:`\\omega_0` in the above formula, according to
-        :math:`\\omega_0 = 2\\pi c/\\lambda_0`.
+        The main laser wavelength :math:`\lambda_0` of the laser, which
+        defines :math:`\omega_0` in the above formula, according to
+        :math:`\omega_0 = 2\pi c/\lambda_0`.
 
     pol : list of 2 complex numbers (dimensionless)
         Polarization vector. It corresponds to :math:`p_u` in the above
@@ -20,7 +29,8 @@ class FromArrayProfile(Profile):
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
 
-    array : Array of the electric field of the laser pulse.
+    array : 3darray of complex numbers
+        Contains the values of the envelope, defined as :math:`\mathcal{E}` in the above formula.
 
     axes : Python dictionary containing the axes vectors.
         Keys are 'x', 'y', 't'.
@@ -48,13 +58,12 @@ class FromArrayProfile(Profile):
             else:
                 self.array = array
 
-            self.field_interp = RegularGridInterpolator(
+            self.combined_field_interp = RegularGridInterpolator(
                 (axes["x"], axes["y"], axes["t"]),
-                array,
+                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )
-
         else:  # dim = "rt"
             assert axes_order in [["r", "t"], ["t", "r"]]
 
@@ -63,14 +72,17 @@ class FromArrayProfile(Profile):
             else:
                 self.array = array
 
-            # The first point is at dr/2.
-            # To make correct interpolation within the first cell, mirror
-            # field and axes along r.
-            r = np.concatenate((-axes["r"][::-1], axes["r"]))
-            array = np.concatenate((array[::-1], array))
-            self.field_interp = RegularGridInterpolator(
+            # If the first point of radial axis is not 0, we "mirror" it,
+            # to make correct interpolation within the first cell
+            if axes["r"][0] != 0.0:
+                r = np.concatenate(([-axes["r"][0]], axes["r"]))
+                array = np.concatenate(([array[0]], array))
+            else:
+                r = axes["r"]
+
+            self.combined_field_interp = RegularGridInterpolator(
                 (r, axes["t"]),
-                array,
+                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )
@@ -78,7 +90,12 @@ class FromArrayProfile(Profile):
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
         if self.dim == "xyt":
-            envelope = self.field_interp((x, y, t))
+            combined_field = self.combined_field_interp((x, y, t))
         else:
-            envelope = self.field_interp((np.sqrt(x**2 + y**2), t))
+            combined_field = self.combined_field_interp((np.sqrt(x**2 + y**2), t))
+
+        envelope = np.abs(np.real(combined_field)) * np.exp(
+            1.0j * np.imag(combined_field)
+        )
+
         return envelope

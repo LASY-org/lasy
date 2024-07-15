@@ -44,6 +44,17 @@ class Laser:
         Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
         used in order to represent the laser field.
 
+    n_theta_evals: int (optional)
+        Only used if ``dim`` is ``'rt'``. The number of points in the theta
+        (azimuthal) direction at which to evaluate the laser field, before
+        decomposing it into ``n_azimuthal_modes`` azimuthal modes. By default,
+        this is set to ``2*n_azimuthal_modes - 1``. However, for highly asymmetrical
+        profiles, it may be necessary to increase this number.
+
+        For instance, using ``n_theta_evals=20`` and ``n_azimuthal_modes=1``
+        will evaluate the laser field at 20 points in the azimuthal direction
+        and then average the values to extract the amplitude of the azimuthal mode 0.
+
     Examples
     --------
     >>> import matplotlib.pyplot as plt
@@ -92,7 +103,9 @@ class Laser:
     >>>         axes[step].set(ylabel='r (µm)')
     """
 
-    def __init__(self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1):
+    def __init__(
+        self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1, n_theta_evals=None
+    ):
         self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
         self.dim = dim
         self.profile = profile
@@ -102,17 +115,25 @@ class Laser:
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
             self.grid.field[...] = profile.evaluate(x, y, t)
         elif self.dim == "rt":
-            # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
-            # theta, to evaluate the laser
-            n_theta = 2 * self.grid.n_azimuthal_modes - 1
-            theta1d = 2 * np.pi / n_theta * np.arange(n_theta)
+            if n_theta_evals is None:
+                # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
+                # theta, to evaluate the laser
+                n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
+            # Make sure that there are enough points to resolve the azimuthal modes
+            assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
+            theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
             theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
             x = r * np.cos(theta)
             y = r * np.sin(theta)
             # Evaluate the profile on the generated grid
             envelope = profile.evaluate(x, y, t)
             # Perform the azimuthal decomposition
-            self.grid.field[...] = np.fft.ifft(envelope, axis=0)
+            azimuthal_modes = np.fft.ifft(envelope, axis=0)
+            self.grid.field[:n_azimuthal_modes] = azimuthal_modes[:n_azimuthal_modes]
+            if n_azimuthal_modes > 1:
+                self.grid.field[-n_azimuthal_modes + 1 :] = azimuthal_modes[
+                    -n_azimuthal_modes + 1 :
+                ]
 
         # For profiles that define the energy, normalize the amplitude
         if hasattr(profile, "laser_energy"):
@@ -264,11 +285,11 @@ class Laser:
                     verbose=False,
                 )
             # Propagate the spectral image
-            transform_data = np.transpose(field_fft).copy()
+            transform_data = np.moveaxis(field_fft, -1, 0).copy()
             self.prop.step(
                 transform_data, distance, overwrite=True, show_progress=show_progress
             )
-            field_fft[:, :, :] = np.transpose(transform_data).copy()
+            field_fft[:, :, :] = np.moveaxis(transform_data, 0, -1).copy()
 
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / c
@@ -329,11 +350,11 @@ class Laser:
             # Show field in the plane y=0, above and below axis, with proper sign for each mode
             E = [
                 np.concatenate(
-                    ((-1) ** m * self.grid.field[0, ::-1], self.grid.field[0])
+                    ((-1.0) ** m * self.grid.field[m, ::-1], self.grid.field[m])
                 )
                 for m in self.grid.azimuthal_modes
             ]
-            E = sum(E)
+            E = sum(E)  # Sum all the modes
             extent = [
                 self.grid.lo[-1],
                 self.grid.hi[-1],

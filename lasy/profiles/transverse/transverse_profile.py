@@ -34,11 +34,21 @@ class TransverseProfile(object):
         # (This should be replaced by any class that inherits from this one.)
         return np.zeros(x.shape, dtype="complex128")
 
+    def __add__(self, other):
+        """Return the sum of two transverse profiles."""
+        return SummedTransverseProfile(self, other)
+
+    def __mul__(self, factor):
+        """Return the scaled transverse profile."""
+        return ScaledTransverseProfile(self, factor)
+
+    def __rmul__(self, factor):
+        """Return the scaled transverse profile."""
+        return ScaledTransverseProfile(self, factor)
+
     def evaluate(self, x, y):
         """
         Return the transverse envelope modified by any spatial offsets.
-
-        This is the public facing evaluate method, it calls the _evaluate function of the derived class.
 
         Parameters
         ----------
@@ -72,3 +82,62 @@ class TransverseProfile(object):
         self.y_offset = y_offset
 
         return self
+
+
+class SummedTransverseProfile(TransverseProfile):
+    """
+    Base class for transverse profiles that are the sum of several other transverse profiles.
+
+    Transverse Profile class that represents the sum of multiple transverse profiles.
+
+    Parameters
+    ----------
+    transverse_profiles: list of TransverseProfile objects
+        List of transverse profiles to be summed.
+    """
+
+    def __init__(self, *transverse_profiles):
+        """Initialize the summed profile."""
+        TransverseProfile.__init__(self)
+        # Check that all transverse_profiles are TransverseProfile objects
+        assert all(
+            [isinstance(tp, TransverseProfile) for tp in transverse_profiles]
+        ), "All summands must be Profile objects."
+        self.transverse_profiles = transverse_profiles
+
+    def evaluate(self, x, y):
+        """Return the envelope field of the summed profile."""
+        # Sum the fields of each profile
+        return sum([tp.evaluate(x, y) for tp in self.transverse_profiles])
+
+
+class ScaledTransverseProfile(TransverseProfile):
+    """
+    Base class for transverse profiles that are scaled by a factor.
+
+    Transverse Profile class that represents scaled transverse profiles.
+
+    Parameters
+    ----------
+    transverse_profile: TrasnverseProfile object
+        Trasnverse profile to be scaled.
+    factor: int or float
+        Factor by which to scale the profile.
+    """
+
+    def __init__(self, transverse_profile, factor):
+        """Initialize the summed profile."""
+        TransverseProfile.__init__(self)
+        # Check that the factor is a number
+        assert isinstance(factor, (int, float, complex)), "The factor must be a number."
+        # Check that the profile is a Profile object
+        assert isinstance(
+            transverse_profile, TransverseProfile
+        ), "The profile must be a TransverseProfile object."
+        self.transverse_profile = transverse_profile
+        self.factor = factor
+
+    def evaluate(self, x, y):
+        """Return the envelope field of the scaled transverse profile."""
+        # Sum the fields of each profile
+        return self.transverse_profile.evaluate(x, y) * self.factor

@@ -79,8 +79,11 @@ def normalize_energy(dim, energy, grid):
         return
 
     current_energy = compute_laser_energy(dim, grid)
-    norm_factor = (energy / current_energy) ** 0.5
-    grid.field *= norm_factor
+    if current_energy == 0.0:
+        print("Field is zero everywhere, normalization will be skipped")
+    else:
+        norm_factor = (energy / current_energy) ** 0.5
+        grid.field *= norm_factor
 
 
 def normalize_peak_field_amplitude(amplitude, grid):
@@ -95,9 +98,11 @@ def normalize_peak_field_amplitude(amplitude, grid):
     grid : a Grid object
         Contains value of the laser envelope and metadata.
     """
-    if amplitude is None:
-        return
-    grid.field *= amplitude / np.abs(grid.field).max()
+    if amplitude is not None:
+        if np.abs(grid.field).max() == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            grid.field *= amplitude / np.abs(grid.field).max()
 
 
 def normalize_peak_intensity(peak_intensity, grid):
@@ -112,12 +117,13 @@ def normalize_peak_intensity(peak_intensity, grid):
     grid : a Grid object
         Contains value of the laser envelope and metadata.
     """
-    if peak_intensity is None:
-        return
-    intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
-    input_peak_intensity = intensity.max()
-
-    grid.field *= np.sqrt(peak_intensity / input_peak_intensity)
+    if peak_intensity is not None:
+        intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
+        input_peak_intensity = intensity.max()
+        if input_peak_intensity == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            grid.field *= np.sqrt(peak_intensity / input_peak_intensity)
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
@@ -667,7 +673,7 @@ def create_grid(array, axes, dim):
         grid = Grid(dim, lo, hi, npoints)
         assert np.all(grid.axes[0] == axes["x"])
         assert np.all(grid.axes[1] == axes["y"])
-        assert np.all(grid.axes[2] == axes["t"])
+        assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
         assert grid.field.shape == array.shape
         grid.field = array
     else:  # dim == "rt":
@@ -764,8 +770,9 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
             verbose=False,
         )
         # Convert the spectral image to the spatial field representation
-        FieldAxprp.import_field(np.transpose(grid.field).copy())
-        field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
+        FieldAxprp.import_field(np.moveaxis(grid.field, -1, 0).copy())
+        field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0)
+        field_z = np.moveaxis(field_z, 0, -1)
         field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
 
     return field_z
@@ -850,7 +857,7 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
             verbose=False,
         )
         # Convert the spectral image to the spatial field representation
-        transform_data = np.transpose(field_fft).copy()
+        transform_data = np.moveaxis(field_fft, -1, 0).copy()
         transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
-        grid.field = prop.z2t(transform_data, t_axis, z0=z0, t0=t0).T
+        grid.field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
         grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
