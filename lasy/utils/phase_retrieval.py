@@ -64,11 +64,11 @@ def gerchberg_saxton_algo(
 
     i = 0
     while breakout(cond):
-        laser1.grid.set_temporal_field( amp1 * np.exp(1j * phase1) )
+        laser1.grid.set_temporal_field(amp1 * np.exp(1j * phase1))
         laser1.propagate(dz, show_progress=False)
 
         phase2 = np.angle(laser1.grid.get_temporal_field())
-        laser2.grid.set_temporal_field( amp2 * np.exp(1j * phase2) )
+        laser2.grid.set_temporal_field(amp2 * np.exp(1j * phase2))
         laser2.propagate(-dz, show_progress=False)
 
         field2 = laser2.grid.get_temporal_field()
