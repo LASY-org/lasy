@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .transverse_profile import TransverseProfile
 
@@ -45,6 +45,6 @@ class SuperGaussianTransverseProfile(TransverseProfile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-        envelope = np.exp(-np.power((x**2 + y**2) / self.w0**2, self.n_order / 2))
+        envelope = xp.exp(-xp.power((x**2 + y**2) / self.w0**2, self.n_order / 2))
 
         return envelope

@@ -1,4 +1,4 @@
-import numpy as np
+from .backend import xp
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 from scipy.constants import c
 
@@ -87,7 +87,7 @@ class Laser:
     >>>     extent[2:] *= 1e6
     >>>     extent[:2] *= 1e12
     >>>     tmin, tmax, rmin, rmax = extent
-    >>>     vmax = np.abs(E_rt).max()
+    >>>     vmax = xp.abs(E_rt).max()
     >>>     axes[step].imshow(
     ...         E_rt,
     ...         origin="lower",
@@ -112,7 +112,7 @@ class Laser:
 
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
-            x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
+            x, y, t = xp.meshgrid(*self.grid.axes, indexing="ij")
             self.grid.set_temporal_field(profile.evaluate(x, y, t))
         elif self.dim == "rt":
             if n_theta_evals is None:
@@ -121,17 +121,17 @@ class Laser:
                 n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
             # Make sure that there are enough points to resolve the azimuthal modes
             assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
-            theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
-            theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
-            x = r * np.cos(theta)
-            y = r * np.sin(theta)
+            theta1d = 2 * xp.pi / n_theta_evals * xp.arange(n_theta_evals)
+            theta, r, t = xp.meshgrid(theta1d, *self.grid.axes, indexing="ij")
+            x = r * xp.cos(theta)
+            y = r * xp.sin(theta)
             # Evaluate the profile on the generated grid
             envelope = profile.evaluate(x, y, t)
             # Perform the azimuthal decomposition
-            azimuthal_modes = np.fft.ifft(envelope, axis=0)
+            azimuthal_modes = xp.fft.ifft(envelope, axis=0)
             field = azimuthal_modes[:n_azimuthal_modes]
             if n_azimuthal_modes > 1:
-                field = np.concatenate(
+                field = xp.concatenate(
                     (field, azimuthal_modes[-n_azimuthal_modes + 1 :])
                 )
             self.grid.set_temporal_field(field)
@@ -175,12 +175,12 @@ class Laser:
         dt = self.grid.dx[time_axis_indx]
         omega0 = self.profile.omega0
         Nt = self.grid.shape[time_axis_indx]
-        omega_1d = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+        omega_1d = 2 * xp.pi * xp.fft.fftfreq(Nt, dt) + omega0
 
         # Apply optical element
         spectral_field = self.grid.get_spectral_field()
         if self.dim == "rt":
-            r, omega = np.meshgrid(self.grid.axes[0], omega_1d, indexing="ij")
+            r, omega = xp.meshgrid(self.grid.axes[0], omega_1d, indexing="ij")
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and 0 as `y`
@@ -193,7 +193,7 @@ class Laser:
             for i_m in range(self.grid.azimuthal_modes.size):
                 spectral_field[i_m, :, :] *= multiplier
         else:
-            x, y, omega = np.meshgrid(
+            x, y, omega = xp.meshgrid(
                 self.grid.axes[0], self.grid.axes[1], omega_1d, indexing="ij"
             )
             spectral_field *= optical_element.amplitude_multiplier(x, y, omega)
@@ -221,8 +221,8 @@ class Laser:
         # apply boundary "absorption" if required
         if nr_boundary is not None:
             assert type(nr_boundary) is int and nr_boundary > 0
-            absorb_layer_axis = np.linspace(0, np.pi / 2, nr_boundary)
-            absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
+            absorb_layer_axis = xp.linspace(0, xp.pi / 2, nr_boundary)
+            absorb_layer_shape = xp.cos(absorb_layer_axis) ** 0.5
             absorb_layer_shape[-1] = 0.0
             field = self.grid.get_temporal_field()
             if self.dim == "rt":
@@ -238,7 +238,7 @@ class Laser:
         dt = self.grid.dx[time_axis_indx]
         omega0 = self.profile.omega0
         Nt = self.grid.shape[time_axis_indx]
-        omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+        omega = 2 * xp.pi * xp.fft.fftfreq(Nt, dt) + omega0
 
         if self.dim == "rt":
             # Construct the propagator (check if exists)
@@ -258,14 +258,14 @@ class Laser:
             # Propagate the spectral image
             spectral_field = self.grid.get_spectral_field()
             for i_m in range(self.grid.azimuthal_modes.size):
-                transform_data = np.transpose(spectral_field[i_m]).copy()
+                transform_data = xp.transpose(spectral_field[i_m]).copy()
                 self.prop[i_m].step(
                     transform_data,
                     distance,
                     overwrite=True,
                     show_progress=show_progress,
                 )
-                spectral_field[i_m, :, :] = np.transpose(transform_data).copy()
+                spectral_field[i_m, :, :] = xp.transpose(transform_data).copy()
             self.grid.set_spectral_field(spectral_field)
         else:
             # Construct the propagator (check if exists)
@@ -282,11 +282,11 @@ class Laser:
                 )
             # Propagate the spectral image
             spectral_field = self.grid.get_spectral_field()
-            transform_data = np.moveaxis(spectral_field, -1, 0).copy()
+            transform_data = xp.moveaxis(spectral_field, -1, 0).copy()
             self.prop.step(
                 transform_data, distance, overwrite=True, show_progress=show_progress
             )
-            spectral_field = np.moveaxis(transform_data, 0, -1).copy()
+            spectral_field = xp.moveaxis(transform_data, 0, -1).copy()
 
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / c
@@ -296,7 +296,7 @@ class Laser:
         # propagators, so it needs to be added by hand.
         # Note: subtracting by omega0 is only a global phase convention,
         # that derives from the definition of the envelope in lasy.
-        spectral_field *= np.exp(-1j * (omega[None, None, :] - omega0) * translate_time)
+        spectral_field *= xp.exp(-1j * (omega[None, None, :] - omega0) * translate_time)
         self.grid.set_spectral_field(spectral_field)
 
         # Translate the domain
@@ -346,7 +346,7 @@ class Laser:
         if self.dim == "rt":
             # Show field in the plane y=0, above and below axis, with proper sign for each mode
             E = [
-                np.concatenate(
+                xp.concatenate(
                     ((-1.0) ** m * temporal_field[m, ::-1], temporal_field[m])
                 )
                 for m in self.grid.azimuthal_modes

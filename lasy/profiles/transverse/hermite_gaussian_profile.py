@@ -1,6 +1,6 @@
 from math import factorial
 
-import numpy as np
+from lasy.backend import xp
 from scipy.special import hermite
 
 from .transverse_profile import TransverseProfile
@@ -63,7 +63,7 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
             assert (
                 wavelength is not None
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
-            self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
+            self.z_foc_over_zr = z_foc * wavelength / (xp.pi * w0**2)
 
     def _evaluate(self, x, y):
         """
@@ -84,15 +84,15 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         # Term for wavefront curvature, waist and Gouy phase
         diffract_factor = 1.0 - 1j * self.z_foc_over_zr
         w = self.w0 * abs(diffract_factor)
-        psi = np.angle(diffract_factor)
+        psi = xp.angle(diffract_factor)
 
         envelope = (
-            np.sqrt(2 / np.pi)
-            * np.sqrt(1 / (2 ** (self.n_x) * factorial(self.n_x) * self.w0))
-            * np.sqrt(1 / (2 ** (self.n_y) * factorial(self.n_y) * self.w0))
-            * hermite(self.n_x)(np.sqrt(2) * x / w)
-            * hermite(self.n_y)(np.sqrt(2) * y / w)
-            * np.exp(
+            xp.sqrt(2 / xp.pi)
+            * xp.sqrt(1 / (2 ** (self.n_x) * factorial(self.n_x) * self.w0))
+            * xp.sqrt(1 / (2 ** (self.n_y) * factorial(self.n_y) * self.w0))
+            * hermite(self.n_x)(xp.sqrt(2) * x / w)
+            * hermite(self.n_y)(xp.sqrt(2) * y / w)
+            * xp.exp(
                 -(x**2 + y**2) / (self.w0**2 * diffract_factor)
                 - 1.0j * (self.n_x + self.n_y) * psi
             )

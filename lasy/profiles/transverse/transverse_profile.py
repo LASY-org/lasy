@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 
 class TransverseProfile(object):
@@ -32,7 +32,7 @@ class TransverseProfile(object):
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
-        return np.zeros(x.shape, dtype="complex128")
+        return xp.zeros(x.shape, dtype="complex128")
 
     def __add__(self, other):
         """Return the sum of two transverse profiles."""

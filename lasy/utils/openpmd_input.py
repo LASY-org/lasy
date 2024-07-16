@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 from scipy.constants import c
 
 
@@ -57,7 +57,7 @@ def reorder_array_xyt(array, md):
     if "z" in md.axes.values():
         t = (md.z - md.z[0]) / c
         # Flip to get complex envelope in t assuming z = -c*t
-        array = np.flip(array, axis=-1)
+        array = xp.flip(array, axis=-1)
     else:
         t = md.t
     axes = {"x": md.x, "y": md.y, "t": t}
@@ -94,7 +94,7 @@ def reorder_array_rt(array, md):
     if "z" in md.axes.values():
         t = (md.z - md.z[0]) / c
         # Flip to get complex envelope in t assuming z = -c*t
-        array = np.flip(array, axis=-1)
+        array = xp.flip(array, axis=-1)
     else:
         t = md.t
     r = md.r[md.r.size // 2 :]
@@ -102,6 +102,6 @@ def reorder_array_rt(array, md):
 
     array = 0.5 * (
         array[array.shape[0] // 2 :, :]
-        + np.flip(array[: array.shape[0] // 2, :], axis=0)
+        + xp.flip(array[: array.shape[0] // 2, :], axis=0)
     )
     return array, axes

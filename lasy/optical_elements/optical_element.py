@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 
 class OpticalElement(object):
@@ -38,4 +38,4 @@ class OpticalElement(object):
         """
         # The base class only defines dummy multiplier
         # (This should be replaced by any class that inherits from this one.)
-        return np.ones_like(x, dtype="complex128")
+        return xp.ones_like(x, dtype="complex128")

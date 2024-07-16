@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 from scipy.constants import c, pi
 
 
@@ -31,4 +31,4 @@ class LongitudinalProfile(object):
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
-        return np.zeros(t.shape, dtype="complex128")
+        return xp.zeros(t.shape, dtype="complex128")

@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 time_axis_indx = -1
 
@@ -44,13 +44,13 @@ class Grid:
         self.axes = []
         self.dx = []
         for i in range(ndims):
-            self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
+            self.axes.append(xp.linspace(lo[i], hi[i], npoints[i]))
             self.dx.append(self.axes[i][1] - self.axes[i][0])
 
         if dim == "rt":
             self.n_azimuthal_modes = n_azimuthal_modes
-            self.azimuthal_modes = np.r_[
-                np.arange(n_azimuthal_modes), np.arange(-n_azimuthal_modes + 1, 0, 1)
+            self.azimuthal_modes = xp.r_[
+                xp.arange(n_azimuthal_modes), xp.arange(-n_azimuthal_modes + 1, 0, 1)
             ]
 
         # Data
@@ -61,9 +61,9 @@ class Grid:
             # 0, 1, 2, ..., n_azimuthal_modes-1, -n_azimuthal_modes+1, ..., -1
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
-        self.temporal_field = np.zeros(self.shape, dtype="complex128")
+        self.temporal_field = xp.zeros(self.shape, dtype="complex128")
         self.temporal_field_valid = False
-        self.spectral_field = np.zeros(self.shape, dtype="complex128")
+        self.spectral_field = xp.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
 
     def set_temporal_field(self, field):
@@ -147,7 +147,7 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
-        self.spectral_field = np.fft.ifft(
+        self.spectral_field = xp.fft.ifft(
             self.temporal_field, axis=time_axis_indx, norm="backward"
         )
         self.spectral_field_valid = True
@@ -159,7 +159,7 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.spectral_field_valid
-        self.temporal_field = np.fft.fft(
+        self.temporal_field = xp.fft.fft(
             self.spectral_field, axis=time_axis_indx, norm="backward"
         )
         self.temporal_field_valid = True
