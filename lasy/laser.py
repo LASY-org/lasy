@@ -209,11 +209,6 @@ class Laser:
         distance : scalar
             Distance by which the laser pulse should be propagated
 
-        initial_optical_element: an :class:`.OpticalElement` object (optional)
-            Represents a thin optical element, through which the laser
-            propagates, before propagating for `distance` in free space.
-            If this is `None`, no optical element is used.
-
         nr_boundary : integer (optional)
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
