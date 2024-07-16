@@ -1,11 +1,11 @@
 import numpy as np
+import pytest
+from scipy.constants import c
 
 np.random.seed(0)  # Fix random seed for reproducibility
 
 from lasy.laser import Laser
 from lasy.profiles.speckle_profile import SpeckleProfile
-import pytest
-from scipy.constants import c
 
 
 @pytest.mark.parametrize(

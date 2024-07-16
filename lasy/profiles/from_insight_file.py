@@ -1,6 +1,7 @@
-import numpy as np
 import h5py
+import numpy as np
 from scipy.constants import c
+
 from .from_array_profile import FromArrayProfile
 
 

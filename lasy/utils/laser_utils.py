@@ -1,9 +1,10 @@
 import numpy as np
-from scipy.constants import c, epsilon_0, e, m_e
+from axiprop.containers import ScalarFieldEnvelope
+from axiprop.lib import PropagatorFFT2, PropagatorResampling
+from scipy.constants import c, e, epsilon_0, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
-from axiprop.lib import PropagatorFFT2, PropagatorResampling
-from axiprop.containers import ScalarFieldEnvelope
+
 from .grid import Grid
 
 
