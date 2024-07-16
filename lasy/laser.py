@@ -159,6 +159,51 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
+    def apply_optics(self, optical_element):
+        """
+        Propagate the laser pulse through a thin optical element.
+
+        Parameter
+        ---------
+        optical_element: an :class:`.OpticalElement` object (optional)
+            Represents a thin optical element, through which the laser
+            propagates.
+        """
+        # Transform the field from temporal to frequency domain
+        time_axis_indx = -1
+        field_fft = np.fft.ifft(self.grid.field, axis=time_axis_indx, norm="backward")
+
+        # Create the frequency axis
+        dt = self.grid.dx[time_axis_indx]
+        omega0 = self.profile.omega0
+        Nt = self.grid.field.shape[time_axis_indx]
+        omega_1d = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+
+        # Apply optical element
+        if self.dim == "rt":
+            r, omega = np.meshgrid(self.grid.axes[0], omega_1d, indexing="ij")
+            # The line below assumes that amplitude_multiplier
+            # is cylindrically symmetric, hence we pass
+            # `r` as `x` and 0 as `y`
+            multiplier = optical_element.amplitude_multiplier(r, 0, omega)
+            # The azimuthal modes are the components of the Fourier transform
+            # along theta (FT_theta). Because the multiplier is assumed to be
+            # cylindrically symmetric (i.e. theta-independent):
+            # FT_theta[ multiplier * field ] = multiplier * FT_theta[ field ]
+            # Thus, we can simply multiply each azimuthal mode by the multiplier.
+            for i_m in range(self.grid.azimuthal_modes.size):
+                field_fft[i_m, :, :] *= multiplier
+        else:
+            x, y, omega = np.meshgrid(
+                self.grid.axes[0], self.grid.axes[1], omega_1d, indexing="ij"
+            )
+            field_fft *= optical_element.amplitude_multiplier(x, y, omega)
+
+        # Transform field from frequency to temporal domain
+        self.grid.field[:, :, :] = np.fft.fft(
+            field_fft, axis=time_axis_indx, norm="backward"
+        )
+
     def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
         """
         Propagate the laser pulse by the distance specified.
@@ -172,6 +217,7 @@ class Laser:
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
             Only used for ``'rt'``.
+
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
         show_progress : bool (optional)
@@ -211,6 +257,7 @@ class Laser:
         omega0 = self.profile.omega0
         Nt = self.grid.field.shape[time_axis_indx]
         omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+
         # make 3D shape for the frequency axis
         omega_shape = (1, 1, self.grid.field.shape[time_axis_indx])
 
