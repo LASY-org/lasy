@@ -187,6 +187,11 @@ class Laser:
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and 0 as `y`
             multiplier = optical_element.amplitude_multiplier(r, 0, omega)
+            # The azimuthal modes are the components of the Fourier transform
+            # along theta (FT_theta). Because the multiplier is assumed to be
+            # cylindrically symmetric (i.e. theta-independent):
+            # FT_theta[ multiplier * field ] = multiplier * FT_theta[ field ]
+            # Thus, we can simply multiply each azimuthal mode by the multiplier.
             for i_m in range(self.grid.azimuthal_modes.size):
                 field_fft[i_m, :, :] *= multiplier
         else:
