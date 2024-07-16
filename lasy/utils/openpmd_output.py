@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import openpmd_api as io
 from scipy.constants import c
@@ -5,7 +7,6 @@ from scipy.constants import c
 from lasy import __version__ as lasy_version
 
 from .laser_utils import field_to_vector_potential
-import os
 
 
 def write_to_openpmd_file(
@@ -61,7 +62,9 @@ def write_to_openpmd_file(
     array = grid.field
 
     # Create file
-    full_filepath = os.path.join(write_dir, "{}_%05T.{}".format(file_prefix, file_format))
+    full_filepath = os.path.join(
+        write_dir, "{}_%05T.{}".format(file_prefix, file_format)
+    )
     if os.path.exists(full_filepath):
         raise FileExistsError("File already exists: {}".format(full_filepath))
     os.makedirs(write_dir, exist_ok=True)
