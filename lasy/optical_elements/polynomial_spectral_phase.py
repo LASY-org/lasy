@@ -24,7 +24,7 @@ class PolynomialSpectralPhase(OpticalElement):
     Parameters
     ----------
     gdd : float (in s^2)
-        Group Delay Dispersion.
+        Group Delay Dispersion. ``gdd > 0`` corresponds to a positive chirp, i.e. low-frequency part of the spectrum arriving earlier than the high-frequency part of the spectrum.
     tod : float (in s^3)
         Third-order Dispersion.
     fod : float (in s^4)
