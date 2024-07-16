@@ -27,12 +27,13 @@ class Profile(object):
 
     """
 
-    def __init__(self, wavelength, pol):
+    def __init__(self, wavelength, pol, laser_energy=None):
         assert len(pol) == 2
         norm_pol = np.sqrt(np.abs(pol[0]) ** 2 + np.abs(pol[1]) ** 2)
         self.pol = np.array([pol[0] / norm_pol, pol[1] / norm_pol])
         self.lambda0 = wavelength
         self.omega0 = 2 * np.pi * c / self.lambda0
+        self.laser_energy
 
     def evaluate(self, x, y, t):
         """
@@ -89,6 +90,7 @@ class SummedProfile(Profile):
         # Get the wavelength values from each profile
         lambda0s = [p.lambda0 for p in self.profiles]
         pols = [p.pol for p in self.profiles]
+        energies = [p.laser_energy for p in self.profiles]
         # Check that all wavelengths are the same
         assert np.allclose(
             lambda0s, lambda0s[0]
@@ -99,6 +101,10 @@ class SummedProfile(Profile):
             pols, pols[0]
         ), "Added profiles must have the same polarization."
         pol = profiles[0].pol
+        # Check that all profiles have a defined energy
+        assert None not in energies,  "All summed profiled must have a defined laser_energy"
+        # The energy of the summed profile is still undefined, it is not the
+        # sum of energies of the summed profiles, so we let it be None.
         # Initialize the parent class
         super().__init__(lambda0, pol)
 

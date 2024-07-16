@@ -47,8 +47,7 @@ class CombinedLongitudinalTransverseProfile(Profile):
     """
 
     def __init__(self, wavelength, pol, laser_energy, long_profile, trans_profile):
-        super().__init__(wavelength, pol)
-        self.laser_energy = laser_energy
+        super().__init__(wavelength, pol, laser_energy)
         self.long_profile = long_profile
         self.trans_profile = trans_profile
 

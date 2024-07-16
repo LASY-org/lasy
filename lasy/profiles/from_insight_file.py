@@ -27,7 +27,7 @@ class FromInsightFile(FromArrayProfile):
         corresponding to the location of the maximum of the on-axis spectrum.
     """
 
-    def __init__(self, file_path, pol, omega0="barycenter"):
+    def __init__(self, file_path, pol, omega0="barycenter", laser_energy=None):
         # read the data from H5 filed
         with h5py.File(file_path, "r") as hf:
             data = np.asanyarray(hf["data/Exyt_0"][()], dtype=np.complex128, order="C")
@@ -74,4 +74,5 @@ class FromInsightFile(FromArrayProfile):
             dim=dim,
             axes=axes,
             axes_order=["x", "y", "t"],
+            laser_energy=laser_energy
         )
