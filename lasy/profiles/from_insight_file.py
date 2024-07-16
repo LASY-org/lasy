@@ -1,6 +1,7 @@
 import h5py
-from lasy.backend import xp
 from scipy.constants import c
+
+from lasy.backend import xp
 
 from .from_array_profile import FromArrayProfile
 

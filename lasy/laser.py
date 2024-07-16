@@ -1,6 +1,4 @@
 import numpy as np
-from .backend import xp
-
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 from scipy.constants import c
 
@@ -11,6 +9,8 @@ from lasy.utils.laser_utils import (
     normalize_peak_intensity,
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
+
+from .backend import xp
 
 
 class Laser:

@@ -1,8 +1,8 @@
-from lasy.backend import xp
 import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
 from scipy.constants import c
 
+from lasy.backend import xp
 from lasy.utils.laser_utils import create_grid, field_to_envelope
 from lasy.utils.openpmd_input import reorder_array
 

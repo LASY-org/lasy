@@ -1,7 +1,6 @@
 import math
 
 from lasy.backend import xp
-
 from lasy.profiles.transverse.hermite_gaussian_profile import (
     HermiteGaussianTransverseProfile,
 )

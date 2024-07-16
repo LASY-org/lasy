@@ -1,5 +1,6 @@
-from lasy.backend import xp
 import scipy.special as scispe
+
+from lasy.backend import xp
 
 from .transverse_profile import TransverseProfile
 

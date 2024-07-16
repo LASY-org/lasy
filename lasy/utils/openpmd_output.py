@@ -1,8 +1,8 @@
-from lasy.backend import xp
 import openpmd_api as io
 from scipy.constants import c
 
 from lasy import __version__ as lasy_version
+from lasy.backend import xp
 
 from .laser_utils import field_to_vector_potential
 
