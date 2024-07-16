@@ -175,7 +175,7 @@ class Laser:
         # Create the frequency axis
         dt = self.grid.dx[time_axis_indx]
         omega0 = self.profile.omega0
-        Nt = self.grid.field.shape[time_axis_indx]
+        Nt = self.grid.shape[time_axis_indx]
         omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
 
         # Apply optical element in spectral space
