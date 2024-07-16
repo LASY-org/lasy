@@ -7,4 +7,4 @@ except ImportError:
 
     use_cupy = False
 
-__all__ = ['use_cupy', 'xp']
+__all__ = ["use_cupy", "xp"]
