@@ -54,7 +54,7 @@ def test_intensity_distribution(temporal_smoothing_type):
 
     laser = Laser(dimensions, lo, hi, num_points, profile)
 
-    F = laser.grid.field
+    F = laser.grid.get_temporal_field()
 
     # get spatial statistics
     # <real env> = 0 = <imag env> = <er * ei>
@@ -124,7 +124,7 @@ def test_spatial_correlation(temporal_smoothing_type):
     num_points = (200, 200, 300)
 
     laser = Laser(dimensions, lo, hi, num_points, profile)
-    F = laser.grid.field
+    F = laser.grid.get_temporal_field()
 
     # compare speckle profile / autocorrelation
     # compute autocorrelation using Wiener-Khinchin Theorem
@@ -207,7 +207,7 @@ def test_sinc_zeros(temporal_smoothing_type):
     num_points = (300, 300, 10)
 
     laser = Laser(dimensions, lo, hi, num_points, profile)
-    F = laser.grid.field
+    F = laser.grid.get_temporal_field()
 
     assert abs(F[0, :, :]).max() / abs(F).max() < 1.0e-8
     assert abs(F[-1, :, :]).max() / abs(F).max() < 1.0e-8
@@ -268,6 +268,6 @@ def test_FM_SSD_periodicity():
     num_points = (160, 200, 400)  # Number of points in each dimension
 
     laser = Laser(dimensions, lo, hi, num_points, laser_profile)
-    F = laser.grid.field
+    F = laser.grid.get_temporal_field()
     period_error = abs(F[:, :, 0] - F[:, :, -1]).max() / abs(F).max()
     assert period_error < 1.0e-8
