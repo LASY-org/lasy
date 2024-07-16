@@ -43,7 +43,7 @@ class Laser:
         Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
         used in order to represent the laser field.
 
-    n_theta_evals: int (optional)
+    n_theta_evals : int (optional)
         Only used if ``dim`` is ``'rt'``. The number of points in the theta
         (azimuthal) direction at which to evaluate the laser field, before
         decomposing it into ``n_azimuthal_modes`` azimuthal modes. By default,
@@ -145,9 +145,9 @@ class Laser:
 
         Parameters
         ----------
-        value: scalar
+        value : scalar
             Value to which to normalize the field property that is defined in ``kind``
-        kind: string (optional)
+        kind : string (optional)
             Distance by which the laser pulse should be propagated
             Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
@@ -362,7 +362,7 @@ class Laser:
 
         Parameters
         ----------
-        **kw: additional arguments to be passed to matplotlib's imshow command
+        **kw : additional arguments to be passed to matplotlib's imshow command
         """
         if self.dim == "rt":
             # Show field in the plane y=0, above and below axis, with proper sign for each mode

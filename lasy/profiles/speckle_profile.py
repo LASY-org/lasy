@@ -9,13 +9,13 @@ def gen_gaussian_time_series(t_num, dt, fwhm, rms_mean):
 
     Parameters
     ----------
-    t_num: number of grid points in time
-    fwhm: full width half maximum of the power spectrum
-    rms_mean: root-mean-square average of the spectrum
+    t_num : number of grid points in time
+    fwhm : full width half maximum of the power spectrum
+    rms_mean : root-mean-square average of the spectrum
 
     Returns
     -------
-    temporal_amplitude: a time series array of complex numbers with shape [t_num]
+    temporal_amplitude : a time series array of complex numbers with shape [t_num]
     """
     if fwhm == 0.0:
         temporal_amplitude = np.zeros(t_num, dtype=np.complex128)
@@ -292,9 +292,9 @@ class SpeckleProfile(Profile):
 
         Parameters
         ----------
-        series_time: array of times at which to sample from Gaussian process
-        ssd_time_delay: only required for "SSD" type smoothing
-        ssd_phase_modulation_frequency: only required for "SSD" type smoothing
+        series_time : array of times at which to sample from Gaussian process
+        ssd_time_delay : only required for "SSD" type smoothing
+        ssd_phase_modulation_frequency : only required for "SSD" type smoothing
 
         Returns
         -------
@@ -363,10 +363,10 @@ class SpeckleProfile(Profile):
 
         Parameters
         ----------
-        t_now: float, time at which to calculate the complex amplitude of the beamlets
-        series_time: 1d array of times at which the stochastic process was sampled to generate the time series
-        time_series: array of random phase and/or amplitudes as determined by the smoothing type
-        temporal_smoothing_type: string, what type of temporal smoothing to perform.
+        t_now : float, time at which to calculate the complex amplitude of the beamlets
+        series_time : 1d array of times at which the stochastic process was sampled to generate the time series
+        time_series : array of random phase and/or amplitudes as determined by the smoothing type
+        temporal_smoothing_type : string, what type of temporal smoothing to perform.
 
         Returns
         -------
@@ -430,16 +430,16 @@ class SpeckleProfile(Profile):
 
         Parameters
         ----------
-        t_now: float, time at which to calculate the speckle pattern
-        exp_phase_plate: 2d array of complex numbers giving the RPP / CPP phase contributions to the beamlets
-        x: 3d array of x-positions in focal plane
-        y: 3d array of y-positions in focal plane
-        series_time: 1d array of times at which the stochastic process was sampled to generate the time series
-        time_series: array of random phase and/or amplitudes as determined by the smoothing type
+        t_now : float, time at which to calculate the speckle pattern
+        exp_phase_plate : 2d array of complex numbers giving the RPP / CPP phase contributions to the beamlets
+        x : 3d array of x-positions in focal plane
+        y : 3d array of y-positions in focal plane
+        series_time : 1d array of times at which the stochastic process was sampled to generate the time series
+        time_series : array of random phase and/or amplitudes as determined by the smoothing type
 
         Returns
         -------
-        speckle_amp: 2D array of complex numbers defining the laser envelope at focus at time `t_now`
+        speckle_amp : 2D array of complex numbers defining the laser envelope at focus at time `t_now`
         """
         lambda_fnum = self.lambda0 * self.focal_length / self.beam_aperture
         X_focus_matrix = x[:, :, 0] / lambda_fnum[0]
@@ -488,13 +488,13 @@ class SpeckleProfile(Profile):
 
         Parameters
         ----------
-        x, y, t: ndarrays of floats
+        x, y, t : ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
         Returns
         -------
-        envelope: ndarray of complex numbers
+        envelope : ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
         """
