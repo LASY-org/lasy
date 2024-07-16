@@ -184,7 +184,7 @@ class Laser:
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and 0 as `y`
-            multiplier = optical_element.amplitude_multiplier(r, 0, omega)
+            multiplier = optical_element.amplitude_multiplier(r, 0, omega, omega0)
             # The azimuthal modes are the components of the Fourier transform
             # along theta (FT_theta). Because the multiplier is assumed to be
             # cylindrically symmetric (i.e. theta-independent):
@@ -196,7 +196,7 @@ class Laser:
             x, y, omega = np.meshgrid(
                 self.grid.axes[0], self.grid.axes[1], omega_1d, indexing="ij"
             )
-            spectral_field *= optical_element.amplitude_multiplier(x, y, omega)
+            spectral_field *= optical_element.amplitude_multiplier(x, y, omega, omega0)
         self.grid.set_spectral_field(spectral_field)
 
     def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
