@@ -253,7 +253,7 @@ class Laser:
                 k = omega / c
                 if use_cupy:
                     # Move quantities to CPU to create propagator
-                    k = xp.asnumpy( k )
+                    k = xp.asnumpy(k)
                     spatial_axes = (xp.asnumpy(spatial_axes[0]),)
                 self.prop = []
                 for m in self.grid.azimuthal_modes:
