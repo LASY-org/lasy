@@ -2,7 +2,6 @@
 
 import pytest
 import numpy as np
-from scipy.special import gamma as gamma
 from scipy.constants import c
 
 from lasy.laser import Laser
