@@ -1,14 +1,15 @@
+import math
+
+import numpy as np
+
+from lasy.profiles.transverse.hermite_gaussian_profile import (
+    HermiteGaussianTransverseProfile,
+)
 from lasy.profiles.transverse.transverse_profile import TransverseProfile
 from lasy.profiles.transverse.transverse_profile_from_data import (
     TransverseProfileFromData,
 )
-from lasy.profiles.transverse.hermite_gaussian_profile import (
-    HermiteGaussianTransverseProfile,
-)
 from lasy.utils.exp_data_utils import find_d4sigma
-
-import numpy as np
-import math
 
 
 def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):

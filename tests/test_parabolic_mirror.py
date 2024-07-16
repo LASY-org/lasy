@@ -8,9 +8,10 @@ expected value in the far field (i.e. in the focal plane)
 """
 
 import numpy as np
+
 from lasy.laser import Laser
-from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.optical_elements import ParabolicMirror
+from lasy.profiles.gaussian_profile import GaussianProfile
 
 wavelength = 0.8e-6
 w0 = 5.0e-3  # m, initialized in near field

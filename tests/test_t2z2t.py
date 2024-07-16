@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import pytest
-
 import numpy as np
+import pytest
+from scipy.constants import c
+
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.laser_utils import import_from_z, export_to_z
-from scipy.constants import c
+from lasy.utils.laser_utils import export_to_z, import_from_z
 
 
 @pytest.fixture(scope="function")

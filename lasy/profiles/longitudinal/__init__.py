@@ -1,8 +1,8 @@
 from .cosine_profile import CosineLongitudinalProfile
 from .gaussian_profile import GaussianLongitudinalProfile
-from .super_gaussian_profile import SuperGaussianLongitudinalProfile
-from .longitudinal_profile_from_data import LongitudinalProfileFromData
 from .longitudinal_profile import LongitudinalProfile
+from .longitudinal_profile_from_data import LongitudinalProfileFromData
+from .super_gaussian_profile import SuperGaussianLongitudinalProfile
 
 __all__ = [
     "CosineLongitudinalProfile",
