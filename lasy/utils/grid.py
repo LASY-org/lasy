@@ -1,5 +1,7 @@
 import numpy as np
+
 time_axis_indx = -1
+
 
 class Grid:
     """
@@ -77,7 +79,7 @@ class Grid:
         assert field.dtype == "complex128"
         self.temporal_field = field
         self.temporal_field_valid = True
-        self.spectral_field_valid = False # Invalidates the spectral field
+        self.spectral_field_valid = False  # Invalidates the spectral field
 
     def set_spectral_field(self, field):
         """
@@ -92,7 +94,7 @@ class Grid:
         assert field.dtype == "complex128"
         self.spectral_field = field
         self.spectral_field_valid = True
-        self.temporal_field_valid = False # Invalidates the temporal field
+        self.temporal_field_valid = False  # Invalidates the temporal field
 
     def get_temporal_field(self):
         """
@@ -111,8 +113,7 @@ class Grid:
             self.spectral2temporal_fft()
             return self.temporal_field.copy()
         else:
-            raise ValueError(
-                "Both temporal and spectral fields are invalid")
+            raise ValueError("Both temporal and spectral fields are invalid")
 
     def get_spectral_field(self):
         """
@@ -131,8 +132,7 @@ class Grid:
             self.temporal2spectral_fft()
             return self.spectral_field.copy()
         else:
-            raise ValueError(
-                "Both temporal and spectral fields are invalid")
+            raise ValueError("Both temporal and spectral fields are invalid")
 
     def temporal2spectral_fft(self):
         """
@@ -140,8 +140,9 @@ class Grid:
         (Only along the time axis, not allong the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
-        self.spectral_field = np.fft.ifft( self.temporal_field,
-            axis=time_axis_indx, norm="backward")
+        self.spectral_field = np.fft.ifft(
+            self.temporal_field, axis=time_axis_indx, norm="backward"
+        )
         self.spectral_field_valid = True
 
     def spectral2temporal_fft(self):
@@ -150,7 +151,7 @@ class Grid:
         (Only along the time axis, not allong the transverse spatial coordinates.)
         """
         assert self.spectral_field_valid
-        self.temporal_field = np.fft.fft( self.spectral_field,
-            axis=time_axis_indx, norm="backward"
+        self.temporal_field = np.fft.fft(
+            self.spectral_field, axis=time_axis_indx, norm="backward"
         )
         self.temporal_field_valid = True

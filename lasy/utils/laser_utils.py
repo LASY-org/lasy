@@ -110,7 +110,6 @@ def normalize_peak_field_amplitude(amplitude, grid):
             grid.set_temporal_field(field)
 
 
-
 def normalize_peak_intensity(peak_intensity, grid):
     """
     Normalize energy of the laser pulse contained in grid.
@@ -130,7 +129,7 @@ def normalize_peak_intensity(peak_intensity, grid):
         if input_peak_intensity == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
         else:
-            grid.set_temporal_field( np.sqrt(peak_intensity / input_peak_intensity) )
+            grid.set_temporal_field(np.sqrt(peak_intensity / input_peak_intensity))
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
@@ -687,7 +686,7 @@ def create_grid(array, axes, dim):
         assert np.all(grid.axes[0] == axes["x"])
         assert np.all(grid.axes[1] == axes["y"])
         assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
-        grid.set_temporal_field( array )
+        grid.set_temporal_field(array)
     else:  # dim == "rt":
         lo = (axes["r"][0], axes["t"][0])
         hi = (axes["r"][-1], axes["t"][-1])
@@ -695,7 +694,7 @@ def create_grid(array, axes, dim):
         grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1)
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
-        grid.set_temporal_field( array )
+        grid.set_temporal_field(array)
     return grid
 
 
@@ -852,13 +851,13 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
             )
 
         # Convert the spectral image to the spatial field representation
-        field = np.zeros( grid.shape, dtype=np.complex128 )
+        field = np.zeros(grid.shape, dtype=np.complex128)
         for i_m in range(grid.azimuthal_modes.size):
             transform_data = np.transpose(field_fft[i_m]).copy()
             transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None] - omega0 / c))
             field[i_m] = prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
             field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
-        grid.set_temporal_field( field )
+        grid.set_temporal_field(field)
     else:
         # Construct the propagator
         Nx, Ny, _ = grid.npoints
