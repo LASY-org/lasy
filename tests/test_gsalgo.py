@@ -5,11 +5,11 @@ import copy
 import numpy as np
 import pytest
 
+from lasy.backend import xp
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.utils.phase_retrieval import gerchberg_saxton_algo
 from lasy.utils.zernike import zernike
-from lasy.backend import xp
 
 w0 = 25.0e-6  # m
 
