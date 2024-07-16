@@ -1,9 +1,8 @@
 import numpy as np
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
-from grid import time_axis_indx
 from scipy.constants import c
 
-from lasy.utils.grid import Grid
+from lasy.utils.grid import Grid, time_axis_indx
 from lasy.utils.laser_utils import (
     normalize_energy,
     normalize_peak_field_amplitude,
