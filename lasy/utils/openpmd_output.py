@@ -65,8 +65,6 @@ def write_to_openpmd_file(
     full_filepath = os.path.join(
         write_dir, "{}_%05T.{}".format(file_prefix, file_format)
     )
-    if os.path.exists(full_filepath):
-        raise FileExistsError("File already exists: {}".format(full_filepath))
     os.makedirs(write_dir, exist_ok=True)
     series = io.Series(full_filepath, io.Access.create)
     series.set_software("lasy", lasy_version)
