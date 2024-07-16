@@ -1,4 +1,6 @@
+import numpy as np
 from .backend import xp
+
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 from scipy.constants import c
 
@@ -342,11 +344,12 @@ class Laser:
         ----------
         **kw: additional arguments to be passed to matplotlib's imshow command
         """
-        temporal_field = self.grid.get_temporal_field()
+        # Get field on CPU
+        temporal_field = self.grid.get_temporal_field(to_cpu=True)
         if self.dim == "rt":
             # Show field in the plane y=0, above and below axis, with proper sign for each mode
             E = [
-                xp.concatenate(
+                np.concatenate(
                     ((-1.0) ** m * temporal_field[m, ::-1], temporal_field[m])
                 )
                 for m in self.grid.azimuthal_modes
