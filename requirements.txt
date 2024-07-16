@@ -1,4 +1,4 @@
-git+https://github.com/hightower8083/axiprop@add-step-on-device
+axiprop @ git+https://github.com/hightower8083/axiprop@add-step-on-device
 numpy
 openpmd-api
 openpmd-viewer
