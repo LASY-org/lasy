@@ -102,7 +102,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         if not is_envelope:
             grid = create_grid(F, axes, dim)
             grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
-            array = grid.field[0]
+            array = grid.get_temporal_field()[0]
         else:
             s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
             it = s.iterations[iteration]

@@ -39,7 +39,7 @@ def compute_laser_energy(dim, grid):
     # specified laser wavelength.
     # This probably needs to be generalized for few-cycle laser pulses.
 
-    envelope = grid.field
+    envelope = grid.get_temporal_field()
 
     dV = get_grid_cell_volume(grid, dim)
 
@@ -84,7 +84,9 @@ def normalize_energy(dim, energy, grid):
         print("Field is zero everywhere, normalization will be skipped")
     else:
         norm_factor = (energy / current_energy) ** 0.5
-        grid.field *= norm_factor
+        field = grid.get_temporal_field()
+        field *= norm_factor
+        grid.set_temporal_field(field)
 
 
 def normalize_peak_field_amplitude(amplitude, grid):
@@ -100,10 +102,13 @@ def normalize_peak_field_amplitude(amplitude, grid):
         Contains value of the laser envelope and metadata.
     """
     if amplitude is not None:
-        if np.abs(grid.field).max() == 0.0:
+        field = grid.get_temporal_field()
+        field_max = np.abs(field).max()
+        if field_max == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
         else:
-            grid.field *= amplitude / np.abs(grid.field).max()
+            field *= amplitude / field_max
+            grid.set_temporal_field(field)
 
 
 def normalize_peak_intensity(peak_intensity, grid):
@@ -119,12 +124,13 @@ def normalize_peak_intensity(peak_intensity, grid):
         Contains value of the laser envelope and metadata.
     """
     if peak_intensity is not None:
-        intensity = np.abs(epsilon_0 * grid.field**2 / 2 * c)
+        field = grid.get_temporal_field()
+        intensity = np.abs(epsilon_0 * field**2 / 2 * c)
         input_peak_intensity = intensity.max()
         if input_peak_intensity == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
         else:
-            grid.field *= np.sqrt(peak_intensity / input_peak_intensity)
+            grid.set_temporal_field(np.sqrt(peak_intensity / input_peak_intensity))
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
@@ -151,7 +157,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
             Physical extent of the reconstructed field.
     """
     omega0 = laser.profile.omega0
-    env = laser.grid.field.copy()
+    env = laser.grid.get_temporal_field()
     time_axis = laser.grid.axes[-1]
 
     if laser.dim == "rt":
@@ -295,18 +301,17 @@ def get_spectrum(
         Array with the angular frequencies of the spectrum.
     """
     # Get the frequencies of the fft output.
-    freq = np.fft.fftfreq(grid.field.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
+    freq = np.fft.fftfreq(grid.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
     omega = 2 * np.pi * freq
 
     # Get on axis or full field.
+    field = grid.get_temporal_field()
     if method == "on_axis":
         if dim == "xyt":
-            nx, ny, nt = grid.field.shape
-            field = grid.field[nx // 2, ny // 2]
+            nx, ny, _ = field.shape
+            field = field[nx // 2, ny // 2]
         else:
-            field = grid.field[0, 0]
-    else:
-        field = grid.field
+            field = field[0, 0]
 
     # Get spectrum.
     if is_envelope:
@@ -421,19 +426,21 @@ def get_frequency(
         Central angular frequency (averaged omega, weighted by the local
         envelope amplitude).
     """
+    field = grid.get_temporal_field()
+
     # Assumes t is last dimension!
     if is_envelope:
         assert omega0 is not None
-        phase = np.unwrap(np.angle(grid.field))
+        phase = np.unwrap(np.angle(field))
         omega = omega0 + np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
-        central_omega = np.average(omega, weights=np.abs(grid.field))
+        central_omega = np.average(omega, weights=np.abs(field))
     else:
         assert dim in ["xyt", "rt"]
         if dim == "xyt" and phase_unwrap_nd:
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
-        h = grid.field if is_hilbert else hilbert_transform(grid)
-        h = np.squeeze(grid.field)
+        h = field if is_hilbert else hilbert_transform(grid)
+        h = np.squeeze(field)
         if phase_unwrap_nd:
             try:
                 from skimage.restoration import unwrap_phase
@@ -482,10 +489,11 @@ def get_duration(grid, dim):
     """
     # Calculate weights of each grid cell (amplitude of the field).
     dV = get_grid_cell_volume(grid, dim)
+    field = grid.get_temporal_field()
     if dim == "xyt":
-        weights = np.abs(grid.field) ** 2 * dV
+        weights = np.abs(field) ** 2 * dV
     else:  # dim == "rt":
-        weights = np.abs(grid.field) ** 2 * dV[np.newaxis, :, np.newaxis]
+        weights = np.abs(field) ** 2 * dV[np.newaxis, :, np.newaxis]
     # project weights to longitudinal axes
     weights = np.sum(weights, axis=(0, 1))
     return weighted_std(grid.axes[-1], weights)
@@ -513,7 +521,7 @@ def field_to_vector_potential(grid, omega0):
     # term in: E = -dA/dt + 1j * omega0 * A where E and A are the field and
     # vector potential envelopes, respectively
     omega, _ = get_frequency(grid, is_envelope=True, omega0=omega0)
-    return -1j * e * grid.field / (m_e * omega * c)
+    return -1j * e * grid.get_temporal_field() / (m_e * omega * c)
 
 
 def vector_potential_to_field(grid, omega0, direct=True):
@@ -538,15 +546,16 @@ def vector_potential_to_field(grid, omega0, direct=True):
     -------
     Envelope of the electric field (V/m).
     """
+    field = grid.get_temporal_field()
     if direct:
         A = (
-            -np.gradient(grid.field, grid.axes[-1], axis=-1, edge_order=2)
-            + 1j * omega0 * grid.field
+            -np.gradient(field, grid.axes[-1], axis=-1, edge_order=2)
+            + 1j * omega0 * field
         )
         return m_e * c / e * A
     else:
         omega, _ = get_frequency(grid, is_envelope=True, omega0=omega0)
-        return 1j * m_e * omega * c * grid.field / e
+        return 1j * m_e * omega * c * field / e
 
 
 def field_to_envelope(grid, dim, phase_unwrap_nd=False):
@@ -571,8 +580,10 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     tuple
         A tuple with the envelope array and the central wavelength.
     """
+    field = grid.get_temporal_field()
+
     # hilbert transform needs inverted time axis.
-    grid.field = hilbert_transform(grid)
+    field = hilbert_transform(field)
 
     # Get central wavelength from array
     omg_h, omg0_h = get_frequency(
@@ -582,12 +593,13 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
         is_hilbert=True,
         phase_unwrap_nd=phase_unwrap_nd,
     )
-    grid.field *= np.exp(1j * omg0_h * grid.axes[-1])
+    field *= np.exp(1j * omg0_h * grid.axes[-1])
+    grid.set_temporal_field(field)
 
     return grid, omg0_h
 
 
-def hilbert_transform(grid):
+def hilbert_transform(field):
     """Make a hilbert transform of the grid field.
 
     Currently the arrays need to be flipped along t (both the input field and
@@ -599,7 +611,7 @@ def hilbert_transform(grid):
     grid : Grid
         The lasy grid whose field should be transformed.
     """
-    return hilbert(grid.field[:, :, ::-1])[:, :, ::-1]
+    return hilbert(field[:, :, ::-1])[:, :, ::-1]
 
 
 def get_grid_cell_volume(grid, dim):
@@ -675,8 +687,7 @@ def create_grid(array, axes, dim):
         assert np.all(grid.axes[0] == axes["x"])
         assert np.all(grid.axes[1] == axes["y"])
         assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
-        assert grid.field.shape == array.shape
-        grid.field = array
+        grid.set_temporal_field(array)
     else:  # dim == "rt":
         lo = (axes["r"][0], axes["t"][0])
         hi = (axes["r"][-1], axes["t"][-1])
@@ -684,8 +695,7 @@ def create_grid(array, axes, dim):
         grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1)
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
-        assert grid.field.shape == array[np.newaxis].shape
-        grid.field = array[np.newaxis]
+        grid.set_temporal_field(array)
     return grid
 
 
@@ -732,6 +742,8 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
 
     FieldAxprp = ScalarFieldEnvelope(omega0 / c, t_axis)
 
+    field = grid.get_temporal_field()
+
     if dim == "rt":
         # Construct the propagator
         prop = []
@@ -747,20 +759,20 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
             )
 
         field_z = np.zeros(
-            (grid.field.shape[0], grid.field.shape[1], z_axis.size),
-            dtype=grid.field.dtype,
+            (field.shape[0], field.shape[1], z_axis.size),
+            dtype=field.dtype,
         )
 
         # Convert the spectral image to the spatial field representation
         for i_m in range(grid.azimuthal_modes.size):
-            FieldAxprp.import_field(np.transpose(grid.field[i_m]).copy())
+            FieldAxprp.import_field(np.transpose(field[i_m]).copy())
 
             field_z[i_m] = prop[i_m].t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
 
             field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
     else:
         # Construct the propagator
-        Nx, Ny, Nt = grid.field.shape
+        Nx, Ny, Nt = field.shape
         Lx = grid.hi[0] - grid.lo[0]
         Ly = grid.hi[1] - grid.lo[1]
         prop = PropagatorFFT2(
@@ -771,7 +783,7 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
             verbose=False,
         )
         # Convert the spectral image to the spatial field representation
-        FieldAxprp.import_field(np.moveaxis(grid.field, -1, 0).copy())
+        FieldAxprp.import_field(np.moveaxis(field, -1, 0).copy())
         field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0)
         field_z = np.moveaxis(field_z, 0, -1)
         field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
@@ -840,14 +852,16 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
             )
 
         # Convert the spectral image to the spatial field representation
+        field = np.zeros(grid.shape, dtype=np.complex128)
         for i_m in range(grid.azimuthal_modes.size):
             transform_data = np.transpose(field_fft[i_m]).copy()
             transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None] - omega0 / c))
-            grid.field[i_m] = prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
-            grid.field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
+            field[i_m] = prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
+            field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
+        grid.set_temporal_field(field)
     else:
         # Construct the propagator
-        Nx, Ny, Nt = grid.field.shape
+        Nx, Ny, _ = grid.npoints
         Lx = grid.hi[0] - grid.lo[0]
         Ly = grid.hi[1] - grid.lo[1]
         prop = PropagatorFFT2(
@@ -860,5 +874,6 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         # Convert the spectral image to the spatial field representation
         transform_data = np.moveaxis(field_fft, -1, 0).copy()
         transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
-        grid.field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
-        grid.field *= np.exp(1j * (z0 / c + t_axis) * omega0)
+        field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
+        field *= np.exp(1j * (z0 / c + t_axis) * omega0)
+        grid.set_temporal_field(field)

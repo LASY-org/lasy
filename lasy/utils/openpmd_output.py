@@ -53,7 +53,7 @@ def write_to_openpmd_file(
         Whether the envelope is converted to normalized vector potential
         before writing to file.
     """
-    array = grid.field
+    array = grid.get_temporal_field()
 
     # Create file
     series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
