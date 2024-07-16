@@ -5,10 +5,12 @@ from scipy.constants import c
 from lasy import __version__ as lasy_version
 
 from .laser_utils import field_to_vector_potential
+import os
 
 
 def write_to_openpmd_file(
     dim,
+    write_dir,
     file_prefix,
     file_format,
     iteration,
@@ -33,6 +35,9 @@ def write_to_openpmd_file(
     file_prefix : string
         The file name will start with this prefix.
 
+    write_dir : string
+        The directory where the file will be written.
+
     file_format : string
         Format to be used for the output file. Options are "h5" and "bp".
 
@@ -56,7 +61,11 @@ def write_to_openpmd_file(
     array = grid.field
 
     # Create file
-    series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
+    full_filepath = os.path.join(write_dir, "{}_%05T.{}".format(file_prefix, file_format))
+    if os.path.exists(full_filepath):
+        raise FileExistsError("File already exists: {}".format(full_filepath))
+    os.makedirs(write_dir, exist_ok=True)
+    series = io.Series(full_filepath, io.Access.create)
     series.set_software("lasy", lasy_version)
 
     i = series.iterations[iteration]

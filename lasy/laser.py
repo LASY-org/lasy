@@ -327,13 +327,16 @@ class Laser:
         self.grid.field *= np.exp(1j * omega0 * distance / c)
 
     def write_to_file(
-        self, file_prefix="laser", file_format="h5", save_as_vector_potential=False
+        self, file_prefix="laser", file_format="h5", write_dir="diags", save_as_vector_potential=False
     ):
         """
         Write the laser profile + metadata to file.
 
         Parameters
         ----------
+        write_dir : string
+            The directory where the file will be written.
+
         file_prefix : string
             The file name will start with this prefix.
 
@@ -346,6 +349,7 @@ class Laser:
         """
         write_to_openpmd_file(
             self.dim,
+            write_dir,
             file_prefix,
             file_format,
             self.output_iteration,
