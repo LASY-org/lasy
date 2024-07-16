@@ -301,7 +301,9 @@ class Laser:
         # This translation (e.g. delay in time, compared to t=0, associated
         # with the propagation) is not automatically handled by the above
         # propagators, so it needs to be added by hand.
-        spectral_field *= np.exp(-1j * omega[None, None, :] * translate_time)
+        # Note: subtracting by omega0 is only a global phase convention,
+        # that derives from the definition of the envelope in lasy.
+        spectral_field *= np.exp(-1j * (omega[None, None, :] - omega0) * translate_time)
         self.grid.set_spectral_field(spectral_field)
 
         # Translate the domain
