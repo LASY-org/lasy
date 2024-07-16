@@ -143,7 +143,8 @@ class Grid:
     def temporal2spectral_fft(self):
         """
         Perform the Fourier transform of field from temporal to spectral space.
-        (Only along the time axis, not allong the transverse spatial coordinates.)
+
+        (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
         self.spectral_field = np.fft.ifft(
@@ -154,7 +155,8 @@ class Grid:
     def spectral2temporal_fft(self):
         """
         Perform the Fourier transform of field from spectral to temporal space.
-        (Only along the time axis, not allong the transverse spatial coordinates.)
+
+        (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.spectral_field_valid
         self.temporal_field = np.fft.fft(
