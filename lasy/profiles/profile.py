@@ -33,7 +33,7 @@ class Profile(object):
         self.pol = np.array([pol[0] / norm_pol, pol[1] / norm_pol])
         self.lambda0 = wavelength
         self.omega0 = 2 * np.pi * c / self.lambda0
-        self.laser_energy
+        self.laser_energy = laser_energy
 
     def evaluate(self, x, y, t):
         """
