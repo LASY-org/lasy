@@ -8,12 +8,21 @@ class FromArrayProfile(Profile):
     r"""
     Profile defined from numpy array directly.
 
+    The numpy array contains the envelope of the electric field of the laser pulse, defined as :math:`\mathcal{E}` in:
+
+    .. math::
+        \begin{aligned}
+        E_x(x,y,t) = \operatorname{Re} \left( \mathcal{E}(x,y,t) e^{-i \omega_0t}p_x \right)\\
+        E_y(x,y,t) = \operatorname{Re} \left( \mathcal{E}(x,y,t) e^{-i \omega_0t}p_y \right)\end{aligned}
+
+    where :math:`\operatorname{Re}` stands for real part, :math:`E_x` (resp. :math:`E_y`) is the laser electric field in the :math:`x` (resp. :math:`y`) direction.
+
     Parameters
     ----------
     wavelength : float (in meter)
-        The main laser wavelength :math:`\\lambda_0` of the laser, which
-        defines :math:`\\omega_0` in the above formula, according to
-        :math:`\\omega_0 = 2\\pi c/\\lambda_0`.
+        The main laser wavelength :math:`\lambda_0` of the laser, which
+        defines :math:`\omega_0` in the above formula, according to
+        :math:`\omega_0 = 2\pi c/\lambda_0`.
 
     pol : list of 2 complex numbers (dimensionless)
         Polarization vector. It corresponds to :math:`p_u` in the above
@@ -21,7 +30,8 @@ class FromArrayProfile(Profile):
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
 
-    array : Array of the electric field of the laser pulse.
+    array : 3darray of complex numbers
+        Contains the values of the envelope, defined as :math:`\mathcal{E}` in the above formula.
 
     axes : Python dictionary containing the axes vectors.
         Keys are 'x', 'y', 't'.
