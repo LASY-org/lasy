@@ -79,7 +79,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         theta=None,
         phase_unwrap_nd=False,
         verbose=False,
-        laser_energy=None
+        laser_energy=None,
     ):
         ts = OpenPMDTimeSeries(path)
         F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=theta)
@@ -124,5 +124,5 @@ class FromOpenPMDProfile(FromArrayProfile):
             dim=dim,
             axes=axes,
             axes_order=axes_order,
-            laser_energy=laser_energy
+            laser_energy=laser_energy,
         )

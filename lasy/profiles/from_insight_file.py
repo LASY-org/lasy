@@ -74,5 +74,5 @@ class FromInsightFile(FromArrayProfile):
             dim=dim,
             axes=axes,
             axes_order=["x", "y", "t"],
-            laser_energy=laser_energy
+            laser_energy=laser_energy,
         )

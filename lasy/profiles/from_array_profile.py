@@ -44,8 +44,16 @@ class FromArrayProfile(Profile):
         ['x', 'y', 't'] and ['t', 'y', 'x'].
     """
 
-    def __init__(self, wavelength, pol, array, dim, axes, axes_order=["x", "y", "t"],
-                 laser_energy=None):
+    def __init__(
+        self,
+        wavelength,
+        pol,
+        array,
+        dim,
+        axes,
+        axes_order=["x", "y", "t"],
+        laser_energy=None,
+    ):
         super().__init__(wavelength, pol, laser_energy)
 
         assert dim in ["xyt", "rt"]

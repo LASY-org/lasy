@@ -102,7 +102,9 @@ class SummedProfile(Profile):
         ), "Added profiles must have the same polarization."
         pol = profiles[0].pol
         # Check that all profiles have a defined energy
-        assert None not in energies,  "All summed profiled must have a defined laser_energy"
+        assert (
+            None not in energies
+        ), "All summed profiled must have a defined laser_energy"
         # The energy of the summed profile is still undefined, it is not the
         # sum of energies of the summed profiles, so we let it be None.
         # Initialize the parent class
