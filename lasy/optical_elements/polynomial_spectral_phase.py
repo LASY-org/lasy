@@ -37,8 +37,7 @@ class PolynomialSpectralPhase(OpticalElement):
         self.tod = tod
         self.fod = fod
 
-
-    def amplitude_multiplier(self, omega, omega_0):
+    def amplitude_multiplier(self, omega, omega0):
         """
         Return the amplitude multiplier.
 
@@ -54,9 +53,9 @@ class PolynomialSpectralPhase(OpticalElement):
             This array has the same shape as the array omega
         """
         spectral_phase = (
-            self.gdd / 2 * (omega - self.omega_0) ** 2
-            + self.tod / 6 * (omega - self.omega_0) ** 3
-            + self.fod / 24 * (omega - self.omega_0) ** 4
+            self.gdd / 2 * (omega - omega0) ** 2
+            + self.tod / 6 * (omega - omega0) ** 3
+            + self.fod / 24 * (omega - omega0) ** 4
         )
 
         return np.exp(1j * spectral_phase)
