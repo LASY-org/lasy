@@ -98,7 +98,10 @@ class Grid:
 
     def get_temporal_field(self):
         """
-        Get the temporal field.
+        Return a copy of the temporal field.
+
+        (Modifying the returned object will not modify the original field stored
+        in the Grid object ; one must use set_temporal_field to do so.)
 
         Returns
         -------
@@ -117,7 +120,10 @@ class Grid:
 
     def get_spectral_field(self):
         """
-        Get the spectral field.
+        Return a copy of the spectral field.
+
+        (Modifying the returned object will not modify the original field stored
+        in the Grid object ; one must use set_spectral_field to do so.)
 
         Returns
         -------
