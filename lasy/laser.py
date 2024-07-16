@@ -11,6 +11,7 @@ from lasy.utils.laser_utils import (
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
+time_axis_indx = -1
 
 class Laser:
     """
@@ -171,17 +172,14 @@ class Laser:
             Represents a thin optical element, through which the laser
             propagates.
         """
-        # Transform the field from temporal to frequency domain
-        time_axis_indx = -1
-        field_fft = np.fft.ifft(self.grid.field, axis=time_axis_indx, norm="backward")
-
         # Create the frequency axis
         dt = self.grid.dx[time_axis_indx]
         omega0 = self.profile.omega0
         Nt = self.grid.field.shape[time_axis_indx]
         omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
 
-        # Apply optical element
+        # Apply optical element in spectral space
+        spectral_field = self.grid.get_spectral_field()
         if self.dim == "rt":
             r, w = np.meshgrid(self.grid.axes[0], omega, indexing="ij")
             # The line below assumes that amplitude_multiplier
@@ -189,17 +187,13 @@ class Laser:
             # `r` as `x` and 0 as `y`
             multiplier = optical_element.amplitude_multiplier(r, 0, w)
             for i_m in range(self.grid.azimuthal_modes.size):
-                field_fft[i_m, :, :] *= multiplier
+                spectral_field[i_m, :, :] *= multiplier
         else:
             x, y, w = np.meshgrid(
                 self.grid.axes[0], self.grid.axes[1], omega, indexing="ij"
             )
-            field_fft *= optical_element.amplitude_multiplier(x, y, w)
-
-        # Transform field from frequency to temporal domain
-        self.grid.field[:, :, :] = np.fft.fft(
-            field_fft, axis=time_axis_indx, norm="backward"
-        )
+            spectral_field *= optical_element.amplitude_multiplier(x, y, w)
+        self.grid.set_spectral_field(spectral_field)
 
 
     def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
@@ -226,8 +220,6 @@ class Laser:
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
         """
-        time_axis_indx = -1
-
         # apply boundary "absorption" if required
         if nr_boundary is not None:
             assert type(nr_boundary) is int and nr_boundary > 0
@@ -259,12 +251,6 @@ class Laser:
         omega0 = self.profile.omega0
         Nt = self.grid.shape[time_axis_indx]
         omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
-<<<<<<< HEAD
-
-        # make 3D shape for the frequency axis
-        omega_shape = (1, 1, self.grid.field.shape[time_axis_indx])
-=======
->>>>>>> e65b35d (Implement getter and setters for temporal and spectral fields)
 
         if self.dim == "rt":
             # Construct the propagator (check if exists)
