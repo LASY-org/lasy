@@ -49,7 +49,7 @@ def test_3D_case(gaussian):
     # NOW ADD THE PHASE TO EACH SLICE OF THE FOCUS
     phase3D = np.repeat(phase[:, :, np.newaxis], npoints[2], axis=2)
     field = laser.grid.get_temporal_field()
-    laser.grid.set_temporal_field( np.abs(field) * np.exp(1j * phase3D) )
+    laser.grid.set_temporal_field(np.abs(field) * np.exp(1j * phase3D))
 
     # PROPAGATE THE FIELD FIELD FOWARDS AND BACKWARDS BY 1 MM
     propDist = 2e-3

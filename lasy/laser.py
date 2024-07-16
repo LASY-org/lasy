@@ -13,6 +13,7 @@ from lasy.utils.openpmd_output import write_to_openpmd_file
 
 time_axis_indx = -1
 
+
 class Laser:
     """
     Evaluate a laser profile on a grid, propagate it, and write it to a file.
@@ -114,7 +115,7 @@ class Laser:
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
-            self.grid.set_temporal_field( profile.evaluate(x, y, t) )
+            self.grid.set_temporal_field(profile.evaluate(x, y, t))
         elif self.dim == "rt":
             if n_theta_evals is None:
                 # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
@@ -162,7 +163,7 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def apply_optics( self, optical_element ):
+    def apply_optics(self, optical_element):
         """
         Propagate the laser pulse through a thin optical element.
 
@@ -194,7 +195,6 @@ class Laser:
             )
             spectral_field *= optical_element.amplitude_multiplier(x, y, w)
         self.grid.set_spectral_field(spectral_field)
-
 
     def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
         """
@@ -228,23 +228,13 @@ class Laser:
             absorb_layer_shape[-1] = 0.0
             field = self.grid.get_temporal_field()
             if self.dim == "rt":
-                field[:, -nr_boundary:, :] *= absorb_layer_shape[
-                    None, :, None
-                ]
+                field[:, -nr_boundary:, :] *= absorb_layer_shape[None, :, None]
             else:
-                field[-nr_boundary:, :, :] *= absorb_layer_shape[
-                    :, None, None
-                ]
-                field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
-                    :, None, None
-                ]
-                field[:, -nr_boundary:, :] *= absorb_layer_shape[
-                    None, :, None
-                ]
-                field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
-                    None, :, None
-                ]
-            self.grid.set_temporal_field( field )
+                field[-nr_boundary:, :, :] *= absorb_layer_shape[:, None, None]
+                field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][:, None, None]
+                field[:, -nr_boundary:, :] *= absorb_layer_shape[None, :, None]
+                field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][None, :, None]
+            self.grid.set_temporal_field(field)
 
         # Create the frequency axis
         dt = self.grid.dx[time_axis_indx]
