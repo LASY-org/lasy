@@ -38,4 +38,4 @@ class OpticalElement(object):
         """
         # The base class only defines dummy multiplier
         # (This should be replaced by any class that inherits from this one.)
-        return np.zeros_like(x, dtype="complex128")
+        return np.ones_like(x, dtype="complex128")
