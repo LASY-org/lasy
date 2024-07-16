@@ -294,10 +294,15 @@ class Laser:
                 transform_data, distance, overwrite=True, show_progress=show_progress
             )
             spectral_field = np.moveaxis(transform_data, 0, -1).copy()
-            self.grid.set_spectral_field(spectral_field)
 
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / c
+
+        # This translation (e.g. delay in time, compared to t=0, associated
+        # with the propagation) is not automatically handled by the above
+        # propagators, so it needs to be added by hand.
+        spectral_field *= np.exp(-1j * omega[None, None, :] * translate_time)
+        self.grid.set_spectral_field(spectral_field)
 
         # Translate the domain
         self.grid.lo[time_axis_indx] += translate_time
