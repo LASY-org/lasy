@@ -242,7 +242,7 @@ class Laser:
 
         # Select backend
         if use_cupy:
-            backend = "CP"
+            backend = "CU"
         else:
             backend = "NP"
 
