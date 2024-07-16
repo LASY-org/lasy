@@ -164,8 +164,8 @@ class Laser:
         """
         Propagate the laser pulse through a thin optical element.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         optical_element: an :class:`.OpticalElement` object (optional)
             Represents a thin optical element, through which the laser
             propagates.

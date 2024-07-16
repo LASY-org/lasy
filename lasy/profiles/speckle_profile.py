@@ -9,13 +9,19 @@ def gen_gaussian_time_series(t_num, dt, fwhm, rms_mean):
 
     Parameters
     ----------
-    t_num : number of grid points in time
-    fwhm : full width half maximum of the power spectrum
-    rms_mean : root-mean-square average of the spectrum
+    t_num : int
+        The number of grid points in time
+
+    fwhm : float
+        The full width half maximum of the power spectrum
+
+    rms_mean : scalar
+        The root-mean-square average of the spectrum
 
     Returns
     -------
-    temporal_amplitude : a time series array of complex numbers with shape [t_num]
+    temporal_amplitude : 1darray
+        A time series array of complex numbers with shape [t_num]
     """
     if fwhm == 0.0:
         temporal_amplitude = np.zeros(t_num, dtype=np.complex128)
@@ -292,9 +298,14 @@ class SpeckleProfile(Profile):
 
         Parameters
         ----------
-        series_time : array of times at which to sample from Gaussian process
-        ssd_time_delay : only required for "SSD" type smoothing
-        ssd_phase_modulation_frequency : only required for "SSD" type smoothing
+        series_time : 1d array
+            Array of times at which to sample from Gaussian process
+
+        ssd_time_delay : scalar
+            Only required for "SSD" type smoothing
+
+        ssd_phase_modulation_frequency : scalar
+            Only required for "SSD" type smoothing
 
         Returns
         -------
@@ -363,10 +374,17 @@ class SpeckleProfile(Profile):
 
         Parameters
         ----------
-        t_now : float, time at which to calculate the complex amplitude of the beamlets
-        series_time : 1d array of times at which the stochastic process was sampled to generate the time series
-        time_series : array of random phase and/or amplitudes as determined by the smoothing type
-        temporal_smoothing_type : string, what type of temporal smoothing to perform.
+        t_now : scalar
+            Time at which to calculate the complex amplitude of the beamlets
+
+        series_time : 1d array
+            Array of times at which the stochastic process was sampled to generate the time series
+
+        time_series : 1d array
+            Array of random phase and/or amplitudes as determined by the smoothing type
+
+        temporal_smoothing_type : string
+            What type of temporal smoothing to perform.
 
         Returns
         -------
@@ -430,12 +448,23 @@ class SpeckleProfile(Profile):
 
         Parameters
         ----------
-        t_now : float, time at which to calculate the speckle pattern
-        exp_phase_plate : 2d array of complex numbers giving the RPP / CPP phase contributions to the beamlets
-        x : 3d array of x-positions in focal plane
-        y : 3d array of y-positions in focal plane
-        series_time : 1d array of times at which the stochastic process was sampled to generate the time series
-        time_series : array of random phase and/or amplitudes as determined by the smoothing type
+        t_now : Scalar
+            Time at which to calculate the speckle pattern
+
+        exp_phase_plate : 2d array of complex numbers
+            The RPP / CPP phase contributions to the beamlets
+
+        x : 3d array
+            x-positions in focal plane
+
+        y : 3d array
+            y-positions in focal plane
+
+        series_time : 1d array
+            Times at which the stochastic process was sampled to generate the time series
+
+        time_series : array
+            Random phase and/or amplitudes as determined by the smoothing type
 
         Returns
         -------
