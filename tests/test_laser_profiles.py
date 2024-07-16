@@ -31,8 +31,8 @@ class MockProfile(Profile):
     A mock Profile class that always returns a constant value.
     """
 
-    def __init__(self, wavelength, pol, value):
-        super().__init__(wavelength, pol)
+    def __init__(self, wavelength, pol, value, laser_energy=None):
+        super().__init__(wavelength, pol, laser_energy=laser_energy)
         self.value = value
 
     def evaluate(self, x, y, t):
@@ -343,8 +343,8 @@ def test_speckle_profile():
 
 def test_add_profiles():
     # Add the two profiles together
-    profile_1 = MockProfile(0.8e-6, (1, 0), 1.0)
-    profile_2 = MockProfile(0.8e-6, (1, 0), 2.0)
+    profile_1 = MockProfile(0.8e-6, (1, 0), 1.0, laser_energy=1.0)
+    profile_2 = MockProfile(0.8e-6, (1, 0), 2.0, laser_energy=1.0)
     summed_profile = profile_1 + profile_2
     # Check that the result is a SummedProfile object
     assert isinstance(summed_profile, SummedProfile)
@@ -362,18 +362,18 @@ def test_add_error_if_not_all_profiles():
 
 
 def test_add_error_if_different_wavelength():
-    profile_1 = MockProfile(0.8e-6, (1, 0), 1.0)
-    profile_2 = MockProfile(0.8e-6, (1, 0), 2.0)
-    profile_3 = MockProfile(0.9e-6, (1, 0), 2.0)
+    profile_1 = MockProfile(0.8e-6, (1, 0), 1.0, laser_energy=1.0)
+    profile_2 = MockProfile(0.8e-6, (1, 0), 2.0, laser_energy=1.0)
+    profile_3 = MockProfile(0.9e-6, (1, 0), 2.0, laser_energy=1.0)
     summed_profile = profile_1 + profile_2
     with pytest.raises(AssertionError):
         summed_profile + profile_3
 
 
 def test_add_error_if_different_polarisation():
-    profile_1 = MockProfile(0.8e-6, (1, 0), 1.0)
-    profile_2 = MockProfile(0.8e-6, (1, 0), 2.0)
-    profile_3 = MockProfile(0.8e-6, (0, 1), 2.0)
+    profile_1 = MockProfile(0.8e-6, (1, 0), 1.0, laser_energy=1.0)
+    profile_2 = MockProfile(0.8e-6, (1, 0), 2.0, laser_energy=1.0)
+    profile_3 = MockProfile(0.8e-6, (0, 1), 2.0, laser_energy=1.0)
     summed_profile = profile_1 + profile_2
     with pytest.raises(AssertionError):
         summed_profile + profile_3
