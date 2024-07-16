@@ -178,22 +178,22 @@ class Laser:
         dt = self.grid.dx[time_axis_indx]
         omega0 = self.profile.omega0
         Nt = self.grid.field.shape[time_axis_indx]
-        omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
+        omega_1d = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
 
         # Apply optical element
         if self.dim == "rt":
-            r, w = np.meshgrid(self.grid.axes[0], omega, indexing="ij")
+            r, omega = np.meshgrid(self.grid.axes[0], omega_1d, indexing="ij")
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and 0 as `y`
-            multiplier = optical_element.amplitude_multiplier(r, 0, w)
+            multiplier = optical_element.amplitude_multiplier(r, 0, omega)
             for i_m in range(self.grid.azimuthal_modes.size):
                 field_fft[i_m, :, :] *= multiplier
         else:
-            x, y, w = np.meshgrid(
-                self.grid.axes[0], self.grid.axes[1], omega, indexing="ij"
+            x, y, omega = np.meshgrid(
+                self.grid.axes[0], self.grid.axes[1], omega_1d, indexing="ij"
             )
-            field_fft *= optical_element.amplitude_multiplier(x, y, w)
+            field_fft *= optical_element.amplitude_multiplier(x, y, omega)
 
         # Transform field from frequency to temporal domain
         self.grid.field[:, :, :] = np.fft.fft(
