@@ -109,6 +109,7 @@ class Laser:
         self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
         self.dim = dim
         self.profile = profile
+        self.output_iteration = 0 # Incremented each time write_to_file is called
 
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
@@ -301,11 +302,13 @@ class Laser:
             self.dim,
             file_prefix,
             file_format,
+            self.output_iteration,
             self.grid,
             self.profile.lambda0,
             self.profile.pol,
             save_as_vector_potential,
         )
+        self.output_iteration += 1
 
     def show(self, **kw):
         """

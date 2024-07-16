@@ -6,7 +6,8 @@ from lasy import __version__ as lasy_version
 
 
 def write_to_openpmd_file(
-    dim, file_prefix, file_format, grid, wavelength, pol, save_as_vector_potential=False
+    dim, file_prefix, file_format, iteration, grid, wavelength,
+    pol, save_as_vector_potential=False
 ):
     """
     Write the laser field into an openPMD file.
@@ -26,6 +27,9 @@ def write_to_openpmd_file(
 
     file_format : string
         Format to be used for the output file. Options are "h5" and "bp".
+
+    iteration : int
+        The iteration number for the file to be written.
 
     grid : Grid
         A grid object containing the 3-dimensional array
@@ -47,7 +51,7 @@ def write_to_openpmd_file(
     series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
     series.set_software("lasy", lasy_version)
 
-    i = series.iterations[0]
+    i = series.iterations[iteration]
 
     # Define the mesh
     m = i.meshes["laserEnvelope"]
