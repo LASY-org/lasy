@@ -43,7 +43,7 @@ class Laser:
         Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
         used in order to represent the laser field.
 
-    n_theta_evals: int (optional)
+    n_theta_evals : int (optional)
         Only used if ``dim`` is ``'rt'``. The number of points in the theta
         (azimuthal) direction at which to evaluate the laser field, before
         decomposing it into ``n_azimuthal_modes`` azimuthal modes. By default,
@@ -146,9 +146,9 @@ class Laser:
 
         Parameters
         ----------
-        value: scalar
+        value : scalar
             Value to which to normalize the field property that is defined in ``kind``
-        kind: string (optional)
+        kind : string (optional)
             Distance by which the laser pulse should be propagated
             Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
@@ -165,8 +165,8 @@ class Laser:
         """
         Propagate the laser pulse through a thin optical element.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         optical_element: an :class:`.OpticalElement` object (optional)
             Represents a thin optical element, through which the laser
             propagates.
@@ -348,7 +348,7 @@ class Laser:
 
         Parameters
         ----------
-        **kw: additional arguments to be passed to matplotlib's imshow command
+        **kw : additional arguments to be passed to matplotlib's imshow command
         """
         temporal_field = self.grid.get_temporal_field()
         if self.dim == "rt":

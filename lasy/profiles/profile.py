@@ -40,13 +40,13 @@ class Profile(object):
 
         Parameters
         ----------
-        x, y, t: ndarrays of floats
+        x, y, t : ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
         Returns
         -------
-        envelope: ndarray of complex numbers
+        envelope : ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
         """
@@ -75,7 +75,7 @@ class SummedProfile(Profile):
 
     Parameters
     ----------
-    profiles: list of Profile objects
+    profiles : list of Profile objects
         List of profiles to be summed.
     """
 
@@ -116,9 +116,9 @@ class ScaledProfile(Profile):
 
     Parameters
     ----------
-    profiles: Profile object
+    profiles : Profile object
         Profile to be scaled.
-    factor: int or float
+    factor : int or float
         Factor by which to scale the profile.
     """
 
