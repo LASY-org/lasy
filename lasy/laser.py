@@ -10,7 +10,7 @@ from lasy.utils.laser_utils import (
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
-time_axis_indx = -1
+from grid import time_axis_indx
 
 
 class Laser:
