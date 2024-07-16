@@ -37,7 +37,9 @@ phaseMask[R > pupilRadius] = 0
 
 # NOW ADD THE PHASE TO EACH SLICE OF THE FOCUS
 phase3D = np.repeat(phase[:, :, np.newaxis], npoints[2], axis=2)
-laser.grid.field = np.abs(laser.grid.field) * np.exp(1j * phase3D)
+laser.grid.set_temporal_field(
+    np.abs(laser.grid.get_temporal_field()) * np.exp(1j * phase3D)
+)
 
 # PROPAGATE THE FIELD FIELD FOWARDS AND BACKWARDS BY 1 MM
 propDist = 2e-3
@@ -70,9 +72,9 @@ def addColorbar(im, ax, label=None):
     plt.colorbar(im, cax=cax)
     cax.set_ylabel(label)
 
-
+field = laser.grid.get_temporal_field()
 im0 = ax[0, 0].imshow(
-    np.abs(laser.grid.field[:, :, tIndx]) ** 2, extent=extent, cmap="PuRd"
+    np.abs(field[:, :, tIndx]) ** 2, extent=extent, cmap="PuRd"
 )
 addColorbar(im0, ax[0, 0], "Intensity (norm.)")
 ax[0, 0].set_title("Inten. z = 0.0 mm")
@@ -81,7 +83,7 @@ ax[0, 0].set_ylabel("y ($\mu m$)")
 
 
 im1 = ax[0, 1].imshow(
-    np.angle(laser.grid.field[:, :, tIndx]) * phaseMask, extent=extent, cmap="coolwarm"
+    np.angle(field[:, :, tIndx]) * phaseMask, extent=extent, cmap="coolwarm"
 )
 addColorbar(im1, ax[0, 1], "Phase (rad.)")
 ax[0, 1].set_title("Phase z = 0.0 mm")
@@ -90,12 +92,16 @@ ax[0, 1].set_ylabel("y ($\mu m$)")
 
 
 laser_calc = copy.deepcopy(laserBackward)
-laser_calc.grid.field = np.abs(laser_calc.grid.field) * np.exp(1j * phaseBackward)
+laser_calc.grid.set_temporal_field(
+    np.abs(laser_calc.grid.get_temporal_field()) * np.exp(1j * phaseBackward)
+)
 laser_calc.propagate(propDist)
+
+field_calc = laser_calc.grid.get_temporal_field()
 im2 = ax[1, 0].imshow(
     np.abs(
-        np.abs(laser.grid.field[:, :, tIndx]) ** 2
-        - np.abs(laser_calc.grid.field[:, :, tIndx]) ** 2
+        np.abs(field[:, :, tIndx]) ** 2
+        - np.abs(field_calc[:, :, tIndx]) ** 2
     ),
     extent=extent,
     cmap="PuRd",
@@ -105,8 +111,8 @@ ax[1, 0].set_xlabel("x ($\mu m$)")
 ax[1, 0].set_ylabel("y ($\mu m$)")
 addColorbar(im2, ax[1, 0], "Intensity (norm.)")
 
-phaseResidual = np.angle(laser_calc.grid.field[:, :, tIndx]) - np.angle(
-    laser.grid.field[:, :, tIndx]
+phaseResidual = np.angle(field_calc[:, :, tIndx]) - np.angle(
+    field[:, :, tIndx]
 )
 phaseResidual -= phaseResidual[int(npoints[1] / 2), int(npoints[0] / 2)]
 maxPhaseRes = np.max(np.abs(phaseResidual) * phaseMask)
@@ -122,9 +128,9 @@ ax[1, 1].set_xlabel("x ($\mu m$)")
 ax[1, 1].set_ylabel("y ($\mu m$)")
 addColorbar(im3, ax[1, 1], "Phase (rad.)")
 
-
+field_bw = laserBackward.grid.get_temporal_field()
 im4 = ax[0, 2].imshow(
-    np.abs(laserBackward.grid.field[:, :, tIndx]) ** 2, extent=extent, cmap="PuRd"
+    np.abs(field_bw[:, :, tIndx]) ** 2, extent=extent, cmap="PuRd"
 )
 addColorbar(im4, ax[0, 2], "Intensity (norm.)")
 ax[0, 2].set_title("Inten. z = %.1f mm" % (-propDist * 1e3))
@@ -132,7 +138,7 @@ ax[0, 2].set_xlabel("x ($\mu m$)")
 ax[0, 2].set_ylabel("y ($\mu m$)")
 
 im5 = ax[0, 3].imshow(
-    np.angle(laserBackward.grid.field[:, :, tIndx]), extent=extent, cmap="coolwarm"
+    np.angle(field_bw[:, :, tIndx]), extent=extent, cmap="coolwarm"
 )
 addColorbar(im5, ax[0, 3], "Phase (rad.)")
 ax[0, 3].set_title("Phase z = %.1f mm" % (-propDist * 1e3))
@@ -140,7 +146,7 @@ ax[0, 3].set_xlabel("x ($\mu m$)")
 ax[0, 3].set_ylabel("y ($\mu m$)")
 
 phaseResidual = (
-    np.angle(laserBackward.grid.field[:, :, tIndx]) - phaseBackward[:, :, tIndx]
+    np.angle(field_bw[:, :, tIndx]) - phaseBackward[:, :, tIndx]
 )
 phaseResidual -= phaseResidual[int(npoints[1] / 2), int(npoints[0] / 2)]
 maxPhaseRes = np.max(np.abs(phaseResidual) * phaseMask)
@@ -156,15 +162,16 @@ ax[0, 4].set_title("Phase Res. z = %.1f mm" % (-propDist * 1e3))
 ax[0, 4].set_xlabel("x ($\mu m$)")
 ax[0, 4].set_ylabel("y ($\mu m$)")
 
+field_fw = laserForward.grid.get_temporal_field()
 im7 = ax[1, 2].imshow(
-    np.abs(laserForward.grid.field[:, :, tIndx]) ** 2, extent=extent, cmap="PuRd"
+    np.abs(field_fw[:, :, tIndx]) ** 2, extent=extent, cmap="PuRd"
 )
 addColorbar(im7, ax[1, 2], "Intensity (norm.)")
 ax[1, 2].set_title("Inten. z = %.1f mm" % (propDist * 1e3))
 ax[1, 2].set_xlabel("x ($\mu m$)")
 ax[1, 2].set_ylabel("y ($\mu m$)")
 im8 = ax[1, 3].imshow(
-    np.angle(laserForward.grid.field[:, :, tIndx]), extent=extent, cmap="coolwarm"
+    np.angle(field_fw[:, :, tIndx]), extent=extent, cmap="coolwarm"
 )
 addColorbar(im8, ax[1, 3], "Phase (rad.)")
 ax[1, 3].set_title("Phase z = %.1f mm" % (propDist * 1e3))
@@ -172,7 +179,7 @@ ax[1, 3].set_xlabel("x ($\mu m$)")
 ax[1, 3].set_ylabel("y ($\mu m$)")
 
 phaseResidual = (
-    np.angle(laserForward.grid.field[:, :, tIndx]) - phaseForward[:, :, tIndx]
+    np.angle(field_fw[:, :, tIndx]) - phaseForward[:, :, tIndx]
 )
 phaseResidual -= phaseResidual[int(npoints[1] / 2), int(npoints[0] / 2)]
 maxPhaseRes = np.max(np.abs(phaseResidual) * phaseMask)
