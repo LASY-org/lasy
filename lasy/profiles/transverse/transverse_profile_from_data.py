@@ -1,6 +1,6 @@
-from lasy.backend import xp
 from scipy.interpolate import RegularGridInterpolator
 
+from lasy.backend import xp
 from lasy.utils.exp_data_utils import find_center_of_mass
 
 from .transverse_profile import TransverseProfile

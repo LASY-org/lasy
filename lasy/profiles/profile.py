@@ -1,5 +1,6 @@
-from lasy.backend import xp
 from scipy.constants import c
+
+from lasy.backend import xp
 
 
 class Profile(object):

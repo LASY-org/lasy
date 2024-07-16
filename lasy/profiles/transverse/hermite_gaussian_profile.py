@@ -1,7 +1,8 @@
 from math import factorial
 
-from lasy.backend import xp
 from scipy.special import hermite
+
+from lasy.backend import xp
 
 from .transverse_profile import TransverseProfile
 

@@ -1,5 +1,6 @@
-from lasy.backend import xp
 from scipy.interpolate import RegularGridInterpolator
+
+from lasy.backend import xp
 
 from .profile import Profile
 

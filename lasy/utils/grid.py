@@ -1,5 +1,6 @@
 import numpy as np
-from lasy.backend import xp, use_cupy
+
+from lasy.backend import use_cupy, xp
 
 time_axis_indx = -1
 
@@ -79,8 +80,8 @@ class Grid:
         assert field.shape == self.temporal_field.shape
         assert field.dtype == "complex128"
         if use_cupy and type(field) == np.ndarray:
-            field = xp.asarray(field) # Copy to GPU
-        self.temporal_field[:,:,:] = field
+            field = xp.asarray(field)  # Copy to GPU
+        self.temporal_field[:, :, :] = field
         self.temporal_field_valid = True
         self.spectral_field_valid = False  # Invalidates the spectral field
 
@@ -96,8 +97,8 @@ class Grid:
         assert field.shape == self.spectral_field.shape
         assert field.dtype == "complex128"
         if use_cupy and type(field) == np.ndarray:
-            field = xp.asarray(field) # Copy to GPU
-        self.spectral_field[:,:,:] = field
+            field = xp.asarray(field)  # Copy to GPU
+        self.spectral_field[:, :, :] = field
         self.spectral_field_valid = True
         self.temporal_field_valid = False  # Invalidates the temporal field
 

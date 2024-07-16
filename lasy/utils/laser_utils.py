@@ -1,9 +1,10 @@
-from lasy.backend import xp
 from axiprop.containers import ScalarFieldEnvelope
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 from scipy.constants import c, e, epsilon_0, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
+
+from lasy.backend import xp
 
 from .grid import Grid
 
