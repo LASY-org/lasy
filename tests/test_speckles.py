@@ -1,4 +1,5 @@
 import numpy as np
+np.random.seed(0) # Fix random seed for reproducibility
 
 from lasy.laser import Laser
 from lasy.profiles.speckle_profile import SpeckleProfile
