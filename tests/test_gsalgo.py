@@ -9,6 +9,7 @@ from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.utils.phase_retrieval import gerchberg_saxton_algo
 from lasy.utils.zernike import zernike
+from lasy.backend import xp
 
 w0 = 25.0e-6  # m
 
@@ -37,20 +38,20 @@ def test_3D_case(gaussian):
 
     # Add a phase aberration
     # CALCULATE THE REQUIRED PHASE ABERRATION
-    x = np.linspace(lo[0], hi[0], npoints[0])
-    y = np.linspace(lo[1], hi[1], npoints[1])
-    X, Y = np.meshgrid(x, y)
+    x = xp.linspace(lo[0], hi[0], npoints[0])
+    y = xp.linspace(lo[1], hi[1], npoints[1])
+    X, Y = xp.meshgrid(x, y)
     pupilRadius = 2 * w0
     phase = -0.2 * zernike(X, Y, (0, 0, pupilRadius), 3)
 
-    R = np.sqrt(X**2 + Y**2)
-    phaseMask = np.ones_like(phase)
+    R = xp.sqrt(X**2 + Y**2)
+    phaseMask = xp.ones_like(phase)
     phaseMask[R > pupilRadius] = 0
 
     # NOW ADD THE PHASE TO EACH SLICE OF THE FOCUS
-    phase3D = np.repeat(phase[:, :, np.newaxis], npoints[2], axis=2)
+    phase3D = xp.repeat(phase[:, :, xp.newaxis], npoints[2], axis=2)
     field = laser.grid.get_temporal_field()
-    laser.grid.set_temporal_field(np.abs(field) * np.exp(1j * phase3D))
+    laser.grid.set_temporal_field(xp.abs(field) * xp.exp(1j * phase3D))
 
     # PROPAGATE THE FIELD FIELD FOWARDS AND BACKWARDS BY 1 MM
     propDist = 2e-3

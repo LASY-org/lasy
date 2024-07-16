@@ -1,5 +1,5 @@
 import math
-
+import numpy as np
 from lasy.backend import xp
 
 
@@ -105,7 +105,7 @@ def RmnGenerator(n, m, rho):
             Rmn = xp.ones((r, c))
     elif (n - m) % 2 == 0:
         # Even, Rmn is not 0
-        k = xp.linspace(0, int((n - m) / 2), int((n - m) / 2) + 1).astype(int)
+        k = np.linspace(0, int((n - m) / 2), int((n - m) / 2) + 1).astype(int)
         try:
             (r,) = rho.shape
             Rmn = xp.zeros(
