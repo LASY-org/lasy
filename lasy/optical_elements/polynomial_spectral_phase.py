@@ -26,7 +26,7 @@ class PolynomialSpectralPhase(OpticalElement):
     gdd : float (in s^2)
         Group Delay Dispersion. ``gdd > 0`` corresponds to a positive chirp, i.e. low-frequency part of the spectrum arriving earlier than the high-frequency part of the spectrum.
     tod : float (in s^3)
-        Third-order Dispersion.
+        Third-order Dispersion. For a Gaussian pulse, adding a positive TOD (``tod > 0``) results in the apparition of post-pulses, i.e. lower intensity pulses arriving after the main pulse.
     fod : float (in s^4)
         Fourth-order Dispersion.
     omega_0 : float (in rad/s)
