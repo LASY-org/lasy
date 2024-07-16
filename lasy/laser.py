@@ -201,7 +201,7 @@ class Laser:
             spectral_field *= optical_element.amplitude_multiplier(x, y, omega)
         self.grid.set_spectral_field(spectral_field)
 
-    def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
+    def propagate(self, distance, nr_boundary=None, show_progress=True):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -215,8 +215,6 @@ class Laser:
             will be attenuated (to assert proper Hankel transform).
             Only used for ``'rt'``.
 
-        backend : string (optional)
-            Backend used by axiprop (see axiprop documentation).
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
         """
@@ -241,6 +239,12 @@ class Laser:
         omega0 = self.profile.omega0
         Nt = self.grid.shape[time_axis_indx]
         omega = 2 * xp.pi * xp.fft.fftfreq(Nt, dt) + omega0
+
+        # Select backend
+        if use_cupy:
+            backend = "CP"
+        else:
+            backend = "NP"
 
         if self.dim == "rt":
             # Construct the propagator (check if exists)
