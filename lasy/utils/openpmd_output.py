@@ -1,4 +1,4 @@
-from lasy.backend import xp
+import numpy as np
 import openpmd_api as io
 from scipy.constants import c
 
