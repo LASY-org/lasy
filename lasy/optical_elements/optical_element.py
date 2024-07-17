@@ -1,5 +1,7 @@
-from lasy.backend import xp
 from abc import ABC, abstractmethod
+
+from lasy.backend import xp
+
 
 class OpticalElement(ABC):
     """
