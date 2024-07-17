@@ -45,7 +45,7 @@ class Laser:
         Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
         used in order to represent the laser field.
 
-    n_theta_evals: int (optional)
+    n_theta_evals : int (optional)
         Only used if ``dim`` is ``'rt'``. The number of points in the theta
         (azimuthal) direction at which to evaluate the laser field, before
         decomposing it into ``n_azimuthal_modes`` azimuthal modes. By default,
@@ -148,9 +148,9 @@ class Laser:
 
         Parameters
         ----------
-        value: scalar
+        value : scalar
             Value to which to normalize the field property that is defined in ``kind``
-        kind: string (optional)
+        kind : string (optional)
             Distance by which the laser pulse should be propagated
             Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
@@ -167,8 +167,8 @@ class Laser:
         """
         Propagate the laser pulse through a thin optical element.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         optical_element: an :class:`.OpticalElement` object (optional)
             Represents a thin optical element, through which the laser
             propagates.
@@ -186,7 +186,7 @@ class Laser:
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and 0 as `y`
-            multiplier = optical_element.amplitude_multiplier(r, 0, omega)
+            multiplier = optical_element.amplitude_multiplier(r, 0, omega, omega0)
             # The azimuthal modes are the components of the Fourier transform
             # along theta (FT_theta). Because the multiplier is assumed to be
             # cylindrically symmetric (i.e. theta-independent):
@@ -198,7 +198,7 @@ class Laser:
             x, y, omega = xp.meshgrid(
                 self.grid.axes[0], self.grid.axes[1], omega_1d, indexing="ij"
             )
-            spectral_field *= optical_element.amplitude_multiplier(x, y, omega)
+            spectral_field *= optical_element.amplitude_multiplier(x, y, omega, omega0)
         self.grid.set_spectral_field(spectral_field)
 
     def propagate(self, distance, nr_boundary=None, show_progress=True):
@@ -316,13 +316,20 @@ class Laser:
         self.grid.axes[time_axis_indx] += translate_time
 
     def write_to_file(
-        self, file_prefix="laser", file_format="h5", save_as_vector_potential=False
+        self,
+        file_prefix="laser",
+        file_format="h5",
+        write_dir="diags",
+        save_as_vector_potential=False,
     ):
         """
         Write the laser profile + metadata to file.
 
         Parameters
         ----------
+        write_dir : string
+            The directory where the file will be written.
+
         file_prefix : string
             The file name will start with this prefix.
 
@@ -335,6 +342,7 @@ class Laser:
         """
         write_to_openpmd_file(
             self.dim,
+            write_dir,
             file_prefix,
             file_format,
             self.output_iteration,
@@ -351,7 +359,7 @@ class Laser:
 
         Parameters
         ----------
-        **kw: additional arguments to be passed to matplotlib's imshow command
+        **kw : additional arguments to be passed to matplotlib's imshow command
         """
         # Get field on CPU
         temporal_field = self.grid.get_temporal_field(to_cpu=True)

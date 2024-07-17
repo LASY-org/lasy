@@ -40,7 +40,8 @@ class FromArrayProfile(Profile):
         array.shape = (axes['x'].size, axes['y'].size, axes['t'].size) in 3D,
         and similar in cylindrical geometry.
 
-    axes_order : List of strings, giving the name and ordering of the axes in the array.
+    axes_order : List of strings
+        Gives the name and ordering of the axes in the array.
         Currently, only implemented for 3D, and supported values are
         ['x', 'y', 't'] and ['t', 'y', 'x'].
     """
