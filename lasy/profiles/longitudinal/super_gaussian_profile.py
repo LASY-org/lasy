@@ -52,12 +52,12 @@ class SuperGaussianLongitudinalProfile(LongitudinalProfile):
 
         Parameters
         ----------
-        t: ndarrays of floats
+        t : ndarrays of floats
             Define points on which to evaluate the envelope
 
         Returns
         -------
-        envelope: ndarray of complex numbers
+        envelope : ndarray of complex numbers
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
         """
