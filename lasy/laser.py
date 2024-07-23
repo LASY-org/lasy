@@ -295,7 +295,7 @@ class Laser:
                     show_progress=show_progress,
                 )
                 spectral_field[i_m, :, :] = np.transpose(transform_data).copy()
-                self.grid.set_spectral_field(spectral_field)
+            self.grid.set_spectral_field(spectral_field)
             # Delete Propagator if resampling was done
             if grid is not None:
                 del self.prop
