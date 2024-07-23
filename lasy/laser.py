@@ -201,7 +201,7 @@ class Laser:
 
     def propagate(
         self, distance, nr_boundary=None, backend="NP", grid=None, show_progress=True
-        ):
+    ):
         """
         Propagate the laser pulse by the distance specified.
 
