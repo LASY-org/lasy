@@ -5,7 +5,7 @@ from .optical_element import OpticalElement
 
 class PolynomialSpectralPhase(OpticalElement):
     r"""
-    Class for an optical element that adds spectral phase (e.g. a dazzler)
+    Class for an optical element that adds spectral phase (e.g. a dazzler).
 
     The amplitude multiplier corresponds to:
 

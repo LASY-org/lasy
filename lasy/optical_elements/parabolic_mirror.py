@@ -28,7 +28,7 @@ class ParabolicMirror(OpticalElement):
     def __init__(self, f):
         self.f = f
 
-    def amplitude_multiplier(self, x, y, omega):
+    def amplitude_multiplier(self, x, y, omega, omega0):
         """
         Return the amplitude multiplier.
 

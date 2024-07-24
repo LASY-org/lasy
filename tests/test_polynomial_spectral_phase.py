@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-This test checks the implementation of the parabolic mirror
-by initializing a Gaussian pulse in the near field, and
-propagating it through a parabolic mirror, and then to
-the focal position ; we then check that the waist as the
-expected value in the far field (i.e. in the focal plane)
+This test checks the implementation of the polynomial spectral phase
+by initializing a Gaussian pulse (with flat spectral phase),
+adding spectral phase to it, and checking the corresponding
+temporal shape of the laser pulse again analytical formulas.
 """
 
 import numpy as np
@@ -14,25 +13,22 @@ from lasy.optical_elements import ParabolicMirror
 from lasy.profiles.gaussian_profile import GaussianProfile
 
 wavelength = 0.8e-6
-w0 = 5.0e-3  # m, initialized in near field
+w0 = 5.0e-6  # m
 
-# The laser is initialized in the near field
 pol = (1, 0)
 laser_energy = 1.0  # J
 t_peak = 0.0e-15  # s
 tau = 30.0e-15  # s
 gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
-
 def get_w0(laser):
     # Calculate the laser waist
-    field = laser.grid.get_temporal_field()
     if laser.dim == "xyt":
-        Nx = field.shape[0]
-        A2 = (np.abs(field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
+        Nx, Ny, Nt = laser.grid.field.shape
+        A2 = (np.abs(laser.grid.field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
         ax = laser.grid.axes[1]
     else:
-        A2 = (np.abs(field[0, :, :]) ** 2).sum(-1)
+        A2 = (np.abs(laser.grid.field[0, :, :]) ** 2).sum(-1)
         ax = laser.grid.axes[0]
         if ax[0] > 0:
             A2 = np.r_[A2[::-1], A2]
@@ -62,8 +58,8 @@ def test_3D_case():
     # - 3D case
     # The laser is initialized in the near field
     dim = "xyt"
-    lo = (-12e-3, -12e-3, -60e-15)
-    hi = (+12e-3, +12e-3, +60e-15)
+    lo = (-12e-6, -12e-6, -60e-15)
+    hi = (+12e-6, +12e-6, +60e-15)
     npoints = (500, 500, 100)
 
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)
@@ -75,7 +71,7 @@ def test_RT_case():
     # The laser is initialized in the near field
     dim = "rt"
     lo = (0e-6, -60e-15)
-    hi = (15e-3, +60e-15)
+    hi = (15e-6, +60e-15)
     npoints = (750, 100)
 
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)

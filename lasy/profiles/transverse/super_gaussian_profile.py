@@ -41,7 +41,7 @@ class SuperGaussianTransverseProfile(TransverseProfile):
 
         Returns
         -------
-        envelope: ndarray of complex numbers
+        envelope : ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """

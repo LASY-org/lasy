@@ -2,7 +2,7 @@ import numpy as np
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 from scipy.constants import c
 
-from lasy.utils.grid import Grid
+from lasy.utils.grid import Grid, time_axis_indx
 from lasy.utils.laser_utils import (
     normalize_energy,
     normalize_peak_field_amplitude,
@@ -43,7 +43,7 @@ class Laser:
         Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
         used in order to represent the laser field.
 
-    n_theta_evals: int (optional)
+    n_theta_evals : int (optional)
         Only used if ``dim`` is ``'rt'``. The number of points in the theta
         (azimuthal) direction at which to evaluate the laser field, before
         decomposing it into ``n_azimuthal_modes`` azimuthal modes. By default,
@@ -113,7 +113,7 @@ class Laser:
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
-            self.grid.field[...] = profile.evaluate(x, y, t)
+            self.grid.set_temporal_field(profile.evaluate(x, y, t))
         elif self.dim == "rt":
             if n_theta_evals is None:
                 # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
@@ -129,11 +129,12 @@ class Laser:
             envelope = profile.evaluate(x, y, t)
             # Perform the azimuthal decomposition
             azimuthal_modes = np.fft.ifft(envelope, axis=0)
-            self.grid.field[:n_azimuthal_modes] = azimuthal_modes[:n_azimuthal_modes]
+            field = azimuthal_modes[:n_azimuthal_modes]
             if n_azimuthal_modes > 1:
-                self.grid.field[-n_azimuthal_modes + 1 :] = azimuthal_modes[
-                    -n_azimuthal_modes + 1 :
-                ]
+                field = np.concatenate(
+                    (field, azimuthal_modes[-n_azimuthal_modes + 1 :])
+                )
+            self.grid.set_temporal_field(field)
 
         # For profiles that define the energy, normalize the amplitude
         if hasattr(profile, "laser_energy"):
@@ -145,9 +146,9 @@ class Laser:
 
         Parameters
         ----------
-        value: scalar
+        value : scalar
             Value to which to normalize the field property that is defined in ``kind``
-        kind: string (optional)
+        kind : string (optional)
             Distance by which the laser pulse should be propagated
             Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
         """
@@ -164,46 +165,39 @@ class Laser:
         """
         Propagate the laser pulse through a thin optical element.
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         optical_element: an :class:`.OpticalElement` object (optional)
             Represents a thin optical element, through which the laser
             propagates.
         """
-        # Transform the field from temporal to frequency domain
-        time_axis_indx = -1
-        field_fft = np.fft.ifft(self.grid.field, axis=time_axis_indx, norm="backward")
-
         # Create the frequency axis
         dt = self.grid.dx[time_axis_indx]
         omega0 = self.profile.omega0
-        Nt = self.grid.field.shape[time_axis_indx]
+        Nt = self.grid.shape[time_axis_indx]
         omega_1d = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
 
         # Apply optical element
+        spectral_field = self.grid.get_spectral_field()
         if self.dim == "rt":
             r, omega = np.meshgrid(self.grid.axes[0], omega_1d, indexing="ij")
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and 0 as `y`
-            multiplier = optical_element.amplitude_multiplier(r, 0, omega)
+            multiplier = optical_element.amplitude_multiplier(r, 0, omega, omega0)
             # The azimuthal modes are the components of the Fourier transform
             # along theta (FT_theta). Because the multiplier is assumed to be
             # cylindrically symmetric (i.e. theta-independent):
             # FT_theta[ multiplier * field ] = multiplier * FT_theta[ field ]
             # Thus, we can simply multiply each azimuthal mode by the multiplier.
             for i_m in range(self.grid.azimuthal_modes.size):
-                field_fft[i_m, :, :] *= multiplier
+                spectral_field[i_m, :, :] *= multiplier
         else:
             x, y, omega = np.meshgrid(
                 self.grid.axes[0], self.grid.axes[1], omega_1d, indexing="ij"
             )
-            field_fft *= optical_element.amplitude_multiplier(x, y, omega)
-
-        # Transform field from frequency to temporal domain
-        self.grid.field[:, :, :] = np.fft.fft(
-            field_fft, axis=time_axis_indx, norm="backward"
-        )
+            spectral_field *= optical_element.amplitude_multiplier(x, y, omega, omega0)
+        self.grid.set_spectral_field(spectral_field)
 
     def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
         """
@@ -224,43 +218,27 @@ class Laser:
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
         """
-        time_axis_indx = -1
-
         # apply boundary "absorption" if required
         if nr_boundary is not None:
             assert type(nr_boundary) is int and nr_boundary > 0
             absorb_layer_axis = np.linspace(0, np.pi / 2, nr_boundary)
             absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
             absorb_layer_shape[-1] = 0.0
+            field = self.grid.get_temporal_field()
             if self.dim == "rt":
-                self.grid.field[:, -nr_boundary:, :] *= absorb_layer_shape[
-                    None, :, None
-                ]
+                field[:, -nr_boundary:, :] *= absorb_layer_shape[None, :, None]
             else:
-                self.grid.field[-nr_boundary:, :, :] *= absorb_layer_shape[
-                    :, None, None
-                ]
-                self.grid.field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][
-                    :, None, None
-                ]
-                self.grid.field[:, -nr_boundary:, :] *= absorb_layer_shape[
-                    None, :, None
-                ]
-                self.grid.field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][
-                    None, :, None
-                ]
-
-        # Transform the field from temporal to frequency domain
-        field_fft = np.fft.ifft(self.grid.field, axis=time_axis_indx, norm="backward")
+                field[-nr_boundary:, :, :] *= absorb_layer_shape[:, None, None]
+                field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][:, None, None]
+                field[:, -nr_boundary:, :] *= absorb_layer_shape[None, :, None]
+                field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][None, :, None]
+            self.grid.set_temporal_field(field)
 
         # Create the frequency axis
         dt = self.grid.dx[time_axis_indx]
         omega0 = self.profile.omega0
-        Nt = self.grid.field.shape[time_axis_indx]
+        Nt = self.grid.shape[time_axis_indx]
         omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
-
-        # make 3D shape for the frequency axis
-        omega_shape = (1, 1, self.grid.field.shape[time_axis_indx])
 
         if self.dim == "rt":
             # Construct the propagator (check if exists)
@@ -278,19 +256,21 @@ class Laser:
                         )
                     )
             # Propagate the spectral image
+            spectral_field = self.grid.get_spectral_field()
             for i_m in range(self.grid.azimuthal_modes.size):
-                transform_data = np.transpose(field_fft[i_m]).copy()
+                transform_data = np.transpose(spectral_field[i_m]).copy()
                 self.prop[i_m].step(
                     transform_data,
                     distance,
                     overwrite=True,
                     show_progress=show_progress,
                 )
-                field_fft[i_m, :, :] = np.transpose(transform_data).copy()
+                spectral_field[i_m, :, :] = np.transpose(transform_data).copy()
+            self.grid.set_spectral_field(spectral_field)
         else:
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
-                Nx, Ny, Nt = self.grid.field.shape
+                Nx, Ny, Nt = self.grid.shape
                 Lx = self.grid.hi[0] - self.grid.lo[0]
                 Ly = self.grid.hi[1] - self.grid.lo[1]
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
@@ -301,39 +281,44 @@ class Laser:
                     verbose=False,
                 )
             # Propagate the spectral image
-            transform_data = np.moveaxis(field_fft, -1, 0).copy()
+            spectral_field = self.grid.get_spectral_field()
+            transform_data = np.moveaxis(spectral_field, -1, 0).copy()
             self.prop.step(
                 transform_data, distance, overwrite=True, show_progress=show_progress
             )
-            field_fft[:, :, :] = np.moveaxis(transform_data, 0, -1).copy()
+            spectral_field = np.moveaxis(transform_data, 0, -1).copy()
 
         # Choose the time translation assuming propagation at v=c
         translate_time = distance / c
+
+        # This translation (e.g. delay in time, compared to t=0, associated
+        # with the propagation) is not automatically handled by the above
+        # propagators, so it needs to be added by hand.
+        # Note: subtracting by omega0 is only a global phase convention,
+        # that derives from the definition of the envelope in lasy.
+        spectral_field *= np.exp(-1j * (omega[None, None, :] - omega0) * translate_time)
+        self.grid.set_spectral_field(spectral_field)
 
         # Translate the domain
         self.grid.lo[time_axis_indx] += translate_time
         self.grid.hi[time_axis_indx] += translate_time
         self.grid.axes[time_axis_indx] += translate_time
 
-        # Translate the phase of spectral image
-        field_fft *= np.exp(-1j * translate_time * omega.reshape(omega_shape))
-
-        # Transform field from frequency to temporal domain
-        self.grid.field[:, :, :] = np.fft.fft(
-            field_fft, axis=time_axis_indx, norm="backward"
-        )
-
-        # Translate phase of the retrieved envelope by the distance
-        self.grid.field *= np.exp(1j * omega0 * distance / c)
-
     def write_to_file(
-        self, file_prefix="laser", file_format="h5", save_as_vector_potential=False
+        self,
+        file_prefix="laser",
+        file_format="h5",
+        write_dir="diags",
+        save_as_vector_potential=False,
     ):
         """
         Write the laser profile + metadata to file.
 
         Parameters
         ----------
+        write_dir : string
+            The directory where the file will be written.
+
         file_prefix : string
             The file name will start with this prefix.
 
@@ -346,6 +331,7 @@ class Laser:
         """
         write_to_openpmd_file(
             self.dim,
+            write_dir,
             file_prefix,
             file_format,
             self.output_iteration,
@@ -362,13 +348,14 @@ class Laser:
 
         Parameters
         ----------
-        **kw: additional arguments to be passed to matplotlib's imshow command
+        **kw : additional arguments to be passed to matplotlib's imshow command
         """
+        temporal_field = self.grid.get_temporal_field()
         if self.dim == "rt":
             # Show field in the plane y=0, above and below axis, with proper sign for each mode
             E = [
                 np.concatenate(
-                    ((-1.0) ** m * self.grid.field[m, ::-1], self.grid.field[m])
+                    ((-1.0) ** m * temporal_field[m, ::-1], temporal_field[m])
                 )
                 for m in self.grid.azimuthal_modes
             ]
@@ -382,8 +369,8 @@ class Laser:
 
         else:
             # In 3D show an image in the xt plane
-            i_slice = int(self.grid.field.shape[1] // 2)
-            E = self.grid.field[:, i_slice, :]
+            i_slice = int(temporal_field.shape[1] // 2)
+            E = temporal_field[:, i_slice, :]
             extent = [
                 self.grid.lo[-1],
                 self.grid.hi[-1],
