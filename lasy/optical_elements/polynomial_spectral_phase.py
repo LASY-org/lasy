@@ -23,17 +23,19 @@ class PolynomialSpectralPhase(OpticalElement):
 
     Parameters
     ----------
-    gdd : float (in s^2)
-        Group Delay Dispersion. ``gdd > 0`` corresponds to a positive chirp, i.e. the low-frequency
-        part of the spectrum arriving earlier than the high-frequency part of the spectrum.
-    tod : float (in s^3)
-        Third-order Dispersion. For a Gaussian pulse, adding a positive TOD (``tod > 0``) results
-        in the apparition of post-pulses, i.e. lower intensity pulses arriving after the main pulse.
-    fod : float (in s^4)
-        Fourth-order Dispersion.
+    gdd : float (in s^2), optional
+        Group Delay Dispersion (by default: ``gdd=0``). ``gdd > 0`` corresponds to a positive
+        chirp, i.e. the low-frequency part of the spectrum arriving earlier than the
+        high-frequency part of the spectrum.
+    tod : float (in s^3), optional
+        Third-order Dispersion (by default: ``tod=0``). For a Gaussian pulse, adding a positive
+        TOD (``tod > 0``) results in the apparition of post-pulses, i.e. lower intensity pulses
+        arriving after the main pulse.
+    fod : float (in s^4), optional
+        Fourth-order Dispersion (by default: ``fod=0``).
     """
 
-    def __init__(self, gdd, tod, fod):
+    def __init__(self, gdd=0, tod=0, fod=0):
         self.gdd = gdd
         self.tod = tod
         self.fod = fod

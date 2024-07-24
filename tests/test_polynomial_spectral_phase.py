@@ -9,71 +9,46 @@ temporal shape of the laser pulse again analytical formulas.
 import numpy as np
 
 from lasy.laser import Laser
-from lasy.optical_elements import ParabolicMirror
+from lasy.optical_elements import PolynomialSpectralPhase
 from lasy.profiles.gaussian_profile import GaussianProfile
 
+# Laser parameters
 wavelength = 0.8e-6
 w0 = 5.0e-6  # m
-
 pol = (1, 0)
 laser_energy = 1.0  # J
 t_peak = 0.0e-15  # s
-tau = 16.7e-15  # s
+tau = 15.e-15  # s
 gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
+# Grid parameters
+dim = "xyt"
+lo = (-12e-6, -12e-6, -100e-15)
+hi = (+12e-6, +12e-6, +100e-15)
+npoints = (100, 100, 200)
 
-def get_w0(laser):
-    # Calculate the laser waist
-    if laser.dim == "xyt":
-        Nx, Ny, Nt = laser.grid.field.shape
-        A2 = (np.abs(laser.grid.field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
-        ax = laser.grid.axes[1]
-    else:
-        A2 = (np.abs(laser.grid.field[0, :, :]) ** 2).sum(-1)
-        ax = laser.grid.axes[0]
-        if ax[0] > 0:
-            A2 = np.r_[A2[::-1], A2]
-            ax = np.r_[-ax[::-1], ax]
-        else:
-            A2 = np.r_[A2[::-1][:-1], A2]
-            ax = np.r_[-ax[::-1][:-1], ax]
+def test_gdd():
+    """
+    Add GDD to the laser and compare the on-axis field with with the
+    analytical formula for a Gaussian pulse with GDD.
+    """
+    gdd = 200e-30
+    dazzler = PolynomialSpectralPhase( gdd=gdd )
 
-    sigma = 2 * np.sqrt(np.average(ax**2, weights=A2))
-
-    return sigma
-
-
-def check_parabolic_mirror(laser):
-    # Propagate laser after parabolic mirror + vacuum
-    f0 = 8.0  # focal distance in m
-    laser.apply_optics(ParabolicMirror(f=f0))
-    laser.propagate(f0)
-    # Check that the value is the expected one in the near field
-    w0_num = get_w0(laser)
-    w0_theor = wavelength * f0 / (np.pi * w0)
-    err = 2 * np.abs(w0_theor - w0_num) / (w0_theor + w0_num)
-    assert err < 1e-3
-
-
-def test_3D_case():
-    # - 3D case
-    # The laser is initialized in the near field
-    dim = "xyt"
-    lo = (-12e-6, -12e-6, -60e-15)
-    hi = (+12e-6, +12e-6, +60e-15)
-    npoints = (500, 500, 100)
-
+    # Initialize the laser
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)
-    check_parabolic_mirror(laser)
 
+    # Get field before and after dazzler
+    E_before = laser.grid.get_temporal_field()
+    laser.apply_optics(dazzler)
+    E_after = laser.grid.get_temporal_field()
 
-def test_RT_case():
-    # - Cylindrical case
-    # The laser is initialized in the near field
-    dim = "rt"
-    lo = (0e-6, -60e-15)
-    hi = (15e-6, +60e-15)
-    npoints = (750, 100)
+    # Compute the analtical expression in real space for a Gaussian
+    t = np.linspace( laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
+    E0 = E_before.max()
+    stretch_factor = 1 - 2j * gdd / tau**2
+    E_analytical = E0 * np.exp(- 1./stretch_factor * (t/tau) ** 2) / stretch_factor ** 0.5
 
-    laser = Laser(dim, lo, hi, npoints, gaussian_profile)
-    check_parabolic_mirror(laser)
+    # Compare the on-axis field with the analytical formula
+    tol = 1.2e-3
+    assert np.all( abs(E_after[50,50, :]-E_analytical)/abs(E_analytical).max() < tol )
