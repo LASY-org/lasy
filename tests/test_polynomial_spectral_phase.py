@@ -18,7 +18,7 @@ w0 = 5.0e-6  # m
 pol = (1, 0)
 laser_energy = 1.0  # J
 t_peak = 0.0e-15  # s
-tau = 30.0e-15  # s
+tau = 16.7e-15  # s
 gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
 def get_w0(laser):
