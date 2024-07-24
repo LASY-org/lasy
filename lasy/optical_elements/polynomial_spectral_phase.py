@@ -5,7 +5,7 @@ from .optical_element import OpticalElement
 
 class PolynomialSpectralPhase(OpticalElement):
     r"""
-    Class for an optical element with added spectral phase.
+    Class for an optical element that adds spectral phase (e.g. a dazzler)
 
     The amplitude multiplier corresponds to:
 
@@ -24,13 +24,13 @@ class PolynomialSpectralPhase(OpticalElement):
     Parameters
     ----------
     gdd : float (in s^2)
-        Group Delay Dispersion. ``gdd > 0`` corresponds to a positive chirp, i.e. low-frequency part of the spectrum arriving earlier than the high-frequency part of the spectrum.
+        Group Delay Dispersion. ``gdd > 0`` corresponds to a positive chirp, i.e. the low-frequency
+        part of the spectrum arriving earlier than the high-frequency part of the spectrum.
     tod : float (in s^3)
-        Third-order Dispersion. For a Gaussian pulse, adding a positive TOD (``tod > 0``) results in the apparition of post-pulses, i.e. lower intensity pulses arriving after the main pulse.
+        Third-order Dispersion. For a Gaussian pulse, adding a positive TOD (``tod > 0``) results
+        in the apparition of post-pulses, i.e. lower intensity pulses arriving after the main pulse.
     fod : float (in s^4)
         Fourth-order Dispersion.
-    omega_0 : float (in rad/s)
-        Central angular frequency.
     """
 
     def __init__(self, gdd, tod, fod):
@@ -38,14 +38,18 @@ class PolynomialSpectralPhase(OpticalElement):
         self.tod = tod
         self.fod = fod
 
-    def amplitude_multiplier(self, omega, omega0):
+    def amplitude_multiplier(self, x, y, omega, omega0):
         """
         Return the amplitude multiplier.
 
         Parameters
         ----------
-        omega: ndarray of floats
+        x, y, omega: ndarrays of floats
             Define points on which to evaluate the multiplier.
+            These arrays need to all have the same shape.
+
+        omega_0 : float (in rad/s)
+            Central angular frequency.
 
         Returns
         -------

@@ -30,6 +30,9 @@ class OpticalElement(object):
             Define points on which to evaluate the multiplier.
             These arrays need to all have the same shape.
 
+        omega_0 : float (in rad/s)
+            Central angular frequency.
+
         Returns
         -------
         multiplier: ndarray of complex numbers
