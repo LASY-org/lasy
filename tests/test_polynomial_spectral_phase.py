@@ -21,6 +21,7 @@ t_peak = 0.0e-15  # s
 tau = 30.0e-15  # s
 gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
+
 def get_w0(laser):
     # Calculate the laser waist
     if laser.dim == "xyt":
