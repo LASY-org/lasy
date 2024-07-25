@@ -48,7 +48,7 @@ def test_gdd():
     laser.apply_optics(dazzler)
     E_after = laser.grid.get_temporal_field()
     # Extract peak field before dazzler
-    E0 = abs(E_before[50,50]).max()
+    E0 = abs(E_before[50, 50]).max()
 
     # Compute the analtical expression in real space for a Gaussian
     t = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
@@ -85,13 +85,13 @@ def test_tod():
     laser.apply_optics(dazzler)
     E_after = laser.grid.get_temporal_field()
     # Extract peak field before dazzler
-    E0 = abs(E_before[50,50]).max()
+    E0 = abs(E_before[50, 50]).max()
 
     # Compare data in the post-pulse region to the stationary phase approximation.
     # The stationary phase approximation result was obtained under the additional
     # assumption t >> tau^4/tod, so we only compare the data in this region
-    E_compare = abs( E_after[50, 50, t>t_peak + 2*tau**4/tod] ) # On-axis field
-    t = t[t>t_peak + 2*tau**4/tod]
+    E_compare = abs(E_after[50, 50, t > t_peak + 2 * tau**4 / tod])  # On-axis field
+    t = t[t > t_peak + 2 * tau**4 / tod]
     prediction = abs(
         2
         * E0
@@ -107,4 +107,4 @@ def test_tod():
 
     # Compare the on-axis field with the analytical formula
     tol = 2.4e-2
-    assert np.all( abs(E_compare - prediction)/abs(E0) < tol )
+    assert np.all(abs(E_compare - prediction) / abs(E0) < tol)
