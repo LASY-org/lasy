@@ -81,28 +81,19 @@ def test_tod():
     laser.apply_optics(dazzler)
     E_after = laser.grid.get_temporal_field()
 
-    # TOD typically results in several post-pulses with decreasing amplitude.
-    # The stationary phase approximation cannot predict the oscillations that corresponds
-    # to discrete post-pulses, but it predicts their average, decreasing amplitude.
-    # Thus, here we extract the amplitude of the peaks of the post-pulses
-    # and multiply by 0.5 to find the average amplitude.
-    on_axis_env = abs(E_after[50,50, :])
-    peak_positions = []
-    for i in range(1, len(on_axis_env)-1):
-        if ( on_axis_env[i] > on_axis_env[i+1] ) and ( on_axis_env[i] > on_axis_env[i-1] ):
-            peak_positions.append(i)
-    # Skip first maximum, for which the stationary phase is not adapted
-    peak_positions = np.array(peak_positions[1:])
-    assert len(peak_positions) > 10 # Check that there are multiple post-pulses
-    avg_amplitude = on_axis_env[peak_positions] * 0.5
+    # Only compare data in the post-pulse region (t>t_peak+tau),
+    # where the stationary phase approximation is valid
+    E_compare = abs( E_after[50, 50, t>t_peak + tau] )
+    t = t[t>t_peak + tau]
 
-    # Compute the analtical expression using the stationary phase approximation
-    E0 = E_before.max()
-    def stationary_phase_approx(t):
-        w_stat = (2*t*(t>0)/tod)**.5  # Omega for which the derivative of the phase is 0
-        return abs( E0 * np.exp( - w_stat**2*tau**2/4  )/(1 + 2j*tod*w_stat/tau**2)**.5 )
-    predictions = stationary_phase_approx(t[peak_positions])
+    E0 = abs(E_before[50,50]).max()
+    prediction = abs(
+            2* E0 * tau/(8*tod*t)**.25
+            * np.exp( - tau**2*t/(2*tod) )
+            * np.cos( 2*t/3 * (2*t/tod)**.5
+            - tau**4/(8*tod)*(2*t/tod)**.5 - np.pi/4 )
+        )
 
     # Compare the on-axis field with the analytical formula
-    tol = 1.3e-3
-    assert np.all( abs(avg_amplitude - predictions)/abs(E0) < tol )
+    tol = 3e-2
+    assert np.all( abs(E_compare - prediction)/abs(E0) < tol )
