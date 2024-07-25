@@ -314,7 +314,7 @@ class Laser:
                         overwrite=True,
                         show_progress=show_progress,
                     )
-                    field_fft[i_m, :, :] = np.transpose(transform_data).copy()
+                field_fft[i_m, :, :] = np.transpose(transform_data).copy()
                 # Delete Propagator if resampling was done
                 if grid is not None:
                     del self.prop

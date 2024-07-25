@@ -12,8 +12,16 @@ pol = (1, 0)
 laser_energy = 1.0  # J
 t_peak = 0.0e-15  # s
 tau = 30.0e-15  # s
-gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
+# Define the initial grid for the laser
+dim = "rt"
+lo = (0e-3, -90e-15)
+hi = (15e-3, +90e-15)
+npoints = (250, 30)
+
+# Initialize the laser
+gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
+laser = Laser(dim, lo, hi, npoints, gaussian_profile)
 
 def get_w0(laser):
     A2 = (np.abs(laser.grid.field[0, :, :]) ** 2).sum(-1)
@@ -34,7 +42,7 @@ def check_resampling(laser, new_grid):
     # Focus down the laser and propagate using resampling 
     f0 = 2.0  # focal distance in m
     laser.apply_optics(ParabolicMirror(f=f0))    
-    laser.propagate((f0), grid=new_grid) # resample the radial grid
+    laser.propagate((f0), grid=new_grid, show_progress=False) # resample the radial grid
     
     # Check that the value is the expected one in the near field
     w0_num = get_w0(laser)
@@ -43,15 +51,9 @@ def check_resampling(laser, new_grid):
     assert err < 1e-3
     
 def test_resampling():
-    # Define the initial grid for the laser
-    dim = "rt"
-    lo = (0e-3, -90e-15)
-    hi = (15e-3, +90e-15)
-    npoints = (250, 30)
-
     # Define the new grid for the laser
     new_r_max = 300.e-6
     new_grid = Grid(dim, lo, (new_r_max, hi[1]), npoints, n_azimuthal_modes=laser.grid.n_azimuthal_modes)
     
-    laser = Laser(dim, lo, hi, npoints, gaussian_profile)
     check_resampling(laser, new_grid)
+
