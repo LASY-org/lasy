@@ -58,7 +58,10 @@ def test_gdd():
 
     # Compare the on-axis field with the analytical formula
     tol = 1.2e-3
-    assert np.all( abs(E_after[50,50, :]-E_analytical)/abs(E_analytical).max() < tol )
+    assert np.all(
+        abs(E_after[50, 50, :] - E_analytical) / abs(E_analytical).max() < tol
+    )
+
 
 def test_tod():
     """
@@ -66,7 +69,7 @@ def test_tod():
     analytical formula from the stationary phase approximation.
     """
     tod = 5e-42
-    dazzler = PolynomialSpectralPhase( tod=tod )
+    dazzler = PolynomialSpectralPhase(tod=tod)
 
     # Initialize the laser
     dim = "xyt"
@@ -74,7 +77,7 @@ def test_tod():
     hi = (+12e-6, +12e-6, +250e-15)
     npoints = (100, 100, 400)
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)
-    t = np.linspace( laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
+    t = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
 
     # Get field before and after dazzler
     E_before = laser.grid.get_temporal_field()
@@ -86,23 +89,33 @@ def test_tod():
     # to discrete post-pulses, but it predicts their average, decreasing amplitude.
     # Thus, here we extract the amplitude of the peaks of the post-pulses
     # and multiply by 0.5 to find the average amplitude.
-    on_axis_env = abs(E_after[50,50, :])
+    on_axis_env = abs(E_after[50, 50, :])
     peak_positions = []
-    for i in range(1, len(on_axis_env)-1):
-        if ( on_axis_env[i] > on_axis_env[i+1] ) and ( on_axis_env[i] > on_axis_env[i-1] ):
+    for i in range(1, len(on_axis_env) - 1):
+        if (on_axis_env[i] > on_axis_env[i + 1]) and (
+            on_axis_env[i] > on_axis_env[i - 1]
+        ):
             peak_positions.append(i)
     # Skip first maximum, for which the stationary phase is not adapted
     peak_positions = np.array(peak_positions[1:])
-    assert len(peak_positions) > 10 # Check that there are multiple post-pulses
+    assert len(peak_positions) > 10  # Check that there are multiple post-pulses
     avg_amplitude = on_axis_env[peak_positions] * 0.5
 
     # Compute the analtical expression using the stationary phase approximation
     E0 = E_before.max()
+
     def stationary_phase_approx(t):
-        w_stat = (2*t*(t>0)/tod)**.5  # Omega for which the derivative of the phase is 0
-        return abs( E0 * np.exp( - w_stat**2*tau**2/4  )/(1 + 2j*tod*w_stat/tau**2)**.5 )
+        w_stat = (
+            2 * t * (t > 0) / tod
+        ) ** 0.5  # Omega for which the derivative of the phase is 0
+        return abs(
+            E0
+            * np.exp(-(w_stat**2) * tau**2 / 4)
+            / (1 + 2j * tod * w_stat / tau**2) ** 0.5
+        )
+
     predictions = stationary_phase_approx(t[peak_positions])
 
     # Compare the on-axis field with the analytical formula
     tol = 1.3e-3
-    assert np.all( abs(avg_amplitude - predictions)/abs(E0) < tol )
+    assert np.all(abs(avg_amplitude - predictions) / abs(E0) < tol)
