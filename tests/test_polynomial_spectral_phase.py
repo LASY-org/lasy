@@ -58,7 +58,10 @@ def test_gdd():
 
     # Compare the on-axis field with the analytical formula
     tol = 1.2e-3
-    assert np.all( abs(E_after[50,50, :]-E_analytical)/abs(E_analytical).max() < tol )
+    assert np.all(
+        abs(E_after[50, 50, :] - E_analytical) / abs(E_analytical).max() < tol
+    )
+
 
 def test_tod():
     """
@@ -66,7 +69,7 @@ def test_tod():
     analytical formula from the stationary phase approximation.
     """
     tod = 5e-42
-    dazzler = PolynomialSpectralPhase( tod=tod )
+    dazzler = PolynomialSpectralPhase(tod=tod)
 
     # Initialize the laser
     dim = "xyt"
@@ -74,7 +77,7 @@ def test_tod():
     hi = (+12e-6, +12e-6, +250e-15)
     npoints = (100, 100, 400)
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)
-    t = np.linspace( laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
+    t = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
 
     # Get field before and after dazzler
     E_before = laser.grid.get_temporal_field()
