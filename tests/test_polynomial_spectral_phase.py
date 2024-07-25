@@ -18,16 +18,26 @@ w0 = 5.0e-6  # m
 pol = (1, 0)
 laser_energy = 1.0  # J
 t_peak = 0.0e-15  # s
-tau = 15.e-15  # s
+tau = 15.0e-15  # s
 gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
+<<<<<<< HEAD
+=======
+# Grid parameters
+dim = "xyt"
+lo = (-12e-6, -12e-6, -100e-15)
+hi = (+12e-6, +12e-6, +100e-15)
+npoints = (100, 100, 200)
+
+
+>>>>>>> 65af898144d48b83e56b7c7f6626f7525d34d5ac
 def test_gdd():
     """
     Add GDD to the laser and compare the on-axis field with the
     analytical formula for a Gaussian pulse with GDD.
     """
     gdd = 200e-30
-    dazzler = PolynomialSpectralPhase( gdd=gdd )
+    dazzler = PolynomialSpectralPhase(gdd=gdd)
 
     # Initialize the laser
     dim = "xyt"
@@ -42,10 +52,12 @@ def test_gdd():
     E_after = laser.grid.get_temporal_field()
 
     # Compute the analtical expression in real space for a Gaussian
-    t = np.linspace( laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
+    t = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
     E0 = E_before.max()
     stretch_factor = 1 - 2j * gdd / tau**2
-    E_analytical = E0 * np.exp(- 1./stretch_factor * (t/tau) ** 2) / stretch_factor ** 0.5
+    E_analytical = (
+        E0 * np.exp(-1.0 / stretch_factor * (t / tau) ** 2) / stretch_factor**0.5
+    )
 
     # Compare the on-axis field with the analytical formula
     tol = 1.2e-3
