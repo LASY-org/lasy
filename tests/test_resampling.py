@@ -42,9 +42,9 @@ def check_resampling(laser, new_grid):
     # Focus down the laser and propagate using resampling
     f0 = 2.0  # focal distance in m
 <<<<<<< HEAD
-    laser.apply_optics(ParabolicMirror(f=f0))    
+    laser.apply_optics(ParabolicMirror(f=f0))
     laser.propagate((f0), grid=new_grid, show_progress=False) # resample the radial grid
-    
+
 =======
     laser.apply_optics(ParabolicMirror(f=f0))
     laser.propagate((f0), grid=new_grid)  # resample the radial grid
@@ -62,7 +62,7 @@ def test_resampling():
 <<<<<<< HEAD
     new_r_max = 300.e-6
     new_grid = Grid(dim, lo, (new_r_max, hi[1]), npoints, n_azimuthal_modes=laser.grid.n_azimuthal_modes)
-    
+
     check_resampling(laser, new_grid)
 
 =======
