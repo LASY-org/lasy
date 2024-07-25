@@ -21,8 +21,6 @@ t_peak = 0.0e-15  # s
 tau = 15.0e-15  # s
 gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
 
-<<<<<<< HEAD
-=======
 # Grid parameters
 dim = "xyt"
 lo = (-12e-6, -12e-6, -100e-15)
@@ -30,7 +28,6 @@ hi = (+12e-6, +12e-6, +100e-15)
 npoints = (100, 100, 200)
 
 
->>>>>>> 65af898144d48b83e56b7c7f6626f7525d34d5ac
 def test_gdd():
     """
     Add GDD to the laser and compare the on-axis field with the
