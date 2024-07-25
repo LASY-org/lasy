@@ -86,17 +86,23 @@ def test_tod():
 
     # Only compare data in the post-pulse region (t>t_peak+tau),
     # where the stationary phase approximation is valid
-    E_compare = abs( E_after[50, 50, t>t_peak + tau] )
-    t = t[t>t_peak + tau]
+    E_compare = abs(E_after[50, 50, t > t_peak + tau])
+    t = t[t > t_peak + tau]
 
-    E0 = abs(E_before[50,50]).max()
+    E0 = abs(E_before[50, 50]).max()
     prediction = abs(
-            2* E0 * tau/(8*tod*t)**.25
-            * np.exp( - tau**2*t/(2*tod) )
-            * np.cos( 2*t/3 * (2*t/tod)**.5
-            - tau**4/(8*tod)*(2*t/tod)**.5 - np.pi/4 )
+        2
+        * E0
+        * tau
+        / (8 * tod * t) ** 0.25
+        * np.exp(-(tau**2) * t / (2 * tod))
+        * np.cos(
+            2 * t / 3 * (2 * t / tod) ** 0.5
+            - tau**4 / (8 * tod) * (2 * t / tod) ** 0.5
+            - np.pi / 4
         )
+    )
 
     # Compare the on-axis field with the analytical formula
     tol = 3e-2
-    assert np.all( abs(E_compare - prediction)/abs(E0) < tol )
+    assert np.all(abs(E_compare - prediction) / abs(E0) < tol)
