@@ -192,7 +192,9 @@ class Laser:
             x, y, omega = np.meshgrid(
                 self.grid.axes[0], self.grid.axes[1], self.omega_1d, indexing="ij"
             )
-            spectral_field *= optical_element.amplitude_multiplier(x, y, omega, self.omega0)
+            spectral_field *= optical_element.amplitude_multiplier(
+                x, y, omega, self.omega0
+            )
         self.grid.set_spectral_field(spectral_field)
 
     def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
@@ -286,8 +288,9 @@ class Laser:
         # propagators, so it needs to be added by hand.
         # Note: subtracting by omega0 is only a global phase convention,
         # that derives from the definition of the envelope in lasy.
-        spectral_field *= np.exp(-1j \
-            * (self.omega_1d[None, None, :] - self.omega0) * translate_time)
+        spectral_field *= np.exp(
+            -1j * (self.omega_1d[None, None, :] - self.omega0) * translate_time
+        )
         self.grid.set_spectral_field(spectral_field)
 
         # Translate the domain
