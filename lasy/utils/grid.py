@@ -61,10 +61,16 @@ class Grid:
             # 0, 1, 2, ..., n_azimuthal_modes-1, -n_azimuthal_modes+1, ..., -1
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
+
         self.temporal_field = np.zeros(self.shape, dtype="complex128")
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
+
+        # Envelope frequency axis
+        dt = self.dx[time_axis_indx]
+        Nt = self.shape[time_axis_indx]
+        self.omega_env = 2 * np.pi * np.fft.fftfreq(Nt, dt)
 
     def set_temporal_field(self, field):
         """
