@@ -67,11 +67,6 @@ class Grid:
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
 
-        # Envelope frequency axis
-        dt = self.dx[time_axis_indx]
-        Nt = self.shape[time_axis_indx]
-        self.omega_env = 2 * np.pi * np.fft.fftfreq(Nt, dt)
-
     def set_temporal_field(self, field):
         """
         Set the temporal field.

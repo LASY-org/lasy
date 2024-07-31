@@ -108,9 +108,12 @@ class Laser:
         self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
         self.dim = dim
         self.profile = profile
-        self.omega0 = profile.omega0
-        self.omega_1d = self.grid.omega_env + self.omega0
         self.output_iteration = 0  # Incremented each time write_to_file is called
+
+        # Get the spectral axis
+        dt = self.grid.dx[time_axis_indx]
+        Nt = self.grid.shape[time_axis_indx]
+        self.omega_1d = 2 * np.pi * np.fft.fftfreq(Nt, dt) + profile.omega0
 
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
@@ -180,7 +183,7 @@ class Laser:
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and 0 as `y`
-            multiplier = optical_element.amplitude_multiplier(r, 0, omega, self.omega0)
+            multiplier = optical_element.amplitude_multiplier(r, 0, omega, self.profile.omega0)
             # The azimuthal modes are the components of the Fourier transform
             # along theta (FT_theta). Because the multiplier is assumed to be
             # cylindrically symmetric (i.e. theta-independent):
@@ -193,7 +196,7 @@ class Laser:
                 self.grid.axes[0], self.grid.axes[1], self.omega_1d, indexing="ij"
             )
             spectral_field *= optical_element.amplitude_multiplier(
-                x, y, omega, self.omega0
+                x, y, omega, self.profile.omega0
             )
         self.grid.set_spectral_field(spectral_field)
 
@@ -289,7 +292,7 @@ class Laser:
         # Note: subtracting by omega0 is only a global phase convention,
         # that derives from the definition of the envelope in lasy.
         spectral_field *= np.exp(
-            -1j * (self.omega_1d[None, None, :] - self.omega0) * translate_time
+            -1j * (self.omega_1d[None, None, :] - self.profile.omega0) * translate_time
         )
         self.grid.set_spectral_field(spectral_field)
 
