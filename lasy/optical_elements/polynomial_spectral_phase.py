@@ -46,18 +46,18 @@ class PolynomialSpectralPhase(OpticalElement):
 
         Parameters
         ----------
-        x, y, omega: ndarrays of floats
+        x, y, omega : ndarrays of floats
             Define points on which to evaluate the multiplier.
             These arrays need to all have the same shape.
-
-        omega_0 : float (in rad/s)
-            Central angular frequency.
+        omega0 : float (in rad/s)
+            Central angular frequency, as used for the definition
+            of the laser envelope.
 
         Returns
         -------
-        multiplier: ndarray of complex numbers
-            Contains the value of the multiplier at the specified points
-            This array has the same shape as the array omega
+        multiplier : ndarray of complex numbers
+            Contains the value of the multiplier at the specified points.
+            This array has the same shape as the array omega.
         """
         spectral_phase = (
             self.gdd / 2 * (omega - omega0) ** 2
