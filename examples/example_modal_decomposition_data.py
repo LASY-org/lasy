@@ -1,19 +1,17 @@
+import matplotlib.pyplot as plt
 import numpy as np
+import skimage
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from lasy.profiles.transverse.transverse_profile_from_data import (
-    TransverseProfileFromData,
-)
+from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
+from lasy.profiles.longitudinal.gaussian_profile import GaussianLongitudinalProfile
 from lasy.profiles.transverse.hermite_gaussian_profile import (
     HermiteGaussianTransverseProfile,
 )
-from lasy.profiles.longitudinal.gaussian_profile import GaussianLongitudinalProfile
-from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
+from lasy.profiles.transverse.transverse_profile_from_data import (
+    TransverseProfileFromData,
+)
 from lasy.utils.mode_decomposition import hermite_gauss_decomposition
-
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-import skimage
-
 
 # Define the transverse profile of the laser pulse
 img_url = "https://user-images.githubusercontent.com/27694869/228038930-d6ab03b1-a726-4b41-a378-5f4a83dc3778.png"

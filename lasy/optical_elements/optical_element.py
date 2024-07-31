@@ -1,7 +1,9 @@
+from abc import ABC, abstractmethod
+
 import numpy as np
 
 
-class OpticalElement(object):
+class OpticalElement(ABC):
     """
     Base class to model thin optical elements.
 
@@ -12,7 +14,8 @@ class OpticalElement(object):
     def __init__(self):
         pass
 
-    def amplitude_multiplier(self, x, y, omega):
+    @abstractmethod
+    def amplitude_multiplier(self, x, y, omega, omega0):
         r"""
         Return the amplitude multiplier :math:`T`.
 
@@ -26,15 +29,22 @@ class OpticalElement(object):
 
         Parameters
         ----------
-        x, y, omega: ndarrays of floats
+        Return the amplitude multiplier.
+
+        Parameters
+        ----------
+        x, y, omega : ndarrays of floats
             Define points on which to evaluate the multiplier.
             These arrays need to all have the same shape.
+        omega0 : float (in rad/s)
+            Central angular frequency, as used for the definition
+            of the laser envelope.
 
         Returns
         -------
-        multiplier: ndarray of complex numbers
-            Contains the value of the multiplier at the specified points
-            This array has the same shape as the arrays x, y, omega
+        multiplier : ndarray of complex numbers
+            Contains the value of the multiplier at the specified points.
+            This array has the same shape as the array omega.
         """
         # The base class only defines dummy multiplier
         # (This should be replaced by any class that inherits from this one.)

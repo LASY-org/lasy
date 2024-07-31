@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import pytest
+import copy
 
 import numpy as np
+import pytest
+
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.zernike import zernike
 from lasy.utils.phase_retrieval import gerchberg_saxton_algo
-import copy
+from lasy.utils.zernike import zernike
 
 w0 = 25.0e-6  # m
 
@@ -48,7 +49,8 @@ def test_3D_case(gaussian):
 
     # NOW ADD THE PHASE TO EACH SLICE OF THE FOCUS
     phase3D = np.repeat(phase[:, :, np.newaxis], npoints[2], axis=2)
-    laser.grid.field = np.abs(laser.grid.field) * np.exp(1j * phase3D)
+    field = laser.grid.get_temporal_field()
+    laser.grid.set_temporal_field(np.abs(field) * np.exp(1j * phase3D))
 
     # PROPAGATE THE FIELD FIELD FOWARDS AND BACKWARDS BY 1 MM
     propDist = 2e-3

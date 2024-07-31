@@ -1,10 +1,12 @@
 import numpy as np
-from scipy.constants import c
 import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
-from .from_array_profile import FromArrayProfile
-from lasy.utils.laser_utils import field_to_envelope, create_grid
+from scipy.constants import c
+
+from lasy.utils.laser_utils import create_grid, field_to_envelope
 from lasy.utils.openpmd_input import reorder_array
+
+from .from_array_profile import FromArrayProfile
 
 
 class FromOpenPMDProfile(FromArrayProfile):
@@ -100,7 +102,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         if not is_envelope:
             grid = create_grid(F, axes, dim)
             grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
-            array = grid.field[0]
+            array = grid.get_temporal_field()[0]
         else:
             s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
             it = s.iterations[iteration]
