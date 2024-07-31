@@ -1,6 +1,7 @@
-from .optical_element import OpticalElement
 import numpy as np
 from scipy.constants import c
+
+from .optical_element import OpticalElement
 
 
 class AxiParabola(OpticalElement):
