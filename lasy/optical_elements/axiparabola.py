@@ -6,14 +6,10 @@ from .optical_element import OpticalElement
 
 class AxiParabola(OpticalElement):
     r"""
-    Class that represents the combination of an axiparabola with
-    an additional optical element that provides a radially-dependent
-    delay (e.g. an optical echelon) to tune the group velocity.
+    Class that represents an axiparabola.
 
-    The rays that impinge the axiparabola at different radii are focused
-    to different positions on the axis (resulting in an extended "focal
-    range"). An additional radially-dependent delay is usually applied,
-    in order to tune the effective group velocity on axis.
+    The rays that impinge ton he axiparabola at different radii are focused
+    to different positions on the axis (resulting in an extended "focal range").
 
     For more details, see S. Smartsev et al, "Axiparabola: a long-focal-depth,
     high-resolution mirror for broadband high-intensity lasers", Optics Letters 44, 14 (2019)
