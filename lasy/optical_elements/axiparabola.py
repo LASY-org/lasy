@@ -24,8 +24,8 @@ class AxiParabola(OpticalElement):
         The length of the focal range.
 
     R: float (in meter)
-        The radius of the axiparabola. Rays coming from r=0 focus
-        at z=f0 ; rays coming from r=R focus at z=f0+delta
+        The radius of the axiparabola. Rays coming from ``r=0`` focus
+        at ``z=f0`` ; rays coming from ``r=R`` focus at ``z=f0+delta``
     """
 
     def __init__(self, f0, delta, R):
