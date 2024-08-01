@@ -11,7 +11,7 @@ from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import CombinedLongitudinalTransverseProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import SuperGaussianTransverseProfile
-
+from lasy.optical_elements import Axiparabola
 
 def test_axiparabola():
 
@@ -38,12 +38,10 @@ def test_axiparabola():
     laser = Laser(dimensions, lo, hi, num_points, laser_profile)
 
     # Define the parameters of the axiparabola
-    from lasy.optical_elements import AxiParabola
-
     f0 = 3e-2  # Focal distance
     delta = 1.5e-2  # Focal range
     R = spot_size  # Radius
-    axiparabola = AxiParabola(f0, delta, R)
+    axiparabola = Axiparabola(f0, delta, R)
 
     # Apply axiparabola and propagate to the middle of the focal range
     laser.apply_optics(axiparabola)

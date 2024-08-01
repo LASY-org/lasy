@@ -4,7 +4,7 @@ from scipy.constants import c
 from .optical_element import OpticalElement
 
 
-class AxiParabola(OpticalElement):
+class Axiparabola(OpticalElement):
     r"""
     Class that represents an axiparabola.
 
