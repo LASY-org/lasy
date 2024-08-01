@@ -61,6 +61,7 @@ class Grid:
             # 0, 1, 2, ..., n_azimuthal_modes-1, -n_azimuthal_modes+1, ..., -1
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
+
         self.temporal_field = np.zeros(self.shape, dtype="complex128")
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
