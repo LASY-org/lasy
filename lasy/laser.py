@@ -110,6 +110,11 @@ class Laser:
         self.profile = profile
         self.output_iteration = 0  # Incremented each time write_to_file is called
 
+        # Get the spectral axis
+        dt = self.grid.dx[time_axis_indx]
+        Nt = self.grid.shape[time_axis_indx]
+        self.omega_1d = 2 * np.pi * np.fft.fftfreq(Nt, dt) + profile.omega0
+
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
@@ -171,20 +176,16 @@ class Laser:
             Represents a thin optical element, through which the laser
             propagates.
         """
-        # Create the frequency axis
-        dt = self.grid.dx[time_axis_indx]
-        omega0 = self.profile.omega0
-        Nt = self.grid.shape[time_axis_indx]
-        omega_1d = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
-
         # Apply optical element
         spectral_field = self.grid.get_spectral_field()
         if self.dim == "rt":
-            r, omega = np.meshgrid(self.grid.axes[0], omega_1d, indexing="ij")
+            r, omega = np.meshgrid(self.grid.axes[0], self.omega_1d, indexing="ij")
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and 0 as `y`
-            multiplier = optical_element.amplitude_multiplier(r, 0, omega, omega0)
+            multiplier = optical_element.amplitude_multiplier(
+                r, 0, omega, self.profile.omega0
+            )
             # The azimuthal modes are the components of the Fourier transform
             # along theta (FT_theta). Because the multiplier is assumed to be
             # cylindrically symmetric (i.e. theta-independent):
@@ -194,9 +195,11 @@ class Laser:
                 spectral_field[i_m, :, :] *= multiplier
         else:
             x, y, omega = np.meshgrid(
-                self.grid.axes[0], self.grid.axes[1], omega_1d, indexing="ij"
+                self.grid.axes[0], self.grid.axes[1], self.omega_1d, indexing="ij"
             )
-            spectral_field *= optical_element.amplitude_multiplier(x, y, omega, omega0)
+            spectral_field *= optical_element.amplitude_multiplier(
+                x, y, omega, self.profile.omega0
+            )
         self.grid.set_spectral_field(spectral_field)
 
     def propagate(self, distance, nr_boundary=None, backend="NP", show_progress=True):
@@ -234,12 +237,6 @@ class Laser:
                 field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][None, :, None]
             self.grid.set_temporal_field(field)
 
-        # Create the frequency axis
-        dt = self.grid.dx[time_axis_indx]
-        omega0 = self.profile.omega0
-        Nt = self.grid.shape[time_axis_indx]
-        omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + omega0
-
         if self.dim == "rt":
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
@@ -249,7 +246,7 @@ class Laser:
                     self.prop.append(
                         PropagatorResampling(
                             *spatial_axes,
-                            omega / c,
+                            self.omega_1d / c,
                             mode=m,
                             backend=backend,
                             verbose=False,
@@ -276,7 +273,7 @@ class Laser:
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
                 self.prop = PropagatorFFT2(
                     *spatial_axes,
-                    omega / c,
+                    self.omega_1d / c,
                     backend=backend,
                     verbose=False,
                 )
@@ -296,7 +293,9 @@ class Laser:
         # propagators, so it needs to be added by hand.
         # Note: subtracting by omega0 is only a global phase convention,
         # that derives from the definition of the envelope in lasy.
-        spectral_field *= np.exp(-1j * (omega[None, None, :] - omega0) * translate_time)
+        spectral_field *= np.exp(
+            -1j * (self.omega_1d[None, None, :] - self.profile.omega0) * translate_time
+        )
         self.grid.set_spectral_field(spectral_field)
 
         # Translate the domain
