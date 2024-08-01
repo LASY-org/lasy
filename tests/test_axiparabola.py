@@ -1,6 +1,6 @@
+from lasy.laser import Laser
 from lasy.profiles.axiparabola_profile import AxiparabolaProfile
 from lasy.profiles.longitudinal_profiles import GaussianLongitudinalProfile
-from lasy.laser import Laser
 
 wavelength = 800e-9  # Laser wavelength in meters
 polarization = (1, 0)  # Linearly polarized in the x direction
