@@ -248,9 +248,6 @@ class Laser:
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
                 spatial_axes = (self.grid.axes[0],)
-                if use_cupy:
-                    # Move quantities to CPU to create propagator
-                    k = xp.asnumpy(k)
                     spatial_axes = (xp.asnumpy(spatial_axes[0]),)
                 self.prop = []
                 for m in self.grid.azimuthal_modes:
