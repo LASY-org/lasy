@@ -244,16 +244,21 @@ class Laser:
         else:
             backend = "NP"
 
+        k = self.omega_1d/c            
         if self.dim == "rt":
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
                 spatial_axes = (self.grid.axes[0],)
                 self.prop = []
+                if use_cupy:
+                    # Move quantities to CPU to create propagator
+                    k = xp.asnumpy(k)
+                    spatial_axes = (xp.asnumpy(spatial_axes[0]),)                
                 for m in self.grid.azimuthal_modes:
                     self.prop.append(
                         PropagatorResampling(
                             *spatial_axes,
-                            self.omega_1d / c,
+                            k,
                             mode=m,
                             backend=backend,
                             verbose=False,
