@@ -191,7 +191,7 @@ class SpeckleProfile(Profile):
         self.laser_energy = laser_energy
         self.focal_length = focal_length
         self.beam_aperture = xp.array(beam_aperture, dtype="float")
-        self.n_beamlets = xp.array(n_beamlets, dtype="int")
+        self.n_beamlets = n_beamlets
         self.temporal_smoothing_type = temporal_smoothing_type
         self.laser_bandwidth = relative_laser_bandwidth
 
@@ -261,7 +261,7 @@ class SpeckleProfile(Profile):
             SpeckleProfile.supported_smoothing
         )
         assert relative_laser_bandwidth > 0, "laser_bandwidth must be greater than 0"
-        assert xp.size(n_beamlets) == 2, "has to be a size 2 array"
+        assert len(n_beamlets) == 2, "has to be a size 2 array"
         if "SSD" in self.temporal_smoothing_type.upper():
             assert (
                 ssd_number_color_cycles is not None
