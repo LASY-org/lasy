@@ -4,7 +4,7 @@ from scipy.constants import c, e, epsilon_0, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
 
-from lasy.backend import xp
+from lasy.backend import xp, use_cupy
 
 from .grid import Grid
 
@@ -738,9 +738,12 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
     time_axis_indx = -1
 
     t_axis = grid.axes[time_axis_indx]
+    if use_cupy:
+        t_axis = xp.asnumpy(t_axis)
+
     if z_axis is None:
         z_axis = t_axis * c
-
+        
     FieldAxprp = ScalarFieldEnvelope(omega0 / c, t_axis)
 
     field = grid.get_temporal_field()
