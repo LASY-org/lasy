@@ -6,3 +6,4 @@ Optical elements
 
    parabolic_mirror
    polynomial_spectral_phase
+   axiparabola
