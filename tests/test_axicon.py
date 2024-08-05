@@ -83,14 +83,14 @@ def test_3D_case():
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)
     check_axicon(laser)
 
-#def test_RT_case():
+def test_RT_case():
     # Cylindrical case
-    #dim = "rt"
-    #lo = (0e-6, -60e-15)
-    #hi = (15e-3, +60e-15)
-    #npoints = (1100, 300)
+    dim = "rt"
+    lo = (0e-6, -60e-15)
+    hi = (15e-3, +60e-15)
+    npoints = (1100, 300)
 
-    #laser = Laser(dim, lo, hi, npoints, gaussian_profile)
-    #check_axicon(laser)
+    laser = Laser(dim, lo, hi, npoints, gaussian_profile)
+    check_axicon(laser)
 
 
