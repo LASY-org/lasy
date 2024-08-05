@@ -8,7 +8,7 @@ class Axiparabola(OpticalElement):
     r"""
     Class that represents an axiparabola.
 
-    The rays that impinge ton he axiparabola at different radii are focused
+    The rays that impinge on the axiparabola at different radii are focused
     to different positions on the axis (resulting in an extended "focal range").
 
     For more details, see S. Smartsev et al, "Axiparabola: a long-focal-depth,
