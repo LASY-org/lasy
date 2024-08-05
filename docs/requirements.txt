@@ -9,4 +9,3 @@ pydata-sphinx-theme
 sphinx-copybutton
 sphinx-design
 sphinx-gallery
-axiprop
