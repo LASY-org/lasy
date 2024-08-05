@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy import special
 from scipy.constants import c, epsilon_0
@@ -80,18 +79,6 @@ def check_bessel_profile(laser, z):
     expected_profile_norm = expected_profile / np.max(expected_profile)
     # Calculate error
     error1 = np.mean(np.abs(expected_profile_norm - A2_norm))
-    plt.figure(figsize=(10, 6))
-    plt.plot(ax, expected_profile, label="Expected Profile")
-    plt.plot(ax, A2, label="Actual Profile")
-    plt.xlim(-1e-4, 1e-4)
-    plt.xlabel("Radial distance (m)")
-    plt.ylabel("Intensity")
-    plt.title(f"Bessel Profile Comparison at z = {z:.2e} m")
-    plt.legend()
-
-    # Save the plot
-    plt.savefig(f"bessel_profile_z_{z:.2e}.png")
-    plt.close()
     return error1  # Return the smallest error
 
 
