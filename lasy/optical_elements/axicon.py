@@ -7,6 +7,7 @@ from .optical_element import OpticalElement
 class Axicon(OpticalElement):
     r"""
     Class for an axicon.
+
     This object technically represents a reflective axicon. However, it could
     also be used to represent a refractive axicon, if the chromatic effects of
     the refractive axicon are assumed to be negligible.
