@@ -1,8 +1,6 @@
 import numpy as np
 from scipy.constants import c
-
 from .optical_element import OpticalElement
-
 
 class Axicon(OpticalElement):
     r"""
@@ -10,12 +8,15 @@ class Axicon(OpticalElement):
     This object technically represents a reflective axicon. However, it could
     also be used to represent a refractive axicon, if the chromatic effects of
     the refractive axicon are assumed to be negligible.
+    
     More precisely, the amplitude multiplier corresponds to:
     .. math::
         T(\boldsymbol{x}_\perp,\omega) = \exp(-i\omega \sqrt{x^2+y^2} \tan(\gamma/2))
+    
     where :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
     to the propagation direction). The other parameters in this formula
     are defined below.
+
     Parameters
     ----------
     gamma : float (in radians)
@@ -29,6 +30,7 @@ class Axicon(OpticalElement):
     def amplitude_multiplier(self, x, y, omega, omega0):
         """
         Return the amplitude multiplier.
+
         Parameters
         ----------
         x, y, omega : ndarrays of floats
@@ -37,6 +39,7 @@ class Axicon(OpticalElement):
         omega0 : float (in rad/s)
             Central angular frequency, as used for the definition
             of the laser envelope.
+
         Returns
         -------
         multiplier : ndarray of complex numbers
@@ -46,3 +49,4 @@ class Axicon(OpticalElement):
         return np.exp(
             -2j * (omega / c) * np.sqrt(x**2 + y**2) * np.tan(0.5 * self.gamma)
         )
+
