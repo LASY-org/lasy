@@ -81,7 +81,7 @@ python3 -m pytest -s -vvvv tests/
 Install sphinx (https://www.sphinx-doc.org/en/master/usage/installation.html)
 
 ```bash
+python -m pip install --upgrade -r docs/requirements.txt
 cd docs
-python -m pip install -r requirements.txt
 sphinx-build -b html source _build
 ```
