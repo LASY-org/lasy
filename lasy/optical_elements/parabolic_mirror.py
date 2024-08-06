@@ -12,7 +12,7 @@ class ParabolicMirror(OpticalElement):
 
     .. math::
 
-        T(\boldsymbol{x}_\perp,\omega) = \exp(-i\omega \sqrt{x^2+y^2}/2cf)
+        T(\boldsymbol{x}_\perp,\omega) = \exp(-i\omega (x^2+y^2)/2cf)
 
     where
     :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
