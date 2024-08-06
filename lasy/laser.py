@@ -230,7 +230,7 @@ class Laser:
             absorb_layer_axis = np.linspace(0, np.pi / 2, nr_boundary)
             absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
             absorb_layer_shape[-1] = 0.0
-            field = self.grid.get_temporal_field()
+            field = self.grid.get_spectral_field()
             if self.dim == "rt":
                 field[:, -nr_boundary:, :] *= absorb_layer_shape[None, :, None]
             else:
@@ -238,7 +238,7 @@ class Laser:
                 field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][:, None, None]
                 field[:, -nr_boundary:, :] *= absorb_layer_shape[None, :, None]
                 field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][None, :, None]
-            temporal_field = self.grid.set_temporal_field(field)
+            self.grid.set_spectral_field(field)
 
         spectral_field = self.grid.get_spectral_field()
 
@@ -260,7 +260,7 @@ class Laser:
                     self.prop.append(
                         PropagatorResampling(
                             *spatial_axes,
-                            omega / c,
+                            self.omega_1d / c,
                             *spatial_axes_n,
                             mode=m,
                             backend=backend,
