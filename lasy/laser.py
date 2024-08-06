@@ -223,7 +223,6 @@ class Laser:
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
         """
-
         # apply boundary "absorption" if required
         if nr_boundary is not None:
             assert type(nr_boundary) is int and nr_boundary > 0
