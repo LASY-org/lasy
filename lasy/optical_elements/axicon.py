@@ -13,7 +13,9 @@ class Axicon(OpticalElement):
     the refractive axicon are assumed to be negligible.
 
     More precisely, the amplitude multiplier corresponds to:
+
     .. math::
+
         T(\boldsymbol{x}_\perp,\omega) = \exp(-i\omega \sqrt{x^2+y^2} \tan(\gamma/2))
 
     where :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
