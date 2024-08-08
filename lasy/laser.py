@@ -223,7 +223,7 @@ class Laser:
 
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
-            
+
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
         """
@@ -290,7 +290,7 @@ class Laser:
                     )
             # Propagate the spectral image
             spectral_field = self.grid.get_spectral_field()
-            
+
             for i_m in range(self.grid.azimuthal_modes.size):
                 transform_data = np.transpose(spectral_field[i_m]).copy()
                 self.prop[i_m].step(
