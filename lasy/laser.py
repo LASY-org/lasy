@@ -319,6 +319,7 @@ class Laser:
                     verbose=False,
                 )
             # Propagate the spectral image
+            spectral_field = self.grid.get_spectral_field()
             transform_data = np.moveaxis(spectral_field, -1, 0).copy()
             self.prop.step(
                 transform_data, distance, overwrite=True, show_progress=show_progress
