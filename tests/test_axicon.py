@@ -57,21 +57,7 @@ def check_bessel_profile(laser, z):
     error = np.max(np.abs(expected_profile - A2))/abs(A2).max()
     max_error_index = np.argmax(error)
     max_error_location = ax[max_error_index]
-    print(max_error_location)
-    plt.figure(figsize=(10, 6))
-    plt.plot(ax, expected_profile, label='Expected Profile')
-    plt.plot(ax, A2, label='Actual Profile')
-    plt.axvline(x=-20e-6, color='r', linestyle='--', label='ROI boundary')
-    plt.axvline(x=20e-6, color='r', linestyle='--')
-    plt.xlim(-3e-4, 3e-4)
-    plt.xlabel('Radial distance (m)')
-    plt.ylabel('Normalized Intensity')
-    plt.title(f'Bessel Profile Comparison at z = {z:.2e} m')
-    plt.legend()
     
-    # Save the plot
-    plt.savefig(f'bessel_profile_z_{z:.2e}.png')
-    plt.close()
     return error
 
 
