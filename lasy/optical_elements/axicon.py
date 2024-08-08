@@ -43,4 +43,6 @@ class Axicon(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        return np.exp(-2j * (omega / c) * np.sqrt(x**2 + y**2) * np.tan(0.5 * self.gamma))
+        return np.exp(
+            -2j * (omega / c) * np.sqrt(x**2 + y**2) * np.tan(0.5 * self.gamma)
+        )
