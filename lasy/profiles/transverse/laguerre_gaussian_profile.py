@@ -1,5 +1,6 @@
-import numpy as np
 from scipy.special import genlaguerre
+
+from lasy.backend import xp
 
 from .transverse_profile import TransverseProfile
 
@@ -61,7 +62,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
             assert (
                 wavelength is not None
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
-            self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
+            self.z_foc_over_zr = z_foc * wavelength / (xp.pi * w0**2)
 
     def _evaluate(self, x, y):
         """
@@ -82,7 +83,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         # Term for wavefront curvature, waist and Gouy phase
         diffract_factor = 1.0 - 1j * self.z_foc_over_zr
         w = self.w0 * abs(diffract_factor)
-        psi = np.angle(diffract_factor)
+        psi = xp.angle(diffract_factor)
         # complex_position corresponds to r e^{+/-i\theta}
         if self.m > 0:
             complex_position = x - 1j * y
@@ -92,7 +93,7 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         envelope = (
             complex_position ** abs(self.m)
             * genlaguerre(self.p, abs(self.m))(2 * radius**2 / w**2)
-            * np.exp(
+            * xp.exp(
                 -(radius**2) / (self.w0**2 * diffract_factor)
                 - 1.0j * (2 * self.p + self.m) * psi
             )  # Additional Gouy phase

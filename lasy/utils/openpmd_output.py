@@ -59,7 +59,8 @@ def write_to_openpmd_file(
         Whether the envelope is converted to normalized vector potential
         before writing to file.
     """
-    array = grid.get_temporal_field()
+    # Get field on CPU
+    array = grid.get_temporal_field(to_cpu=True)
 
     # Create file
     full_filepath = os.path.join(

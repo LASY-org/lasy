@@ -1,5 +1,7 @@
 import numpy as np
 
+from lasy.backend import use_cupy, xp
+
 time_axis_indx = -1
 
 
@@ -44,7 +46,7 @@ class Grid:
         self.axes = []
         self.dx = []
         for i in range(ndims):
-            self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
+            self.axes.append(xp.linspace(lo[i], hi[i], npoints[i]))
             self.dx.append(self.axes[i][1] - self.axes[i][0])
 
         if dim == "rt":
@@ -61,10 +63,9 @@ class Grid:
             # 0, 1, 2, ..., n_azimuthal_modes-1, -n_azimuthal_modes+1, ..., -1
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
-
-        self.temporal_field = np.zeros(self.shape, dtype="complex128")
+        self.temporal_field = xp.zeros(self.shape, dtype="complex128")
         self.temporal_field_valid = False
-        self.spectral_field = np.zeros(self.shape, dtype="complex128")
+        self.spectral_field = xp.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
 
     def set_temporal_field(self, field):
@@ -78,6 +79,8 @@ class Grid:
         """
         assert field.shape == self.temporal_field.shape
         assert field.dtype == "complex128"
+        if use_cupy and type(field) == np.ndarray:
+            field = xp.asarray(field)  # Copy to GPU
         self.temporal_field[:, :, :] = field
         self.temporal_field_valid = True
         self.spectral_field_valid = False  # Invalidates the spectral field
@@ -93,11 +96,13 @@ class Grid:
         """
         assert field.shape == self.spectral_field.shape
         assert field.dtype == "complex128"
+        if use_cupy and type(field) == np.ndarray:
+            field = xp.asarray(field)  # Copy to GPU
         self.spectral_field[:, :, :] = field
         self.spectral_field_valid = True
         self.temporal_field_valid = False  # Invalidates the temporal field
 
-    def get_temporal_field(self):
+    def get_temporal_field(self, to_cpu=False):
         """
         Return a copy of the temporal field.
 
@@ -109,37 +114,41 @@ class Grid:
         field : ndarray of complexs
             The temporal field.
         """
-        # We return a copy, so that the user cannot modify
-        # the original field, unless get_temporal_field is called
-        if self.temporal_field_valid:
-            return self.temporal_field.copy()
-        elif self.spectral_field_valid:
+        if not self.temporal_field_valid:
             self.spectral2temporal_fft()
-            return self.temporal_field.copy()
+        # Return a copy of the field, either on CPU or GPU, so that the user
+        # cannot modify the original field, unless set_spectral_field is called
+        if to_cpu and use_cupy:
+            return xp.asnumpy(self.temporal_field)
         else:
-            raise ValueError("Both temporal and spectral fields are invalid")
+            return self.temporal_field.copy()
 
-    def get_spectral_field(self):
+    def get_spectral_field(self, to_cpu=False):
         """
         Return a copy of the spectral field.
 
         (Modifying the returned object will not modify the original field stored
         in the Grid object ; one must use set_spectral_field to do so.)
 
+        Parameters
+        ----------
+        to_cpu : bool
+            If True, the returned field is always returned as a numpy array on CPU
+            (even when the lasy backend is cupy)
+
         Returns
         -------
         field : ndarray of complexs
             The spectral field.
         """
-        # We return a copy, so that the user cannot modify
-        # the original field, unless set_spectral_field is called
-        if self.spectral_field_valid:
-            return self.spectral_field.copy()
-        elif self.temporal_field_valid:
+        if not self.spectral_field_valid:
             self.temporal2spectral_fft()
-            return self.spectral_field.copy()
+        # Return a copy of the field, either on CPU or GPU, so that the user
+        # cannot modify the original field, unless set_spectral_field is called
+        if to_cpu and use_cupy:
+            return xp.asnumpy(self.spectral_field)
         else:
-            raise ValueError("Both temporal and spectral fields are invalid")
+            return self.spectral_field.copy()
 
     def temporal2spectral_fft(self):
         """
@@ -148,7 +157,7 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
-        self.spectral_field = np.fft.ifft(
+        self.spectral_field = xp.fft.ifft(
             self.temporal_field, axis=time_axis_indx, norm="backward"
         )
         self.spectral_field_valid = True
@@ -160,7 +169,7 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.spectral_field_valid
-        self.temporal_field = np.fft.fft(
+        self.temporal_field = xp.fft.fft(
             self.spectral_field, axis=time_axis_indx, norm="backward"
         )
         self.temporal_field_valid = True

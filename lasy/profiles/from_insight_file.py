@@ -1,6 +1,7 @@
 import h5py
-import numpy as np
 from scipy.constants import c
+
+from lasy.backend import xp
 
 from .from_array_profile import FromArrayProfile
 
@@ -30,10 +31,10 @@ class FromInsightFile(FromArrayProfile):
     def __init__(self, file_path, pol, omega0="barycenter"):
         # read the data from H5 filed
         with h5py.File(file_path, "r") as hf:
-            data = np.asanyarray(hf["data/Exyt_0"][()], dtype=np.complex128, order="C")
-            t = np.asanyarray(hf["scales/t"][()], dtype=np.float64, order="C")
-            x = np.asanyarray(hf["scales/x"][()], dtype=np.float64, order="C")
-            y = np.asanyarray(hf["scales/y"][()], dtype=np.float64, order="C")
+            data = xp.asanyarray(hf["data/Exyt_0"][()], dtype=xp.complex128, order="C")
+            t = xp.asanyarray(hf["scales/t"][()], dtype=xp.float64, order="C")
+            x = xp.asanyarray(hf["scales/x"][()], dtype=xp.float64, order="C")
+            y = xp.asanyarray(hf["scales/y"][()], dtype=xp.float64, order="C")
 
         # convert data and axes to SI units
         t *= 1e-15
@@ -42,29 +43,29 @@ class FromInsightFile(FromArrayProfile):
 
         # get the field on axis and local frequencies
         field_onaxis = data[data.shape[0] // 2, data.shape[1] // 2, :]
-        omega_array = -np.gradient(np.unwrap(np.angle(field_onaxis)), t)
+        omega_array = -xp.gradient(xp.unwrap(xp.angle(field_onaxis)), t)
 
         # choose the central frequency
         if omega0 == "peak":
             # using peak field frequency
-            omega0 = omega_array[np.abs(field_onaxis).argmax()]
+            omega0 = omega_array[xp.abs(field_onaxis).argmax()]
         elif omega0 == "barycenter":
             # or "center of mass" frequency
-            omega0 = np.average(omega_array, weights=np.abs(field_onaxis) ** 2)
+            omega0 = xp.average(omega_array, weights=xp.abs(field_onaxis) ** 2)
         else:
             assert type(omega0) == float
 
         # check the complex field convention and correct if needed
         if omega0 < 0:
             omega0 *= -1
-            data = np.conj(data)
+            data = xp.conj(data)
             print("Warning: input field will be conjugated")
 
         # remove the envelope frequency
-        data *= np.exp(1j * omega0 * t[None, None, :])
+        data *= xp.exp(1j * omega0 * t[None, None, :])
 
         # created LASY profile using FromArrayProfile class
-        wavelength = 2 * np.pi * c / omega0
+        wavelength = 2 * xp.pi * c / omega0
         dim = "xyt"
         axes = {"x": x, "y": y, "t": t}
         super().__init__(

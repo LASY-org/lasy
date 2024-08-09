@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .transverse_profile import TransverseProfile
 
@@ -50,7 +50,7 @@ class GaussianTransverseProfile(TransverseProfile):
             assert (
                 wavelength is not None
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
-            self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
+            self.z_foc_over_zr = z_foc * wavelength / (xp.pi * w0**2)
 
     def _evaluate(self, x, y):
         """
@@ -73,6 +73,6 @@ class GaussianTransverseProfile(TransverseProfile):
         # Calculate the argument of the complex exponential
         exp_argument = -(x**2 + y**2) / (self.w0**2 * diffract_factor)
         # Get the transverse profile
-        envelope = np.exp(exp_argument) / diffract_factor
+        envelope = xp.exp(exp_argument) / diffract_factor
 
         return envelope

@@ -1,5 +1,6 @@
-import numpy as np
 from scipy.constants import c
+
+from lasy.backend import xp
 
 from .longitudinal_profile import LongitudinalProfile
 
@@ -62,58 +63,58 @@ class LongitudinalProfileFromData(LongitudinalProfile):
         if data["datatype"] == "spectral":
             # First find central frequency
             wavelength = data["axis"]
-            assert np.all(
-                np.diff(wavelength) > 0
+            assert xp.all(
+                xp.diff(wavelength) > 0
             ), 'data["axis"] must be in monotonously increasing order.'
             spectral_intensity = data["intensity"]
             if data.get("phase") is None:
-                spectral_phase = np.zeros_like(wavelength)
+                spectral_phase = xp.zeros_like(wavelength)
             else:
                 spectral_phase = data["phase"]
             dt = data["dt"]
-            cwl = np.sum(spectral_intensity * wavelength) / np.sum(spectral_intensity)
+            cwl = xp.sum(spectral_intensity * wavelength) / xp.sum(spectral_intensity)
             cfreq = c / cwl
             # Determine required sampling frequency for desired dt
             sample_freq = 1 / dt
             # Determine number of points in temporal domain. This is the number of
             # points required to maintain the input spectral resolution while spanning
             # enough spectrum to achieve the desired temporal resolution.
-            indx = np.argmin(np.abs(wavelength - cwl))
-            dfreq = np.abs(c / wavelength[indx] - c / wavelength[indx + 1])
+            indx = xp.argmin(xp.abs(wavelength - cwl))
+            dfreq = xp.abs(c / wavelength[indx] - c / wavelength[indx + 1])
             N = int(sample_freq / dfreq)
-            freq = np.linspace(cfreq - sample_freq / 2, cfreq + sample_freq / 2, N)
+            freq = xp.linspace(cfreq - sample_freq / 2, cfreq + sample_freq / 2, N)
             # interpolate the spectrum onto this new array
-            freq_intensity = np.interp(
+            freq_intensity = xp.interp(
                 freq, c / wavelength[::-1], spectral_intensity[::-1], left=0, right=0
             )
-            freq_phase = np.interp(
+            freq_phase = xp.interp(
                 freq, c / wavelength[::-1], spectral_phase[::-1], left=0, right=0
             )
 
-            freq_amplitude = np.sqrt(freq_intensity)
+            freq_amplitude = xp.sqrt(freq_intensity)
 
             # Inverse Fourier Transform to the time domain
             t_amplitude = (
-                np.fft.fftshift(
-                    np.fft.ifft(
-                        np.fft.ifftshift(freq_amplitude * np.exp(-1j * freq_phase))
+                xp.fft.fftshift(
+                    xp.fft.ifft(
+                        xp.fft.ifftshift(freq_amplitude * xp.exp(-1j * freq_phase))
                     )
                 )
                 / dt
             )
-            time = np.linspace(-dt * N / 2, dt * N / 2 - dt, N)
+            time = xp.linspace(-dt * N / 2, dt * N / 2 - dt, N)
 
             # Extract intensity and phase
-            temporal_intensity = np.abs(t_amplitude) ** 2
-            temporal_intensity /= np.max(temporal_intensity)
-            temporal_phase = np.unwrap(-np.angle(t_amplitude))
-            temporal_phase -= temporal_phase[np.argmin(np.abs(time))]
+            temporal_intensity = xp.abs(t_amplitude) ** 2
+            temporal_intensity /= xp.max(temporal_intensity)
+            temporal_phase = xp.unwrap(-xp.angle(t_amplitude))
+            temporal_phase -= temporal_phase[xp.argmin(xp.abs(time))]
 
         elif data["datatype"] == "temporal":
             time = data["axis"]
             temporal_intensity = data["intensity"]
             if data.get("phase") is None:
-                temporal_phase = np.zeros_like(time)
+                temporal_phase = xp.zeros_like(time)
             else:
                 temporal_phase = data["phase"]
             cwl = data["wavelength"]
@@ -126,8 +127,8 @@ class LongitudinalProfileFromData(LongitudinalProfile):
         # Finally crop the temporal domain to the physical domain
         # of interest
 
-        tIndLo = np.argmin(np.abs(time - lo))
-        tIndHi = np.argmin(np.abs(time - hi))
+        tIndLo = xp.argmin(xp.abs(time - lo))
+        tIndHi = xp.argmin(xp.abs(time - hi))
 
         self.time = time[tIndLo:tIndHi]
         self.temporal_intensity = temporal_intensity[tIndLo:tIndHi]
@@ -148,9 +149,9 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
         """
-        intensity = np.interp(t, self.time, self.temporal_intensity)
-        phase = np.interp(t, self.time, self.temporal_phase)
+        intensity = xp.interp(t, self.time, self.temporal_intensity)
+        phase = xp.interp(t, self.time, self.temporal_phase)
 
-        envelope = np.sqrt(intensity) * np.exp(-1j * phase)
+        envelope = xp.sqrt(intensity) * xp.exp(-1j * phase)
 
         return envelope

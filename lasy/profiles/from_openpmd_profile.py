@@ -1,8 +1,8 @@
-import numpy as np
 import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
 from scipy.constants import c
 
+from lasy.backend import xp
 from lasy.utils.laser_utils import create_grid, field_to_envelope
 from lasy.utils.openpmd_input import reorder_array
 
@@ -85,7 +85,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
         # If `is_envelope` is not given, assume that complex arrays are envelopes.
         if is_envelope is None:
-            is_envelope = np.iscomplexobj(F)
+            is_envelope = xp.iscomplexobj(F)
 
         if theta is None:  # Envelope obtained from the full 3D array
             dim = "xyt"
@@ -109,7 +109,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
             array = F
 
-        wavelength = 2 * np.pi * c / omg0
+        wavelength = 2 * xp.pi * c / omg0
         if verbose:
             print(
                 "Wavelength used in the definition of the envelope (nm):",

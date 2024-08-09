@@ -9,6 +9,7 @@ expected value in the far field (i.e. in the focal plane)
 
 import numpy as np
 
+from lasy.backend import use_cupy, xp
 from lasy.laser import Laser
 from lasy.optical_elements import ParabolicMirror
 from lasy.profiles.gaussian_profile import GaussianProfile
@@ -26,14 +27,18 @@ gaussian_profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_pea
 
 def get_w0(laser):
     # Calculate the laser waist
-    field = laser.grid.get_temporal_field()
+    field = laser.grid.get_temporal_field(to_cpu=True)
     if laser.dim == "xyt":
-        Nx = field.shape[0]
+        Nx, Ny, Nt = field.shape
         A2 = (np.abs(field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
         ax = laser.grid.axes[1]
+        if use_cupy:
+            ax = xp.asnumpy(ax)
     else:
         A2 = (np.abs(field[0, :, :]) ** 2).sum(-1)
         ax = laser.grid.axes[0]
+        if use_cupy:
+            ax = xp.asnumpy(ax)
         if ax[0] > 0:
             A2 = np.r_[A2[::-1], A2]
             ax = np.r_[-ax[::-1], ax]

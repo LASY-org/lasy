@@ -1,5 +1,6 @@
-import numpy as np
 from scipy.constants import c
+
+from lasy.backend import xp
 
 
 class Profile(object):
@@ -29,10 +30,10 @@ class Profile(object):
 
     def __init__(self, wavelength, pol):
         assert len(pol) == 2
-        norm_pol = np.sqrt(np.abs(pol[0]) ** 2 + np.abs(pol[1]) ** 2)
-        self.pol = np.array([pol[0] / norm_pol, pol[1] / norm_pol])
+        norm_pol = xp.sqrt(xp.abs(pol[0]) ** 2 + xp.abs(pol[1]) ** 2)
+        self.pol = xp.array([pol[0] / norm_pol, pol[1] / norm_pol])
         self.lambda0 = wavelength
-        self.omega0 = 2 * np.pi * c / self.lambda0
+        self.omega0 = 2 * xp.pi * c / self.lambda0
 
     def evaluate(self, x, y, t):
         """
@@ -52,7 +53,7 @@ class Profile(object):
         """
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
-        return np.zeros_like(x, dtype="complex128")
+        return xp.zeros_like(x, dtype="complex128")
 
     def __add__(self, other):
         """Return the sum of two profiles."""
@@ -90,12 +91,12 @@ class SummedProfile(Profile):
         lambda0s = [p.lambda0 for p in self.profiles]
         pols = [p.pol for p in self.profiles]
         # Check that all wavelengths are the same
-        assert np.allclose(
+        assert xp.allclose(
             lambda0s, lambda0s[0]
         ), "Added profiles must have the same wavelength."
         lambda0 = profiles[0].lambda0
         # Check that all polarizations are the same
-        assert np.allclose(
+        assert xp.allclose(
             pols, pols[0]
         ), "Added profiles must have the same polarization."
         pol = profiles[0].pol
