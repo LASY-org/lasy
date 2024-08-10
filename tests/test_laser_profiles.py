@@ -27,9 +27,7 @@ from lasy.utils.exp_data_utils import find_center_of_mass
 
 
 class MockProfile(Profile):
-    """
-    A mock Profile class that always returns a constant value.
-    """
+    """A mock Profile class that always returns a constant value."""
 
     def __init__(self, wavelength, pol, value):
         super().__init__(wavelength, pol)
@@ -40,9 +38,7 @@ class MockProfile(Profile):
 
 
 class MockTransverseProfile(TransverseProfile):
-    """
-    A mock TransverseProfile class that always returns a constant value.
-    """
+    """A mock TransverseProfile class that always returns a constant value."""
 
     def __init__(self, value):
         super().__init__()
