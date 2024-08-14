@@ -16,7 +16,6 @@ from lasy.profiles.transverse import SuperGaussianTransverseProfile
 
 
 def test_axiparabola():
-
     # Define the laser profile
     wavelength = 800e-9  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
