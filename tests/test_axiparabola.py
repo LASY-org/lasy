@@ -1,5 +1,6 @@
-"""
-This test checks the implementation of the axiparabola
+"""Test the implementation of the axiparabola.
+
+Test checks the implementation of the axiparabola
 by initializing a super-Gaussian pulse in the near field, and
 propagating it to the middle of the focal range. It then
 checks that the field amplitude remains high over the focal range.
@@ -15,7 +16,6 @@ from lasy.profiles.transverse import SuperGaussianTransverseProfile
 
 
 def test_axiparabola():
-
     # Define the laser profile
     wavelength = 800e-9  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-This test checks the implementation of the parabolic mirror
+"""Thest the parabolic mirror implementation.
+
+Test checks the implementation of the parabolic mirror
 by initializing a Gaussian pulse in the near field, and
 propagating it through a parabolic mirror, and then to
 the focal position ; we then check that the waist as the
-expected value in the far field (i.e. in the focal plane)
+expected value in the far field (i.e. in the focal plane).
 """
 
 import numpy as np

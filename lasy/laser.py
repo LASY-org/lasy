@@ -64,10 +64,10 @@ class Laser:
     >>> profile = GaussianProfile(
     ...     wavelength=0.6e-6,  # m
     ...     pol=(1, 0),
-    ...     laser_energy=1.,  # J
+    ...     laser_energy=1.0,  # J
     ...     w0=5e-6,  # m
     ...     tau=30e-15,  # s
-    ...     t_peak=0.  # s
+    ...     t_peak=0.0,  # s
     ... )
     >>> # Create laser with given profile in `rt` geometry.
     >>> laser = Laser(
@@ -75,7 +75,7 @@ class Laser:
     ...     lo=(0e-6, -60e-15),
     ...     hi=(10e-6, +60e-15),
     ...     npoints=(50, 400),
-    ...     profile=profile
+    ...     profile=profile,
     ... )
     >>> # Propagate and visualize.
     >>> n_steps = 3
