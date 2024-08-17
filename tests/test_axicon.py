@@ -18,27 +18,19 @@ z_max = w0 * np.cos(gamma) / np.sin(gamma)
 
 
 def check_axicon(laser):
-    distances = np.linspace(z_max / 1.5, z_max, 2)
+    # Apply the axicon
+    laser.apply_optics(Axicon(gamma=gamma))
 
-    errors = []
-    for dist in distances:
-        # create a new laser for each distance
-        new_laser = Laser(
-            laser.dim,
-            laser.grid.lo,
-            laser.grid.hi,
-            laser.grid.npoints,
-            gaussian_profile,
-        )
+    # Compare check the laser profiles
+    # after different propagation distances
+    distances = [0, z_max / 1.5, z_max ]
 
-        new_laser.apply_optics(Axicon(gamma=gamma))
-        new_laser.propagate(dist)
+    # i_dist starts at 1: we do not compare the profile at distance 0
+    for i_dist in range(1, len(distances)):
+        laser.propagate( distances[i_dist] - distances[i_dist-1] )
         # Check the Bessel profile
-        error = check_bessel_profile(new_laser, dist)
-        errors.append(error)
-        print(errors)
-    assert np.max(errors) < 3e-2
-
+        error = check_bessel_profile(laser, distances[i_dist])
+        assert error < 3e-2
 
 def check_bessel_profile(laser, z):
     # Calculate the laser profile
