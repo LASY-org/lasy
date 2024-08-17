@@ -23,14 +23,15 @@ def check_axicon(laser):
 
     # Compare check the laser profiles
     # after different propagation distances
-    distances = [0, z_max / 1.5, z_max ]
+    distances = [0, z_max / 1.5, z_max]
 
     # i_dist starts at 1: we do not compare the profile at distance 0
     for i_dist in range(1, len(distances)):
-        laser.propagate( distances[i_dist] - distances[i_dist-1] )
+        laser.propagate(distances[i_dist] - distances[i_dist - 1])
         # Check the Bessel profile
         error = check_bessel_profile(laser, distances[i_dist])
         assert error < 3e-2
+
 
 def check_bessel_profile(laser, z):
     # Calculate the laser profile
@@ -69,7 +70,7 @@ def check_bessel_profile(laser, z):
     )
 
     # Calculate error
-    error = np.max(np.abs(expected_profile - A2))/abs(A2).max()
+    error = np.max(np.abs(expected_profile - A2)) / abs(A2).max()
     return error
 
 
