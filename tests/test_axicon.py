@@ -37,7 +37,7 @@ def check_axicon(laser):
         error = check_bessel_profile(new_laser, dist)
         errors.append(error)
         print(errors)
-    assert np.max(errors) < 1e-2
+    assert np.max(errors) < 3e-2
 
 
 def check_bessel_profile(laser, z):
@@ -76,12 +76,9 @@ def check_bessel_profile(laser, z):
         * special.j0(kr) ** 2
     )
 
-    # Normalize profiles
-    A2_norm = A2 / np.max(A2)
-    expected_profile_norm = expected_profile / np.max(expected_profile)
     # Calculate error
-    error1 = np.mean(np.abs(expected_profile_norm - A2_norm))
-    return error1  # Return the smallest error
+    error = np.max(np.abs(expected_profile - A2))/abs(A2).max()
+    return error
 
 
 def test_3D_case():
@@ -89,7 +86,7 @@ def test_3D_case():
     dim = "xyt"
     lo = (-20e-5, -20e-5, -100e-15)
     hi = (+20e-5, +20e-5, +100e-15)
-    npoints = (1000, 1000, 150)
+    npoints = (500, 500, 150)
 
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)
     check_axicon(laser)
@@ -98,9 +95,9 @@ def test_3D_case():
 def test_RT_case():
     # Cylindrical case
     dim = "rt"
-    lo = (0e-6, -60e-15)
-    hi = (15e-3, +60e-15)
-    npoints = (1100, 300)
+    lo = (0e-6, -100e-15)
+    hi = (20e-5, +100e-15)
+    npoints = (250, 150)
 
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)
     check_axicon(laser)
