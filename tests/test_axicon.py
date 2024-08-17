@@ -48,7 +48,7 @@ def check_bessel_profile(laser, z):
         A2 = 0.5 * epsilon_0 * c * (np.abs(field[Nx // 2 - 1, :, :]) ** 2).max(-1)
         ax = laser.grid.axes[1]
     else:
-        A2 = 0.5 * epsilon_0 * c * (np.abs(field[0, :, :]) ** 2).sum(-1)
+        A2 = 0.5 * epsilon_0 * c * (np.abs(field[0, :, :]) ** 2).max(-1)
         ax = laser.grid.axes[0]
         if ax[0] > 0:
             A2 = np.r_[A2[::-1], A2]
