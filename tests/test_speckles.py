@@ -17,7 +17,6 @@ def test_intensity_distribution(temporal_smoothing_type):
     The distribution should be exponential, 1/<I> exp(-I/<I>) [Michel, 9.35].
     The real and imaginary parts of the envelope [Michel, Eqn. 9.26] and their product [9.30] should all be 0 on average.
     """
-
     wavelength = 0.351e-6  # Laser wavelength in meters
     polarization = (1, 0)  # Linearly polarized in the x direction
     focal_length = 3.5  # m
@@ -154,7 +153,7 @@ def test_spatial_correlation(temporal_smoothing_type):
     "temporal_smoothing_type", ["RPP", "CPP", "FM SSD", "GP RPM SSD", "GP ISI"]
 )
 def test_sinc_zeros(temporal_smoothing_type):
-    """Test whether the transverse sinc envelope has the correct width
+    r"""Test whether the transverse sinc envelope has the correct width.
 
     The transverse envelope for the rectangular laser has the form
 

@@ -26,6 +26,8 @@ In cylindrical coordinates, the envelope is decomposed in $N_m$ azimuthal modes 
    E_y (r,\theta,t) = \mathrm{Re}\left( \sum_{-N_m+1}^{N_m-1}\mathcal{E}_m(r,t) e^{-im\theta}e^{-i\omega_0t}p_y\right).\end{aligned}
 ```
 
+For more information, please check our [arXiv preprint](https://doi.org/10.48550/arXiv.2403.12191).
+
 ## Workflow
 
 # How to contribute

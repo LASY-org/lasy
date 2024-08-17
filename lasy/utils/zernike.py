@@ -95,23 +95,23 @@ def RmnGenerator(n, m, rho):
         The radial component of the Zernike mode
     """
     if n == 0:
-        try:
+        if len(rho.shape) == 1:
             (r,) = rho.shape
             Rmn = np.ones(
                 r,
             )
-        except:
+        else:
             r, c = rho.shape
             Rmn = np.ones((r, c))
     elif (n - m) % 2 == 0:
         # Even, Rmn is not 0
         k = np.linspace(0, int((n - m) / 2), int((n - m) / 2) + 1).astype(int)
-        try:
+        if len(rho.shape) == 1:
             (r,) = rho.shape
             Rmn = np.zeros(
                 r,
             )
-        except:
+        else:
             r, c = rho.shape
             Rmn = np.zeros((r, c))
         for i in k:
@@ -122,12 +122,12 @@ def RmnGenerator(n, m, rho):
             ) * rho ** (n - 2 * i)
 
     else:
-        try:
+        if len(rho.shape) == 1:
             (r,) = rho.shape
             Rmn = np.zeros(
                 r,
             )
-        except:
+        else:
             r, c = rho.shape
             Rmn = np.zeros((r, c))
 

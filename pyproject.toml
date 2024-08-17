@@ -4,6 +4,23 @@ add-ignore = ["D100", "D104"]
 #inherit = false
 #match = .*\.py
 
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+# https://docs.astral.sh/ruff/
+select = ["D", "E", "F", "I"]
+ignore = ["D100", "D104", "E402", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore `D103` (public doc string) in tests
+"tests/*" = ["D102", "D103"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.isort]
+known-first-party = ["lasy"]
 
 [tool.isort]
 known_first_party = ["lasy"]
