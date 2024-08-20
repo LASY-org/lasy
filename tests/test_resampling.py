@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-This test checks the implementation of the resampling propagator
-by initializing a Gaussian pulse in the near field, and
+""" Checking the implementation of the resampling propagator.
+
+Initializing a Gaussian pulse in the near field, and
 propagating it through a parabolic mirror, and then to
 the focal position (radial axis is resampled to accomodate the new size of the beam) ; we then check that the waist as the
 expected value in the far field (i.e. in the focal plane)
