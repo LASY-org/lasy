@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" Checking the implementation of the resampling propagator.
+"""Checking the implementation of the resampling propagator.
 
 Initializing a Gaussian pulse in the near field, and
 propagating it through a parabolic mirror, and then to
