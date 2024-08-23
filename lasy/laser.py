@@ -258,7 +258,6 @@ class Laser:
                 spatial_axes = (self.grid.axes[0],)  # current radial axis
                 spatial_axes_n = (grid.axes[0],)  # resampled axis
                 # Overwrite grid with new grid (for the resampled field)
-                # grid.azimuthal_modes = self.grid.azimuthal_modes
                 self.grid = grid
                 # Creating an empty array to store the resampled spectral field.
                 # This will be needed in the propagation step below.
