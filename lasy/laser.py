@@ -217,18 +217,17 @@ class Laser:
             Number of cells at the end of radial axis, where the field
             will be attenuated (to assert proper Hankel transform).
             Only used for ``'rt'``.
-            
+
         grid : Grid object (optional)
             Resample the field onto a new grid of different radial size and/or different number
             of radial grid points. Only works for ``'rt'``.
-            
+
         backend : string (optional)
             Backend used by axiprop (see axiprop documentation).
-            
+
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
         """
-
         # apply boundary "absorption" if required
         if nr_boundary is not None:
             assert type(nr_boundary) is int and nr_boundary > 0
@@ -244,7 +243,7 @@ class Laser:
                 field[:, -nr_boundary:, :] *= absorb_layer_shape[None, :, None]
                 field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][None, :, None]
             self.grid.set_temporal_field(field)
-        
+
         # Retrieve the spectral field from the current grid
         spectral_field = self.grid.get_spectral_field()
 
@@ -256,16 +255,17 @@ class Laser:
                 grid.hi[time_axis_indx] = self.grid.hi[time_axis_indx]
                 grid.axes[time_axis_indx] = self.grid.axes[time_axis_indx]
                 # Get radial axis of current and resampled grid
-                spatial_axes = (self.grid.axes[0],) # current radial axis
-                spatial_axes_n = (grid.axes[0],) # resampled axis
+                spatial_axes = (self.grid.axes[0],)  # current radial axis
+                spatial_axes_n = (grid.axes[0],)  # resampled axis
                 # Overwrite grid with new grid (for the resampled field)
-                #grid.azimuthal_modes = self.grid.azimuthal_modes
+                # grid.azimuthal_modes = self.grid.azimuthal_modes
                 self.grid = grid
                 # Creating an empty array to store the resampled spectral field.
                 # This will be needed in the propagation step below.
-                spectral_field_n = np.zeros((len(self.grid.azimuthal_modes), 
-                                            grid.npoints[0], grid.npoints[1]), 
-                                            dtype="complex128")
+                spectral_field_n = np.zeros(
+                    (len(self.grid.azimuthal_modes), grid.npoints[0], grid.npoints[1]),
+                    dtype="complex128",
+                )
                 self.prop = []  # Delete existing propagator
                 # Construct the propagator and pass resampled axis
                 for m in self.grid.azimuthal_modes:
@@ -296,29 +296,29 @@ class Laser:
                             )
                         )
             # Propagate the spectral image in time
-            for i_m in range(self.grid.azimuthal_modes.size):   
+            for i_m in range(self.grid.azimuthal_modes.size):
                 transform_data = np.transpose(spectral_field[i_m]).copy()
-                # Propagation step. The spectral field is explicitely 
+                # Propagation step. The spectral field is explicitely
                 # overwritten with the updated field.
                 transform_data = self.prop[i_m].step(
                     transform_data,
                     distance,
                     overwrite=False,
                     show_progress=show_progress,
-                )    
+                )
                 if grid is not None:
                     # Store the updated and resampled field.
-                    spectral_field_n[i_m, :, :] = np.transpose(transform_data).copy() 
+                    spectral_field_n[i_m, :, :] = np.transpose(transform_data).copy()
                 else:
                     # Store the updated field.
                     spectral_field[i_m, :, :] = np.transpose(transform_data).copy()
-            
+
             if grid is not None:
-                # Define the resampled field as new spectral field 
+                # Define the resampled field as new spectral field
                 spectral_field = spectral_field_n
                 # Delete Propagator if resampling and propagation was done
                 del self.prop
-                    
+
         else:
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
@@ -351,7 +351,6 @@ class Laser:
             -1j * (self.omega_1d[None, None, :] - self.profile.omega0) * translate_time
         )
         self.grid.set_spectral_field(spectral_field)
-
 
         # Translate the domain
         self.grid.lo[time_axis_indx] += translate_time
