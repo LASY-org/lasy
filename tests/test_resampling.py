@@ -13,6 +13,10 @@ from lasy.laser import Grid, Laser
 from lasy.optical_elements import ParabolicMirror
 from lasy.profiles.gaussian_profile import GaussianProfile
 
+from lasy.profiles.longitudinal.gaussian_profile import GaussianLongitudinalProfile
+from lasy.profiles.transverse.laguerre_gaussian_profile import LaguerreGaussianTransverseProfile
+from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
+
 # Laser parameters
 wavelength = 0.8e-6
 w0 = 5.0e-3  # m, initialized in near field
