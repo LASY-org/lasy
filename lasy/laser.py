@@ -263,7 +263,6 @@ class Laser:
                     show_progress=show_progress,
                 )
                 spectral_field[i_m, :, :] = np.transpose(transform_data).copy()
-            self.grid.set_spectral_field(spectral_field)
         else:
             # Construct the propagator (check if exists)
             if not hasattr(self, "prop"):
