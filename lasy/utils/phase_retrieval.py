@@ -57,10 +57,16 @@ def gerchberg_saxton_algo(
     phase1 = np.zeros_like(amp1)
 
     if condition == "max_iterations":
-        breakout = lambda i: i < max_iterations
+
+        def breakout(i):
+            return i < max_iterations
+
         cond = 0
     elif condition == "amplitude_error":
-        breakout = lambda amp: amp / amp1_summed > amplitude_error
+
+        def breakout(amp):
+            return amp / amp1_summed > amplitude_error
+
         cond = 9e30
 
     i = 0

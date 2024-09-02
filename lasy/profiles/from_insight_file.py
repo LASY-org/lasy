@@ -52,7 +52,7 @@ class FromInsightFile(FromArrayProfile):
             # or "center of mass" frequency
             omega0 = np.average(omega_array, weights=np.abs(field_onaxis) ** 2)
         else:
-            assert type(omega0) == float
+            assert isinstance(omega0, float)
 
         # check the complex field convention and correct if needed
         if omega0 < 0:

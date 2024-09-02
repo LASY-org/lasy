@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-This test checks the implementation of the polynomial spectral phase
+"""Test the polynomial spectral phase implementation.
+
+Test checks the implementation of the polynomial spectral phase
 by initializing a Gaussian pulse (with flat spectral phase),
 adding spectral phase to it, and checking the corresponding
 temporal shape of the laser pulse again analytical formulas.
@@ -29,7 +30,8 @@ npoints = (100, 100, 200)
 
 
 def test_gdd():
-    """
+    """Add and compare GDD laser.
+
     Add GDD to the laser and compare the on-axis field with the
     analytical formula for a Gaussian pulse with GDD.
     """
@@ -65,7 +67,8 @@ def test_gdd():
 
 
 def test_tod():
-    """
+    """Add and compare TOD laser.
+
     Add TOD to the laser and compare the on-axis field with the
     analytical formula from the stationary phase approximation.
     """

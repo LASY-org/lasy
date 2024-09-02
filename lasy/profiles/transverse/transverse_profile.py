@@ -7,6 +7,12 @@ class TransverseProfile(object):
 
     Any new transverse profile should inherit from this class, and define its own
     `evaluate` method, using the same signature as the method below.
+    For most cases, use derived classes instead of this base class.
+
+    Common operators (addition and multiplication by a scalar) are provided as part of this base class.
+    For such operations, the user is responsible for handling the complex phase and weights of summed profiles.
+    In particular, summing between different types of profiles is not recommended.
+    This feature is tailored for linear combination of profiles of the same type, in particular analytical profiles like Laguerre-gauss or Hermite-Gauss.
     """
 
     def __init__(self):

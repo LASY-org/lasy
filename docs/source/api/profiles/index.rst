@@ -1,6 +1,9 @@
 Laser Profiles
 ==============
 
+.. autoclass:: lasy.profiles.Profile
+    :members:
+
 .. toctree::
    :hidden:
 

@@ -254,10 +254,9 @@ class SpeckleProfile(Profile):
             )
 
         # Check user input
-        assert (
-            temporal_smoothing_type.upper() in SpeckleProfile.supported_smoothing
-        ), "Only support one of the following: " + ", ".join(
-            SpeckleProfile.supported_smoothing
+        assert temporal_smoothing_type.upper() in SpeckleProfile.supported_smoothing, (
+            "Only support one of the following: "
+            + ", ".join(SpeckleProfile.supported_smoothing)
         )
         assert relative_laser_bandwidth > 0, "laser_bandwidth must be greater than 0"
         assert np.size(n_beamlets) == 2, "has to be a size 2 array"
