@@ -32,11 +32,10 @@ lo = (0e-3, -90e-15)
 hi = (15e-3, +90e-15)
 npoints = (500, 100)
 
-
-def get_w0(laser):
+def get_w0(laser, m):
     # Calculate the laser waist
     field = laser.grid.get_temporal_field()
-    A2 = (np.abs(field[0, :, :]) ** 2).sum(-1)
+    A2 = (np.abs(field[m, :, :]) ** 2).sum(-1)
     ax = laser.grid.axes[0]
     if ax[0] > 0:
         A2 = np.r_[A2[::-1], A2]
@@ -49,18 +48,18 @@ def get_w0(laser):
 
     return sigma
 
-
-def check_resampling(laser, new_grid, p=None, m=None):
+def check_resampling(laser, new_grid, m=0):
     # Focus down the laser and propagate
     f0 = 2.0  # focal distance in m
     laser.apply_optics(ParabolicMirror(f=f0))
-    laser.propagate((f0), nr_boundary=128, grid=new_grid)  # resample the radial grid
+    laser.propagate(f0, nr_boundary=128, grid=new_grid) # resample the radial grid
 
     # Check that the value is the expected one in the near field
-    w0_num = get_w0(laser)
+    w0_num = get_w0(laser, m)
+    assert m in [0, 1]
     w0_theor = wavelength * f0 / (np.pi * w0)
-    if p is not None:
-        w0_theor = wavelength * f0 / (np.pi * w0)  # np.sqrt(2*p + m + 1))
+    if m == 1:
+        w0_theor *= np.sqrt(3)
     err = 2 * np.abs(w0_theor - w0_num) / (w0_theor + w0_num)
     assert err < 1e-3
 
@@ -107,8 +106,8 @@ def test_resampling_multimode_gaussian():
 
 def test_resampling_laguerre():
     # Initialize the laser (LaguerreGaussian)
-    p = 2  # Radial order of Generalized Laguerre polynomial
-    m = 0  # Phase Rotation
+    p = 0  # Radial order of Generalized Laguerre polynomial
+    m = 1  # Phase Rotation
 
     LongitProfile = GaussianLongitudinalProfile(wavelength, tau, t_peak)
     TransvProfile = LaguerreGaussianTransverseProfile(w0, p, m)
@@ -116,7 +115,7 @@ def test_resampling_laguerre():
         wavelength, pol, laser_energy, LongitProfile, TransvProfile
     )
 
-    laser = Laser(dim, lo, hi, npoints, pulseProfile)
+    laser = Laser(dim, lo, hi, npoints, pulseProfile, n_azimuthal_modes=2)
 
     # Define the new grid for the laser
     new_r_max = 300e-6
@@ -129,4 +128,4 @@ def test_resampling_laguerre():
         n_azimuthal_modes=laser.grid.n_azimuthal_modes,
     )
     # Check resampling propagator
-    check_resampling(laser, new_grid, p, m)
+    check_resampling(laser, new_grid, m)
