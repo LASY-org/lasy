@@ -3,10 +3,10 @@
 -e .
 jupyter
 matplotlib
-skimage
 nbsphinx
 numpydoc
 pydata-sphinx-theme
+skimage
 sphinx-copybutton
 sphinx-design
 sphinx-gallery
