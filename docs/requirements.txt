@@ -3,6 +3,7 @@
 -e .
 jupyter
 matplotlib
+skimage
 nbsphinx
 numpydoc
 pydata-sphinx-theme
