@@ -67,15 +67,17 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
         hi[0] = laserProfile.w0 * 5 + laserProfile.x_offset
         hi[1] = laserProfile.w0 * 5 + laserProfile.x_offset
 
-    N_pts_x = int((hi[0] - lo[0]) / res)
-    N_pts_y = int((hi[1] - lo[1]) / res)
+    Nx = int((hi[0] - lo[0])//(2*res)*2)+2
+    Ny = int((hi[1] - lo[1])//(2*res)*2)+2
 
     # Define spatial arrays
-    x = np.linspace(lo[0], hi[0], N_pts_x)
-    y = np.linspace(lo[1], hi[1], N_pts_y)
+    x = np.linspace( (lo[0]+hi[0])/2 - (Nx-1)/2*res,
+                     (lo[0]+hi[0])/2 + (Nx-1)/2*res, Nx )
+    y = np.linspace( (lo[1]+hi[1])/2 - (Ny-1)/2*res,
+                     (lo[1]+hi[1])/2 + (Ny-1)/2*res, Ny )
     X, Y = np.meshgrid(x, y)
-    dx = x[2] - x[1]
-    dy = y[2] - y[1]
+    dx = x[1] - x[0]
+    dy = y[1] - y[0]
 
     # Get the field on this grid
     field = laserProfile.evaluate(X, Y)
@@ -123,7 +125,7 @@ def estimate_best_HG_waist(x, y, field):
     """
     dx = x[1] - x[0]
     dy = y[1] - y[0]
-    assert dx == dy
+    assert np.isclose(dx, dy, rtol=1e-10)
 
     X, Y = np.meshgrid(x, y)
 
