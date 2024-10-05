@@ -220,7 +220,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 
 
 def get_spectrum(
-    grid, dim, range=None, bins=20, is_envelope=True, omega0=None, method="sum"
+    grid, dim, range=None, bins=20, omega0=None, method="sum"
 ):
     r"""
     Get the frequency spectrum of an envelope or electric field.
@@ -279,14 +279,8 @@ def get_spectrum(
         Number of bins into which to interpolate the spectrum if a `range`
         is given.
 
-    is_envelope : bool (optional)
-        Whether the field provided uses the envelope representation, as used
-        internally in lasy. If False, field is assumed to represent the
-        the full electric field (with fast oscillations).
-
     omega0 : scalar (optional)
-        Angular frequency at which the envelope is defined. Required if
-        `is_envelope=True`.
+        Angular frequency at which the envelope is defined.
 
     method : {'sum', 'on_axis', 'raw'} (optional)
         Determines the type of spectrum that is returned as described above.
@@ -314,10 +308,11 @@ def get_spectrum(
             field = field[0, 0]
 
     # Get spectrum.
-    if is_envelope:
+    if grid.is_envelope:
         # Assume that the FFT of the envelope and the FFT of the complex
         # conjugate of the envelope do not overlap. Then we only need
         # one of them.
+        assert omega0 is not None
         spectrum = 0.5 * np.fft.fft(field) * grid.dx[-1]
         omega = omega0 - omega
         # Sort frequency array (and the spectrum accordingly).
@@ -360,7 +355,6 @@ def get_spectrum(
 def get_frequency(
     grid,
     dim=None,
-    is_envelope=True,
     is_hilbert=False,
     omega0=None,
     phase_unwrap_nd=False,
@@ -379,18 +373,13 @@ def get_frequency(
         Can be the full electric field or the envelope.
 
     dim : string (optional)
-        Dimensionality of the array. Only used if is_envelope is False.
+        Dimensionality of the array.
         Options are:
 
         - 'xyt': The laser pulse is represented on a 3D grid:
                  Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
                  Cylindrical (r) transversely, and temporal (t) longitudinally.
-
-    is_envelope : bool (optional)
-        Whether the field provided uses the envelope representation, as used
-        internally in lasy. If False, field is assumed to represent the
-        the electric field.
 
     is_hilbert : boolean (optional)
         If True, the field argument is assumed to be a Hilbert transform, and
@@ -399,7 +388,6 @@ def get_frequency(
 
     omega0 : scalar
         Angular frequency at which the envelope is defined.
-        Required if an only if is_envelope is True.
 
     phase_unwrap_nd : boolean (optional)
         If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
@@ -429,7 +417,7 @@ def get_frequency(
     field = grid.get_temporal_field()
 
     # Assumes t is last dimension!
-    if is_envelope:
+    if grid.is_envelope:
         assert omega0 is not None
         phase = np.unwrap(np.angle(field))
         omega = omega0 + np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
@@ -520,7 +508,8 @@ def field_to_vector_potential(grid, omega0):
     # Here, we neglect the time derivative of the envelope of E, the first RHS
     # term in: E = -dA/dt + 1j * omega0 * A where E and A are the field and
     # vector potential envelopes, respectively
-    omega, _ = get_frequency(grid, is_envelope=True, omega0=omega0)
+    assert grid.is_envelope is True
+    omega, _ = get_frequency(grid, omega0=omega0)
     return -1j * e * grid.get_temporal_field() / (m_e * omega * c)
 
 
@@ -546,6 +535,7 @@ def vector_potential_to_field(grid, omega0, direct=True):
     -------
     Envelope of the electric field (V/m).
     """
+    assert grid.is_envelope is True
     field = grid.get_temporal_field()
     if direct:
         A = (
@@ -554,7 +544,7 @@ def vector_potential_to_field(grid, omega0, direct=True):
         )
         return m_e * c / e * A
     else:
-        omega, _ = get_frequency(grid, is_envelope=True, omega0=omega0)
+        omega, _ = get_frequency(grid, omega0=omega0)
         return 1j * m_e * omega * c * field / e
 
 
@@ -589,7 +579,6 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     omg_h, omg0_h = get_frequency(
         grid,
         dim=dim,
-        is_envelope=False,
         is_hilbert=True,
         phase_unwrap_nd=phase_unwrap_nd,
     )

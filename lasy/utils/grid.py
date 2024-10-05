@@ -29,9 +29,14 @@ class Grid:
     n_azimuthal_modes : int (optional)
         Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
         used in order to represent the laser field.
+
+    is_envelope : bool (optional)
+        Whether the field provided uses the (complex) envelope representation, as
+        used internally in lasy. If False, field is assumed to represent the
+        the full (real) electric field (with fast oscillations).
     """
 
-    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None):
+    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None, is_envelope=True):
         # Metadata
         ndims = 2 if dim == "rt" else 3
         assert dim in ["rt", "xyt"]
@@ -43,6 +48,7 @@ class Grid:
         self.npoints = npoints
         self.axes = []
         self.dx = []
+        self.is_envelope = is_envelope
         for i in range(ndims):
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
             self.dx.append(self.axes[i][1] - self.axes[i][0])
@@ -62,10 +68,16 @@ class Grid:
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
 
-        self.temporal_field = np.zeros(self.shape, dtype="complex128")
+        self.temporal_field = np.zeros(self.shape, dtype=self.get_dtype())
+        self.spectral_field = np.zeros(self.shape, dtype=self.get_dtype())
         self.temporal_field_valid = False
-        self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
+
+    def get_dtype(self):
+        if self.is_envelope:
+            return "complex128"
+        else:
+            return "float64"
 
     def set_temporal_field(self, field):
         """
@@ -77,7 +89,7 @@ class Grid:
             The temporal field.
         """
         assert field.shape == self.temporal_field.shape
-        assert field.dtype == "complex128"
+        assert field.dtype == self.get_dtype()
         self.temporal_field[:, :, :] = field
         self.temporal_field_valid = True
         self.spectral_field_valid = False  # Invalidates the spectral field
@@ -92,7 +104,8 @@ class Grid:
             The spectral field.
         """
         assert field.shape == self.spectral_field.shape
-        assert field.dtype == "complex128"
+        assert field.dtype == self.get_dtype()
+        assert self.is_envelope == True
         self.spectral_field[:, :, :] = field
         self.spectral_field_valid = True
         self.temporal_field_valid = False  # Invalidates the temporal field
@@ -111,6 +124,7 @@ class Grid:
         """
         # We return a copy, so that the user cannot modify
         # the original field, unless get_temporal_field is called
+        assert self.is_envelope == True
         if self.temporal_field_valid:
             return self.temporal_field.copy()
         elif self.spectral_field_valid:
@@ -133,6 +147,7 @@ class Grid:
         """
         # We return a copy, so that the user cannot modify
         # the original field, unless set_spectral_field is called
+        assert self.is_envelope == True
         if self.spectral_field_valid:
             return self.spectral_field.copy()
         elif self.temporal_field_valid:
@@ -148,6 +163,7 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
+        assert self.is_envelope == True
         self.spectral_field = np.fft.ifft(
             self.temporal_field, axis=time_axis_indx, norm="backward"
         )
@@ -160,6 +176,7 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.spectral_field_valid
+        assert self.is_envelope == True
         self.temporal_field = np.fft.fft(
             self.spectral_field, axis=time_axis_indx, norm="backward"
         )
