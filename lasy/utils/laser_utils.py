@@ -219,9 +219,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     return env, ext
 
 
-def get_spectrum(
-    grid, dim, range=None, bins=20, omega0=None, method="sum"
-):
+def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     r"""
     Get the frequency spectrum of an envelope or electric field.
 
