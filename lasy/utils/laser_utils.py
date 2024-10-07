@@ -47,9 +47,7 @@ def compute_laser_energy(dim, grid):
         energy = ((dV * epsilon_0) * abs(envelope) ** 2).sum()
     else:  # dim == "rt":
         energy = (
-            dV[np.newaxis, :, np.newaxis]
-            * epsilon_0
-            * abs(envelope[:, :, :]) ** 2
+            dV[np.newaxis, :, np.newaxis] * epsilon_0 * abs(envelope[:, :, :]) ** 2
         ).sum()
 
     if grid.is_envelope:
