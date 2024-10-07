@@ -228,6 +228,7 @@ class Laser:
         show_progress : bool (optional)
             Whether to show a progress bar when performing the computation
         """
+        assert self.grid.is_envelope # The propagator assumes envelope
         # apply boundary "absorption" if required
         if nr_boundary is not None:
             assert type(nr_boundary) is int and nr_boundary > 0

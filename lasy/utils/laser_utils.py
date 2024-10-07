@@ -44,14 +44,16 @@ def compute_laser_energy(dim, grid):
     dV = get_grid_cell_volume(grid, dim)
 
     if dim == "xyt":
-        energy = ((dV * epsilon_0 * 0.5) * abs(envelope) ** 2).sum()
+        energy = ((dV * epsilon_0) * abs(envelope) ** 2).sum()
     else:  # dim == "rt":
         energy = (
             dV[np.newaxis, :, np.newaxis]
             * epsilon_0
-            * 0.5
             * abs(envelope[:, :, :]) ** 2
         ).sum()
+
+    if grid.is_envelope:
+        energy *= 0.5
 
     return energy
 
@@ -159,6 +161,10 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     omega0 = laser.profile.omega0
     env = laser.grid.get_temporal_field()
     time_axis = laser.grid.axes[-1]
+
+    # If the field is not an envelope, it is a full field, so no
+    # reason to recompute the full field.
+    assert laser.grid.is_envelope
 
     if laser.dim == "rt":
         azimuthal_phase = np.exp(-1j * laser.grid.azimuthal_modes * theta)
@@ -568,6 +574,8 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     tuple
         A tuple with the envelope array and the central wavelength.
     """
+    assert not grid.is_envelope
+
     field = grid.get_temporal_field()
 
     # hilbert transform needs inverted time axis.
@@ -670,7 +678,7 @@ def create_grid(array, axes, dim, is_envelope=True):
         lo = (axes["x"][0], axes["y"][0], axes["t"][0])
         hi = (axes["x"][-1], axes["y"][-1], axes["t"][-1])
         npoints = (axes["x"].size, axes["y"].size, axes["t"].size)
-        grid = Grid(dim, lo, hi, npoints)
+        grid = Grid(dim, lo, hi, npoints, is_envelope=is_envelope)
         assert np.all(grid.axes[0] == axes["x"])
         assert np.all(grid.axes[1] == axes["y"])
         assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
@@ -679,7 +687,7 @@ def create_grid(array, axes, dim, is_envelope=True):
         lo = (axes["r"][0], axes["t"][0])
         hi = (axes["r"][-1], axes["t"][-1])
         npoints = (axes["r"].size, axes["t"].size)
-        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1)
+        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1, is_envelope=is_envelope)
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
         grid.set_temporal_field(array)

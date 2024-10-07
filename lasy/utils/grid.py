@@ -69,8 +69,8 @@ class Grid:
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
 
         self.temporal_field = np.zeros(self.shape, dtype=self.get_dtype())
-        self.spectral_field = np.zeros(self.shape, dtype=self.get_dtype())
         self.temporal_field_valid = False
+        self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
 
     def get_dtype(self):
@@ -105,8 +105,6 @@ class Grid:
             The spectral field.
         """
         assert field.shape == self.spectral_field.shape
-        assert field.dtype == self.get_dtype()
-        assert self.is_envelope
         self.spectral_field[:, :, :] = field
         self.spectral_field_valid = True
         self.temporal_field_valid = False  # Invalidates the temporal field
@@ -125,7 +123,6 @@ class Grid:
         """
         # We return a copy, so that the user cannot modify
         # the original field, unless get_temporal_field is called
-        assert self.is_envelope
         if self.temporal_field_valid:
             return self.temporal_field.copy()
         elif self.spectral_field_valid:
@@ -164,7 +161,6 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
-        assert self.is_envelope
         self.spectral_field = np.fft.ifft(
             self.temporal_field, axis=time_axis_indx, norm="backward"
         )
@@ -177,7 +173,6 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.spectral_field_valid
-        assert self.is_envelope
         self.temporal_field = np.fft.fft(
             self.spectral_field, axis=time_axis_indx, norm="backward"
         )
