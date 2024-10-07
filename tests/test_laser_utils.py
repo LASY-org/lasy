@@ -37,9 +37,7 @@ def test_laser_analysis_utils():
         laser = get_gaussian_laser(dim)
 
         # Check that energy computed from spectrum agrees with `compute_laser_energy`.
-        spectrum, omega = get_spectrum(
-            laser.grid, dim, omega0=laser.profile.omega0
-        )
+        spectrum, omega = get_spectrum(laser.grid, dim, omega0=laser.profile.omega0)
         d_omega = omega[1] - omega[0]
         spectrum_energy = np.sum(spectrum) * d_omega
         energy = compute_laser_energy(dim, laser.grid)
