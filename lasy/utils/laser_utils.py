@@ -648,7 +648,7 @@ def weighted_std(values, weights=None):
     return std
 
 
-def create_grid(array, axes, dim):
+def create_grid(array, axes, dim, is_envelope=True):
     """Create a lasy grid from a numpy array.
 
     Parameters

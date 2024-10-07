@@ -38,7 +38,7 @@ def test_laser_analysis_utils():
 
         # Check that energy computed from spectrum agrees with `compute_laser_energy`.
         spectrum, omega = get_spectrum(
-            laser.grid, dim, is_envelope=True, omega0=laser.profile.omega0
+            laser.grid, dim, omega0=laser.profile.omega0
         )
         d_omega = omega[1] - omega[0]
         spectrum_energy = np.sum(spectrum) * d_omega

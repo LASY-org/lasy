@@ -74,6 +74,9 @@ class Grid:
         self.spectral_field_valid = False
 
     def get_dtype(self):
+        """
+        Get the data type of self.temporal_field.
+        """
         if self.is_envelope:
             return "complex128"
         else:
@@ -105,7 +108,7 @@ class Grid:
         """
         assert field.shape == self.spectral_field.shape
         assert field.dtype == self.get_dtype()
-        assert self.is_envelope == True
+        assert self.is_envelope
         self.spectral_field[:, :, :] = field
         self.spectral_field_valid = True
         self.temporal_field_valid = False  # Invalidates the temporal field
@@ -124,7 +127,7 @@ class Grid:
         """
         # We return a copy, so that the user cannot modify
         # the original field, unless get_temporal_field is called
-        assert self.is_envelope == True
+        assert self.is_envelope
         if self.temporal_field_valid:
             return self.temporal_field.copy()
         elif self.spectral_field_valid:
@@ -147,7 +150,7 @@ class Grid:
         """
         # We return a copy, so that the user cannot modify
         # the original field, unless set_spectral_field is called
-        assert self.is_envelope == True
+        assert self.is_envelope
         if self.spectral_field_valid:
             return self.spectral_field.copy()
         elif self.temporal_field_valid:
@@ -163,7 +166,7 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
-        assert self.is_envelope == True
+        assert self.is_envelope
         self.spectral_field = np.fft.ifft(
             self.temporal_field, axis=time_axis_indx, norm="backward"
         )
@@ -176,7 +179,7 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.spectral_field_valid
-        assert self.is_envelope == True
+        assert self.is_envelope
         self.temporal_field = np.fft.fft(
             self.spectral_field, axis=time_axis_indx, norm="backward"
         )
