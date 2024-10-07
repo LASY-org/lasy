@@ -105,6 +105,7 @@ class Grid:
             The spectral field.
         """
         assert field.shape == self.spectral_field.shape
+        assert field.dtype == "complex128"
         self.spectral_field[:, :, :] = field
         self.spectral_field_valid = True
         self.temporal_field_valid = False  # Invalidates the temporal field
