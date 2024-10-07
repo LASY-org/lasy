@@ -74,9 +74,7 @@ class Grid:
         self.spectral_field_valid = False
 
     def get_dtype(self):
-        """
-        Get the data type of self.temporal_field.
-        """
+        """Get the data type of self.temporal_field."""
         if self.is_envelope:
             return "complex128"
         else:
