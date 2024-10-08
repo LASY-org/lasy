@@ -242,7 +242,7 @@ def test_longitudinal_profiles():
     print("LongitudinalProfileFromData")
     data = {}
     data["datatype"] = "spectral"
-    data["dt"] = np.abs(t[1]-t[0])
+    data["dt"] = np.abs(t[1] - t[0])
     Gamma = (
         2 * np.log(2) / tau_fwhm**2
     )  # Generate spectral data assuming unchirped Gaussian
