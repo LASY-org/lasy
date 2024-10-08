@@ -10,6 +10,7 @@ from lasy.profiles.longitudinal import (
     CosineLongitudinalProfile,
     GaussianLongitudinalProfile,
     SuperGaussianLongitudinalProfile,
+    LongitudinalProfileFromData,
 )
 from lasy.profiles.profile import Profile, ScaledProfile, SummedProfile
 from lasy.profiles.transverse import (
@@ -233,6 +234,32 @@ def test_longitudinal_profiles():
     print("cep_phase_th = ", cep_phase)
     print("cep_phase = ", cep_phase_cos)
     assert np.abs(cep_phase_cos - cep_phase) / cep_phase < 0.02
+    
+    # LongitudinalProfileFromData
+    print("LongitudinalProfileFromData (monotonically increasing)")
+    tau = tau_fwhm / np.sqrt(2 * np.log(2))
+    # Generate spectral data
+    profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
+    field = profile_data.evaluate(t)
+    
+    
+    # The following are the actual tests
+    std_gauss = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_gaussian)))
+    std_gauss_th = tau / np.sqrt(2.0)
+    print("std_th = ", std_gauss_th)
+    print("std = ", std_gauss)
+    assert np.abs(std_gauss - std_gauss_th) / std_gauss_th < 0.01
+
+    t_peak_gaussian = t[np.argmax(np.abs(field_gaussian))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_gaussian)
+    assert np.abs(t_peak_gaussian - t_peak) / t_peak < 0.01
+
+    ff_gaussian = field_gaussian * np.exp(-1.0j * omega_0 * t)
+    cep_phase_gaussian = np.angle(ff_gaussian[np.argmax(np.abs(field_gaussian))])
+    print("cep_phase_th = ", cep_phase)
+    print("cep_phase = ", cep_phase_gaussian)
+    assert np.abs(cep_phase_gaussian - cep_phase) / cep_phase < 0.02
 
 
 def test_profile_gaussian_3d_cartesian(gaussian):
