@@ -11,7 +11,6 @@ from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
     LongitudinalProfileFromData,
     SuperGaussianLongitudinalProfile,
-    LongitudinalProfileFromData,
 )
 from lasy.profiles.profile import Profile, ScaledProfile, SummedProfile
 from lasy.profiles.transverse import (
@@ -155,14 +154,14 @@ def test_longitudinal_profiles():
 
     wavelength = 800e-9
     tau_fwhm = 30.0e-15
-    omega_fwhm = 4 * np.log(2) / tau_fwhm # Assumes fully-compressed
+    omega_fwhm = 4 * np.log(2) / tau_fwhm  # Assumes fully-compressed
     t_peak = 1.0 * tau_fwhm
     cep_phase = 0.5 * np.pi
     omega_0 = 2.0 * np.pi * c / wavelength
 
     t = np.linspace(t_peak - 4 * tau_fwhm, t_peak + 4 * tau_fwhm, npoints)
     omega = np.linspace(omega_0 - 4 * omega_fwhm, omega_0 + 4 * omega_fwhm, npoints)
-    wavelength = 2. * np.pi * c / omega
+    wavelength = 2.0 * np.pi * c / omega
 
     # GaussianLongitudinalProfile
     print("GaussianLongitudinalProfile")
@@ -243,9 +242,11 @@ def test_longitudinal_profiles():
     print("LongitudinalProfileFromData")
     data = {}
     data["datatype"] = "spectral"
-    Gamma = 2 * np.log(2) / tau_fwhm**2 # Generate spectral data assuming unchirped Gaussian
+    Gamma = (
+        2 * np.log(2) / tau_fwhm**2
+    )  # Generate spectral data assuming unchirped Gaussian
     spectral_intensity = np.exp(-((omega - omega_0) ** 2) / (4.0 * Gamma))
-    
+
     print("Case 1: monotonically increasing spectral data")
     data["axis"] = wavelength
     data["intensity"] = spectral_intensity
@@ -262,7 +263,7 @@ def test_longitudinal_profiles():
     print("t_peak_th = ", t_peak)
     print("t_peak = ", t_peak_gaussian_data)
     assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
-    
+
     print("Case 2: monotonically decreasing spectral data")
     data["axis"] = wavelength[::-1]
     data["intensity"] = spectral_intensity[::-1]
@@ -279,7 +280,7 @@ def test_longitudinal_profiles():
     print("t_peak_th = ", t_peak)
     print("t_peak = ", t_peak_gaussian_data)
     assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
-    
+
 
 def test_profile_gaussian_3d_cartesian(gaussian):
     # - 3D Cartesian case
