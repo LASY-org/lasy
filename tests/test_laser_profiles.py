@@ -9,8 +9,8 @@ from lasy.profiles import FromArrayProfile, GaussianProfile, SpeckleProfile
 from lasy.profiles.longitudinal import (
     CosineLongitudinalProfile,
     GaussianLongitudinalProfile,
-    SuperGaussianLongitudinalProfile,
     LongitudinalProfileFromData,
+    SuperGaussianLongitudinalProfile,
 )
 from lasy.profiles.profile import Profile, ScaledProfile, SummedProfile
 from lasy.profiles.transverse import (
@@ -234,15 +234,14 @@ def test_longitudinal_profiles():
     print("cep_phase_th = ", cep_phase)
     print("cep_phase = ", cep_phase_cos)
     assert np.abs(cep_phase_cos - cep_phase) / cep_phase < 0.02
-    
+
     # LongitudinalProfileFromData
     print("LongitudinalProfileFromData (monotonically increasing)")
     tau = tau_fwhm / np.sqrt(2 * np.log(2))
     # Generate spectral data
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
     field = profile_data.evaluate(t)
-    
-    
+
     # The following are the actual tests
     std_gauss = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_gaussian)))
     std_gauss_th = tau / np.sqrt(2.0)
