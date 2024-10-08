@@ -11,6 +11,7 @@ from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
     LongitudinalProfileFromData,
     SuperGaussianLongitudinalProfile,
+    LongitudinalProfileFromData,
 )
 from lasy.profiles.profile import Profile, ScaledProfile, SummedProfile
 from lasy.profiles.transverse import (
@@ -154,11 +155,14 @@ def test_longitudinal_profiles():
 
     wavelength = 800e-9
     tau_fwhm = 30.0e-15
+    omega_fwhm = 4 * np.log(2) / tau_fwhm # Assumes fully-compressed
     t_peak = 1.0 * tau_fwhm
     cep_phase = 0.5 * np.pi
     omega_0 = 2.0 * np.pi * c / wavelength
 
     t = np.linspace(t_peak - 4 * tau_fwhm, t_peak + 4 * tau_fwhm, npoints)
+    omega = np.linspace(omega_0 - 4 * omega_fwhm, omega_0 + 4 * omega_fwhm, npoints)
+    wavelength = 2. * np.pi * c / omega
 
     # GaussianLongitudinalProfile
     print("GaussianLongitudinalProfile")
@@ -235,31 +239,47 @@ def test_longitudinal_profiles():
     print("cep_phase = ", cep_phase_cos)
     assert np.abs(cep_phase_cos - cep_phase) / cep_phase < 0.02
 
-    # LongitudinalProfileFromData
-    print("LongitudinalProfileFromData (monotonically increasing)")
-    tau = tau_fwhm / np.sqrt(2 * np.log(2))
-    # Generate spectral data
+    # LongitudinalProfileFromData - initially assuming zero phase
+    print("LongitudinalProfileFromData")
+    data = {}
+    data["datatype"] = "spectral"
+    Gamma = 2 * np.log(2) / tau_fwhm**2 # Generate spectral data assuming unchirped Gaussian
+    spectral_intensity = np.exp(-((omega - omega_0) ** 2) / (4.0 * Gamma))
+    
+    print("Case 1: monotonically increasing spectral data")
+    data["axis"] = wavelength
+    data["intensity"] = spectral_intensity
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
-    field = profile_data.evaluate(t)
+    field_data = profile_data.evaluate(t)
 
-    # The following are the actual tests
-    std_gauss = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_gaussian)))
+    std_gauss_data = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_data)))
     std_gauss_th = tau / np.sqrt(2.0)
     print("std_th = ", std_gauss_th)
-    print("std = ", std_gauss)
-    assert np.abs(std_gauss - std_gauss_th) / std_gauss_th < 0.01
+    print("std = ", std_gauss_data)
+    assert np.abs(std_gauss_data - std_gauss_th) / std_gauss_th < 0.01
 
-    t_peak_gaussian = t[np.argmax(np.abs(field_gaussian))]
+    t_peak_gaussian_data = t[np.argmax(np.abs(field_data))]
     print("t_peak_th = ", t_peak)
-    print("t_peak = ", t_peak_gaussian)
-    assert np.abs(t_peak_gaussian - t_peak) / t_peak < 0.01
+    print("t_peak = ", t_peak_gaussian_data)
+    assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
+    
+    print("Case 2: monotonically decreasing spectral data")
+    data["axis"] = wavelength[::-1]
+    data["intensity"] = spectral_intensity[::-1]
+    profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
+    field_data = profile_data.evaluate(t)
 
-    ff_gaussian = field_gaussian * np.exp(-1.0j * omega_0 * t)
-    cep_phase_gaussian = np.angle(ff_gaussian[np.argmax(np.abs(field_gaussian))])
-    print("cep_phase_th = ", cep_phase)
-    print("cep_phase = ", cep_phase_gaussian)
-    assert np.abs(cep_phase_gaussian - cep_phase) / cep_phase < 0.02
+    std_gauss_data = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_data)))
+    std_gauss_th = tau / np.sqrt(2.0)
+    print("std_th = ", std_gauss_th)
+    print("std = ", std_gauss_data)
+    assert np.abs(std_gauss_data - std_gauss_th) / std_gauss_th < 0.01
 
+    t_peak_gaussian_data = t[np.argmax(np.abs(field_data))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_gaussian_data)
+    assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
+    
 
 def test_profile_gaussian_3d_cartesian(gaussian):
     # - 3D Cartesian case
