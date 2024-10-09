@@ -248,10 +248,13 @@ def test_longitudinal_profiles():
     profile = np.exp(
         tau**2 * ((omega - omega_0) ** 2) / 4.0 + +1.0j * (cep_phase + omega * t_peak)
     )
+    spectral_intensity = np.abs(profile) ** 2 / np.max(np.abs(profile) ** 2)
+    spectral_phase = np.unwrap(np.angle(profile))
 
     print("Case 1: monotonically increasing spectral data")
     data["axis"] = wavelength_axis
     data["intensity"] = spectral_intensity
+    # data["phase"] = spectral_phase
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
     field_data = profile_data.evaluate(t)
 
@@ -269,6 +272,7 @@ def test_longitudinal_profiles():
     print("Case 2: monotonically decreasing spectral data")
     data["axis"] = wavelength_axis[::-1]
     data["intensity"] = spectral_intensity[::-1]
+    # data["phase"] = spectral_phase[::-1]
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
     field_data = profile_data.evaluate(t)
 
