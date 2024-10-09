@@ -74,7 +74,7 @@ class Grid:
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
 
-    def set_is_envelope(is_envelope):
+    def set_is_envelope(self, is_envelope):
         """Set is_envelope attribute. Also set dtype accordingly."""
         assert is_envelope in [True, False]
         if is_envelope:
@@ -93,7 +93,7 @@ class Grid:
             The temporal field.
         """
         assert field.shape == self.temporal_field.shape
-        assert field.dtype == self.get_dtype()
+        assert field.dtype == self.dtype
         self.temporal_field[:, :, :] = field
         self.temporal_field_valid = True
         self.spectral_field_valid = False  # Invalidates the spectral field
