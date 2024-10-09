@@ -246,7 +246,7 @@ def test_longitudinal_profiles():
         t[1] - t[0]
     )  # Generate spectral data assuming analytic ft of GaussianLongitudinalProfile
     profile = np.exp(
-        tau**2 * ((omega - omega_0) ** 2) / 4.0 + 1.0j * (cep_phase + omega * t_peak)
+        - tau**2 * ((omega - omega_0) ** 2) / 4.0 + 1.0j * (cep_phase + omega * t_peak)
     )
     spectral_intensity = np.abs(profile) ** 2 / np.max(np.abs(profile) ** 2)
     spectral_phase = np.unwrap(np.angle(profile))
