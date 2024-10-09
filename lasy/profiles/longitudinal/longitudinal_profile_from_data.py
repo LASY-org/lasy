@@ -70,7 +70,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
                 spectral_phase = np.zeros_like(wavelength)
             else:
                 spectral_phase = data["phase"]
-            if np.all(np.diff(wavelength) < 0): # Flip arrays
+            if np.all(np.diff(wavelength) < 0):  # Flip arrays
                 wavelength = wavelength[::-1]
                 spectral_intensity = spectral_intensity[::-1]
                 spectral_phase = spectral_phase[::-1]
