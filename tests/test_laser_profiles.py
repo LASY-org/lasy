@@ -240,11 +240,9 @@ def test_longitudinal_profiles():
 
     # LongitudinalProfileFromData
     print("LongitudinalProfileFromData")
-    data = {}
+    data = {} # Generate spectral data assuming analytic ft of GaussianLongitudinalProfile
     data["datatype"] = "spectral"
-    data["dt"] = np.abs(
-        t[1] - t[0]
-    )  # Generate spectral data assuming analytic ft of GaussianLongitudinalProfile
+    data["dt"] = 1e-15
     profile = np.exp(
         -(tau**2) * ((omega - omega_0) ** 2) / 4.0 + 1.0j * (cep_phase + omega * t_peak)
     )

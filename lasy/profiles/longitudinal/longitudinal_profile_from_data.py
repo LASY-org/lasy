@@ -65,18 +65,15 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             assert np.all(np.diff(wavelength) > 0) or np.all(
                 np.diff(wavelength) < 0
             ), 'data["axis"] must be in monotonically increasing or decreasing order.'
-            if np.all(np.diff(wavelength) < 0):
-                wavelength = wavelength[::-1]
-                spectral_intensity = data["intensity"][::-1]
-            else:
-                spectral_intensity = data["intensity"]
+            spectral_intensity = data["intensity"]
             if data.get("phase") is None:
                 spectral_phase = np.zeros_like(wavelength)
             else:
-                if np.all(np.diff(wavelength) < 0):
-                    spectral_phase = data["phase"][::-1]
-                else:
-                    spectral_phase = data["phase"]
+                spectral_phase = data["phase"]
+            if np.all(np.diff(wavelength) < 0: # Flip arrays
+                wavelength = wavelength[::-1]
+                spectral_intensity = spectral_intensity[::-1]
+                spectral_phase = spectral_phase[::-1]
             dt = data["dt"]
             cwl = np.sum(spectral_intensity * wavelength) / np.sum(spectral_intensity)
             cfreq = c / cwl
