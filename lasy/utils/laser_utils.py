@@ -587,6 +587,7 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
         phase_unwrap_nd=phase_unwrap_nd,
     )
     field *= np.exp(1j * omg0_h * grid.axes[-1])
+    grid.is_envelope = True
     grid.set_temporal_field(field)
 
     return grid, omg0_h
