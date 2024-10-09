@@ -67,7 +67,6 @@ class Grid:
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
 
-        # This overwrites the dtype of temporal_field above
         self.set_is_envelope(is_envelope)
         self.temporal_field = np.zeros(self.shape, dtype=self.dtype)
         self.temporal_field_valid = False
