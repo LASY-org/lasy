@@ -160,8 +160,8 @@ def test_longitudinal_profiles():
     omega0 = 2.0 * np.pi * c / wavelength
 
     t = np.linspace(t_peak - 4 * tau_fwhm, t_peak + 4 * tau_fwhm, npoints)
-    omega = np.linspace(omega_0 - 4 * omega_fwhm, omega_0 + 4 * omega_fwhm, npoints)
-    wavelength = 2.0 * np.pi * c / omega
+    omega = np.linspace(omega0 - 4 * omega_fwhm, omega0 + 4 * omega_fwhm, npoints)
+    wavelength_axis = 2.0 * np.pi * c / omega
 
     # GaussianLongitudinalProfile
     print("GaussianLongitudinalProfile")
@@ -242,14 +242,12 @@ def test_longitudinal_profiles():
     print("LongitudinalProfileFromData")
     data = {}
     data["datatype"] = "spectral"
-    data["dt"] = np.abs(t[1] - t[0])
-    Gamma = (
-        2 * np.log(2) / tau_fwhm**2
-    )  # Generate spectral data assuming unchirped Gaussian
-    spectral_intensity = np.exp(-((omega - omega0) ** 2) / (4.0 * Gamma))
+    data["dt"] = np.abs(t[1] - t[0]) # Generate spectral data assuming unchirped Gaussian
+    profile = np.exp(tau**2 * ((omega - omega0) ** 2) / 4.0 + 
+                    + 1.0j * (cep_phase + omega * t_peak))
 
     print("Case 1: monotonically increasing spectral data")
-    data["axis"] = wavelength
+    data["axis"] = wavelength_axis
     data["intensity"] = spectral_intensity
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
     field_data = profile_data.evaluate(t)
@@ -266,7 +264,7 @@ def test_longitudinal_profiles():
     assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
 
     print("Case 2: monotonically decreasing spectral data")
-    data["axis"] = wavelength[::-1]
+    data["axis"] = wavelength_axis[::-1]
     data["intensity"] = spectral_intensity[::-1]
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
     field_data = profile_data.evaluate(t)
