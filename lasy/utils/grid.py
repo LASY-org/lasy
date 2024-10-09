@@ -48,7 +48,8 @@ class Grid:
         self.npoints = npoints
         self.axes = []
         self.dx = []
-        self.is_envelope = is_envelope
+        self.dtype = None
+        self.set_is_envelope(is_envelope)
         for i in range(ndims):
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
             self.dx.append(self.axes[i][1] - self.axes[i][0])
@@ -68,17 +69,19 @@ class Grid:
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
 
-        self.temporal_field = np.zeros(self.shape, dtype=self.get_dtype())
+        self.temporal_field = np.zeros(self.shape, dtype=self.dtype)
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
 
-    def get_dtype(self):
-        """Get the data type of self.temporal_field."""
-        if self.is_envelope:
-            return "complex128"
+    def set_is_envelope(is_envelope):
+        """Set is_envelope attribute. Also set dtype accordingly."""
+        assert is_envelope in [True, False]
+        if is_envelope:
+            self.dtype = "complex128"
         else:
-            return "float64"
+            self.dtype = "float64"
+        self.is_envelope = is_envelope
 
     def set_temporal_field(self, field):
         """

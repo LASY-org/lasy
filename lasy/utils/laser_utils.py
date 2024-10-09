@@ -510,7 +510,7 @@ def field_to_vector_potential(grid, omega0):
     # Here, we neglect the time derivative of the envelope of E, the first RHS
     # term in: E = -dA/dt + 1j * omega0 * A where E and A are the field and
     # vector potential envelopes, respectively
-    assert grid.is_envelope is True
+    assert grid.is_envelope
     omega, _ = get_frequency(grid, omega0=omega0)
     return -1j * e * grid.get_temporal_field() / (m_e * omega * c)
 
@@ -537,7 +537,7 @@ def vector_potential_to_field(grid, omega0, direct=True):
     -------
     Envelope of the electric field (V/m).
     """
-    assert grid.is_envelope is True
+    assert grid.is_envelope
     field = grid.get_temporal_field()
     if direct:
         A = (
@@ -587,7 +587,7 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
         phase_unwrap_nd=phase_unwrap_nd,
     )
     field *= np.exp(1j * omg0_h * grid.axes[-1])
-    grid.is_envelope = True
+    grid.set_is_envelope(True)
     grid.set_temporal_field(field)
 
     return grid, omg0_h
