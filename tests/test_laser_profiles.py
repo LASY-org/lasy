@@ -238,15 +238,15 @@ def test_longitudinal_profiles():
     print("cep_phase = ", cep_phase_cos)
     assert np.abs(cep_phase_cos - cep_phase) / cep_phase < 0.02
 
-    # LongitudinalProfileFromData - initially assuming zero phase
+    # LongitudinalProfileFromData
     print("LongitudinalProfileFromData")
     data = {}
     data["datatype"] = "spectral"
     data["dt"] = np.abs(
         t[1] - t[0]
-    )  # Generate spectral data assuming sunchirped Gaussian
+    )  # Generate spectral data assuming analytic ft of GaussianLongitudinalProfile
     profile = np.exp(
-        tau**2 * ((omega - omega_0) ** 2) / 4.0 + +1.0j * (cep_phase + omega * t_peak)
+        tau**2 * ((omega - omega_0) ** 2) / 4.0 + 1.0j * (cep_phase + omega * t_peak)
     )
     spectral_intensity = np.abs(profile) ** 2 / np.max(np.abs(profile) ** 2)
     spectral_phase = np.unwrap(np.angle(profile))
@@ -254,7 +254,7 @@ def test_longitudinal_profiles():
     print("Case 1: monotonically increasing spectral data")
     data["axis"] = wavelength_axis
     data["intensity"] = spectral_intensity
-    # data["phase"] = spectral_phase
+    data["phase"] = spectral_phase
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
     field_data = profile_data.evaluate(t)
 
@@ -272,7 +272,7 @@ def test_longitudinal_profiles():
     print("Case 2: monotonically decreasing spectral data")
     data["axis"] = wavelength_axis[::-1]
     data["intensity"] = spectral_intensity[::-1]
-    # data["phase"] = spectral_phase[::-1]
+    data["phase"] = spectral_phase[::-1]
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
     field_data = profile_data.evaluate(t)
 
