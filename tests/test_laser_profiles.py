@@ -157,10 +157,10 @@ def test_longitudinal_profiles():
     omega_fwhm = 4 * np.log(2) / tau_fwhm  # Assumes fully-compressed
     t_peak = 1.0 * tau_fwhm
     cep_phase = 0.5 * np.pi
-    omega0 = 2.0 * np.pi * c / wavelength
+    omega_0 = 2.0 * np.pi * c / wavelength
 
     t = np.linspace(t_peak - 4 * tau_fwhm, t_peak + 4 * tau_fwhm, npoints)
-    omega = np.linspace(omega0 - 4 * omega_fwhm, omega0 + 4 * omega_fwhm, npoints)
+    omega = np.linspace(omega_0 - 4 * omega_fwhm, omega_0 + 4 * omega_fwhm, npoints)
     wavelength_axis = 2.0 * np.pi * c / omega
 
     # GaussianLongitudinalProfile
@@ -244,9 +244,9 @@ def test_longitudinal_profiles():
     data["datatype"] = "spectral"
     data["dt"] = np.abs(
         t[1] - t[0]
-    )  # Generate spectral data assuming unchirped Gaussian
+    )  # Generate spectral data assuming sunchirped Gaussian
     profile = np.exp(
-        tau**2 * ((omega - omega0) ** 2) / 4.0 + +1.0j * (cep_phase + omega * t_peak)
+        tau**2 * ((omega - omega_0) ** 2) / 4.0 + +1.0j * (cep_phase + omega * t_peak)
     )
 
     print("Case 1: monotonically increasing spectral data")
