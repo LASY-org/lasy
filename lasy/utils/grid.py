@@ -67,9 +67,9 @@ class Grid:
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
 
-        self.temporal_field = np.zeros(self.shape, dtype="complex128")
         # This overwrites the dtype of temporal_field above
         self.set_is_envelope(is_envelope)
+        self.temporal_field = np.zeros(self.shape, dtype=self.dtype)
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
@@ -88,7 +88,8 @@ class Grid:
             self.dtype = "complex128"
         else:
             self.dtype = "float64"
-        self.temporal_field = self.temporal_field.astype(dtype=self.dtype)
+        if hasattr(self, "temporal_field"):
+            self.temporal_field = self.temporal_field.astype(dtype=self.dtype)
         self.is_envelope = is_envelope
 
     def set_temporal_field(self, field):
