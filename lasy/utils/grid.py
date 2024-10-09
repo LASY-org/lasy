@@ -81,6 +81,7 @@ class Grid:
             self.dtype = "complex128"
         else:
             self.dtype = "float64"
+        self.temporal_field = self.temporal_field.astype(dtype=self.dtype)
         self.is_envelope = is_envelope
 
     def set_temporal_field(self, field):
