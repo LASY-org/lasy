@@ -62,26 +62,18 @@ class LongitudinalProfileFromData(LongitudinalProfile):
         if data["datatype"] == "spectral":
             # First find central frequency
             wavelength = data["axis"]
-            assert np.all(
-                np.diff(wavelength) > 0
-            ), 'data["axis"] must be in monotonously increasing order.'
+            assert np.all(np.diff(wavelength) > 0) or np.all(
+                np.diff(wavelength) < 0
+            ), 'data["axis"] must be in monotonically increasing or decreasing order.'
             spectral_intensity = data["intensity"]
             if data.get("phase") is None:
                 spectral_phase = np.zeros_like(wavelength)
             else:
                 spectral_phase = data["phase"]
-            # assert np.all(np.diff(wavelength) > 0) or np.all(
-            #     np.diff(wavelength) < 0
-            # ), 'data["axis"] must be in monotonically increasing or decreasing order.'
-            # spectral_intensity = data["intensity"]
-            # if data.get("phase") is None:
-            #     spectral_phase = np.zeros_like(wavelength)
-            # else:
-            #     spectral_phase = data["phase"]
-            # if np.all(np.diff(wavelength) < 0: # Flip arrays
-            #     wavelength = wavelength[::-1]
-            #     spectral_intensity = spectral_intensity[::-1]
-            #     spectral_phase = spectral_phase[::-1]
+            if np.all(np.diff(wavelength) < 0): # Flip arrays
+                wavelength = wavelength[::-1]
+                spectral_intensity = spectral_intensity[::-1]
+                spectral_phase = spectral_phase[::-1]
             dt = data["dt"]
             cwl = np.sum(spectral_intensity * wavelength) / np.sum(spectral_intensity)
             cfreq = c / cwl
