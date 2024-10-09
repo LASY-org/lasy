@@ -48,8 +48,6 @@ class Grid:
         self.npoints = npoints
         self.axes = []
         self.dx = []
-        self.dtype = None
-        self.set_is_envelope(is_envelope)
         for i in range(ndims):
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
             self.dx.append(self.axes[i][1] - self.axes[i][0])
@@ -69,7 +67,9 @@ class Grid:
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
 
-        self.temporal_field = np.zeros(self.shape, dtype=self.dtype)
+        self.temporal_field = np.zeros(self.shape, dtype="complex128")
+        # This overwrites the dtype of temporal_field above
+        self.set_is_envelope(is_envelope)
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
