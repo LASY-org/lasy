@@ -242,9 +242,12 @@ def test_longitudinal_profiles():
     print("LongitudinalProfileFromData")
     data = {}
     data["datatype"] = "spectral"
-    data["dt"] = np.abs(t[1] - t[0]) # Generate spectral data assuming unchirped Gaussian
-    profile = np.exp(tau**2 * ((omega - omega0) ** 2) / 4.0 + 
-                    + 1.0j * (cep_phase + omega * t_peak))
+    data["dt"] = np.abs(
+        t[1] - t[0]
+    )  # Generate spectral data assuming unchirped Gaussian
+    profile = np.exp(
+        tau**2 * ((omega - omega0) ** 2) / 4.0 + +1.0j * (cep_phase + omega * t_peak)
+    )
 
     print("Case 1: monotonically increasing spectral data")
     data["axis"] = wavelength_axis
