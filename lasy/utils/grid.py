@@ -75,7 +75,14 @@ class Grid:
         self.spectral_field_valid = False
 
     def set_is_envelope(self, is_envelope):
-        """Set is_envelope attribute. Also set dtype accordingly."""
+        """
+        Set is_envelope attribute. Also set dtype accordingly.
+
+        Parameters
+        ----------
+        is_envelope : boolean
+            Whether the grid should represent an envelope (True) or a full electric field (False)
+        """
         assert is_envelope in [True, False]
         if is_envelope:
             self.dtype = "complex128"
