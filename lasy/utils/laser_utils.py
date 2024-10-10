@@ -283,6 +283,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
 
     omega0 : scalar (optional)
         Angular frequency at which the envelope is defined.
+        Only used if grid.is_envelope is True.
 
     method : {'sum', 'on_axis', 'raw'} (optional)
         Determines the type of spectrum that is returned as described above.
@@ -390,6 +391,7 @@ def get_frequency(
 
     omega0 : scalar
         Angular frequency at which the envelope is defined.
+        Only used if grid.is_envelope is True.
 
     phase_unwrap_nd : boolean (optional)
         If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
