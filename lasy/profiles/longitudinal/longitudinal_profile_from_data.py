@@ -67,9 +67,9 @@ class LongitudinalProfileFromData(LongitudinalProfile):
                 np.round(np.log10(data["axis"])) - 15.0 < 1.0
             ), 'data["axis"] must be wavelength [m] or angular frequency [s^-1].'
             if np.all(np.round(np.log10(data["axis"])) + 6.0 < 1.0):
-                wavelength = data["axis"] # Accept as wavelength
+                wavelength = data["axis"]  # Accept as wavelength
             else:
-                wavelength = 2.0 * np.pi * c / data["axis"] # Convert to wavelength
+                wavelength = 2.0 * np.pi * c / data["axis"]  # Convert to wavelength
             assert np.all(np.diff(wavelength) > 0) or np.all(
                 np.diff(wavelength) < 0
             ), 'data["axis"] must be in monotonically increasing or decreasing order.'

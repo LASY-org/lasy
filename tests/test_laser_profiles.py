@@ -161,7 +161,7 @@ def test_longitudinal_profiles():
 
     t = np.linspace(t_peak - 4 * tau_fwhm, t_peak + 4 * tau_fwhm, npoints)
     omega = np.linspace(omega_0 - 4 * omega_fwhm, omega_0 + 4 * omega_fwhm, npoints)
-    wavelength_axis = 2.0 * np.pi * c / omega # Note: monotonically decreasing
+    wavelength_axis = 2.0 * np.pi * c / omega  # Note: monotonically decreasing
 
     # GaussianLongitudinalProfile
     print("GaussianLongitudinalProfile")
@@ -302,7 +302,7 @@ def test_longitudinal_profiles():
     print("t_peak_th = ", t_peak)
     print("t_peak = ", t_peak_gaussian_data)
     assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
-    
+
     print("Case 4: monotonically decreasing data on angular frequency axis")
     data["axis"] = omega[::-1]
     data["intensity"] = spectral_intensity[::-1]
