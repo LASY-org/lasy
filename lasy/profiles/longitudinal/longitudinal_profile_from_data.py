@@ -25,12 +25,15 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
         datatype : string
             The domain in which the data has been passed. Options
-            are 'spectral' and 'temporal'
+            are 'spectral' and 'temporal'. Spectral data may either be,
+            a) Wavelength dependent (lambda) or
+            b) Angular freuqency dependent (omega)
 
         axis : ndarrays of floats
             The horizontal axis of the pulse duration measurement.
             The array must be monotonically increasing or decreasing.
-            When datatype is 'spectral' axis is wavelength in meters.
+            When datatype is 'spectral' axis is wavelength in meters OR
+            angular frequency in 1/seconds.
             When datatype is 'temporal' axis is time in seconds.
 
         intensity : ndarrays of floats
@@ -60,8 +63,13 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
     def __init__(self, data, lo, hi):
         if data["datatype"] == "spectral":
-            # First find central frequency
-            wavelength = data["axis"]
+            assert np.all(np.round(np.log10(data["axis"])) + 6.0 < 1.0) or np.all(
+                np.round(np.log10(data["axis"])) - 15.0 < 1.0
+            ), 'data["axis"] must be wavelength [m] or angular frequency [s^-1].'
+            if np.all(np.round(np.log10(data["axis"])) + 6.0 < 1.0):
+                wavelength = data["axis"] # Accept as wavelength
+            else:
+                wavelength = 2.0 * np.pi * c / data["axis"] # Convert to wavelength
             assert np.all(np.diff(wavelength) > 0) or np.all(
                 np.diff(wavelength) < 0
             ), 'data["axis"] must be in monotonically increasing or decreasing order.'
