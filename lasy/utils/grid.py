@@ -29,9 +29,14 @@ class Grid:
     n_azimuthal_modes : int (optional)
         Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
         used in order to represent the laser field.
+
+    is_envelope : bool (optional)
+        Whether the field provided uses the (complex) envelope representation, as
+        used internally in lasy. If False, field is assumed to represent the
+        the full (real) electric field (with fast oscillations).
     """
 
-    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None):
+    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None, is_envelope=True):
         # Metadata
         ndims = 2 if dim == "rt" else 3
         assert dim in ["rt", "xyt"]
@@ -62,10 +67,29 @@ class Grid:
             ncomp = 2 * self.n_azimuthal_modes - 1
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
 
-        self.temporal_field = np.zeros(self.shape, dtype="complex128")
+        self.set_is_envelope(is_envelope)
+        self.temporal_field = np.zeros(self.shape, dtype=self.dtype)
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
+
+    def set_is_envelope(self, is_envelope):
+        """
+        Set is_envelope attribute. Also set dtype accordingly.
+
+        Parameters
+        ----------
+        is_envelope : boolean
+            Whether the grid should represent an envelope (True) or a full electric field (False)
+        """
+        assert is_envelope in [True, False]
+        if is_envelope:
+            self.dtype = "complex128"
+        else:
+            self.dtype = "float64"
+        if hasattr(self, "temporal_field"):
+            self.temporal_field = self.temporal_field.astype(dtype=self.dtype)
+        self.is_envelope = is_envelope
 
     def set_temporal_field(self, field):
         """
@@ -77,7 +101,7 @@ class Grid:
             The temporal field.
         """
         assert field.shape == self.temporal_field.shape
-        assert field.dtype == "complex128"
+        assert field.dtype == self.dtype
         self.temporal_field[:, :, :] = field
         self.temporal_field_valid = True
         self.spectral_field_valid = False  # Invalidates the spectral field
@@ -133,6 +157,7 @@ class Grid:
         """
         # We return a copy, so that the user cannot modify
         # the original field, unless set_spectral_field is called
+        assert self.is_envelope
         if self.spectral_field_valid:
             return self.spectral_field.copy()
         elif self.temporal_field_valid:
