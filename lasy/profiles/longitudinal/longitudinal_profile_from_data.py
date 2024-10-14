@@ -63,14 +63,16 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
     def __init__(self, data, lo, hi):
         if data["datatype"] == "spectral":
-            if not "axis_is_wavelength" in data: # Set to wavelength data by default
+            if "axis_is_wavelength" not in data:  # Set to wavelength data by default
                 data["axis_is_wavelength"] = True
             if data["axis_is_wavelength"]:
                 wavelength = data["axis"]  # Accept as wavelength
                 spectral_intensity = data["intensity"]
             else:
                 wavelength = 2.0 * np.pi * c / data["axis"]  # Convert to wavelength
-                spectral_intensity = data["intensity"] * 2.0 * np.pi * c / wavelength ** 2 # Convert spectral data
+                spectral_intensity = (
+                    data["intensity"] * 2.0 * np.pi * c / wavelength**2
+                )  # Convert spectral data
             assert np.all(np.diff(wavelength) > 0) or np.all(
                 np.diff(wavelength) < 0
             ), 'data["axis"] must be in monotonically increasing or decreasing order.'
