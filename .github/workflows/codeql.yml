@@ -47,7 +47,7 @@ jobs:
           queries: +security-and-quality
 
       - name: Build
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@v3
         if: ${{ matrix.language == 'python' }}
 
       - name: Perform CodeQL Analysis
