@@ -26,8 +26,8 @@ class LongitudinalProfileFromData(LongitudinalProfile):
         datatype : string
             The domain in which the data has been passed. Options
             are 'spectral' and 'temporal'. Spectral data may either be,
-            a) Wavelength dependent (lambda) or
-            b) Angular freuqency dependent (omega)
+            a) Wavelength dependent (lambda): data["axis_is_wavelength"] = True or
+            b) Angular freuqency dependent (omega): data["axis_is_wavelength"] = False
 
         axis : ndarrays of floats
             The horizontal axis of the pulse duration measurement.
@@ -63,17 +63,17 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
     def __init__(self, data, lo, hi):
         if data["datatype"] == "spectral":
-            assert np.all(np.round(np.log10(data["axis"])) + 6.0 < 1.0) or np.all(
-                np.round(np.log10(data["axis"])) - 15.0 < 1.0
-            ), 'data["axis"] must be wavelength [m] or angular frequency [s^-1].'
-            if np.all(np.round(np.log10(data["axis"])) + 6.0 < 1.0):
+            if not "axis_is_wavelength" in data: # Set to wavelength data by default
+                data["axis_is_wavelength"] = True
+            if data["axis_is_wavelength"]:
                 wavelength = data["axis"]  # Accept as wavelength
+                spectral_intensity = data["intensity"]
             else:
                 wavelength = 2.0 * np.pi * c / data["axis"]  # Convert to wavelength
+                spectral_intensity = data["intensity"] * 2.0 * np.pi * c / wavelength ** 2 # Convert spectral data
             assert np.all(np.diff(wavelength) > 0) or np.all(
                 np.diff(wavelength) < 0
             ), 'data["axis"] must be in monotonically increasing or decreasing order.'
-            spectral_intensity = data["intensity"]
             if data.get("phase") is None:
                 spectral_phase = np.zeros_like(wavelength)
             else:

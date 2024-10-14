@@ -240,7 +240,7 @@ def test_longitudinal_profiles():
 
     # LongitudinalProfileFromData
     print("LongitudinalProfileFromData")
-    data = {}  # Generate spectral data assuming analytic ft of GaussianLongitudinalProfile
+    data = {}  # Generate spectral data assuming analytic Fourier transform of GaussianLongitudinalProfile
     data["datatype"] = "spectral"
     data["dt"] = 1e-16
     profile = np.exp(
@@ -289,6 +289,7 @@ def test_longitudinal_profiles():
     data["axis"] = omega
     data["intensity"] = spectral_intensity
     data["phase"] = spectral_phase
+    data["axis_is_wavelength"] = False
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
     field_data = profile_data.evaluate(t)
 
@@ -307,6 +308,7 @@ def test_longitudinal_profiles():
     data["axis"] = omega[::-1]
     data["intensity"] = spectral_intensity[::-1]
     data["phase"] = spectral_phase[::-1]
+    data["axis_is_wavelength"] = False
     profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
     field_data = profile_data.evaluate(t)
 
