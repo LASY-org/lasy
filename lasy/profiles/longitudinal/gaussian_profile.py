@@ -95,7 +95,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         t : ndarrays of floats
             Define longitudinal points on which to evaluate the envelope
 
-        x,y : ndarrays of floats, necessray if spatio-temperal couling exists
+        x,y : ndarrays of floats, necessray if spatio-temperal coulping exists
             Define transverse points on which to evaluate the envelope
 
         Returns
