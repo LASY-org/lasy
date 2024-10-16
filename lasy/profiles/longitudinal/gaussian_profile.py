@@ -84,7 +84,6 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         self.zeta = zeta
         self.w0 = w0
         self.stc_theta = stc_theta
-
         if z_foc == 0:
             self.z_foc_over_zr = 0
         else:
@@ -93,7 +92,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
             self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
 
-    def evaluate(self, t, x, y):
+    def evaluate(self, t, x=None, y=None):
         """
         Return the longitudinal envelope.
 
