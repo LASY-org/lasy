@@ -132,6 +132,6 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
             wavelength,
             pol,
             laser_energy,
-            GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase, beta=0, phi2=0, zeta=0, stc_theta=0,w0=None, z_foc=0),
+            GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase, beta=beta, phi2=phi2, zeta=zeta, stc_theta=0, w0=w0, z_foc=z_foc),
             GaussianTransverseProfile(w0, z_foc, wavelength),
         )
