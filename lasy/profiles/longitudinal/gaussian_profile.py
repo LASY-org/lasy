@@ -73,6 +73,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         self.zeta = zeta
         self.w0 = w0
         self.stc_theta = stc_theta
+        self.k0 = 2.0 * scc.pi/wavelength
         if beta:
             assert (w0 is not None and z_foc is not None),\
             "Both w0 and z_foc should be specified if angular dispersion beta is not 0"
@@ -83,7 +84,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
                 wavelength is not None
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
             self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
-            self.k0 = 2.0 * scc.pi/wavelength
+
 
 
     def evaluate(self, t, x=None, y=None):
