@@ -158,9 +158,9 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
                 beta=beta,
                 phi2=phi2,
                 zeta=zeta,
-                stc_theta=0,
+                stc_theta=stc_theta,
                 w0=w0,
-                z_foc=z_foc,
+                z_foc=z_foc
             ),
             GaussianTransverseProfile(w0, z_foc, wavelength),
         )
