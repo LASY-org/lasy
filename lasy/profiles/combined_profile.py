@@ -68,5 +68,7 @@ class CombinedLongitudinalTransverseProfile(Profile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
         """
-        envelope = self.trans_profile.evaluate(x, y) * self.long_profile.evaluate(t, x, y)
+        envelope = self.trans_profile.evaluate(x, y) * self.long_profile.evaluate(
+            t, x, y
+        )
         return envelope

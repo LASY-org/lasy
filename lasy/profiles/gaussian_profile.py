@@ -132,12 +132,35 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     """
 
     def __init__(
-        self, wavelength, pol, laser_energy, w0, tau, t_peak, cep_phase=0, z_foc=0, phi2=0, beta=0, zeta=0, stc_theta=0
+        self,
+        wavelength,
+        pol,
+        laser_energy,
+        w0,
+        tau,
+        t_peak,
+        cep_phase=0,
+        z_foc=0,
+        phi2=0,
+        beta=0,
+        zeta=0,
+        stc_theta=0,
     ):
         super().__init__(
             wavelength,
             pol,
             laser_energy,
-            GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase, beta=beta, phi2=phi2, zeta=zeta, stc_theta=0, w0=w0, z_foc=z_foc),
+            GaussianLongitudinalProfile(
+                wavelength,
+                tau,
+                t_peak,
+                cep_phase,
+                beta=beta,
+                phi2=phi2,
+                zeta=zeta,
+                stc_theta=0,
+                w0=w0,
+                z_foc=z_foc,
+            ),
             GaussianTransverseProfile(w0, z_foc, wavelength),
         )

@@ -63,7 +63,19 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         The waist of the laser pulse.
     """
 
-    def __init__(self, wavelength, tau, t_peak, cep_phase=0, beta=0, phi2=0, zeta=0, stc_theta=0,w0=None, z_foc=0):
+    def __init__(
+        self,
+        wavelength,
+        tau,
+        t_peak,
+        cep_phase=0,
+        beta=0,
+        phi2=0,
+        zeta=0,
+        stc_theta=0,
+        w0=None,
+        z_foc=0,
+    ):
         super().__init__(wavelength)
         self.tau = tau
         self.t_peak = t_peak
@@ -73,10 +85,11 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         self.zeta = zeta
         self.w0 = w0
         self.stc_theta = stc_theta
-        self.k0 = 2.0 * scc.pi/wavelength
+        self.k0 = 2.0 * scc.pi / wavelength
         if beta:
-            assert (w0 is not None and z_foc is not None),\
-            "Both w0 and z_foc should be specified if angular dispersion beta is not 0"
+            assert (
+                w0 is not None and z_foc is not None
+            ), "Both w0 and z_foc should be specified if angular dispersion beta is not 0"
         if z_foc == 0:
             self.z_foc_over_zr = 0
         else:
@@ -84,8 +97,6 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
                 wavelength is not None
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
             self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
-
-
 
     def evaluate(self, t, x=None, y=None):
         """
@@ -106,23 +117,50 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             specified points. This array has the same shape as the array t.
         """
         stretch_factor = 1.0
-        inv_tau2 = self.tau**(-2)
-        if (self.phi2 or self.zeta or self.beta):
-            assert(x is not None and y is not None),\
-            "transverse points should be specified if spatio-temperal coupling exits"
-            inv_complex_waist_2 = 1.0 / (self.w0**2 * (1.0 + 2.0j *\
-                                  self.z_foc_over_zr /(self.k0 * self.w0**2))) if self.beta else 0
-            stretch_factor += 4.0 * (self.zeta + self.beta * self.z_foc_over_zr * inv_tau2)\
-                             * (self.zeta + self.beta * self.z_foc_over_zr * inv_complex_waist_2)\
-                             + 2.0j * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr) * inv_tau2
-            stc_exponent = 1.0 / stretch_factor * inv_tau2 * (t - self.t_peak - \
-                           self.beta * self.k0 *(x * np.cos(self.stc_theta) +y * np.sin(self.stc_theta))-\
-                           2.0j * (x * np.cos(self.stc_theta) +y * np.sin(self.stc_theta))\
-                            * (self.zeta - self.beta * self.z_foc_over_zr) * inv_complex_waist_2)**2
+        inv_tau2 = self.tau ** (-2)
+        if self.phi2 or self.zeta or self.beta:
+            assert (
+                x is not None and y is not None
+            ), "transverse points should be specified if spatio-temperal coupling exits"
+            inv_complex_waist_2 = (
+                1.0
+                / (
+                    self.w0**2
+                    * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2))
+                )
+                if self.beta
+                else 0
+            )
+            stretch_factor += (
+                4.0
+                * (self.zeta + self.beta * self.z_foc_over_zr * inv_tau2)
+                * (self.zeta + self.beta * self.z_foc_over_zr * inv_complex_waist_2)
+                + 2.0j
+                * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
+                * inv_tau2
+            )
+            stc_exponent = (
+                1.0
+                / stretch_factor
+                * inv_tau2
+                * (
+                    t
+                    - self.t_peak
+                    - self.beta
+                    * self.k0
+                    * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
+                    - 2.0j
+                    * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
+                    * (self.zeta - self.beta * self.z_foc_over_zr)
+                    * inv_complex_waist_2
+                )
+                ** 2
+            )
             envelope = np.exp(-stc_exponent)
-        else: envelope = np.exp(
-            -((t - self.t_peak) ** 2) / self.tau**2
-            + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
-        )
+        else:
+            envelope = np.exp(
+                -((t - self.t_peak) ** 2) / self.tau**2
+                + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
+            )
 
         return envelope
