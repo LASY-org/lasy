@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import constants as scc
 
 from .longitudinal_profile import LongitudinalProfile
 
@@ -114,42 +113,41 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         """
         inv_tau2 = self.tau ** (-2)
         assert (
-                x is not None and y is not None
-            ), "transverse points should be specified if spatio-temperal coupling exits"
+            x is not None and y is not None
+        ), "transverse points should be specified if spatio-temperal coupling exits"
         inv_complex_waist_2 = (
-                1.0
-                / (
-                    self.w0**2
-                    * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2))
-                )
-                if self.beta
-                else 0
+            1.0
+            / (self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2)))
+            if self.beta
+            else 0
         )
         stretch_factor = (
-                1 +
-                4.0
-                * (self.zeta + self.beta * self.z_foc_over_zr * inv_tau2)
-                * (self.zeta + self.beta * self.z_foc_over_zr * inv_complex_waist_2)
-                + 2.0j
-                * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
-                * inv_tau2
+            1
+            + 4.0
+            * (self.zeta + self.beta * self.z_foc_over_zr * inv_tau2)
+            * (self.zeta + self.beta * self.z_foc_over_zr * inv_complex_waist_2)
+            + 2.0j
+            * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
+            * inv_tau2
         )
         stc_exponent = (
-                1.0
-                / stretch_factor
-                * inv_tau2
-                * (
-                    t
-                    - self.t_peak
-                    - self.beta
-                    * self.k0
-                    * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
-                    - 2.0j
-                    * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
-                    * (self.zeta - self.beta * self.z_foc_over_zr)
-                    * inv_complex_waist_2
-                )
-                ** 2
+            1.0
+            / stretch_factor
+            * inv_tau2
+            * (
+                t
+                - self.t_peak
+                - self.beta
+                * self.k0
+                * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
+                - 2.0j
+                * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
+                * (self.zeta - self.beta * self.z_foc_over_zr)
+                * inv_complex_waist_2
+            )
+            ** 2
         )
-        envelope = np.exp(-stc_exponent + 1.0j * (self.cep_phase + self.omega0 * self.t_peak))
+        envelope = np.exp(
+            -stc_exponent + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
+        )
         return envelope
