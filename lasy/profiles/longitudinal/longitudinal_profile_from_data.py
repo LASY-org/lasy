@@ -25,9 +25,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
         datatype : string
             The domain in which the data has been passed. Options
-            are 'spectral' and 'temporal'. Spectral data may either be,
-            a) Wavelength dependent (lambda): data["axis_is_wavelength"] = True or
-            b) Angular freuqency dependent (omega): data["axis_is_wavelength"] = False
+            are 'spectral' and 'temporal'.
 
         axis : ndarrays of floats
             The horizontal axis of the pulse duration measurement.
