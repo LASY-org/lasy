@@ -61,6 +61,28 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     z_foc : float (in meter), optional
         Position of the focal plane. (The laser pulse is initialized at `z=0`.)
 
+    beta : float (in second), optional
+        The angular dispersion parameterized by
+        .. math::
+            \beta = \frac{d\theta_0}{d\omega}
+        Here :math:`\theta_0` is the propagation angle of this component.
+
+    phi2 : float (in second^2), optional (default '0')
+        The group-delay dispertion parameterized by
+        .. math::
+            \phi^{(2)} = \frac{dt}{d\omega}
+
+    zeta : float (in meter * second) optional (defalut '0')
+        The spatio-chirp parameterized by
+        .. math::
+         \zeta = \frac{x_0}{d\omega}
+        Here :math:`x_0` is the beam center position.
+
+    stc_theta :  float (in rad) optional (default '0')
+        Transeverse direction along which spatio-temperal field couples.
+        0 is along x axis.
+
+
     Examples
     --------
     >>> import matplotlib.pyplot as plt
@@ -104,12 +126,12 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     """
 
     def __init__(
-        self, wavelength, pol, laser_energy, w0, tau, t_peak, cep_phase=0, z_foc=0
+        self, wavelength, pol, laser_energy, w0, tau, t_peak, cep_phase=0, z_foc=0, phi2=0, beta=0, zeta=0, stc_theta=0)
     ):
         super().__init__(
             wavelength,
             pol,
             laser_energy,
-            GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase),
+            GaussianLongitudinalProfile(wavelength, tau, t_peak, cep_phase, beta=0, phi2=0, zeta=0, stc_theta=0,w0=None, z_foc=0),
             GaussianTransverseProfile(w0, z_foc, wavelength),
         )
