@@ -85,6 +85,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         self.zeta = zeta
         self.w0 = w0
         self.stc_theta = stc_theta
+
         if z_foc == 0:
             self.z_foc_over_zr = 0
         else:
