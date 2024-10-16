@@ -27,6 +27,10 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             The domain in which the data has been passed. Options
             are 'spectral' and 'temporal'.
 
+        axis_is_wavelength : boolean (optional, default True)
+            If True, the axis represents wavelength in [m] (SI).
+            If False, it represents frequency in [1/s] (SI).
+
         axis : ndarrays of floats
             The horizontal axis of the pulse duration measurement.
             The array must be monotonically increasing or decreasing.
