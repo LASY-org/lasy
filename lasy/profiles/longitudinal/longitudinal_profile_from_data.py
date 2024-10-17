@@ -65,9 +65,10 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
     def __init__(self, data, lo, hi):
         if data["datatype"] == "spectral":
-            if "axis_is_wavelength" not in data:  # Set to wavelength data by default
-                data["axis_is_wavelength"] = True
-            if data["axis_is_wavelength"]:
+            axis_is_wavelength = True  # Set to wavelength data by default
+            if "axis_is_wavelength" in data:
+                axis_is_wavelength = data["axis_is_wavelength"]
+            if axis_is_wavelength:
                 wavelength = data["axis"]  # Accept as wavelength
                 spectral_intensity = data["intensity"]
             else:
