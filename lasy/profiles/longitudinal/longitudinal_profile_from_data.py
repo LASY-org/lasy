@@ -35,7 +35,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             The horizontal axis of the pulse duration measurement.
             The array must be monotonically increasing or decreasing.
             When datatype is 'spectral' axis is wavelength in meters OR
-            angular frequency in 1/seconds.
+           frequency in 1/seconds.
             When datatype is 'temporal' axis is time in seconds.
 
         intensity : ndarrays of floats
