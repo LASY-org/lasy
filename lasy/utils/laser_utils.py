@@ -873,3 +873,106 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
         field *= np.exp(1j * (z0 / c + t_axis) * omega0)
         grid.set_temporal_field(field)
+
+def get_STC(laser):
+    omega0 = laser.profile.omega0
+    env = laser.grid.get_temporal_field()
+    time_axis = laser.grid.axes[-1]
+
+    if laser.dim == "rt":
+        beta = 0
+    else:
+        nu = 0
+        summ = 0
+        laser_module = np.abs(env)
+        phi_envelop = np.array(np.arctan2(Ar.imag, Ar.real))
+    # unwrap phi_envelop
+        phi_envelop = np.unwrap(np.unwrap(phi_envelop, axis=0), axis=1)
+    # calculate pphi_pz
+        z_diff = np.diff(m.z)
+        x_diff = np.diff(m.x)
+        pphi_pz = (np.diff(phi_envelop, axis=0)).T / (z_diff / scc.c)
+        pphi_pzpy = (np.diff(pphi_pz, axis=0)).T / x_diff
+        for i in range(len(m.z) - 2):
+            for j in range(len(m.x) - 2):
+                nu = nu + pphi_pzpy[i, j] * laser_module[i, j]
+                summ = summ + laser_module[i, j]
+        nu = nu / scc.c / summ
+        a = 4 * nu * w0**2 * L**4
+        b = -4 * scc.c
+        c = nu * w0**2 * L**2
+        zeta_roots = np.roots([a, b, c])
+        zeta=np.min(zeta_roots)
+# get temporal chirp phi2
+    temp_chirp = 0
+    summ = 0
+    laser_module1 = np.abs(Ar)
+    phi_envelop = np.unwrap(np.array(np.arctan2(Ar.imag, Ar.real)), axis=0)
+    # calculate pphi_pz
+    z_diff = np.diff(m.z)
+    pphi_pz = (np.diff(phi_envelop, axis=0)).T/ (laser.grid.dt)
+    pphi_pz2 = ((np.diff(pphi_pz, axis=1)) / (laser.grid.dt).T
+    for i in range(len(m.z)-2):
+        for j in range(len(m.x)-2):
+            temp_chirp = temp_chirp + pphi_pz2[i,j] * laser_module1[i,j]
+            summ = summ + laser_module1[i,j]
+    x = temp_chirp * scc.c**2 / summ
+    a = 4 * x
+    b = -4
+    c = tau**4 * x
+    zeta_roots = np.roots([a, b, c])
+    return np.max(zeta_roots)
+
+
+    if Nt is not None:
+        Nr = env.shape[0]
+        time_axis_new = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], Nt)
+        env_new = np.zeros((Nr, Nt), dtype=env.dtype)
+
+        for ir in range(Nr):
+            interp_fu_abs = interp1d(time_axis, np.abs(env[ir]))
+            slice_abs = interp_fu_abs(time_axis_new)
+            interp_fu_angl = interp1d(time_axis, np.unwrap(np.angle(env[ir])))
+            slice_angl = interp_fu_angl(time_axis_new)
+            env_new[ir] = slice_abs * np.exp(1j * slice_angl)
+
+        time_axis = time_axis_new
+        env = env_new
+
+    env *= np.exp(-1j * omega0 * time_axis[None, :])
+    env = np.real(env)
+
+    if laser.dim == "rt":
+        ext = np.array(
+            [
+                laser.grid.lo[-1],
+                laser.grid.hi[-1],
+                -laser.grid.hi[0],
+                laser.grid.hi[0],
+            ]
+        )
+    else:
+        ext = np.array(
+            [
+                laser.grid.lo[-1],
+                laser.grid.hi[-1],
+                laser.grid.lo[0],
+                laser.grid.hi[0],
+            ]
+        )
+
+
+
+
+
+
+def get_centroids(F, x, z):
+    index_array = np.mgrid[0:F.shape[0], 0:F.shape[1]][1]
+    centroids = np.sum(index_array * np.abs(F**2), axis=1) / np.sum(np.abs(F**2), axis=1)
+    return z[centroids.astype(int)]
+
+def get_beta(F, m, k0):
+    z_centroids = get_centroids(F.T, m.x, m.z)
+    weight = np.mean(np.abs(F.T)**2, axis = np.ndim(F) - 1)
+    derivative = np.gradient(z_centroids) / (m.x[1] - m.x[0])
+    return (np.sum(derivative * weight) / np.sum(weight)) / k0 / scc.c

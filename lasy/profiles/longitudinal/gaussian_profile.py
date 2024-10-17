@@ -93,7 +93,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
             self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
 
-    def evaluate(self, t, x, y):
+    def evaluate(self, t, x= None, y=None):
         """
         Return the longitudinal envelope.
 
@@ -112,9 +112,6 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             specified points. This array has the same shape as the array t.
         """
         inv_tau2 = self.tau ** (-2)
-        assert (
-            x is not None and y is not None
-        ), "transverse points should be specified if spatio-temperal coupling exits"
         inv_complex_waist_2 = (
             1.0
             / (self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2)))
@@ -150,4 +147,6 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         envelope = np.exp(
             -stc_exponent + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
         )
+        print("longitudinal field evaluate sucessfully and the imag part is \n")
+        print(envelope.imag)
         return envelope
