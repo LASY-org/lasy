@@ -691,7 +691,7 @@ def create_grid(array, axes, dim, is_envelope=True):
         grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1, is_envelope=is_envelope)
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
-        grid.set_temporal_field(array)
+        grid.set_temporal_field(array[np.newaxis])
     return grid
 
 
