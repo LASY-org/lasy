@@ -913,34 +913,60 @@ def get_STC(dim, grid, tau, w0, k0):
         env_abs[:, :, : env_abs.shape[2] - 2]
     )
     phi2 = np.max(np.roots([4 * temp_chirp, -4, tau**4 * temp_chirp]))
-    #calculate zeta
-    if dim == 'rt':
-        pphi_pzpr = (np.diff(pphi_pz, axis=1))/ grid.dx[0]
-        nu = np.sum(pphi_pzpr * env_abs[:,:env_abs.shape[1]-1,:env_abs.shape[2]-1]) / \
-        np.sum(env_abs[:,:env_abs.shape[1]-1,:env_abs.shape[2]-1])
+    # calculate zeta
+    if dim == "rt":
+        pphi_pzpr = (np.diff(pphi_pz, axis=1)) / grid.dx[0]
+        nu = np.sum(
+            pphi_pzpr * env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1]
+        ) / np.sum(env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1])
         stc_theta_zeta = 0
         beta = 0
-        pft_x=pft_y=0
+        pft_x = pft_y = 0
         stc_theta_beta = 0
-    if dim == 'xyt':
-        pphi_pzpy = (np.diff(pphi_pz, axis=1))/ grid.dx[1]
-        pphi_pzpx = (np.diff(pphi_pz, axis=0))/ grid.dx[0]
-        theta = np.arctan2(pphi_pzpy[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:], pphi_pzpx[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:])
-        stc_theta_zeta = np.sum(theta * env_abs[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:env_abs.shape[2]-1]) / \
-        np.sum(env_abs[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:env_abs.shape[2]-1])
-        pphi_pzpr = (pphi_pzpy[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:]**2+pphi_pzpx[::env_abs.shape[0]-1,:env_abs.shape[1]-1,:]**2)**0.5
-        nu = np.sum(pphi_pzpr * env_abs[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:env_abs.shape[2]-1]) / \
-        np.sum(env_abs[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:env_abs.shape[2]-1])
-        #calculate beta
+    if dim == "xyt":
+        pphi_pzpy = (np.diff(pphi_pz, axis=1)) / grid.dx[1]
+        pphi_pzpx = (np.diff(pphi_pz, axis=0)) / grid.dx[0]
+        theta = np.arctan2(
+            pphi_pzpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
+            pphi_pzpx[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
+        )
+        stc_theta_zeta = np.sum(
+            theta
+            * env_abs[
+                : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
+            ]
+        ) / np.sum(
+            env_abs[
+                : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
+            ]
+        )
+        pphi_pzpr = (
+            pphi_pzpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
+            + pphi_pzpx[:: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
+        ) ** 0.5
+        nu = np.sum(
+            pphi_pzpr
+            * env_abs[
+                : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
+            ]
+        ) / np.sum(
+            env_abs[
+                : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
+            ]
+        )
+        # calculate beta
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
-        weight = np.mean(env_abs**2, axis = 2)
-        derivative_x = np.gradient(z_centroids,axis=0) / grid.dx[0]
-        derivative_y = np.gradient(z_centroids,axis=1) / grid.dx[1]
-        pft_x=(np.sum(derivative_x * weight) / np.sum(weight))
-        pft_y=(np.sum(derivative_y * weight) / np.sum(weight))
-        stc_theta_beta=np.arctan2(pft_y,pft_x)
-        beta = (np.sqrt((pft_x**2 + pft_y**2)) -temp_chirp*nu)/ k0
+        weight = np.mean(env_abs**2, axis=2)
+        derivative_x = np.gradient(z_centroids, axis=0) / grid.dx[0]
+        derivative_y = np.gradient(z_centroids, axis=1) / grid.dx[1]
+        pft_x = np.sum(derivative_x * weight) / np.sum(weight)
+        pft_y = np.sum(derivative_y * weight) / np.sum(weight)
+        stc_theta_beta = np.arctan2(pft_y, pft_x)
+        beta = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
 
-    zeta= np.min(np.roots([4 * nu , -4, nu * w0**2 * tau**2]))
-    return [temp_chirp, phi2], [nu, zeta,stc_theta_zeta], [beta, np.sqrt((pft_x**2 + pft_y**2)), stc_theta_beta]
-
+    zeta = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
+    return (
+        [temp_chirp, phi2],
+        [nu, zeta, stc_theta_zeta],
+        [beta, np.sqrt((pft_x**2 + pft_y**2)), stc_theta_beta],
+    )
