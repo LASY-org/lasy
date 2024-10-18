@@ -122,7 +122,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             * (self.zeta + self.beta * self.z_foc_over_zr * inv_tau2)
             * (self.zeta + self.beta * self.z_foc_over_zr * inv_complex_waist_2)
             + 2.0j
-            * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)vim c
+            * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
             * inv_tau2
         )
         print(stretch_factor)
