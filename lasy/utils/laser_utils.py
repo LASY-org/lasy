@@ -907,8 +907,8 @@ def get_STC(dim, grid, tau, w0, k0):
     ----------
     STC_fac : dict of floats
         A dictionary of floats corresponding to the STC factors. The keys are:
-            Phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` 
-            phi2: Group-delayed dispersion in :math:`\phi^{(2)}=dt_0/d(\omega)` 
+            Phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt`
+            phi2: Group-delayed dispersion in :math:`\phi^{(2)}=dt_0/d(\omega)`
             nu: Spatio-chirp in :math:`\nu=d(\omega_0)/dx`
             zeta: Spatio-chirp in :math:`\zeta=dx_0/d(\omega_0)`
             stc_theta_zeta: The direction of the linear spatial chirp on xoy plane\
@@ -930,7 +930,7 @@ def get_STC(dim, grid, tau, w0, k0):
     'beta': 0,
     'pft': 0,
     'stc_theta_beta': 0
-    }   
+    }
     env = grid.get_temporal_field()
     env_abs = np.abs(env)
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
@@ -994,5 +994,5 @@ def get_STC(dim, grid, tau, w0, k0):
         STC_fac['pft'] = np.sqrt((pft_x**2 + pft_y**2))
         STC_fac['stc_theta_beta'] = np.arctan2(pft_y, pft_x)
         STC_fac['beta'] = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
-        
+
         return STC_fac
