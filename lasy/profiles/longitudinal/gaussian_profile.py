@@ -36,18 +36,23 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
     beta : float (in second), optional
         The angular dispersion parameterized by
     .. math::
+    
             \beta = \frac{d\theta_0}{d\omega}
+            
         Here :math:`\theta_0` is the propagation angle of this component.
 
     phi2 : float (in second^2), optional (default '0')
         The group-delay dispertion parameterized by
     .. math::
+    
             \phi^{(2)} = \frac{dt}{d\omega}
 
     zeta : float (in meter * second) optional (defalut '0')
         The spatio-chirp parameterized by
-        .. math::
+    .. math::
+        
          \zeta = \frac{x_0}{d\omega}
+         
         Here :math:`x_0` is the beam center position.
 
     stc_theta :  float (in rad) optional (default '0')
