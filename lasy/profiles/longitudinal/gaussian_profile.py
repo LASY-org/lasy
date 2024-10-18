@@ -144,6 +144,6 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             ** 2
         )
         envelope = np.exp(
-            -stc_exponent + 1.0j * (self.cep_phase + self.omega0 * (t - self.t_peak))
+            -stc_exponent + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
         )
         return envelope
