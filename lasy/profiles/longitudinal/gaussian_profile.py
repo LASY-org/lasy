@@ -34,27 +34,27 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         oscillation, at the time where the laser envelope is maximum).
 
     beta : float (in second), optional
-        The angular dispersion parameterized by
+        The angular dispersion parameterized by:
 
-    .. math::
+        .. math::
 
-        \beta = \frac{d\theta_0}{d\omega}
+            \beta = \frac{d\theta_0}{d\omega}
 
         Here :math:`\theta_0` is the propagation angle of this component.
 
     phi2 : float (in second^2), optional (default '0')
-        The group-delay dispertion parameterized by
+        The group-delay dispertion parameterized by:
 
-    .. math::
+        .. math::
 
-        \phi^{(2)} = \frac{dt}{d\omega}
+            \phi^{(2)} = \frac{dt}{d\omega}
 
     zeta : float (in meter * second) optional (defalut '0')
-        The spatio-chirp parameterized by
+        The spatio-chirp parameterized by:
 
-    .. math::
+        .. math::
 
-        \zeta = \frac{x_0}{d\omega}
+            \zeta = \frac{x_0}{d\omega}
 
         Here :math:`x_0` is the beam center position.
 
