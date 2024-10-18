@@ -143,6 +143,4 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         envelope = np.exp(
             -stc_exponent + 1.0j * (self.cep_phase + self.omega0 * (t - self.t_peak))
         )
-        print("longitudinal field evaluate sucessfully and the imag part is \n")
-        print(envelope.imag)
         return envelope
