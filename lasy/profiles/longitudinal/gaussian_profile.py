@@ -35,13 +35,13 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
 
     beta : float (in second), optional
         The angular dispersion parameterized by
-        .. math::
+    .. math::
             \beta = \frac{d\theta_0}{d\omega}
         Here :math:`\theta_0` is the propagation angle of this component.
 
     phi2 : float (in second^2), optional (default '0')
         The group-delay dispertion parameterized by
-        .. math::
+    .. math::
             \phi^{(2)} = \frac{dt}{d\omega}
 
     zeta : float (in meter * second) optional (defalut '0')
@@ -61,8 +61,8 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
     w0 : float (in meter), necessary if beta is not 0
         The waist of the laser pulse.
 
-    All those above STC units and definiations are taken from `S. Akturk
-    et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
+    All those above STC units and definiations are taken from 
+    `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
 
     def __init__(
