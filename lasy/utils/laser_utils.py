@@ -933,10 +933,10 @@ def get_STC(dim, grid, tau, w0, k0):
     env = grid.get_temporal_field()
     env_abs = np.abs(env)
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
-    pphi_pz = (np.diff(phi_envelop, axis=2)) / (grid.dx[-1])
+    pphi_pt = (np.diff(phi_envelop, axis=2)) / (grid.dx[-1])
     # Calculate goup-delayed dispersion
-    pphi_pz2 = (np.diff(pphi_pz, axis=2)) / (grid.dx[-1])
-    STC_fac["Phi2"] = np.sum(pphi_pz2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
+    pphi_pt2 = (np.diff(pphi_pz, axis=2)) / (grid.dx[-1])
+    STC_fac["Phi2"] = np.sum(pphi_pt2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
         env_abs[:, :, : env_abs.shape[2] - 2]
     )
     STC_fac["phi2"] = np.max(
@@ -944,9 +944,9 @@ def get_STC(dim, grid, tau, w0, k0):
     )
     # Calculate spatio- and angular dispersion
     if dim == "rt":
-        pphi_pzpr = (np.diff(pphi_pz, axis=1)) / grid.dx[0]
+        pphi_ptpr = (np.diff(pphi_pt, axis=1)) / grid.dx[0]
         STC_fac["nu"] = np.sum(
-            pphi_pzpr * env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1]
+            pphi_ptpr * env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1]
         ) / np.sum(env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1])
 
         # Transfer the unit from nu to zeta
@@ -955,12 +955,12 @@ def get_STC(dim, grid, tau, w0, k0):
         )
         # No angular dispersion in 2D and the direction of spatio-chirp is certain
     if dim == "xyt":
-        pphi_pzpy = (np.diff(pphi_pz, axis=1)) / grid.dx[1]
-        pphi_pzpx = (np.diff(pphi_pz, axis=0)) / grid.dx[0]
+        pphi_ptpy = (np.diff(pphi_pt, axis=1)) / grid.dx[1]
+        pphi_ptpx = (np.diff(pphi_pt, axis=0)) / grid.dx[0]
         # Calculate the STC angle in XOY for spatio coupling
         theta = np.arctan2(
-            pphi_pzpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
-            pphi_pzpx[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
+            pphi_ptpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
+            pphi_ptpx[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
         )
         STC_fac["stc_theta_zeta"] = np.sum(
             theta
@@ -972,12 +972,12 @@ def get_STC(dim, grid, tau, w0, k0):
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
             ]
         )
-        pphi_pzpr = (
-            pphi_pzpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
-            + pphi_pzpx[:: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
+        pphi_ptpr = (
+            pphi_ptpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
+            + pphi_ptpx[:: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
         ) ** 0.5
         STC_fac["nu"] = np.sum(
-            pphi_pzpr
+            pphi_ptpr
             * env_abs[
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
             ]
