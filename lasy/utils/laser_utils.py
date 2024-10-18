@@ -1002,4 +1002,6 @@ def get_STC(dim, grid, tau, w0, k0):
         STC_fac["beta"] = (
             np.sqrt((pft_x**2 + pft_y**2)) - STC_fac["Phi2"] * STC_fac["nu"]
         ) / k0
+
+
 return STC_fac
