@@ -886,4 +886,35 @@ def get_STC(laser, dim, tau, w0):
         env_abs[:, :, : env_abs.shape[2] - 2]
     )
     phi2 = np.max(np.roots([4 * temp_chirp, -4, tau**4 * temp_chirp]))
-    return [temp_chirp, phi2]
+    #calculate zeta
+    if dim == 'rt':
+        pphi_pzpr = (np.diff(pphi_pz, axis=1))/ laser.grid.dx[0]
+        nu = np.sum(pphi_pzpr * env_abs[:,:env_abs.shape[1]-1,:env_abs.shape[2]-1]) / \
+        np.sum(env_abs[:,:env_abs.shape[1]-1,:env_abs.shape[2]-1])
+        stc_theta = 0
+        pft = 0
+    if dim == 'xyt':
+        pphi_pzpy = (np.diff(pphi_pz, axis=1))/ laser.grid.dx[1]
+        pphi_pzpx = (np.diff(pphi_pz, axis=0))/ laser.grid.dx[0]
+        theta = np.arctan2(pphi_pzpy[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:], pphi_pzpx[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:])
+        stc_theta = np.sum(theta * env_abs[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:env_abs.shape[2]-1]) / \
+        np.sum(env_abs[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:env_abs.shape[2]-1])
+        pphi_pzpr = (pphi_pzpy[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:]**2+pphi_pzpx[::env_abs.shape[0]-1,:env_abs.shape[1]-1,:]**2)**0.5
+        nu = np.sum(pphi_pzpr * env_abs[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:env_abs.shape[2]-1]) / \
+        np.sum(env_abs[:env_abs.shape[0]-1,:env_abs.shape[1]-1,:env_abs.shape[2]-1])
+        #calculate beta
+        index_array = np.mgrid[0:env.shape[0], 0:env.shape[1],0:env.shape[2]][1]
+        centroids = np.sum(index_array * env_abs, axis=2) / np.sum(env_abs, axis=2)
+        z_centroids= laser.grid.axes[-1][centroids.astype(int)]
+        weight = np.mean(env_abs**2, axis = 2)
+        derivative_x = np.gradient(z_centroids) / laser.grid.dx[0]
+        derivative_y = np.gradient(z_centroids) / laser.grid.dx[1]
+        k0= 2*scc.pi/0.6e-6
+        pft_x=(np.sum(derivative_x * weight) / np.sum(weight))
+        pft_y=(np.sum(derivative_x * weight) / np.sum(weight))
+        beta_x= pft_x/k0/scc.c
+        beta_y= pft_y/k0/scc.c
+
+    zeta= np.min(np.roots([4 * nu , -4, nu * w0**2 * tau**2]))
+
+    return [temp_chirp, phi2], [nu, zeta,stc_theta]

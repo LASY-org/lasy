@@ -92,7 +92,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
             self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
 
-    def evaluate(self, t, x=None, y=None):
+    def evaluate(self, t, x=0, y=0):
         """
         Return the longitudinal envelope.
 
@@ -115,7 +115,6 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             1.0
             / (self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2)))
         )
-        print(inv_complex_waist_2)
         stretch_factor = (
             1
             + 4.0
@@ -125,7 +124,6 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
             * inv_tau2
         )
-        print(stretch_factor)
         stc_exponent = (
             1.0
             / stretch_factor
@@ -143,7 +141,6 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             )
             ** 2
         )
-        print(stc_exponent)
         envelope = np.exp(
             -stc_exponent + 1.0j * (self.cep_phase + self.omega0 * (t - self.t_peak))
         )
