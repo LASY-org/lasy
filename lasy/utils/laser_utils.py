@@ -881,7 +881,6 @@ def get_STC(dim, grid, tau, w0, k0):
 
     Parameters
     ----------
-    laser:
     dim : string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
