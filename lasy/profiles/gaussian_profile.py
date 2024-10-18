@@ -67,7 +67,7 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     .. math::
 
             \beta = \frac{d\theta_0}{d\omega}
-            
+
         Here :math:`\theta_0` is the propagation angle of this component.
 
     phi2 : float (in second^2), optional (default '0')
@@ -83,7 +83,7 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     .. math::
 
          \zeta = \frac{x_0}{d\omega}
-         
+
         Here :math:`x_0` is the beam center position.
 
     stc_theta :  float (in rad) optional (default '0')
