@@ -928,11 +928,14 @@ def get_STC(dim, grid, tau, w0, k0):
         nu = np.sum(
             pphi_pzpr * env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1]
         ) / np.sum(env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1])
+           #Transfer the unit from nu to zeta
+        zeta = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
         # No angular dispersion in 2D and the direction of spatio-chirp is certain
-        stc_theta_zeta = 0
-        beta = 0
-        pft = 0
-        stc_theta_beta = 0
+        return (
+        [temp_chirp, phi2],
+        [nu, zeta, stc_theta_zeta = 0],
+        [beta = 0,  pft = 0,stc_theta_beta = 0],
+        )
     if dim == "xyt":
         pphi_pzpy = (np.diff(pphi_pz, axis=1)) / grid.dx[1]
         pphi_pzpx = (np.diff(pphi_pz, axis=0)) / grid.dx[0]
@@ -975,9 +978,8 @@ def get_STC(dim, grid, tau, w0, k0):
         pft = np.sqrt((pft_x**2 + pft_y**2))
         stc_theta_beta = np.arctan2(pft_y, pft_x)
         beta = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
-    #Transfer the unit from nu to zeta
-    zeta = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
-    return (
+        zeta = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
+        return (
         [temp_chirp, phi2],
         [nu, zeta, stc_theta_zeta],
         [beta, pft, stc_theta_beta],
