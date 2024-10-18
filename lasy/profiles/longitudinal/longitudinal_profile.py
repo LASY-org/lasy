@@ -13,8 +13,9 @@ class LongitudinalProfile(object):
     def __init__(self, wavelength):
         self.lambda0 = wavelength
         self.omega0 = 2 * pi * c / self.lambda0
+        self.k0 = 2.0 * pi / wavelength
 
-    def evaluate(self, t):
+    def evaluate(self, t, x=0, y=0):
         """
         Return the longitudinal envelope.
 
