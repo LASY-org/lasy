@@ -89,7 +89,7 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     stc_theta :  float (in rad) optional (default '0')
         Transeverse direction along which spatio-temperal field couples.
         0 is along x axis.
-    All those above STC units and definiations are taken from <S. Akturk et al., Optics Express 12, 4399 (2004)>
+    All those above STC units and definitions are taken from <S. Akturk et al., Optics Express 12, 4399 (2004)>
 
     Examples
     --------
