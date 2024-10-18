@@ -874,15 +874,16 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         field *= np.exp(1j * (z0 / c + t_axis) * omega0)
         grid.set_temporal_field(field)
 
-def get_STC(laser,dim,tau,w0):
-        env = laser.grid.get_temporal_field()
-        env_abs= np.abs(env)
-        phi_envelop =np.unwrap( np.array(np.arctan2(env.imag, env.real)),axis=2)
-        pphi_pz = (np.diff(phi_envelop, axis=2))/ (laser.grid.dx[-1])
-        #calculate phi2
-        pphi_pz2 = (np.diff(pphi_pz, axis=2))/ (laser.grid.dx[-1])
-        temp_chirp = np.sum(pphi_pz2 * env_abs[:,:,:env_abs.shape[2]-2]) / \
-            np.sum(env_abs[:,:,:env_abs.shape[2]-2])
-        phi2= np.max(np.roots([4 * temp_chirp, -4, tau**4 * temp_chirp]))
-        return [temp_chirp,phi2]
 
+def get_STC(laser, dim, tau, w0):
+    env = laser.grid.get_temporal_field()
+    env_abs = np.abs(env)
+    phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
+    pphi_pz = (np.diff(phi_envelop, axis=2)) / (laser.grid.dx[-1])
+    # calculate phi2
+    pphi_pz2 = (np.diff(pphi_pz, axis=2)) / (laser.grid.dx[-1])
+    temp_chirp = np.sum(pphi_pz2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
+        env_abs[:, :, : env_abs.shape[2] - 2]
+    )
+    phi2 = np.max(np.roots([4 * temp_chirp, -4, tau**4 * temp_chirp]))
+    return [temp_chirp, phi2]
