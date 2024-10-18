@@ -58,7 +58,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         Position of the focal plane. (The laser pulse is initialized at
         ``z=0``.)
 
-     w0 : float (in meter), necessary if beta is not 0
+    w0 : float (in meter), necessary if beta is not 0
         The waist of the laser pulse.
 
     All those above STC units and definiations are taken from `S. Akturk
