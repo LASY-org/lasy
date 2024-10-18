@@ -877,7 +877,7 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
 
 def get_STC(dim, grid, tau, w0, k0):
     r"""
-    Calculate the spatio-temperal coupling factors of the laser.
+    Calculate the spatio-temporal coupling factors of the laser.
 
     Parameters
     ----------
@@ -916,7 +916,7 @@ def get_STC(dim, grid, tau, w0, k0):
             pft: Pulse front tilt in :math:` p=dt/dx`
             stc_theta_beta: The direction of the linear angular chirp on xoy plane\
             in rad (0 is along x)
-    All those above units and definiations are taken from
+    All those above units and definitions are taken from
     `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
     # Initialise the returned dictionary
