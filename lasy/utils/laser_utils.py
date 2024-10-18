@@ -955,7 +955,6 @@ def get_STC(dim, grid, tau, w0, k0):
             np.roots([4 * STC_fac["nu"], -4, STC_fac["nu"] * w0**2 * tau**2])
         )
         # No angular dispersion in 2D and the direction of spatio-chirp is certain
-        return STC_fac
     if dim == "xyt":
         pphi_pzpy = (np.diff(pphi_pz, axis=1)) / grid.dx[1]
         pphi_pzpx = (np.diff(pphi_pz, axis=0)) / grid.dx[0]
@@ -1003,4 +1002,4 @@ def get_STC(dim, grid, tau, w0, k0):
         STC_fac["beta"] = (
             np.sqrt((pft_x**2 + pft_y**2)) - STC_fac["Phi2"] * STC_fac["nu"]
         ) / k0
-        return STC_fac
+return STC_fac
