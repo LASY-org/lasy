@@ -54,7 +54,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
 
         .. math::
 
-            \zeta = \frac{x_0}{d\omega}
+            \zeta = \frac{dx_0}{d\omega}
 
         Here :math:`x_0` is the beam center position.
 
