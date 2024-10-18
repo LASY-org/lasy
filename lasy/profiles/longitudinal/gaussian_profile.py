@@ -35,6 +35,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
 
     beta : float (in second), optional
         The angular dispersion parameterized by
+        
     .. math::
 
             \beta = \frac{d\theta_0}{d\omega}
@@ -43,12 +44,14 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
 
     phi2 : float (in second^2), optional (default '0')
         The group-delay dispertion parameterized by
+        
     .. math::
 
             \phi^{(2)} = \frac{dt}{d\omega}
 
     zeta : float (in meter * second) optional (defalut '0')
         The spatio-chirp parameterized by
+        
     .. math::
 
          \zeta = \frac{x_0}{d\omega}
