@@ -920,16 +920,16 @@ def get_STC(dim, grid, tau, w0, k0):
     All those above units and definiations are taken from `S. Akturk et al., Optics\
     Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
-    #Initialise the returned dictionary
+    # Initialise the returned dictionary
     STC_fac = {
-        'Phi2': 0,
-        'phi2': 0,
-        'nu': 0,
-        'zeta': 0,
-        'stc_theta_zeta': 0,
-        'beta': 0,
-        'pft': 0,
-        'stc_theta_beta': 0
+        "Phi2": 0,
+        "phi2": 0,
+        "nu": 0,
+        "zeta": 0,
+        "stc_theta_zeta": 0,
+        "beta": 0,
+        "pft": 0,
+        "stc_theta_beta": 0,
     }
     env = grid.get_temporal_field()
     env_abs = np.abs(env)
@@ -937,18 +937,18 @@ def get_STC(dim, grid, tau, w0, k0):
     pphi_pz = (np.diff(phi_envelop, axis=2)) / (grid.dx[-1])
     # Calculate goup-delayed dispersion
     pphi_pz2 = (np.diff(pphi_pz, axis=2)) / (grid.dx[-1])
-    STC_fac['Phi2'] = np.sum(pphi_pz2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
+    STC_fac["Phi2"] = np.sum(pphi_pz2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
         env_abs[:, :, : env_abs.shape[2] - 2]
     )
-    STC_fac['phi2'] = np.max(np.roots([4 * Phi2, -4, tau**4 * Phi2]))
+    STC_fac["phi2"] = np.max(np.roots([4 * Phi2, -4, tau**4 * Phi2]))
     # Calculate spatio- and angular dispersion
     if dim == "rt":
         pphi_pzpr = (np.diff(pphi_pz, axis=1)) / grid.dx[0]
-        STC_fac['nu'] = np.sum(
+        STC_fac["nu"] = np.sum(
             pphi_pzpr * env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1]
         ) / np.sum(env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1])
-           #Transfer the unit from nu to zeta
-        STC_fac['zeta'] = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
+        # Transfer the unit from nu to zeta
+        STC_fac["zeta"] = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
         # No angular dispersion in 2D and the direction of spatio-chirp is certain
         return STC_fac
     if dim == "xyt":
@@ -959,7 +959,7 @@ def get_STC(dim, grid, tau, w0, k0):
             pphi_pzpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
             pphi_pzpx[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
         )
-        STC_fac['stc_theta_zeta'] = np.sum(
+        STC_fac["stc_theta_zeta"] = np.sum(
             theta
             * env_abs[
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
@@ -973,7 +973,7 @@ def get_STC(dim, grid, tau, w0, k0):
             pphi_pzpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
             + pphi_pzpx[:: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
         ) ** 0.5
-        STC_fac['nu'] = np.sum(
+        STC_fac["nu"] = np.sum(
             pphi_pzpr
             * env_abs[
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
@@ -983,7 +983,7 @@ def get_STC(dim, grid, tau, w0, k0):
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
             ]
         )
-        STC_fac['zeta'] = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
+        STC_fac["zeta"] = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
         # calculate angular dispersion and pulse front tilt
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
         weight = np.mean(env_abs**2, axis=2)
@@ -991,7 +991,7 @@ def get_STC(dim, grid, tau, w0, k0):
         derivative_y = np.gradient(z_centroids, axis=1) / grid.dx[1]
         pft_x = np.sum(derivative_x * weight) / np.sum(weight)
         pft_y = np.sum(derivative_y * weight) / np.sum(weight)
-        STC_fac['pft'] = np.sqrt((pft_x**2 + pft_y**2))
-        STC_fac['stc_theta_beta'] = np.arctan2(pft_y, pft_x)
-        STC_fac['beta'] = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
+        STC_fac["pft"] = np.sqrt((pft_x**2 + pft_y**2))
+        STC_fac["stc_theta_beta"] = np.arctan2(pft_y, pft_x)
+        STC_fac["beta"] = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
         return STC_fac
