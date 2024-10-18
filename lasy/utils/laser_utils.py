@@ -903,39 +903,54 @@ def get_STC(dim, grid, tau, w0, k0):
     k0 : scalar
         Wavenumber of the field
 
-    Return value
+    Return
     ----------
-    [temperal_chirp,phi2] Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` and :math:`\phi^{(2)}=dt_0/d(\omega) `
-    [nu, zeta, stc_theta_zeta] Spatio-chirp in :math:`\nu=d(\omega_0)/dx` and `\zeta=dx_0/d(\omega_0)`, stc_theta_zeta refers to
-                               the direction of the linear spatial chirp on xoy plane in rad (0 is along x)
-    [beta, pft, stc_theta_beta] Angular dispersion in :math:` \beta = d\theta_0/d\omega`, and pulse front tilt in :math:` p=dt/dx`,
-                               stc_theta_beta refers to the direction of the linear angular chirp on xoy plane in rad (0 is along x)
-    All those above units and definiations are taken from `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
+    STC_fac : dict of floats
+        A dictionary of floats corresponding to the STC factors. The keys are:
+            Phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` 
+            phi2: Group-delayed dispersion in :math:`\phi^{(2)}=dt_0/d(\omega)` 
+            nu: Spatio-chirp in :math:`\nu=d(\omega_0)/dx`
+            zeta: Spatio-chirp in :math:`\zeta=dx_0/d(\omega_0)`
+            stc_theta_zeta: The direction of the linear spatial chirp on xoy plane\
+            in rad (0 is along x)
+            beta: Angular dispersion in :math:` \beta = d\theta_0/d\omega`
+            pft: Pulse front tilt in :math:` p=dt/dx`
+            stc_theta_beta: The direction of the linear angular chirp on xoy plane\
+            in rad (0 is along x)
+    All those above units and definiations are taken from `S. Akturk et al., Optics\
+    Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
+    #Initialise the returned dictional
+   STC_fac = {
+    'Phi2': 0,
+    'phi2': 0,
+    'nu': 0,
+    'zeta': 0,
+    'stc_theta_zeta': 0,
+    'beta': 0,
+    'pft': 0,
+    'stc_theta_beta': 0
+    }   
     env = grid.get_temporal_field()
     env_abs = np.abs(env)
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pz = (np.diff(phi_envelop, axis=2)) / (grid.dx[-1])
     # Calculate goup-delayed dispersion
     pphi_pz2 = (np.diff(pphi_pz, axis=2)) / (grid.dx[-1])
-    temp_chirp = np.sum(pphi_pz2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
+    STC_fac['Phi2'] = np.sum(pphi_pz2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
         env_abs[:, :, : env_abs.shape[2] - 2]
     )
-    phi2 = np.max(np.roots([4 * temp_chirp, -4, tau**4 * temp_chirp]))
+    STC_fac['phi2'] = np.max(np.roots([4 * Phi2, -4, tau**4 * Phi2]))
     # Calculate spatio- and angular dispersion
     if dim == "rt":
         pphi_pzpr = (np.diff(pphi_pz, axis=1)) / grid.dx[0]
-        nu = np.sum(
+        STC_fac['nu'] = np.sum(
             pphi_pzpr * env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1]
         ) / np.sum(env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1])
            #Transfer the unit from nu to zeta
-        zeta = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
+        STC_fac['zeta'] = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
         # No angular dispersion in 2D and the direction of spatio-chirp is certain
-        return (
-        [temp_chirp, phi2],
-        [nu, zeta, stc_theta_zeta = 0],
-        [beta = 0,  pft = 0,stc_theta_beta = 0],
-        )
+        return STC_fac
     if dim == "xyt":
         pphi_pzpy = (np.diff(pphi_pz, axis=1)) / grid.dx[1]
         pphi_pzpx = (np.diff(pphi_pz, axis=0)) / grid.dx[0]
@@ -944,7 +959,7 @@ def get_STC(dim, grid, tau, w0, k0):
             pphi_pzpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
             pphi_pzpx[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
         )
-        stc_theta_zeta = np.sum(
+        STC_fac['stc_theta_zeta'] = np.sum(
             theta
             * env_abs[
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
@@ -958,7 +973,7 @@ def get_STC(dim, grid, tau, w0, k0):
             pphi_pzpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
             + pphi_pzpx[:: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
         ) ** 0.5
-        nu = np.sum(
+        STC_fac['nu'] = np.sum(
             pphi_pzpr
             * env_abs[
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
@@ -968,19 +983,16 @@ def get_STC(dim, grid, tau, w0, k0):
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
             ]
         )
-        # calculate anglur dispersion and pulse front tilt
+        STC_fac['zeta'] = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
+        # calculate angular dispersion and pulse front tilt
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
         weight = np.mean(env_abs**2, axis=2)
         derivative_x = np.gradient(z_centroids, axis=0) / grid.dx[0]
         derivative_y = np.gradient(z_centroids, axis=1) / grid.dx[1]
         pft_x = np.sum(derivative_x * weight) / np.sum(weight)
         pft_y = np.sum(derivative_y * weight) / np.sum(weight)
-        pft = np.sqrt((pft_x**2 + pft_y**2))
-        stc_theta_beta = np.arctan2(pft_y, pft_x)
-        beta = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
-        zeta = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
-        return (
-        [temp_chirp, phi2],
-        [nu, zeta, stc_theta_zeta],
-        [beta, pft, stc_theta_beta],
-        )
+        STC_fac['pft'] = np.sqrt((pft_x**2 + pft_y**2))
+        STC_fac['stc_theta_beta'] = np.arctan2(pft_y, pft_x)
+        STC_fac['beta'] = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
+        
+        return STC_fac
