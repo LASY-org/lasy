@@ -115,8 +115,10 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         """
         inv_tau2 = self.tau ** (-2)
         inv_complex_waist_2 = (
-            1.0 / (self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2)))
-            if self.w0 else 0
+            1.0
+            / (self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2)))
+            if self.w0
+            else 0
         )
         stretch_factor = (
             1
