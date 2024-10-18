@@ -902,6 +902,15 @@ def get_STC(dim, grid, tau, w0, k0):
 
     k0 : scalar
         Wavenumber of the field
+
+    Return value
+    ----------
+    [temperal_chirp,phi2] Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` and :math:`\phi^{(2)}=dt_0/d(\omega) `
+    [nu, zeta, stc_theta_zeta] Spatio-chirp in :math:`\nu=d(\omega_0)/dx` and `\zeta=dx_0/d(\omega_0)`, stc_theta_zeta refers to
+                               the direction of the linear spatial chirp on xoy plane in rad (0 is along x)
+    [beta, pft, stc_theta_beta] Angular dispersion in :math:` \beta = d\theta_0/d\omega`, and pulse front tilt in :math:` p=dt/dx`,
+                               stc_theta_beta refers to the direction of the linear angular chirp on xoy plane in rad (0 is along x)
+    All those above units and definiations are taken from `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
     env = grid.get_temporal_field()
     env_abs = np.abs(env)
@@ -961,12 +970,12 @@ def get_STC(dim, grid, tau, w0, k0):
         derivative_y = np.gradient(z_centroids, axis=1) / grid.dx[1]
         pft_x = np.sum(derivative_x * weight) / np.sum(weight)
         pft_y = np.sum(derivative_y * weight) / np.sum(weight)
+        pft = np.sqrt((pft_x**2 + pft_y**2))
         stc_theta_beta = np.arctan2(pft_y, pft_x)
         beta = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
-
     zeta = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
     return (
         [temp_chirp, phi2],
         [nu, zeta, stc_theta_zeta],
-        [beta, np.sqrt((pft_x**2 + pft_y**2)), stc_theta_beta],
+        [beta,pft, stc_theta_beta],
     )
