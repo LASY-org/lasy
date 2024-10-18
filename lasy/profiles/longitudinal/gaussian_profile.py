@@ -38,7 +38,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
 
     .. math::
 
-            \beta = \frac{d\theta_0}{d\omega}
+        \beta = \frac{d\theta_0}{d\omega}
 
         Here :math:`\theta_0` is the propagation angle of this component.
 
@@ -47,14 +47,14 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
 
     .. math::
 
-            \phi^{(2)} = \frac{dt}{d\omega}
+        \phi^{(2)} = \frac{dt}{d\omega}
 
     zeta : float (in meter * second) optional (defalut '0')
         The spatio-chirp parameterized by
 
     .. math::
 
-         \zeta = \frac{x_0}{d\omega}
+        \zeta = \frac{x_0}{d\omega}
 
         Here :math:`x_0` is the beam center position.
 
