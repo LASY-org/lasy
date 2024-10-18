@@ -940,7 +940,9 @@ def get_STC(dim, grid, tau, w0, k0):
     STC_fac["Phi2"] = np.sum(pphi_pz2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
         env_abs[:, :, : env_abs.shape[2] - 2]
     )
-    STC_fac["phi2"] = np.max(np.roots([4 * STC_fac["Phi2"], -4, tau**4 * STC_fac["Phi2"]]))
+    STC_fac["phi2"] = np.max(
+        np.roots([4 * STC_fac["Phi2"], -4, tau**4 * STC_fac["Phi2"]])
+    )
     # Calculate spatio- and angular dispersion
     if dim == "rt":
         pphi_pzpr = (np.diff(pphi_pz, axis=1)) / grid.dx[0]
@@ -948,7 +950,9 @@ def get_STC(dim, grid, tau, w0, k0):
             pphi_pzpr * env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1]
         ) / np.sum(env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1])
         # Transfer the unit from nu to zeta
-        STC_fac["zeta"] = np.min(np.roots([4 * STC_fac["nu"], -4, STC_fac["nu"] * w0**2 * tau**2]))
+        STC_fac["zeta"] = np.min(
+            np.roots([4 * STC_fac["nu"], -4, STC_fac["nu"] * w0**2 * tau**2])
+        )
         # No angular dispersion in 2D and the direction of spatio-chirp is certain
         return STC_fac
     if dim == "xyt":
@@ -983,7 +987,9 @@ def get_STC(dim, grid, tau, w0, k0):
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
             ]
         )
-        STC_fac["zeta"] = np.min(np.roots([4 * STC_fac["nu"] , -4, STC_fac["nu"]  * w0**2 * tau**2]))
+        STC_fac["zeta"] = np.min(
+            np.roots([4 * STC_fac["nu"], -4, STC_fac["nu"] * w0**2 * tau**2])
+        )
         # calculate angular dispersion and pulse front tilt
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
         weight = np.mean(env_abs**2, axis=2)
@@ -993,5 +999,7 @@ def get_STC(dim, grid, tau, w0, k0):
         pft_y = np.sum(derivative_y * weight) / np.sum(weight)
         STC_fac["pft"] = np.sqrt((pft_x**2 + pft_y**2))
         STC_fac["stc_theta_beta"] = np.arctan2(pft_y, pft_x)
-        STC_fac["beta"] = (np.sqrt((pft_x**2 + pft_y**2)) - STC_fac["Phi2"] * STC_fac["nu"]) / k0
+        STC_fac["beta"] = (
+            np.sqrt((pft_x**2 + pft_y**2)) - STC_fac["Phi2"] * STC_fac["nu"]
+        ) / k0
         return STC_fac
