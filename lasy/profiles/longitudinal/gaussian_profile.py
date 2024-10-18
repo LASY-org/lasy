@@ -117,6 +117,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             if self.beta
             else 0
         )
+        print(inv_complex_waist_2 )
         stretch_factor = (
             1
             + 4.0
@@ -126,6 +127,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
             * inv_tau2
         )
+        print(stretch_factor )
         stc_exponent = (
             1.0
             / stretch_factor
@@ -143,8 +145,9 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             )
             ** 2
         )
+        print(stc_exponent )
         envelope = np.exp(
-            -stc_exponent + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
+            -stc_exponent + 1.0j * (self.cep_phase + self.omega0 * (t-self.t_peak))
         )
         print("longitudinal field evaluate sucessfully and the imag part is \n")
         print(envelope.imag)

@@ -1,4 +1,4 @@
-import numpy as np
+catimport numpy as np
 from scipy.constants import c
 
 
