@@ -921,15 +921,15 @@ def get_STC(dim, grid, tau, w0, k0):
     Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
     #Initialise the returned dictionary
-   STC_fac = {
-    'Phi2': 0,
-    'phi2': 0,
-    'nu': 0,
-    'zeta': 0,
-    'stc_theta_zeta': 0,
-    'beta': 0,
-    'pft': 0,
-    'stc_theta_beta': 0
+    STC_fac = {
+        'Phi2': 0,
+        'phi2': 0,
+        'nu': 0,
+        'zeta': 0,
+        'stc_theta_zeta': 0,
+        'beta': 0,
+        'pft': 0,
+        'stc_theta_beta': 0
     }
     env = grid.get_temporal_field()
     env_abs = np.abs(env)
