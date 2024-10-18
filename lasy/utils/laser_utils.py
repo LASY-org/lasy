@@ -916,25 +916,27 @@ def get_STC(dim, grid, tau, w0, k0):
     env_abs = np.abs(env)
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pz = (np.diff(phi_envelop, axis=2)) / (grid.dx[-1])
-    # calculate phi2
+    # Calculate goup-delayed dispersion
     pphi_pz2 = (np.diff(pphi_pz, axis=2)) / (grid.dx[-1])
     temp_chirp = np.sum(pphi_pz2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
         env_abs[:, :, : env_abs.shape[2] - 2]
     )
     phi2 = np.max(np.roots([4 * temp_chirp, -4, tau**4 * temp_chirp]))
-    # calculate zeta
+    # Calculate spatio- and angular dispersion
     if dim == "rt":
         pphi_pzpr = (np.diff(pphi_pz, axis=1)) / grid.dx[0]
         nu = np.sum(
             pphi_pzpr * env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1]
         ) / np.sum(env_abs[:, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1])
+        # No angular dispersion in 2D and the direction of spatio-chirp is certain
         stc_theta_zeta = 0
         beta = 0
-        pft_x = pft_y = 0
+        pft = 0
         stc_theta_beta = 0
     if dim == "xyt":
         pphi_pzpy = (np.diff(pphi_pz, axis=1)) / grid.dx[1]
         pphi_pzpx = (np.diff(pphi_pz, axis=0)) / grid.dx[0]
+        # Calculate the STC angle in XOY for spatio coupling
         theta = np.arctan2(
             pphi_pzpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
             pphi_pzpx[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :],
@@ -963,7 +965,7 @@ def get_STC(dim, grid, tau, w0, k0):
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
             ]
         )
-        # calculate beta
+        # calculate anglur dispersion and pulse front tilt
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
         weight = np.mean(env_abs**2, axis=2)
         derivative_x = np.gradient(z_centroids, axis=0) / grid.dx[0]
@@ -973,6 +975,7 @@ def get_STC(dim, grid, tau, w0, k0):
         pft = np.sqrt((pft_x**2 + pft_y**2))
         stc_theta_beta = np.arctan2(pft_y, pft_x)
         beta = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
+    #Transfer the unit from nu to zeta
     zeta = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
     return (
         [temp_chirp, phi2],
