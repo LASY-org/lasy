@@ -972,10 +972,10 @@ def get_STC(dim, grid, tau, w0, k0):
                 : env_abs.shape[0] - 1, : env_abs.shape[1] - 1, : env_abs.shape[2] - 1
             ]
         )
-        pphi_ptpr = (
+        pphi_ptpr = np.sqrt(
             pphi_ptpy[: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
             + pphi_ptpx[:: env_abs.shape[0] - 1, : env_abs.shape[1] - 1, :] ** 2
-        ) ** 0.5
+        )
         STC_fac["nu"] = np.sum(
             pphi_ptpr
             * env_abs[
