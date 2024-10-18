@@ -28,7 +28,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         The time at which the laser envelope reaches its maximum amplitude,
         i.e. :math:`t_{peak}` in the above formula.
 
-    cep_phase : float (in radian), optional(default '0')
+    cep_phase : float (in radian), optional
         The Carrier Enveloppe Phase (CEP), i.e. :math:`\phi_{cep}`
         in the above formula (i.e. the phase of the laser
         oscillation, at the time where the laser envelope is maximum).
