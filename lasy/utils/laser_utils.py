@@ -917,8 +917,8 @@ def get_STC(dim, grid, tau, w0, k0):
             pft: Pulse front tilt in :math:` p=dt/dx`
             stc_theta_beta: The direction of the linear angular chirp on xoy plane\
             in rad (0 is along x)
-    All those above units and definiations are taken from `S. Akturk et al., Optics\
-    Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
+    All those above units and definiations are taken from 
+    `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
     # Initialise the returned dictionary
     STC_fac = {
