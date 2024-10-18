@@ -43,7 +43,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         Here :math:`\theta_0` is the propagation angle of this component.
 
     phi2 : float (in second^2), optional (default '0')
-        The group-delay dispertion parameterized by:
+        The group-delay dispersion parameterized by:
 
         .. math::
 
@@ -59,7 +59,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         Here :math:`x_0` is the beam center position.
 
     stc_theta :  float (in rad) optional (default '0')
-        Transeverse direction along which spatio-temperal field couples.
+        Transverse direction along which spatio-temporal field couples.
         0 is along x axis.
 
     z_foc : float (in meter), necessary if beta is not 0
