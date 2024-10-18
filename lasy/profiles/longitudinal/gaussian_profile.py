@@ -111,9 +111,8 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             specified points. This array has the same shape as the array t.
         """
         inv_tau2 = self.tau ** (-2)
-        inv_complex_waist_2 = (
-            1.0
-            / (self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2)))
+        inv_complex_waist_2 = 1.0 / (
+            self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2))
         )
         stretch_factor = (
             1
