@@ -28,20 +28,20 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         The time at which the laser envelope reaches its maximum amplitude,
         i.e. :math:`t_{peak}` in the above formula.
 
-    cep_phase : float (in radian), optional(default '0')
+    cep_phase : float (in radian), optional
         The Carrier Enveloppe Phase (CEP), i.e. :math:`\phi_{cep}`
         in the above formula (i.e. the phase of the laser
         oscillation, at the time where the laser envelope is maximum).
 
     beta : float (in second), optional
         The angular dispersion parameterized by
-        .. math::
+    .. math::
             \beta = \frac{d\theta_0}{d\omega}
         Here :math:`\theta_0` is the propagation angle of this component.
 
     phi2 : float (in second^2), optional (default '0')
         The group-delay dispertion parameterized by
-        .. math::
+    .. math::
             \phi^{(2)} = \frac{dt}{d\omega}
 
     zeta : float (in meter * second) optional (defalut '0')
@@ -58,11 +58,11 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         Position of the focal plane. (The laser pulse is initialized at
         ``z=0``.)
 
-     w0 : float (in meter), necessary if beta is not 0
+    w0 : float (in meter), necessary if beta is not 0
         The waist of the laser pulse.
 
-    All those above STC units and definiations are taken from `S. Akturk
-    et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
+    All those above STC units and definiations are taken from
+    `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
 
     def __init__(
