@@ -114,8 +114,6 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         inv_complex_waist_2 = (
             1.0
             / (self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2)))
-            if self.beta
-            else 0
         )
         print(inv_complex_waist_2)
         stretch_factor = (
@@ -124,7 +122,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             * (self.zeta + self.beta * self.z_foc_over_zr * inv_tau2)
             * (self.zeta + self.beta * self.z_foc_over_zr * inv_complex_waist_2)
             + 2.0j
-            * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
+            * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)vim c
             * inv_tau2
         )
         print(stretch_factor)
