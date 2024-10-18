@@ -935,7 +935,7 @@ def get_STC(dim, grid, tau, w0, k0):
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pt = (np.diff(phi_envelop, axis=2)) / (grid.dx[-1])
     # Calculate goup-delayed dispersion
-    pphi_pt2 = (np.diff(pphi_pz, axis=2)) / (grid.dx[-1])
+    pphi_pt2 = (np.diff(pphi_pt, axis=2)) / (grid.dx[-1])
     STC_fac["Phi2"] = np.sum(pphi_pt2 * env_abs[:, :, : env_abs.shape[2] - 2]) / np.sum(
         env_abs[:, :, : env_abs.shape[2] - 2]
     )
