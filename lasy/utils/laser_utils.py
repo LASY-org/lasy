@@ -920,7 +920,7 @@ def get_STC(dim, grid, tau, w0, k0):
     All those above units and definiations are taken from `S. Akturk et al., Optics\
     Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
-    #Initialise the returned dictional
+    #Initialise the returned dictionary
    STC_fac = {
     'Phi2': 0,
     'phi2': 0,
