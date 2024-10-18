@@ -975,7 +975,7 @@ def get_STC(dim, grid, tau, w0, k0):
         pft = np.sqrt((pft_x**2 + pft_y**2))
         stc_theta_beta = np.arctan2(pft_y, pft_x)
         beta = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
-    #Transfer the unit from nu to zeta
+    # Transfer the unit from nu to zeta
     zeta = np.min(np.roots([4 * nu, -4, nu * w0**2 * tau**2]))
     return (
         [temp_chirp, phi2],
