@@ -980,5 +980,5 @@ def get_STC(dim, grid, tau, w0, k0):
     return (
         [temp_chirp, phi2],
         [nu, zeta, stc_theta_zeta],
-        [beta,pft, stc_theta_beta],
+        [beta, pft, stc_theta_beta],
     )
