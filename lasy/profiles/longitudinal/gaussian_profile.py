@@ -69,8 +69,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
     w0 : float (in meter), necessary if beta is not 0
         The waist of the laser pulse.
 
-    All those above STC units and definiations are taken from
-    `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
+    All those above STC units and definiations are taken from <S. Akturk et al., Optics Express 12, 4399 (2004)>
     """
 
     def __init__(
