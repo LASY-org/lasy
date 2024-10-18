@@ -994,5 +994,4 @@ def get_STC(dim, grid, tau, w0, k0):
         STC_fac['pft'] = np.sqrt((pft_x**2 + pft_y**2))
         STC_fac['stc_theta_beta'] = np.arctan2(pft_y, pft_x)
         STC_fac['beta'] = (np.sqrt((pft_x**2 + pft_y**2)) - temp_chirp * nu) / k0
-
         return STC_fac
