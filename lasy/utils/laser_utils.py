@@ -943,3 +943,4 @@ def get_STC(dim, grid, tau, w0, k0):
 
     zeta= np.min(np.roots([4 * nu , -4, nu * w0**2 * tau**2]))
     return [temp_chirp, phi2], [nu, zeta,stc_theta_zeta], [beta, np.sqrt((pft_x**2 + pft_y**2)), stc_theta_beta]
+
