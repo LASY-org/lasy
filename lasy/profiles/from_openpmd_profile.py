@@ -95,8 +95,14 @@ class FromOpenPMDProfile(FromArrayProfile):
             dim = "rt"
             axes_order = ["r", "t"]
 
+        # Set r and t axes to the right dimension for LASY.
+        # Note that F is assumed 2D here, no azimuthal data.
         F, axes = reorder_array(F, m, dim)
 
+        if dim == 'rt' and F.ndim == 2:
+            F = F[np.newaxis, :]
+        elif F.ndim != 3:
+             raise ValueError(f"F has the wrong number of dimensions: {F.ndim} (should be 3)")
         # If array does not contain the envelope but the electric field,
         # extract the envelope with a Hilbert transform
         if not is_envelope:

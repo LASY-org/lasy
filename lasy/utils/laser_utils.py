@@ -683,6 +683,7 @@ def create_grid(array, axes, dim, is_envelope=True):
         assert np.all(grid.axes[0] == axes["x"])
         assert np.all(grid.axes[1] == axes["y"])
         assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
+        assert array.ndim == 3, "Input array should be of dimension 3 [x, y, time]"
         grid.set_temporal_field(array)
     else:  # dim == "rt":
         lo = (axes["r"][0], axes["t"][0])
@@ -691,6 +692,7 @@ def create_grid(array, axes, dim, is_envelope=True):
         grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1, is_envelope=is_envelope)
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
+        assert array.ndim == 3, "Input array should be of dimension 3 [modes, radius, time]"
         grid.set_temporal_field(array)
     return grid
 
