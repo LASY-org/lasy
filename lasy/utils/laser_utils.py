@@ -874,9 +874,11 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         field *= np.exp(1j * (z0 / c + t_axis) * omega0)
         grid.set_temporal_field(field)
 
+
 def get_STC(dim, grid, tau, w0, k0):
     r"""
     Calculate the spatio-temporal coupling factors of the laser.
+
     Parameters
     ----------
     dim : string
