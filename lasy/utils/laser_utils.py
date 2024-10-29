@@ -1011,7 +1011,6 @@ def get_STC(dim, grid, k0):
         # Get the shape of pphi_pt2
         shape = pphi_pt2.shape
         phi2 = np.empty(shape, dtype=object)  # Create an array to store roots
-
         # Loop through each element in pphi_pt2
         for i in range(shape[0]):
             for j in range(shape[1]):
