@@ -1023,6 +1023,7 @@ def get_STC(dim, grid, k0):
                 ))
         phi2nu = np.average(phi2 * derivative_x, weights=weight.T)
 
+
         print(phi2nu)
         print(phi2nu.shape)
 
