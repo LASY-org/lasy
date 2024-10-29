@@ -1021,7 +1021,7 @@ def get_STC(dim, grid, k0):
                 phi2[i, j] =  np.max(np.roots(
                     [4 * Phi2_mean[i, j], -4, tau**4 * Phi2_mean[i, j]]
                 ))
-        phi2nu = np.average(phi2 * derivative_x, weights=weight)
+        phi2nu = np.average(phi2 * derivative_x, weights=weight.T)
 
         print(phi2nu)
         print(phi2nu.shape)
