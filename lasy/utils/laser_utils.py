@@ -1009,16 +1009,18 @@ def get_STC(dim, grid, k0):
         zeta_y = np.average(derivative_y.T, weights=weight_y)
         print(derivative_x.shape)
         # Get the shape of pphi_pt2
-        shape = pphi_pt2.shape
-        phi2 = np.empty(shape, dtype=object)  # Create an array to store roots
+        Phi2_mean= np.mean(pphi_pt2, axis=0).T
+        weight = np.mean(env_abs, axis=0)
+        phi2 = np.empty(Phi2_mean.shape, dtype=object)  # Create an array to store roots
         # Loop through each element in pphi_pt2
-        for i in range(shape[0]):
-            for j in range(shape[1]):
-                for k in range(shape[2]):
+        for i in range(Phi2_mean.shape[0]):
+            for j in range(Phi2_mean.shape[1]):
             # Calculate roots for each element
-                    coeffs = [4 * pphi_pt2[i, j, k], -4, tau**4 * pphi_pt2[i, j, k]]
-                    phi2[i, j, k] = np.roots(coeffs)
-        print(phi2.shape)
+                    coeffs = [4 * pphi_pt2[i, j], -4, tau**4 * pphi_pt2[i, j]]
+                    phi2[i, j] = np.roots(coeffs)
+        phi2nu=np.average(phi2*derivative_x, weights=weight)
+        print(phi2nu)
+        print(phi2nu.shape)
         STC_fac["stc_theta_zeta"] = np.arctan2(zeta_y, zeta_x)
         STC_fac["zeta"] = np.sqrt(zeta_x**2 + zeta_y**2)
         STC_fac["nu"] = (
@@ -1029,7 +1031,6 @@ def get_STC(dim, grid, k0):
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
         derivative_x = np.gradient(z_centroids, axis=0) / grid.dx[0]
         derivative_y = np.gradient(z_centroids, axis=1) / grid.dx[1]
-        print(derivative_x.shape)
         pft_x = np.average(derivative_x, weights=weight)
         pft_y = np.average(derivative_y, weights=weight)
         STC_fac["pft"] = np.sqrt((pft_x**2 + pft_y**2))
