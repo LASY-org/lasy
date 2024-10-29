@@ -1012,7 +1012,7 @@ def get_STC(dim, grid, k0):
         Phi2_mean = np.mean(pphi_pt2, axis=0).T
         print(Phi2_mean.shape)
         weight = np.mean(env_abs, axis=0)
-        phi2 =  np.zeros_like(Phi2_mean) # Create an array to store roots
+        phi2 = np.zeros_like(Phi2_mean)  # Create an array to store roots
         print(phi2.shape)
         # Loop through each element in pphi_pt2
         for i in range(Phi2_mean.shape[0]):
