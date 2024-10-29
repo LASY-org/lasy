@@ -1015,7 +1015,7 @@ def get_STC(dim, grid, k0):
         for i in range(shape[0]):
             for j in range(shape[1]):
                 for k in range(shape[2]):
-            # Calculate roots for each element
+                    # Calculate roots for each element
                     coeffs = [4 * pphi_pt2[i, j, k], -4, tau**4 * pphi_pt2[i, j, k]]
                     phi2[i, j, k] = np.roots(coeffs)
         print(phi2.shape)
