@@ -1009,7 +1009,7 @@ def get_STC(dim, grid, k0):
         zeta_y = np.average(derivative_y.T, weights=weight_y)
         print(derivative_x.shape)
         # Get the shape of pphi_pt2
-        Phi2_mean= np.mean(pphi_pt2, axis=0).T
+        Phi2_mean = np.mean(pphi_pt2, axis=0).T
         weight = np.mean(env_abs, axis=0)
         phi2 = np.zeros(Phi2_mean.shape)  # Create an array to store roots
         # Loop through each element in pphi_pt2
@@ -1019,6 +1019,7 @@ def get_STC(dim, grid, k0):
                     coeffs = [4 * Phi2_mean[i, j], -4, tau**4 * Phi2_mean[i, j]]
                     phi2[i, j] = np.roots(coeffs)
         phi2nu=np.average(phi2*derivative_x, weights=weight)
+
         print(phi2nu)
         print(phi2nu.shape)
 
