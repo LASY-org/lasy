@@ -1011,12 +1011,12 @@ def get_STC(dim, grid, k0):
         # Get the shape of pphi_pt2
         Phi2_mean= np.mean(pphi_pt2, axis=0).T
         weight = np.mean(env_abs, axis=0)
-        phi2 = np.empty(Phi2_mean.shape, dtype=object)  # Create an array to store roots
+        phi2 = np.zeros(Phi2_mean.shape)  # Create an array to store roots
         # Loop through each element in pphi_pt2
         for i in range(Phi2_mean.shape[0]):
             for j in range(Phi2_mean.shape[1]):
             # Calculate roots for each element
-                    coeffs = [4 * pphi_pt2[i, j], -4, tau**4 * pphi_pt2[i, j]]
+                    coeffs = [4 * Phi2_mean[i, j], -4, tau**4 * Phi2_mean[i, j]]
                     phi2[i, j] = np.roots(coeffs)
         phi2nu=np.average(phi2*derivative_x, weights=weight)
         print(phi2nu)
