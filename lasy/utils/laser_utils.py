@@ -1013,7 +1013,6 @@ def get_STC(dim, grid, k0):
         weight = np.mean(env_abs, axis=0)
         phi2 = np.empty(Phi2_mean.shape, dtype=object)  # Create an array to store roots
         # Loop through each element in pphi_pt2
-<<<<<<< HEAD
         for i in range(Phi2_mean.shape[0]):
             for j in range(Phi2_mean.shape[1]):
             # Calculate roots for each element
@@ -1022,15 +1021,7 @@ def get_STC(dim, grid, k0):
         phi2nu=np.average(phi2*derivative_x, weights=weight)
         print(phi2nu)
         print(phi2nu.shape)
-=======
-        for i in range(shape[0]):
-            for j in range(shape[1]):
-                for k in range(shape[2]):
-                    # Calculate roots for each element
-                    coeffs = [4 * pphi_pt2[i, j, k], -4, tau**4 * pphi_pt2[i, j, k]]
-                    phi2[i, j, k] = np.roots(coeffs)
-        print(phi2.shape)
->>>>>>> refs/remotes/huixingjian/add_diag_util
+
         STC_fac["stc_theta_zeta"] = np.arctan2(zeta_y, zeta_x)
         STC_fac["zeta"] = np.sqrt(zeta_x**2 + zeta_y**2)
         STC_fac["nu"] = (
