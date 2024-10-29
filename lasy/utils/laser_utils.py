@@ -981,7 +981,7 @@ def get_STC(dim, grid, k0):
     # Calculate group-delayed dispersion
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
     # Use the normalised laser intensity to calculate the weighted average of Phi2
-    phi2 = np.roots([4 * pphi_pt2, -4, tau**4 *pphi_pt2])
+    phi2 = np.roots([4 * pphi_pt2, -4, tau**4 * pphi_pt2])
     print(phi2.shape)
     STC_fac["Phi2"] = np.average(pphi_pt2, weights=env_abs)
     STC_fac["phi2"] = np.max(
