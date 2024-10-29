@@ -1018,11 +1018,10 @@ def get_STC(dim, grid, k0):
         for i in range(Phi2_mean.shape[0]):
             for j in range(Phi2_mean.shape[1]):
                 # Calculate roots for each element
-                phi2[i, j] =  np.max(np.roots(
-                    [4 * Phi2_mean[i, j], -4, tau**4 * Phi2_mean[i, j]]
-                ))
+                phi2[i, j] = np.max(
+                    np.roots([4 * Phi2_mean[i, j], -4, tau**4 * Phi2_mean[i, j]])
+                )
         phi2nu = np.average(phi2 * derivative_x, weights=weight.T)
-
 
         print(phi2nu)
         print(phi2nu.shape)
