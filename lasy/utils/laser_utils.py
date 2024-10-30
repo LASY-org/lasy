@@ -992,7 +992,7 @@ def get_STC(dim, grid, k0):
         rda = np.sum(grid.axes[0] * env_spec[0, :, :].T, axis=1) / np.sum(
             env_spec, axis=1
         )
-        #zeta is dr/domega
+        # zeta is dr/domega
         derivative_r = np.gradient(rda[0, :], omega, axis=0)
         weight = np.mean(env_spec, axis=1)
         STC_fac["zeta"] = -3 * np.average(derivative_r, weights=weight[0])
@@ -1000,12 +1000,12 @@ def get_STC(dim, grid, k0):
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
         )
     if dim == "xyt":
-        #Calculate dx and dy in spectrum space
+        # Calculate dx and dy in spectrum space
         weight_x_3d = np.transpose(env_spec, (2, 1, 0))
         weight_y_3d = np.transpose(env_spec, (2, 0, 1))
         xda = np.sum(grid.axes[0] * weight_x, axis=2) / np.sum(weight_x_3d, axis=2)
         yda = np.sum(grid.axes[1] * weight_y, axis=2) / np.sum(weight_y_3d, axis=2)
-        #Calculate zeta_x and zeta_y
+        # Calculate zeta_x and zeta_y
         derivative_x_zeta = np.gradient(xda, omega, axis=0)
         derivative_y_zeta = np.gradient(yda, omega, axis=0)
         weight_x_2d = np.mean(env_spec, axis=0)
@@ -1026,8 +1026,6 @@ def get_STC(dim, grid, k0):
         pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
         STC_fac["pft"] = np.sqrt((pft_x**2 + pft_y**2))
         STC_fac["stc_theta_beta"] = np.arctan2(pft_y, pft_x)
-        STC_fac["beta"] = (
-            np.sqrt((pft_x**2 + pft_y**2)) 
-        ) / k0
+        STC_fac["beta"] = (np.sqrt((pft_x**2 + pft_y**2))) / k0
 
     return STC_fac
