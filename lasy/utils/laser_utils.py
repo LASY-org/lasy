@@ -995,11 +995,12 @@ def get_STC(dim, grid, k0):
     # Calculate spatio- and angular dispersion
     if dim == "rt":
         # Calculate derivitive of r in (r,omega) space
-        pphi_ptpr = (np.gradient(pphi_pt, axis=1))/ grid.dx[0]
+        pphi_ptpr = (np.gradient(pphi_pt, axis=1)) / grid.dx[0]
         STC_fac["nu"] = np.average(pphi_ptpr, weights=env_abs)
         # Transfer the unit from nu to zeta
         STC_fac["zeta"] = np.min(
-            np.roots([4 * STC_fac["nu"], -4, STC_fac["nu"] * w0**2 * tau**2]))
+            np.roots([4 * STC_fac["nu"], -4, STC_fac["nu"] * w0**2 * tau**2])
+        )
     if dim == "xyt":
         # Calculate dx and dy in (x,y,omega) space
         weight_x_3d = np.transpose(env_spec, (2, 1, 0))
