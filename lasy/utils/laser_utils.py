@@ -956,8 +956,10 @@ def get_STC(dim, grid, k0):
     All those above units and definitions are taken from
     `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
+    
     tau = 2 * get_duration(grid, dim)
     w0 = get_w0(grid, dim)
+    
     # Initialise the returned dictionary
     STC_fac = {
         "Phi2": 0,
@@ -969,18 +971,20 @@ def get_STC(dim, grid, k0):
         "pft": 0,
         "stc_theta_beta": 0,
     }
+    
+    # Get temporal and spectral field
     env = grid.get_temporal_field()
     env_abs = np.abs(env**2)
     env_spec = np.abs(grid.get_spectral_field())
+    
     # Get the spectral axis
     dt = grid.dx[-1]
     Nt = grid.shape[-1]
     omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
 
+    # Calculate group-delayed dispersion
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
-
-    # Calculate group-delayed dispersion
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
 
     # Use the normalised laser intensity to calculate the weighted average of Phi2
