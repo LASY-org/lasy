@@ -988,7 +988,7 @@ def get_STC(dim, grid, k0):
     )
     # Calculate spatio- and angular dispersion
     if dim == "rt":
-        # Calculate derivitive of r in (x,y,omega) space
+        # Calculate derivitive of r in (r,omega) space
         rda = np.sum(grid.axes[0] * env_spec[0, :, :].T, axis=1) / np.sum(
             env_spec, axis=1
         )
