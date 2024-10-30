@@ -1000,8 +1000,7 @@ def get_STC(dim, grid, k0):
         # Transfer the unit from nu to zeta
         STC_fac["zeta"] = np.min(
             np.roots([4 * STC_fac["nu"], -4, STC_fac["nu"] * w0**2 * tau**2])
-
-    elif dim == "xyt":
+    if dim == "xyt":
         # Calculate dx and dy in (x,y,omega) space
         weight_x_3d = np.transpose(env_spec, (2, 1, 0))
         weight_y_3d = np.transpose(env_spec, (2, 0, 1))
