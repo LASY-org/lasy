@@ -948,7 +948,8 @@ def get_STC(dim, grid, k0):
             zeta: Spatio-chirp in :math:`\zeta=dx_0/d(\omega_0)`
             stc_theta_zeta: The direction of the linear spatial chirp on xoy plane\
             in rad (0 is along x)
-            beta: Angular dispersion in :math:` \beta = d\theta_0/d\omega`
+            beta: Angular dispersion in :math:` \beta = d\theta_0/d\omega`(Important note:
+                  for now beta is only correct when zeta and phi2 are 0!)
             pft: Pulse front tilt in :math:` p=dt/dx`
             stc_theta_beta: The direction of the linear angular chirp on xoy plane\
             in rad (0 is along x)
@@ -987,9 +988,11 @@ def get_STC(dim, grid, k0):
     )
     # Calculate spatio- and angular dispersion
     if dim == "rt":
+        # Calculate derivitive of r in (x,y,omega) space
         rda = np.sum(grid.axes[0] * env_spec[0, :, :].T, axis=1) / np.sum(
             env_spec, axis=1
         )
+        #zeta is dr/domega
         derivative_r = np.gradient(rda[0, :], omega, axis=0)
         weight = np.mean(env_spec, axis=1)
         STC_fac["zeta"] = -3 * np.average(derivative_r, weights=weight[0])
@@ -997,32 +1000,34 @@ def get_STC(dim, grid, k0):
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
         )
     if dim == "xyt":
-        weight_x = np.transpose(env_spec, (2, 1, 0))
-        weight_y = np.transpose(env_spec, (2, 0, 1))
-        xda = np.sum(grid.axes[0] * weight_x, axis=2) / np.sum(weight_x, axis=2)
-        yda = np.sum(grid.axes[1] * weight_y, axis=2) / np.sum(weight_y, axis=2)
-        derivative_x = np.gradient(xda, omega, axis=0)
-        derivative_y = np.gradient(yda, omega, axis=0)
-        weight_x = np.mean(env_spec, axis=0)
-        weight_y = np.mean(env_spec, axis=1)
-        zeta_x = np.average(derivative_x.T, weights=weight_x)
-        zeta_y = np.average(derivative_y.T, weights=weight_y)
+        #Calculate dx and dy in spectrum space
+        weight_x_3d = np.transpose(env_spec, (2, 1, 0))
+        weight_y_3d = np.transpose(env_spec, (2, 0, 1))
+        xda = np.sum(grid.axes[0] * weight_x, axis=2) / np.sum(weight_x_3d, axis=2)
+        yda = np.sum(grid.axes[1] * weight_y, axis=2) / np.sum(weight_y_3d, axis=2)
+        #Calculate zeta_x and zeta_y
+        derivative_x_zeta = np.gradient(xda, omega, axis=0)
+        derivative_y_zeta = np.gradient(yda, omega, axis=0)
+        weight_x_2d = np.mean(env_spec, axis=0)
+        weight_y_2d = np.mean(env_spec, axis=1)
+        zeta_x = np.average(derivative_x_zeta.T, weights=weight_x_2d)
+        zeta_y = np.average(derivative_y_zeta.T, weights=weight_y_2d)
         STC_fac["stc_theta_zeta"] = np.arctan2(zeta_y, zeta_x)
         STC_fac["zeta"] = np.sqrt(zeta_x**2 + zeta_y**2)
         STC_fac["nu"] = (
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
         )
         # Use the normalised laser intensity to calculate the weighted average of PFT
-        weight = np.mean(env_abs, axis=2)
+        weight_xy_2d = np.mean(env_abs, axis=2)
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
-        derivative_x = np.gradient(z_centroids, axis=0) / grid.dx[0]
-        derivative_y = np.gradient(z_centroids, axis=1) / grid.dx[1]
-        pft_x = np.average(derivative_x, weights=weight)
-        pft_y = np.average(derivative_y, weights=weight)
+        derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
+        derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
+        pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
+        pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
         STC_fac["pft"] = np.sqrt((pft_x**2 + pft_y**2))
         STC_fac["stc_theta_beta"] = np.arctan2(pft_y, pft_x)
         STC_fac["beta"] = (
-            np.sqrt((pft_x**2 + pft_y**2)) - STC_fac["Phi2"] * STC_fac["nu"]
+            np.sqrt((pft_x**2 + pft_y**2)) 
         ) / k0
 
     return STC_fac
