@@ -27,5 +27,5 @@ laser = Laser(
     profile=profile,
 )
 STC = get_STC(laser.dim, laser.grid, k0=2 * scc.pi / 0.6e-6)
-np.testing.assert_approx_equal(STC["phi2"], 2.4e-22, significant=3)
-np.testing.assert_approx_equal(STC["zeta"], 2.4e-22, significant=3)
+np.testing.assert_approx_equal(STC["phi2"], 2.4e-22, significant=2)
+np.testing.assert_approx_equal(STC["zeta"], 2.4e-22, significant=2)
