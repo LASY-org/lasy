@@ -18,14 +18,25 @@ profile = GaussianProfile(
     phi2=2.4e-22,
     stc_theta=scc.pi / 2,
 )
-# Create laser with given profile in `rt` geometry.
-laser = Laser(
+# Create laser with given profile in `xyt` geometry.
+laser_3d = Laser(
     dim="xyt",
     lo=(-10e-6, -10e-6, -10e-14),
     hi=(10e-6, 10e-6, +10e-14),
     npoints=(50, 60, 70),
     profile=profile,
 )
-STC = get_STC(laser.dim, laser.grid, k0=2 * scc.pi / 0.6e-6)
-np.testing.assert_approx_equal(STC["phi2"], 2.4e-22, significant=2)
-np.testing.assert_approx_equal(STC["zeta"], 2.4e-22, significant=2)
+# Create laser with given profile in `rt` geometry.
+laser_2d = Laser(
+    dim="rt",
+    lo=(-10e-6, -10e-14),
+    hi=(10e-6, +10e-14),
+    npoints=(60, 70),
+    profile=profile,
+)
+STC_3d = get_STC(laser_3d.dim, laser_3d.grid, k0=2 * scc.pi / 0.6e-6)
+STC_2d = get_STC(laser_2d.dim, laser_2d.grid, k0=2 * scc.pi / 0.6e-6)
+np.testing.assert_approx_equal(STC_2d["phi2"], 2.4e-22, significant=2)
+np.testing.assert_approx_equal(STC_2d["zeta"], 2.4e-22, significant=2)
+np.testing.assert_approx_equal(STC_3d["phi2"], 2.4e-22, significant=2)
+np.testing.assert_approx_equal(STC_3d["zeta"], 2.4e-22, significant=2)
