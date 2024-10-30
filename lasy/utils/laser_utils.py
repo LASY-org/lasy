@@ -995,16 +995,9 @@ def get_STC(dim, grid, k0):
     # Calculate spatio- and angular dispersion
     if dim == "rt":
         # Calculate derivitive of r in (r,omega) space
-        rda = np.sum(grid.axes[0] * env_spec[0, :, :].T, axis=1) / np.sum(
-            env_spec, axis=1
-        )
-        # zeta is dr/domega
-        derivative_r = np.gradient(rda[0, :], omega, axis=0)
-        weight = np.mean(env_spec, axis=1)
-        STC_fac["zeta"] = -3 * np.average(derivative_r, weights=weight[0])
-        STC_fac["nu"] = (
-            4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
-        )
+        pphi_pzpr = (np.gradient(pphi_pt, axis=1))/ grid.dx[0]
+        STC_fac["nu"] = np.average(pphi_pzpr * env_abs, weights=env_abs)
+        STC_fac["zeta"] = np.min(np.roots([4 * STC_fac["nu"] , -4, STC_fac["nu"] * w0**2 * tau**2]))
 
     elif dim == "xyt":
         # Calculate dx and dy in (x,y,omega) space
