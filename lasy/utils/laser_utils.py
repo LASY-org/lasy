@@ -1003,8 +1003,8 @@ def get_STC(dim, grid, k0):
         # Calculate dx and dy in spectrum space
         weight_x_3d = np.transpose(env_spec, (2, 1, 0))
         weight_y_3d = np.transpose(env_spec, (2, 0, 1))
-        xda = np.sum(grid.axes[0] * weight_x, axis=2) / np.sum(weight_x_3d, axis=2)
-        yda = np.sum(grid.axes[1] * weight_y, axis=2) / np.sum(weight_y_3d, axis=2)
+        xda = np.sum(grid.axes[0] * weight_x_3d, axis=2) / np.sum(weight_x_3d, axis=2)
+        yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2)
         # Calculate zeta_x and zeta_y
         derivative_x_zeta = np.gradient(xda, omega, axis=0)
         derivative_y_zeta = np.gradient(yda, omega, axis=0)
