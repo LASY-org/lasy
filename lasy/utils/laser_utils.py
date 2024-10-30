@@ -979,16 +979,16 @@ def get_STC(dim, grid, k0):
 
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
-    
+
     # Calculate group-delayed dispersion
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
-    
+
     # Use the normalised laser intensity to calculate the weighted average of Phi2
     STC_fac["Phi2"] = np.average(pphi_pt2, weights=env_abs)
     STC_fac["phi2"] = np.max(
         np.roots([4 * STC_fac["Phi2"], -4, tau**4 * STC_fac["Phi2"]])
     )
-    
+
     # Calculate spatio- and angular dispersion
     if dim == "rt":
         # Calculate derivitive of r in (r,omega) space
@@ -1002,14 +1002,14 @@ def get_STC(dim, grid, k0):
         STC_fac["nu"] = (
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
         )
-        
+
     elif dim == "xyt":
         # Calculate dx and dy in (x,y,omega) space
         weight_x_3d = np.transpose(env_spec, (2, 1, 0))
         weight_y_3d = np.transpose(env_spec, (2, 0, 1))
         xda = np.sum(grid.axes[0] * weight_x_3d, axis=2) / np.sum(weight_x_3d, axis=2)
         yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2)
-        
+
         # Calculate zeta_x and zeta_y
         derivative_x_zeta = np.gradient(xda, omega, axis=0)
         derivative_y_zeta = np.gradient(yda, omega, axis=0)
@@ -1022,7 +1022,7 @@ def get_STC(dim, grid, k0):
         STC_fac["nu"] = (
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
         )
-        
+
         # Use the normalised laser intensity to calculate the weighted average of PFT
         weight_xy_2d = np.mean(env_abs, axis=2)
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
