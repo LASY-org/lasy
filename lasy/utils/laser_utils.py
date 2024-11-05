@@ -994,13 +994,8 @@ def get_STC(dim, grid, k0):
 
     # Calculate spatio- and angular dispersion
     if dim == "rt":
-        # Calculate derivitive of r in (r,omega) space
-        pphi_ptpr = (np.gradient(pphi_pt, axis=1)) / grid.dx[0]
-        STC_fac["nu"] = np.average(pphi_ptpr, weights=env_abs)
-        # Transfer the unit from nu to zeta
-        STC_fac["zeta"] = np.min(
-            np.roots([4 * STC_fac["nu"], -4, STC_fac["nu"] * w0**2 * tau**2])
-        )
+        # No spatial chirp and angular chirp in 'rt' coordinate
+        return STC_fac
     if dim == "xyt":
         # Calculate dx and dy in (x,y,omega) space
         weight_x_3d = np.transpose(env_spec, (2, 1, 0))
@@ -1032,4 +1027,4 @@ def get_STC(dim, grid, k0):
         STC_fac["stc_theta_beta"] = np.arctan2(pft_y, pft_x)
         STC_fac["beta"] = (np.sqrt((pft_x**2 + pft_y**2))) / k0
 
-    return STC_fac
+        return STC_fac
