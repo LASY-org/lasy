@@ -6,9 +6,6 @@ from lasy.profiles.transverse.hermite_gaussian_profile import (
     HermiteGaussianTransverseProfile,
 )
 from lasy.profiles.transverse.transverse_profile import TransverseProfile
-from lasy.profiles.transverse.transverse_profile_from_data import (
-    TransverseProfileFromData,
-)
 from lasy.utils.exp_data_utils import find_d4sigma
 
 
@@ -16,11 +13,7 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     """
     Decomposes a laser profile into a set of hermite-gaussian modes.
 
-    The function takes either an instance of `TransverseProfile` or an
-    instance of `Laser` (that is, either a transverse profile or the
-    full 3D laser profile defined on a grid). In the case that an
-    instance of `Laser` is passed then the intensity of this profile
-    is projected onto an x-y plane for the decomposition.
+    The function only takes an instance of `TransverseProfile`. 
 
     Parameters
     ----------
@@ -45,8 +38,7 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     waist : Beam waist for which the decomposition is calculated.
         It is computed as the waist for which the weight of order 0 is maximum.
     """
-    # Check if the provided laserProfile is a full laser profile or a
-    # transverse profile.
+    # Check if the provided laserProfile is a transverse profile.
 
     assert isinstance(
         laserProfile, TransverseProfile
@@ -55,17 +47,11 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     # Get the field, sensible spatial bounds for the profile
     lo = [None, None]
     hi = [None, None]
-    if isinstance(laserProfile, TransverseProfileFromData):
-        lo[0] = laserProfile.field_interp.grid[0].min() + laserProfile.x_offset
-        lo[1] = laserProfile.field_interp.grid[1].min() + laserProfile.x_offset
-        hi[0] = laserProfile.field_interp.grid[0].max() + laserProfile.y_offset
-        hi[1] = laserProfile.field_interp.grid[1].max() + laserProfile.y_offset
-
-    else:
-        lo[0] = -laserProfile.w0 * 5 + laserProfile.x_offset
-        lo[1] = -laserProfile.w0 * 5 + laserProfile.x_offset
-        hi[0] = laserProfile.w0 * 5 + laserProfile.x_offset
-        hi[1] = laserProfile.w0 * 5 + laserProfile.x_offset
+    
+    lo[0] = laserProfile.field_interp.grid[0].min() + laserProfile.x_offset
+    lo[1] = laserProfile.field_interp.grid[1].min() + laserProfile.x_offset
+    hi[0] = laserProfile.field_interp.grid[0].max() + laserProfile.y_offset
+    hi[1] = laserProfile.field_interp.grid[1].max() + laserProfile.y_offset
 
     Nx = int((hi[0] - lo[0]) // (2 * res) * 2) + 2
     Ny = int((hi[1] - lo[1]) // (2 * res) * 2) + 2
@@ -151,5 +137,5 @@ def estimate_best_HG_waist(x, y, field):
         coeffTest[i] = np.real(np.sum(profile * field))
     w0 = waistTest[np.argmax(coeffTest)]
 
-    print("Estimated w0 = %.2f microns" % (w0Est * 1e6))
+    print("Estimated w0 = %.2f microns (1/e^2 width)" % (w0Est * 1e6))
     return w0
