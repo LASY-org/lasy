@@ -38,8 +38,8 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     waist : Beam waist for which the decomposition is calculated.
         It is computed as the waist for which the weight of order 0 is maximum.
     """
+    
     # Check if the provided laserProfile is a transverse profile.
-
     assert isinstance(
         laserProfile, TransverseProfile
     ), "laserProfile must be an instance of TransverseProfile"
