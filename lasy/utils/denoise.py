@@ -17,7 +17,7 @@ def denoise_laser(parameters, n_modes_x=2, n_modes_y=2):
         wavelength = parameters["wavelength"]
 
     if parameters.get("laser_energy") is None:
-        laser_energy = 1  #In joules
+        laser_energy = 1  # In joules
     else:
         laser_energy = parameters["laser_energy"]
 
