@@ -6,3 +6,4 @@ Tutorials
 
    gaussian_laser.ipynb
    axiparabola.ipynb
+   denoised_laser.ipynb
