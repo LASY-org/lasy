@@ -8,8 +8,9 @@ def denoise_transverse_hg(
     transverse_profile, resolution=0.2e-6, n_modes_x=2, n_modes_y=2
 ):
     """
-    Denoise the transverse profile by decomposing it into a set of Hermite-Gaussian
-    modes and then summing the profile after scaling them by appropriate weights.
+    Denoise the transverse profile by decomposing it into a set of Hermite-Gaussian modes. 
+    
+    The profiles are weighted according to mode coefficients and then added.
 
     Parameters
     ----------
