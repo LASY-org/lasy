@@ -13,7 +13,7 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     """
     Decomposes a laser profile into a set of hermite-gaussian modes.
 
-    The function only takes an instance of `TransverseProfile`. 
+    The function only takes an instance of `TransverseProfile`.
 
     Parameters
     ----------
@@ -47,7 +47,7 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     # Get the field, sensible spatial bounds for the profile
     lo = [None, None]
     hi = [None, None]
-    
+
     lo[0] = laserProfile.field_interp.grid[0].min() + laserProfile.x_offset
     lo[1] = laserProfile.field_interp.grid[1].min() + laserProfile.x_offset
     hi[0] = laserProfile.field_interp.grid[0].max() + laserProfile.y_offset
