@@ -12,6 +12,7 @@ from lasy.utils.exp_data_utils import find_d4sigma
 def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     """
     Decomposes a laser profile into a set of hermite-gaussian modes.
+    
     The function takes an instance of `TransverseProfile`.
 
     Parameters
@@ -38,7 +39,6 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
         It is computed as the waist for which the weight of order 0 is maximum.
     """
     # Check if the provided laserProfile is a transverse profile.
-
     assert isinstance(
         laserProfile, TransverseProfile
     ), "laserProfile must be an instance of TransverseProfile"
