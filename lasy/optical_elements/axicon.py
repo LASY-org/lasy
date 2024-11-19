@@ -16,7 +16,7 @@ class Axicon(OpticalElement):
 
     .. math::
 
-        T(\boldsymbol{x}_\perp,\omega) = \exp(-i\omega \sqrt{x^2+y^2} \tan(\gamma/2))
+        T(\boldsymbol{x}_\perp,\omega) = \exp(-i (\omega/c) \sqrt{x^2+y^2} \tan(\gamma/2))
 
     where :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
     to the propagation direction). The other parameters in this formula
