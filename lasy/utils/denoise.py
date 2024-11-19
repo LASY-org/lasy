@@ -41,12 +41,7 @@ def denoise_transverse_hg(
     laser_energy_new = 0
 
     # Calculate the decomposition and waist of the laser pulse
-    modeCoeffs, waist = (
-        hermite_gauss_decomposition(
-            transverse_profile, n_modes_x, n_modes_y, resolution
-        ),
-        "Make sure that this is profile created through lasy and not the raw intensity data",
-    )
+    modeCoeffs, waist = hermite_gauss_decomposition(transverse_profile, n_modes_x, n_modes_y, resolution)
 
     # Denosing the laser profile
     for i, mode_key in enumerate(list(modeCoeffs)):
