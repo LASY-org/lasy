@@ -8,17 +8,23 @@ value.
 
 import numpy as np
 
+from lasy.profiles.transverse.super_gaussian_profile import (
+    SuperGaussianTransverseProfile,
+)
 from lasy.utils.denoise import denoise_transverse_hg
-from lasy.profiles.transverse.super_gaussian_profile import SuperGaussianTransverseProfile
-
 
 waist = 20e-6
 shape_parameter = 3
 
+
 def test_denoise_transverse_hg():
     # Define the transverse profile
-    transverse_profile = SuperGaussianTransverseProfile(waist, shape_parameter) # Super-Gaussian profile
-    transverse_profile_cleaned,waist,l = denoise_transverse_hg(transverse_profile) # Denoised profile
+    transverse_profile = SuperGaussianTransverseProfile(
+        waist, shape_parameter
+    )  # Super-Gaussian profile
+    transverse_profile_cleaned, waist, l = denoise_transverse_hg(
+        transverse_profile
+    )  # Denoised profile
 
     # Calculate the error
     x = np.linspace(-5 * waist, 5 * waist, 500)
