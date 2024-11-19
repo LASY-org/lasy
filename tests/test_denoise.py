@@ -12,12 +12,14 @@ from lasy.profiles.transverse.super_gaussian_profile import (
     SuperGaussianTransverseProfile,
 )
 from lasy.utils.denoise import denoise_transverse_hg
-
-waist = 20e-6
-shape_parameter = 3
-
+from lasy.profiles.transverse.super_gaussian_profile import SuperGaussianTransverseProfile
 
 def test_denoise_transverse_hg():
+
+    # Parameters
+    waist = 20e-6
+    shape_parameter = 3
+
     # Define the transverse profile
     transverse_profile = SuperGaussianTransverseProfile(
         waist, shape_parameter
