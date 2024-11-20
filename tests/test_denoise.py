@@ -23,7 +23,7 @@ def test_denoise_transverse_hg():
     transverse_profile = SuperGaussianTransverseProfile(
         waist, shape_parameter
     )  # Super-Gaussian profile
-    transverse_profile_cleaned, waist, l = denoise_transverse_hg(
+    transverse_profile_cleaned, waist, laser_energy_new = denoise_transverse_hg(
         transverse_profile
     )  # Denoised profile
 
