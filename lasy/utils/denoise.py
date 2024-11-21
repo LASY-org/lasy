@@ -5,7 +5,7 @@ from lasy.utils.mode_decomposition import hermite_gauss_decomposition
 
 
 def denoise_transverse_hg(
-    transverse_profile, resolution=0.2e-6, n_modes_x=2, n_modes_y=2
+    transverse_profile, resolution=0.2e-6, n_modes_x=2, n_modes_y=2 , lo = [-2e-4,2e-4], hi = [2e-4,2e-4]
 ):
     """
     Denoise the transverse profile by decomposing it into a set of Hermite-Gaussian modes.
@@ -42,7 +42,7 @@ def denoise_transverse_hg(
 
     # Calculate the decomposition and waist of the laser pulse
     modeCoeffs, waist = hermite_gauss_decomposition(
-        transverse_profile, n_modes_x, n_modes_y, resolution
+        transverse_profile, n_modes_x, n_modes_y, resolution ,lo, hi
     )
 
     # Denosing the laser profile
