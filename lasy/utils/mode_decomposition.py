@@ -9,7 +9,7 @@ from lasy.profiles.transverse.transverse_profile import TransverseProfile
 from lasy.utils.exp_data_utils import find_d4sigma
 
 
-def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
+def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6, lo=[-2e-4,-2e-4], hi=[2e-4,2e-4]):
     """
     Decomposes a laser profile into a set of hermite-gaussian modes.
 
@@ -27,6 +27,10 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
     res : float
         The resolution of grid points in x and y that will be used
         during the decomposition calculation
+    
+    lo, hi : array of floats
+        The lower and upper bounds of the spatial grid on which the
+        decomposition will be performed.
 
     Returns
     -------
@@ -43,14 +47,11 @@ def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
         laserProfile, TransverseProfile
     ), "laserProfile must be an instance of TransverseProfile"
 
-    # Get the field, sensible spatial bounds for the profile
-    lo = [None, None]
-    hi = [None, None]
-
-    lo[0] = laserProfile.field_interp.grid[0].min() + laserProfile.x_offset
-    lo[1] = laserProfile.field_interp.grid[1].min() + laserProfile.x_offset
-    hi[0] = laserProfile.field_interp.grid[0].max() + laserProfile.y_offset
-    hi[1] = laserProfile.field_interp.grid[1].max() + laserProfile.y_offset
+    # Get the field, sensible spatial bounds for the profile  
+    lo[0] = lo[0] + laserProfile.x_offset
+    lo[1] = lo[1] + laserProfile.x_offset
+    hi[0] = hi[0] + laserProfile.y_offset
+    hi[1] = hi[1] + laserProfile.y_offset
 
     Nx = int((hi[0] - lo[0]) // (2 * res) * 2) + 2
     Ny = int((hi[1] - lo[1]) // (2 * res) * 2) + 2
