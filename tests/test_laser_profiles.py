@@ -113,22 +113,28 @@ def test_transverse_profiles_rt():
 
 
 def test_transverse_profiles_3d():
-    npoints = 200
-    w0 = 10.0e-6
+    w0_x = 10.0e-6
+    w0_y = 12.0e-6
 
     # HermiteGaussianTransverseProfile
     print("HermiteGaussianTransverseProfile")
-    n_x = 2
-    n_y = 2
-    std_th = np.sqrt(5.0 / 4) * w0
-    profile = HermiteGaussianTransverseProfile(w0, n_x, n_y)
-    x = np.linspace(-4 * w0, 4 * w0, npoints)
-    y = np.zeros_like(x)
-    field = profile.evaluate(x, y)
-    std = np.sqrt(np.average(x**2, weights=np.abs(field) ** 2))
-    print("std_th = ", std_th)
-    print("std = ", std)
-    assert np.abs(std - std_th) / std_th < 0.01
+    m = 2
+    n = 2
+    std_th_x = np.sqrt(5.0 / 4) * w0_x
+    std_th_y = np.sqrt(5.0 / 4) * w0_y
+    profile = HermiteGaussianTransverseProfile(w0_x, w0_y, m, n, wavelength=800e-9)
+    x = np.linspace(-4 * w0_x, 4 * w0_x, 200)
+    y = np.linspace(-4 * w0_y, 4 * w0_y, 150)
+    field_x = profile.evaluate(x, np.zeros_like(x))
+    field_y = profile.evaluate(np.zeros_like(y), y)
+    std_x = np.sqrt(np.average(x**2, weights=np.abs(field_x) ** 2))
+    std_y = np.sqrt(np.average(y**2, weights=np.abs(field_y) ** 2))
+    print("std_th_x = ", std_th_x)
+    print("std_x = ", std_x)
+    print("std_th_y = ", std_th_y)
+    print("std_y = ", std_y)
+    assert np.abs(std_x - std_th_x) / std_th_x < 0.01
+    assert np.abs(std_y - std_th_y) / std_th_y < 0.01
 
     # TransverseProfileFromData
     print("TransverseProfileFromData")
