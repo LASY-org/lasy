@@ -9,9 +9,8 @@ from lasy.profiles.transverse.transverse_profile import TransverseProfile
 from lasy.utils.exp_data_utils import find_d4sigma
 
 
-def hermite_gauss_decomposition(
-    laserProfile, n_x_max=12, n_y_max=12, res=1e-6, lo=[-2e-4, -2e-4], hi=[2e-4, 2e-4]
-):
+def hermite_gauss_decomposition(laserProfile, wavelength, m_max=12, n_max=12, res=1e-6, 
+                                lo=[-2e-4, -2e-4], hi=[2e-4, 2e-4]):
     """
     Decomposes a laser profile into a set of hermite-gaussian modes.
 
@@ -32,7 +31,7 @@ def hermite_gauss_decomposition(
     res : float
         The resolution of grid points in x and y that will be used
         during the decomposition calculation
-
+    
     lo, hi : array of floats
         The lower and upper bounds of the spatial grid on which the
         decomposition will be performed.
@@ -53,23 +52,23 @@ def hermite_gauss_decomposition(
     ), "laserProfile must be an instance of TransverseProfile"
 
     # Get the field, sensible spatial bounds for the profile
-    lo[0] = lo[0] + laserProfile.x_offset
-    lo[1] = lo[1] + laserProfile.x_offset
-    hi[0] = hi[0] + laserProfile.y_offset
-    hi[1] = hi[1] + laserProfile.y_offset
+    lo0 = lo[0] + laserProfile.x_offset
+    lo1 = lo[1] + laserProfile.x_offset
+    hi0 = hi[0] + laserProfile.y_offset
+    hi1 = hi[1] + laserProfile.y_offset
 
-    Nx = int((hi[0] - lo[0]) // (2 * res) * 2) + 2
-    Ny = int((hi[1] - lo[1]) // (2 * res) * 2) + 2
+    Nx = int((hi0 - lo0) // (2 * res) * 2) + 2
+    Ny = int((hi1 - lo1) // (2 * res) * 2) + 2
 
     # Define spatial arrays
     x = np.linspace(
-        (lo[0] + hi[0]) / 2 - (Nx - 1) / 2 * res,
-        (lo[0] + hi[0]) / 2 + (Nx - 1) / 2 * res,
+        (lo0 + hi0) / 2 - (Nx - 1) / 2 * res,
+        (lo0 + hi0) / 2 + (Nx - 1) / 2 * res,
         Nx,
     )
     y = np.linspace(
-        (lo[1] + hi[1]) / 2 - (Ny - 1) / 2 * res,
-        (lo[1] + hi[1]) / 2 + (Ny - 1) / 2 * res,
+        (lo1 + hi1) / 2 - (Ny - 1) / 2 * res,
+        (lo1 + hi1) / 2 + (Ny - 1) / 2 * res,
         Ny,
     )
     X, Y = np.meshgrid(x, y)
