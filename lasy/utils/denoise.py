@@ -4,9 +4,7 @@ import skimage
 from lasy.profiles.transverse.hermite_gaussian_profile import (
     HermiteGaussianTransverseProfile,
 )
-from lasy.profiles.transverse.transverse_profile_from_data import (
-    TransverseProfileFromData,
-)
+from lasy.profiles.transverse.transverse_profile import TransverseProfile
 from lasy.utils.mode_decomposition import hermite_gauss_decomposition
 
 
@@ -59,7 +57,7 @@ def denoise_transverse_hg(
         The total energy of the laser pulse after decomposition.
     """
     laser_energy_new = 0
-    if isinstance(transverse_profile, TransverseProfileFromData):
+    if isinstance(transverse_profile, TransverseProfile):
         pass
     else:
         intensity_data = skimage.io.imread(transverse_profile)
