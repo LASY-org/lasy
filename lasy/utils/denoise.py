@@ -1,14 +1,24 @@
 import numpy as np
 import skimage
+
 from lasy.profiles.transverse.hermite_gaussian_profile import (
     HermiteGaussianTransverseProfile,
 )
+from lasy.profiles.transverse.transverse_profile_from_data import (
+    TransverseProfileFromData,
+)
 from lasy.utils.mode_decomposition import hermite_gauss_decomposition
-from lasy.profiles.transverse.transverse_profile_from_data import TransverseProfileFromData
 
 
-def denoise_transverse_hg(transverse_profile, wavelength, resolution=0.2e-6, n_modes_x=2,
-                          n_modes_y=2, lo=[-2e-4, -2e-4], hi=[2e-4, 2e-4]):
+def denoise_transverse_hg(
+    transverse_profile,
+    wavelength,
+    resolution=0.2e-6,
+    n_modes_x=2,
+    n_modes_y=2,
+    lo=[-2e-4, -2e-4],
+    hi=[2e-4, 2e-4],
+):
     """
     Denoise the transverse profile by decomposing it into a set of Hermite-Gaussian modes.
 
@@ -23,7 +33,7 @@ def denoise_transverse_hg(transverse_profile, wavelength, resolution=0.2e-6, n_m
 
     wavelength : float (in meter)
         Central wavelength at which the Hermite-Gauss beams are to be defined.
-    
+
     resolution : float
         The resolution of grid points in x and y that will be used
         during the decomposition calculation.
@@ -31,7 +41,7 @@ def denoise_transverse_hg(transverse_profile, wavelength, resolution=0.2e-6, n_m
     n_modes_x, n_modes_y : ints
         The maximum values of `n_x` and `n_y` up to which the
         expansion will be performed.
-    
+
     lo, hi : array of floats
         The lower and upper bounds of the spatial grid on which the
         decomposition will be performed.
@@ -51,7 +61,7 @@ def denoise_transverse_hg(transverse_profile, wavelength, resolution=0.2e-6, n_m
     laser_energy_new = 0
     if isinstance(transverse_profile, TransverseProfileFromData):
         pass
-    else :
+    else:
         intensity_data = skimage.io.imread(transverse_profile)
         intensity_scale = np.max(intensity_data)  # Maximum value of the intensity
         intensity_data[intensity_data < intensity_scale / 100] = 0
@@ -61,8 +71,8 @@ def denoise_transverse_hg(transverse_profile, wavelength, resolution=0.2e-6, n_m
 
         # Create the transverse profile. This also centers the data by default
         transverse_profile = TransverseProfileFromData(
-        intensity_data, [lb[0], lb[1]], [ub[0], ub[1]])
-
+            intensity_data, [lb[0], lb[1]], [ub[0], ub[1]]
+        )
 
     # Calculate the decomposition and waist of the laser pulse
     modeCoeffs, waist = hermite_gauss_decomposition(
