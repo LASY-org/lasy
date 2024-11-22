@@ -9,8 +9,15 @@ from lasy.profiles.transverse.transverse_profile import TransverseProfile
 from lasy.utils.exp_data_utils import find_d4sigma
 
 
-def hermite_gauss_decomposition(laserProfile, wavelength, m_max=12, n_max=12, res=1e-6, 
-                                lo=[-2e-4, -2e-4], hi=[2e-4, 2e-4]):
+def hermite_gauss_decomposition(
+    laserProfile,
+    wavelength,
+    m_max=12,
+    n_max=12,
+    res=1e-6,
+    lo=[-2e-4, -2e-4],
+    hi=[2e-4, 2e-4],
+):
     """
     Decomposes a laser profile into a set of hermite-gaussian modes.
 
@@ -31,7 +38,7 @@ def hermite_gauss_decomposition(laserProfile, wavelength, m_max=12, n_max=12, re
     res : float
         The resolution of grid points in x and y that will be used
         during the decomposition calculation
-    
+
     lo, hi : array of floats
         The lower and upper bounds of the spatial grid on which the
         decomposition will be performed.
