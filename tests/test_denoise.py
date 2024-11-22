@@ -18,13 +18,14 @@ def test_denoise_transverse_hg():
     # Parameters
     waist = 20e-6
     shape_parameter = 3
+    wavelength = 8e-7
 
     # Define the transverse profile
     transverse_profile = SuperGaussianTransverseProfile(
         waist, shape_parameter
     )  # Super-Gaussian profile
     transverse_profile_cleaned, waist, laser_energy_new = denoise_transverse_hg(
-        transverse_profile
+        transverse_profile, wavelength
     )  # Denoised profile
 
     # Calculate the error
