@@ -60,7 +60,7 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         The order of hermite polynomial in the x direction
     n : int (dimensionless)
         The order of hermite polynomial in the y direction
-    wavelength : float (in meter), optional
+    wavelength : float (in meter)
         The main laser wavelength :math:`\lambda_0` of the laser.
     z_foc : float (in meter), optional
         Position of the focal plane. (The laser pulse is initialized at
