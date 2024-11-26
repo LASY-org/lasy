@@ -12,8 +12,8 @@ from lasy.utils.exp_data_utils import find_d4sigma
 def hermite_gauss_decomposition(
     laserProfile,
     wavelength,
-    m_max=12,
-    n_max=12,
+    m_max,
+    n_max,
     res,
     lo,
     hi,
