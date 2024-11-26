@@ -30,7 +30,7 @@ def hermite_gauss_decomposition(
 
     wavelength : float (in meter)
         Central wavelength at which the Hermite-Gauss beams are to be defined.
-    
+
     m_max, n_max : ints
         The maximum values of `m` and `n` up to which the expansion
         will be performed
