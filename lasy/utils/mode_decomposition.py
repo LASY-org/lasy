@@ -12,11 +12,11 @@ from lasy.utils.exp_data_utils import find_d4sigma
 def hermite_gauss_decomposition(
     laserProfile,
     wavelength,
+    m_max=12,
+    n_max=12,
     res,
     lo,
     hi,
-    m_max=12,
-    n_max=12,
 ):
     """
     Decomposes a laser profile into a set of hermite-gaussian modes.
@@ -30,6 +30,10 @@ def hermite_gauss_decomposition(
 
     wavelength : float (in meter)
         Central wavelength at which the Hermite-Gauss beams are to be defined.
+    
+    m_max, n_max : ints
+        The maximum values of `m` and `n` up to which the expansion
+        will be performed
 
     res : float
         The resolution of grid points in x and y that will be used
@@ -38,10 +42,6 @@ def hermite_gauss_decomposition(
     lo, hi : array of floats
         The lower and upper bounds of the spatial grid on which the
         decomposition will be performed.
-
-    m_max, n_max : ints
-        The maximum values of `m` and `n` up to which the expansion
-        will be performed
 
     Returns
     -------
