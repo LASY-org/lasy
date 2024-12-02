@@ -36,7 +36,7 @@ def denoise_transverse_hg(
     lo, hi : array of floats
         The lower and upper bounds of the spatial grid on which the
         decomposition will be performed.
-    
+
     n_modes_x, n_modes_y : ints
         The maximum values of `n_x` and `n_y` up to which the
         expansion will be performed.
