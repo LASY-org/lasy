@@ -9,10 +9,10 @@ def denoise_transverse_hg(
     transverse_profile,
     wavelength,
     resolution=0.2e-6,
-    n_modes_x=2,
-    n_modes_y=2,
     lo=[-2e-4, -2e-4],
     hi=[2e-4, 2e-4],
+    n_modes_x=2,
+    n_modes_y=2,
 ):
     """
     Denoise the transverse profile by decomposing it into a set of Hermite-Gaussian modes.
@@ -33,13 +33,13 @@ def denoise_transverse_hg(
         The resolution of grid points in x and y that will be used
         during the decomposition calculation.
 
-    n_modes_x, n_modes_y : ints
-        The maximum values of `n_x` and `n_y` up to which the
-        expansion will be performed.
-
     lo, hi : array of floats
         The lower and upper bounds of the spatial grid on which the
         decomposition will be performed.
+    
+    n_modes_x, n_modes_y : ints
+        The maximum values of `n_x` and `n_y` up to which the
+        expansion will be performed.
 
     Returns
     -------
@@ -78,7 +78,7 @@ def denoise_transverse_hg(
 
     # Calculate the decomposition and waist of the laser pulse
     modeCoeffs, waist = hermite_gauss_decomposition(
-        transverse_profile, wavelength, n_modes_x, n_modes_y, resolution, lo, hi
+        transverse_profile, wavelength, resolution, lo, hi, n_modes_x, n_modes_y
     )
 
     # Denosing the laser profile
