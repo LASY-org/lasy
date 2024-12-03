@@ -58,13 +58,14 @@ def denoise_transverse_hg(
         pass
     else:
         import numpy as np
-        import skimage
+        from PIL import Image
 
         from lasy.profiles.transverse.transverse_profile_from_data import (
             TransverseProfileFromData,
         )
 
-        intensity_data = skimage.io.imread(transverse_profile)
+        img = Image.open(file_transverse)
+        intensity_data = np.array(img)
         intensity_scale = np.max(intensity_data)  # Maximum value of the intensity
         intensity_data[intensity_data < intensity_scale / 100] = 0
         nx, ny = intensity_data.shape
