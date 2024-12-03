@@ -64,7 +64,7 @@ def denoise_transverse_hg(
             TransverseProfileFromData,
         )
 
-        img = Image.open(file_transverse)
+        img = Image.open(transverse_profile)
         intensity_data = np.array(img)
         intensity_scale = np.max(intensity_data)  # Maximum value of the intensity
         intensity_data[intensity_data < intensity_scale / 100] = 0
