@@ -987,25 +987,22 @@ def get_STC(dim, grid, k0):
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
-
-    # Use the normalised laser intensity to calculate the weighted average of Phi2
     STC_fac["Phi2"] = np.average(pphi_pt2, weights=env_abs)
     STC_fac["phi2"] = np.max(
         np.roots([4 * STC_fac["Phi2"], -4, tau**4 * STC_fac["Phi2"]])
     )
-
-    # Calculate spatio- and angular dispersion
+    # No spatial chirp and angular chirp in 'rt' coordinate
     if dim == "rt":
-        # No spatial chirp and angular chirp in 'rt' coordinate
         return STC_fac
+    # Calculate spatio- and angular dispersion
     if dim == "xyt":
-        # Calculate dx and dy in (x,y,omega) space
+        # Calculate dx0 and dy0 in (x,y,omega) space
         weight_x_3d = np.transpose(env_spec_abs, (2, 1, 0))
         weight_y_3d = np.transpose(env_spec_abs, (2, 0, 1))
         xda = np.sum(grid.axes[0] * weight_x_3d, axis=2) / np.sum(weight_x_3d, axis=2)
         yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2)
 
-        # Calculate zeta_x and zeta_y
+        # Calculate spatial chirp zeta
         derivative_x_zeta = np.gradient(xda, domg, axis=0)
         derivative_y_zeta = np.gradient(yda, domg, axis=0)
         weight_x_2d = np.mean(env_spec_abs, axis=0)
@@ -1018,23 +1015,20 @@ def get_STC(dim, grid, k0):
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
         )
 
-        # Calculate propagating angle
-
+        # Calculate angular dispersion beta
         phi_envelop_abs = np.unwrap(
             np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
         )
         angle_y = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
         angle_x = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
-
         derivative_x_beta = np.gradient(angle_y, domg, axis=2)
         derivative_y_beta = np.gradient(angle_x, domg, axis=2)
         beta_x = np.average(derivative_x_beta, weights=env_spec_abs)
         beta_y = np.average(derivative_y_beta, weights=env_spec_abs)
-
         STC_fac["stc_theta_beta"] = np.arctan2(beta_y, beta_x)
         STC_fac["beta"] = np.sqrt(beta_x**2 + beta_y**2)
 
-        # Use the normalised laser intensity to calculate the weighted average of PFT
+        # Calculate pulse front tilt
         weight_xy_2d = np.mean(env_abs, axis=2)
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
         derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
