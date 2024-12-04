@@ -951,7 +951,7 @@ def get_STC(dim, grid, k0):
             beta: Angular dispersion in :math:` \beta = d\theta_0/d\omega`(Important note:
                   for now beta is only correct when zeta and phi2 are 0!)
             pft: Pulse front tilt in :math:` p=dt/dx`
-            stc_theta_beta: The direction of the linear angular chirp on xoy plane\
+            stc_theta_pft: The direction of the linear angular chirp on xoy plane\
             in rad (0 is along x)
     All those above units and definitions are taken from
     `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
@@ -968,7 +968,7 @@ def get_STC(dim, grid, k0):
         "stc_theta_zeta": 0,
         "beta": 0,
         "pft": 0,
-        "stc_theta_beta": 0,
+        "stc_theta_pft": 0,
     }
 
     # Get temporal and spectral field
@@ -1016,6 +1016,17 @@ def get_STC(dim, grid, k0):
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
         )
 
+        #Calculate propagating angle
+        pphi_py = np.gradient(env_spec, grid.dx[1], axis=1)
+        pphi_px = np.gradient(env_spec, grid.dx[0], axis=0)
+        angle_y = (np.sum(pphi_py * env_abs, axis=(0, 1)) / np.sum(env_abs, axis=(0, 1)))/k0
+        angle_x = (np.sum(pphi_px * env_abs, axis=(0, 1)) / np.sum(env_abs, axis=(0, 1)))/k0
+        beta_y = np.gradient(angle_y, omega)
+        beta_x = np.gradient(angle_x, omega)
+        STC_fac["stc_theta_beta"] = np.arctan2(beta_y, beta_x)
+        STC_fac["beta"] = np.sqrt(beta_x**2 + beta_y**2)
+
+
         # Use the normalised laser intensity to calculate the weighted average of PFT
         weight_xy_2d = np.mean(env_abs, axis=2)
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
@@ -1024,7 +1035,7 @@ def get_STC(dim, grid, k0):
         pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
         pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
         STC_fac["pft"] = np.sqrt((pft_x**2 + pft_y**2))
-        STC_fac["stc_theta_beta"] = np.arctan2(pft_y, pft_x)
-        STC_fac["beta"] = (np.sqrt((pft_x**2 + pft_y**2))) / k0
+        STC_fac["stc_theta_pft"] = np.arctan2(pft_y, pft_x)
+
 
         return STC_fac
