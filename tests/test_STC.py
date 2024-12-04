@@ -43,4 +43,3 @@ np.testing.assert_approx_equal(STC_3d["zeta"], 2.4e-24, significant=2)
 np.testing.assert_approx_equal(STC_3d["zeta"], 2.4e-24, significant=2)
 np.testing.assert_approx_equal(STC_3d["stc_theta_beta"], scc.pi / 2, significant=2)
 np.testing.assert_approx_equal(STC_3d["stc_theta_zeta"], scc.pi / 2, significant=2)
-
