@@ -1009,7 +1009,7 @@ def get_STC(dim, grid, k0):
         zeta_x = np.average(derivative_x_zeta.T, weights=weight_x_2d)
         zeta_y = np.average(derivative_y_zeta.T, weights=weight_y_2d)
         zeta = np.sqrt(zeta_x**2 + zeta_y**2)
-        STC_fac["stc_theta_zeta"] = np.arcsin(zeta_y/zeta)
+        STC_fac["stc_theta_zeta"] = np.arcsin(zeta_y / zeta)
         STC_fac["zeta"] = zeta
         STC_fac["nu"] = (
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
@@ -1026,7 +1026,7 @@ def get_STC(dim, grid, k0):
         beta_x = np.average(derivative_x_beta, weights=env_spec_abs)
         beta_y = np.average(derivative_y_beta, weights=env_spec_abs)
         beta = np.sqrt(beta_x**2 + beta_y**2)
-        STC_fac["stc_theta_beta"] = np.arcsin(beta_y/beta)
+        STC_fac["stc_theta_beta"] = np.arcsin(beta_y / beta)
         STC_fac["beta"] = beta
 
         # Calculate pulse front tilt
@@ -1038,6 +1038,6 @@ def get_STC(dim, grid, k0):
         pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
         pft = np.sqrt((pft_x**2 + pft_y**2))
         STC_fac["pft"] = pft
-        STC_fac["stc_theta_pft"] = np.arcsin(pft_y/pft)
+        STC_fac["stc_theta_pft"] = np.arcsin(pft_y / pft)
 
         return STC_fac
