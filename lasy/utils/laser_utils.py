@@ -982,7 +982,7 @@ def get_STC(dim, grid, k0):
     dt = grid.dx[-1]
     Nt = grid.shape[-1]
     omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
-    domg = omega[1]-omega[0]
+    domg = omega[1] - omega[0]
     # Calculate group-delayed dispersion
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
@@ -1020,12 +1020,14 @@ def get_STC(dim, grid, k0):
 
         # Calculate propagating angle
 
-        phi_envelop_abs = np.unwrap(np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2)
-        angle_y = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)/k0
-        angle_x = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)/k0
+        phi_envelop_abs = np.unwrap(
+            np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
+        )
+        angle_y = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
+        angle_x = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
 
-        derivative_x_beta = np.gradient(angle_y,domg ,axis=2)
-        derivative_y_beta = np.gradient(angle_x,domg,axis=2)
+        derivative_x_beta = np.gradient(angle_y, domg, axis=2)
+        derivative_y_beta = np.gradient(angle_x, domg, axis=2)
         beta_x = np.average(derivative_x_beta, weights=env_spec_abs)
         beta_y = np.average(derivative_y_beta, weights=env_spec_abs)
 
