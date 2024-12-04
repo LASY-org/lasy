@@ -1016,16 +1016,19 @@ def get_STC(dim, grid, k0):
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
         )
 
-        #Calculate propagating angle
+        # Calculate propagating angle
         pphi_py = np.gradient(env_spec, grid.dx[1], axis=1)
         pphi_px = np.gradient(env_spec, grid.dx[0], axis=0)
-        angle_y = (np.sum(pphi_py * env_abs, axis=(0, 1)) / np.sum(env_abs, axis=(0, 1)))/k0
-        angle_x = (np.sum(pphi_px * env_abs, axis=(0, 1)) / np.sum(env_abs, axis=(0, 1)))/k0
+        angle_y = (
+            np.sum(pphi_py * env_abs, axis=(0, 1)) / np.sum(env_abs, axis=(0, 1))
+        ) / k0
+        angle_x = (
+            np.sum(pphi_px * env_abs, axis=(0, 1)) / np.sum(env_abs, axis=(0, 1))
+        ) / k0
         beta_y = np.gradient(angle_y, omega)
         beta_x = np.gradient(angle_x, omega)
         STC_fac["stc_theta_beta"] = np.arctan2(beta_y, beta_x)
         STC_fac["beta"] = np.sqrt(beta_x**2 + beta_y**2)
-
 
         # Use the normalised laser intensity to calculate the weighted average of PFT
         weight_xy_2d = np.mean(env_abs, axis=2)
@@ -1036,6 +1039,5 @@ def get_STC(dim, grid, k0):
         pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
         STC_fac["pft"] = np.sqrt((pft_x**2 + pft_y**2))
         STC_fac["stc_theta_pft"] = np.arctan2(pft_y, pft_x)
-
 
         return STC_fac
