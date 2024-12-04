@@ -982,7 +982,6 @@ def get_STC(dim, grid, k0):
     dt = grid.dx[-1]
     Nt = grid.shape[-1]
     omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
-    domg = omega[1] - omega[0]
     # Calculate group-delayed dispersion
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
@@ -1003,15 +1002,15 @@ def get_STC(dim, grid, k0):
         yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2)
 
         # Calculate spatial chirp zeta
-        derivative_x_zeta = np.gradient(xda, domg, axis=0)
-        derivative_y_zeta = np.gradient(yda, domg, axis=0)
-        print(domg)
+        derivative_x_zeta = np.gradient(xda, omega, axis=0)
+        derivative_y_zeta = np.gradient(yda, omega, axis=0)
         weight_x_2d = np.mean(env_spec_abs, axis=0)
         weight_y_2d = np.mean(env_spec_abs, axis=1)
         zeta_x = np.average(derivative_x_zeta.T, weights=weight_x_2d)
         zeta_y = np.average(derivative_y_zeta.T, weights=weight_y_2d)
-        STC_fac["stc_theta_zeta"] = np.arctan2(zeta_y, zeta_x)
-        STC_fac["zeta"] = np.sqrt(zeta_x**2 + zeta_y**2)
+        zeta = np.sqrt(zeta_x**2 + zeta_y**2)
+        STC_fac["stc_theta_zeta"] = np.arcsin(zeta_y/zeta)
+        STC_fac["zeta"] = zeta
         STC_fac["nu"] = (
             4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
         )
@@ -1020,14 +1019,15 @@ def get_STC(dim, grid, k0):
         phi_envelop_abs = np.unwrap(
             np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
         )
-        angle_y = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
-        angle_x = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
-        derivative_x_beta = np.gradient(angle_y, domg, axis=2)
-        derivative_y_beta = np.gradient(angle_x, domg, axis=2)
+        angle_x = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
+        angle_y = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
+        derivative_x_beta = np.gradient(angle_y, omega, axis=2)
+        derivative_y_beta = np.gradient(angle_x, omega, axis=2)
         beta_x = np.average(derivative_x_beta, weights=env_spec_abs)
         beta_y = np.average(derivative_y_beta, weights=env_spec_abs)
-        STC_fac["stc_theta_beta"] = np.arctan2(beta_y, beta_x)
-        STC_fac["beta"] = np.sqrt(beta_x**2 + beta_y**2)
+        beta = np.sqrt(beta_x**2 + beta_y**2)
+        STC_fac["stc_theta_beta"] = np.arcsin(beta_y/beta)
+        STC_fac["beta"] = beta
 
         # Calculate pulse front tilt
         weight_xy_2d = np.mean(env_abs, axis=2)
@@ -1036,7 +1036,8 @@ def get_STC(dim, grid, k0):
         derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
         pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
         pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
-        STC_fac["pft"] = np.sqrt((pft_x**2 + pft_y**2))
-        STC_fac["stc_theta_pft"] = np.arctan2(pft_y, pft_x)
+        pft = np.sqrt((pft_x**2 + pft_y**2))
+        STC_fac["pft"] = pft
+        STC_fac["stc_theta_pft"] = np.arcsin(pft_y/pft)
 
         return STC_fac
