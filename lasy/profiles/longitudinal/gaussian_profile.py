@@ -130,9 +130,9 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         stretch_factor = (
             1
             + 4.0
-            * (self.zeta + self.beta * self.z_foc_over_zr)
+            * (-self.zeta + self.beta * self.z_foc_over_zr)
             * inv_tau2
-            * (self.zeta + self.beta * self.z_foc_over_zr)
+            * (-self.zeta + self.beta * self.z_foc_over_zr)
             * inv_complex_waist_2
             + 2.0j
             * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
@@ -150,7 +150,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
                 * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
                 - 2.0j
                 * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
-                * (self.zeta - self.beta * self.z_foc_over_zr)
+                * (-self.zeta - self.beta * self.z_foc_over_zr)
                 * inv_complex_waist_2
             )
             ** 2
