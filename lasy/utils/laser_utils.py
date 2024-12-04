@@ -1008,6 +1008,7 @@ def get_STC(dim, grid, k0):
         # Calculate zeta_x and zeta_y
         derivative_x_zeta = np.gradient(xda, domg, axis=0)
         derivative_y_zeta = np.gradient(yda, domg, axis=0)
+        print(domg)
         weight_x_2d = np.mean(env_spec_abs, axis=0)
         weight_y_2d = np.mean(env_spec_abs, axis=1)
         zeta_x = np.average(derivative_x_zeta.T, weights=weight_x_2d)
