@@ -1020,13 +1020,17 @@ def get_STC(dim, grid, k0):
         pphi_py = np.gradient(env_spec, grid.dx[1], axis=1)
         pphi_px = np.gradient(env_spec, grid.dx[0], axis=0)
 
-        angle_y = (np.sum(pphi_py * env_spec, axis=(0, 1)) / np.sum(env_spec, axis=(0, 1)))/k0
-        angle_x = (np.sum(pphi_px * env_spec, axis=(0, 1)) / np.sum(env_spec, axis=(0, 1)))/k0
-        weight_omega_1d = np.mean(env_spec, axis=(0,1))
+        angle_y = (
+            np.sum(pphi_py * env_spec, axis=(0, 1)) / np.sum(env_spec, axis=(0, 1))
+        ) / k0
+        angle_x = (
+            np.sum(pphi_px * env_spec, axis=(0, 1)) / np.sum(env_spec, axis=(0, 1))
+        ) / k0
+        weight_omega_1d = np.mean(env_spec, axis=(0, 1))
         derivative_x_beta = np.gradient(angle_y, omega)
         derivative_y_beta = np.gradient(angle_x, omega)
-        beta_x=np.average(derivative_x_beta,weight_omega_1d)
-        beta_y=np.average(derivative_y_beta,weight_omega_1d)
+        beta_x = np.average(derivative_x_beta, weight_omega_1d)
+        beta_y = np.average(derivative_y_beta, weight_omega_1d)
 
         STC_fac["stc_theta_beta"] = np.arctan2(beta_y, beta_x)
         STC_fac["beta"] = np.sqrt(beta_x**2 + beta_y**2)
