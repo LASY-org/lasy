@@ -1019,15 +1019,19 @@ def get_STC(dim, grid, k0):
         )
 
         # Calculate propagating angle
-        phi_envelop_abs = np.unwrap(np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2)
+        phi_envelop_abs = np.unwrap(
+            np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
+        )
         pphi_py = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)
         pphi_px = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)
 
         angle_y = (
-            np.sum(pphi_py * env_spec_abs, axis=(0, 1)) / np.sum(env_spec_abs, axis=(0, 1))
+            np.sum(pphi_py * env_spec_abs, axis=(0, 1))
+            / np.sum(env_spec_abs, axis=(0, 1))
         ) / k0
         angle_x = (
-            np.sum(pphi_px * env_spec_abs, axis=(0, 1)) / np.sum(env_spec_abs, axis=(0, 1))
+            np.sum(pphi_px * env_spec_abs, axis=(0, 1))
+            / np.sum(env_spec_abs, axis=(0, 1))
         ) / k0
         weight_omega_1d = np.mean(env_spec_abs, axis=(0, 1))
         derivative_x_beta = np.gradient(angle_y, omega)
