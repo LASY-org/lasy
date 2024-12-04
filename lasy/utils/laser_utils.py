@@ -1029,8 +1029,8 @@ def get_STC(dim, grid, k0):
         weight_omega_1d = np.mean(env_spec, axis=(0, 1))
         derivative_x_beta = np.gradient(angle_y, omega)
         derivative_y_beta = np.gradient(angle_x, omega)
-        beta_x=np.average(derivative_x_beta,weights=weight_omega_1d)
-        beta_y=np.average(derivative_y_beta,weights=weight_omega_1d)
+        beta_x = np.average(derivative_x_beta, weights=weight_omega_1d)
+        beta_y = np.average(derivative_y_beta, weights=weight_omega_1d)
 
         STC_fac["stc_theta_beta"] = np.arctan2(beta_y, beta_x)
         STC_fac["beta"] = np.sqrt(beta_x**2 + beta_y**2)
