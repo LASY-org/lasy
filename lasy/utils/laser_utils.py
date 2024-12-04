@@ -1020,25 +1020,14 @@ def get_STC(dim, grid, k0):
 
         # Calculate propagating angle
 
-        phi_envelop_abs = np.unwrap(
-            np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
-        )
-        pphi_py = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)
-        pphi_px = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)
+        phi_envelop_abs = np.unwrap(np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2)
+        angle_y = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)/k0
+        angle_x = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)/k0
 
-        angle_y = (
-            np.sum(pphi_py * env_spec_abs, axis=(0, 1))
-            / np.sum(env_spec_abs, axis=(0, 1))
-        ) / k0
-        angle_x = (
-            np.sum(pphi_px * env_spec_abs, axis=(0, 1))
-            / np.sum(env_spec_abs, axis=(0, 1))
-        ) / k0
-        weight_omega_1d = np.mean(env_spec_abs, axis=(0, 1))
-        derivative_x_beta = np.gradient(angle_y, omega)
-        derivative_y_beta = np.gradient(angle_x, omega)
-        beta_x = np.average(derivative_x_beta, weights=weight_omega_1d)
-        beta_y = np.average(derivative_y_beta, weights=weight_omega_1d)
+        derivative_x_beta = np.gradient(angle_y,domg ,axis=2)
+        derivative_y_beta = np.gradient(angle_x,domg,axis=2)
+        beta_x = np.average(derivative_x_beta, weights=env_spec_abs)
+        beta_y = np.average(derivative_y_beta, weights=env_spec_abs)
 
         STC_fac["stc_theta_beta"] = np.arctan2(beta_y, beta_x)
         STC_fac["beta"] = np.sqrt(beta_x**2 + beta_y**2)
