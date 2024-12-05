@@ -1025,7 +1025,7 @@ def get_STC(dim, grid, k0):
         beta_x = np.average(derivative_x_beta, weights=env_spec_abs)
         beta_y = np.average(derivative_y_beta, weights=env_spec_abs)
         STC_fac["beta_x"] = beta_x
-        STC_fac["beta_y"] = beta_x
+        STC_fac["beta_y"] = beta_y
         # Calculate pulse front tilt
         weight_xy_2d = np.mean(env_abs, axis=2)
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
@@ -1033,7 +1033,6 @@ def get_STC(dim, grid, k0):
         derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
         pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
         pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
-        pft = np.sqrt((pft_x**2 + pft_y**2))
         STC_fac["pft_x"] = pft_x
         STC_fac["pft_y"] = pft_y
 
