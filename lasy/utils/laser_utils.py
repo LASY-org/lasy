@@ -944,15 +944,11 @@ def get_STC(dim, grid, k0):
         A dictionary of floats corresponding to the STC factors. The keys are:
             Phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt`
             phi2: Group-delayed dispersion in :math:`\phi^{(2)}=dt_0/d(\omega)`
-            nu: Spatio-chirp in :math:`\nu=d(\omega_0)/dx`
-            zeta: Spatio-chirp in :math:`\zeta=dx_0/d(\omega_0)`
-            stc_theta_zeta: The direction of the linear spatial chirp on xoy plane\
-            in rad (0 is along x)
-            beta: Angular dispersion in :math:` \beta = d\theta_0/d\omega`(Important note:
+            nu_x, nu_y: Spatio-chirp in :math:`\nu=d(\omega_0)/dx`
+            zeta_x, zeta_y: Spatio-chirp in :math:`\zeta=dx_0/d(\omega_0)`
+            beta_x, beta_y: Angular dispersion in :math:` \beta = d\theta_0/d\omega`(Important note:
                   for now beta is only correct when zeta and phi2 are 0!)
-            pft: Pulse front tilt in :math:` p=dt/dx`
-            stc_theta_pft: The direction of the linear angular chirp on xoy plane\
-            in rad (0 is along x)
+            pft_x, pft_y: Pulse front tilt in :math:` p=dt/dx`
     All those above units and definitions are taken from
     `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
     """
@@ -963,13 +959,14 @@ def get_STC(dim, grid, k0):
     STC_fac = {
         "Phi2": 0,
         "phi2": 0,
-        "nu": 0,
-        "zeta": 0,
-        "stc_theta_zeta": 0,
-        "beta": 0,
-        "stc_theta_beta": 0,
-        "pft": 0,
-        "stc_theta_pft": 0,
+        "nu_x": 0,
+        "nu_y": 0,
+        "zeta_x": 0,
+        "zeta_y": 0,
+        "beta_x": 0,
+        "beta_y": 0,
+        "pft_x": 0,
+        "pft_y": 0,
     }
 
     # Get temporal and spectral field
@@ -1008,11 +1005,13 @@ def get_STC(dim, grid, k0):
         weight_y_2d = np.mean(env_spec_abs, axis=1)
         zeta_x = np.average(derivative_x_zeta.T, weights=weight_x_2d)
         zeta_y = np.average(derivative_y_zeta.T, weights=weight_y_2d)
-        zeta = np.sqrt(zeta_x**2 + zeta_y**2)
-        STC_fac["stc_theta_zeta"] = np.arcsin(zeta_y / zeta)
-        STC_fac["zeta"] = zeta
-        STC_fac["nu"] = (
-            4 * STC_fac["zeta"] / (w0**2 * tau**2 + 4 * STC_fac["zeta"] ** 2)
+        STC_fac["zeta_x"] = zeta_x
+        STC_fac["zeta_y"] = zeta_y
+        STC_fac["nu_x"] = (
+            4 * STC_fac["zeta_x"] / (w0**2 * tau**2 + 4 * STC_fac["zeta_x"] ** 2)
+        )
+        STC_fac["nu_y"] = (
+            4 * STC_fac["zeta_y"] / (w0**2 * tau**2 + 4 * STC_fac["zeta_y"] ** 2)
         )
 
         # Calculate angular dispersion beta
@@ -1025,10 +1024,8 @@ def get_STC(dim, grid, k0):
         derivative_y_beta = np.gradient(angle_x, omega, axis=2)
         beta_x = np.average(derivative_x_beta, weights=env_spec_abs)
         beta_y = np.average(derivative_y_beta, weights=env_spec_abs)
-        beta = np.sqrt(beta_x**2 + beta_y**2)
-        STC_fac["stc_theta_beta"] = np.arcsin(beta_y / beta)
-        STC_fac["beta"] = beta
-
+        STC_fac["beta_x"] = beta_x
+        STC_fac["beta_y"] = beta_x
         # Calculate pulse front tilt
         weight_xy_2d = np.mean(env_abs, axis=2)
         z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
@@ -1037,7 +1034,7 @@ def get_STC(dim, grid, k0):
         pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
         pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
         pft = np.sqrt((pft_x**2 + pft_y**2))
-        STC_fac["pft"] = pft
-        STC_fac["stc_theta_pft"] = np.arcsin(pft_y / pft)
+        STC_fac["pft_x"] = pft_x
+        STC_fac["pft_y"] = pft_y
 
         return STC_fac
