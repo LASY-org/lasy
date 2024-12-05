@@ -78,18 +78,6 @@ def test_transverse_profiles_rt():
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
 
-    # LaguerreGaussianTransverseProfile
-    print("LaguerreGaussianTransverseProfile")
-    p = 2
-    m = 0
-    std_th = np.sqrt(5 / 2) * w0
-    profile = LaguerreGaussianTransverseProfile(w0, p, m)
-    field = profile.evaluate(r, np.zeros_like(r))
-    std = np.sqrt(np.average(r**2, weights=r * np.abs(field) ** 2))
-    print("std_th = ", std_th)
-    print("std = ", std)
-    assert np.abs(std - std_th) / std_th < 0.01
-
     # SuperGaussianTransverseProfile
     print("SuperGaussianTransverseProfile")
     n_order = 100  # close to flat-top, compared with flat-top theory
@@ -110,6 +98,18 @@ def test_transverse_profiles_rt():
     print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.1
+
+    # LaguerreGaussianTransverseProfile
+    print("LaguerreGaussianTransverseProfile")
+    p = 2
+    m = 0
+    std_th = np.sqrt((2 * p + m + 1) / 2) * w0
+    profile = LaguerreGaussianTransverseProfile(w0, p, m, wavelength=800e-9)
+    field = profile.evaluate(r, np.zeros_like(r))
+    std = np.sqrt(np.average(r**2, weights=np.abs(r) * np.abs(field) ** 2))
+    print("std_th = ", std_th)
+    print("std = ", std)
+    assert np.abs(std - std_th) / std_th < 0.01
 
 
 def test_transverse_profiles_3d():

@@ -8,6 +8,7 @@ temporal shape of the laser pulse again analytical formulas.
 """
 
 import numpy as np
+from scipy.constants import c
 
 from lasy.laser import Laser
 from lasy.optical_elements import PolynomialSpectralPhase
@@ -15,6 +16,7 @@ from lasy.profiles.gaussian_profile import GaussianProfile
 
 # Laser parameters
 wavelength = 0.8e-6
+omega0 = 2 * np.pi * c / wavelength
 w0 = 5.0e-6  # m
 pol = (1, 0)
 laser_energy = 1.0  # J
@@ -36,7 +38,7 @@ def test_gdd():
     analytical formula for a Gaussian pulse with GDD.
     """
     gdd = 200e-30
-    dazzler = PolynomialSpectralPhase(gdd=gdd)
+    dazzler = PolynomialSpectralPhase(omega0, gdd=gdd)
 
     # Initialize the laser
     dim = "xyt"
@@ -73,7 +75,7 @@ def test_tod():
     analytical formula from the stationary phase approximation.
     """
     tod = 5e-42
-    dazzler = PolynomialSpectralPhase(tod=tod)
+    dazzler = PolynomialSpectralPhase(omega0, tod=tod)
 
     # Initialize the laser
     dim = "xyt"

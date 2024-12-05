@@ -112,7 +112,7 @@ def test_resampling_laguerre():
     m = 1  # Phase Rotation
 
     LongitProfile = GaussianLongitudinalProfile(wavelength, tau, t_peak)
-    TransvProfile = LaguerreGaussianTransverseProfile(w0, p, m)
+    TransvProfile = LaguerreGaussianTransverseProfile(w0, p, m, wavelength=800e-9)
     pulseProfile = CombinedLongitudinalTransverseProfile(
         wavelength, pol, laser_energy, LongitProfile, TransvProfile
     )
