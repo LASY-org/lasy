@@ -70,6 +70,7 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
             \beta = \frac{d\theta_0}{d\omega}
 
         Here :math:`\theta_0` is the propagation angle of this component.
+        The definitions of beta, phi2 and zeta are taken from [S. Akturk et al., Optics Express 12, 4399 (2004)].
 
     phi2 : float (in second^2), optional (default '0')
         The group-delay dispersion parameterized by:
@@ -90,7 +91,6 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
     stc_theta :  float (in rad) optional (default '0')
         Transverse direction along which spatio-temporal field couples.
         0 is along x axis.
-    All those above STC units and definitions are taken from <S. Akturk et al., Optics Express 12, 4399 (2004)>
 
     Examples
     --------
