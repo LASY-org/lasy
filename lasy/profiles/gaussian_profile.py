@@ -1,6 +1,4 @@
 import numpy as np
-from scipy.constants import c, pi
-
 from . import CombinedLongitudinalTransverseProfile
 from .longitudinal import GaussianLongitudinalProfile
 from .profile import Profile
@@ -202,9 +200,6 @@ class STCGaussianProfile(Profile):
         self.w0 = w0
         self.stc_theta = stc_theta
         self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
-        self.lambda0 = wavelength
-        self.omega0 = 2 * pi * c / self.lambda0
-        self.k0 = 2.0 * pi / wavelength
 
     def evaluate(self, t, x, y):
         """
