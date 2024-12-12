@@ -916,6 +916,101 @@ def get_w0(grid, dim):
 
     return sigma
 
+def get_Phi2(dim, grid):
+
+    tau = 2 * get_duration(grid, dim)
+    env = grid.get_temporal_field()
+    env_abs = np.abs(env**2)
+    # Calculate group-delayed dispersion
+    phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
+    pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
+    pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
+    Phi2= np.average(pphi_pt2, weights=env_abs)
+    phi2 = np.max(
+        np.roots([4 * Phi2, -4, tau**4 * Phi2])
+    )
+    return Phi2, phi2
+
+def get_Zeta(dim, grid):
+    assert (
+                dim == 'rt'
+            ), "No spatial chirp for axis-sysmetric dimension"
+    w0 = get_w0(grid, dim)
+    tau = 2 * get_duration(grid, dim)
+    env_spec = grid.get_spectral_field()
+    env_spec_abs2 = np.abs(env_spec**2)
+
+    # Get the spectral axis
+    dt = grid.dx[-1]
+    Nt = grid.shape[-1]
+    omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
+    # Calculate dx0 and dy0 in (x,y,omega) space
+    weight_x_3d = np.transpose(env_spec_abs2, (2, 1, 0))
+    weight_y_3d = np.transpose(env_spec_abs2, (2, 0, 1))
+    xda = np.sum(grid.axes[0] * weight_x_3d, axis=2) / np.sum(weight_x_3d, axis=2)
+    yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2)
+
+    # Calculate spatial chirp zeta
+    derivative_x_zeta = np.gradient(xda, omega, axis=0)
+    derivative_y_zeta = np.gradient(yda, omega, axis=0)
+    weight_x_2d = np.mean(env_spec_abs2, axis=0)
+    weight_y_2d = np.mean(env_spec_abs2, axis=1)
+    zeta_x = np.average(derivative_x_zeta.T, weights=weight_x_2d)
+    zeta_y = np.average(derivative_y_zeta.T, weights=weight_y_2d)
+    nu_x = (
+     4 * zeta_x / (w0**2 * tau**2 + 4 * zeta_x ** 2)
+    )
+    nu_y = (
+        4 * zeta_y / (w0**2 * tau**2 + 4 * zeta_y ** 2)
+    )
+    return [zeta_x,zeta_y], [nu_x, nu_y]
+
+def get_Beta(dim, grid, k0):
+    assert (
+                dim == 'rt'
+            ), "No angular chirp for axis-sysmetric dimension"
+    env_spec = grid.get_spectral_field()
+    env_spec_abs2 = np.abs(env_spec**2)
+    # Get the spectral axis
+    dt = grid.dx[-1]
+    Nt = grid.shape[-1]
+    omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
+     # Calculate angular dispersion beta
+    phi_envelop_abs = np.unwrap(
+            np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
+    )
+    angle_x = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
+    angle_y = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
+    derivative_x_beta = np.gradient(angle_y, omega, axis=2)
+    derivative_y_beta = np.gradient(angle_x, omega, axis=2)
+    beta_x = np.average(derivative_x_beta, weights=env_spec_abs2)
+    beta_y = np.average(derivative_y_beta, weights=env_spec_abs2)
+    return [beta_x, beta_y]
+
+def get_Pft(dim, grid):
+    assert (
+                dim == 'rt'
+            ), "No pulse front tilt for axis-sysmetric dimension"
+    env = grid.get_temporal_field()
+    env_abs = np.abs(env**2)
+    weight_xy_2d = np.mean(env_abs, axis=2)
+    z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
+    derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
+    derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
+    pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
+    pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
+    return [pft_x, pft_y]
+
+def get_prop_angle(dim,grid, k0):
+    assert (
+                dim == 'rt'
+            ), "Propagation always on-axis axis-sysmetric dimension"
+    phi_envelop_abs = np.unwrap(
+            np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
+    )
+    angle_x = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
+    angle_y = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
+    return [angle_x, angle_y]
 
 def get_STC(dim, grid, k0):
     r"""
