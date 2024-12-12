@@ -1,5 +1,4 @@
 import numpy as np
-
 from . import CombinedLongitudinalTransverseProfile, Profile
 from .longitudinal import GaussianLongitudinalProfile
 from .transverse import GaussianTransverseProfile
@@ -190,6 +189,7 @@ class STCGaussianProfile(Profile):
         stc_theta=0,
     ):
         super().__init__(wavelength, pol)
+        self.laser_energy = laser_energy
         self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
