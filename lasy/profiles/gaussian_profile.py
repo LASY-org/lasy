@@ -1,7 +1,8 @@
 from . import CombinedLongitudinalTransverseProfile
 from .longitudinal import GaussianLongitudinalProfile
 from .transverse import GaussianTransverseProfile
-
+from . import Profile
+import numpy as np
 
 class GaussianProfile(CombinedLongitudinalTransverseProfile):
     r"""
@@ -167,3 +168,104 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
             ),
             GaussianTransverseProfile(w0, z_foc, wavelength),
         )
+
+class STCGaussianProfile(Profile):
+    r"""
+    """
+    def __init__(
+        self,
+        wavelength,
+        pol,
+        laser_energy,
+        w0,
+        tau,
+        t_peak,
+        cep_phase=0,
+        z_foc=0,
+        phi2=0,
+        beta=0,
+        zeta=0,
+        stc_theta=0,
+    ):
+        super().__init__(wavelength)
+        self.tau = tau
+        self.t_peak = t_peak
+        self.cep_phase = cep_phase
+        self.beta = beta
+        self.phi2 = phi2
+        self.zeta = zeta
+        self.w0 = w0
+        self.stc_theta = stc_theta
+        if z_foc == 0:
+            self.z_foc_over_zr = 0
+        else:
+            assert (
+                wavelength is not None
+            ), "You need to pass the wavelength, when `z_foc` is non-zero."
+            self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
+
+    def evaluate(self, t, x=0, y=0):
+        """
+        Return the longitudinal envelope.
+
+        Parameters
+        ----------
+        t : ndarrays of floats
+            Define longitudinal points on which to evaluate the envelope
+
+        x,y : ndarrays of floats, necessray if spatio-temperal coulping exists
+            Define transverse points on which to evaluate the envelope
+
+        Returns
+        -------
+        envelope : ndarray of complex numbers
+            Contains the value of the longitudinal envelope at the
+            specified points. This array has the same shape as the array t.
+        """
+        inv_tau2 = self.tau ** (-2)
+        inv_complex_waist_2 = (
+            1.0
+            / (self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2)))
+            if self.w0
+            else 0
+        )
+        stretch_factor = (
+            1
+            + 4.0
+            * (-self.zeta + self.beta * self.z_foc_over_zr)
+            * inv_tau2
+            * (-self.zeta + self.beta * self.z_foc_over_zr)
+            * inv_complex_waist_2
+            + 2.0j
+            * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
+            * inv_tau2
+        )
+        stc_exponent = (
+            1.0
+            / stretch_factor
+            * inv_tau2
+            * (
+                t
+                - self.t_peak
+                - self.beta
+                * self.k0
+                * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
+                - 2.0j
+                * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
+                * (-self.zeta - self.beta * self.z_foc_over_zr)
+                * inv_complex_waist_2
+            )
+            ** 2
+        )
+         # Term for wavefront curvature + Gouy phase
+        diffract_factor = 1.0 - 1j * self.z_foc_over_zr
+        # Calculate the argument of the complex exponential
+        exp_argument = -(x**2 + y**2) / (self.w0**2 * diffract_factor)
+        # Get the profile
+        envelope = np.exp(
+            -stc_exponent
+            + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
+            +exp_argument
+        ) / diffract_factor
+
+        return envelope
