@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy.constants import c, pi
 from . import CombinedLongitudinalTransverseProfile
 from .longitudinal import GaussianLongitudinalProfile
 from .profile import Profile
