@@ -1,7 +1,8 @@
 import numpy as np
-from .profile import Profile
+
 from . import CombinedLongitudinalTransverseProfile
 from .longitudinal import GaussianLongitudinalProfile
+from .profile import Profile
 from .transverse import GaussianTransverseProfile
 
 
