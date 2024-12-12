@@ -189,8 +189,7 @@ class STCGaussianProfile(Profile):
         zeta=0,
         stc_theta=0,
     ):
-        super().__init__(wavelength,
-            pol)
+        super().__init__(wavelength, pol)
         self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
