@@ -2,6 +2,7 @@ import numpy as np
 
 from .longitudinal_profile import LongitudinalProfile
 
+
 class GaussianLongitudinalProfile(LongitudinalProfile):
     r"""
     Class for the analytic profile of a longitudinally-Gaussian laser pulse.

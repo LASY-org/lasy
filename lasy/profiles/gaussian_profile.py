@@ -1,8 +1,11 @@
-from . import CombinedLongitudinalTransverseProfile
+import numpy as np
+
+from . import CombinedLongitudinalTransverseProfile, Profile
 from .longitudinal import GaussianLongitudinalProfile
 from .transverse import GaussianTransverseProfile
 from .profile import Profile
 import numpy as np
+
 
 class GaussianProfile(CombinedLongitudinalTransverseProfile):
     r"""
@@ -169,9 +172,10 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
             GaussianTransverseProfile(w0, z_foc, wavelength),
         )
 
+
 class STCGaussianProfile(Profile):
-    r"""
-    """
+    r""" """
+
     def __init__(
         self,
         wavelength,
@@ -257,15 +261,18 @@ class STCGaussianProfile(Profile):
             )
             ** 2
         )
-         # Term for wavefront curvature + Gouy phase
+        # Term for wavefront curvature + Gouy phase
         diffract_factor = 1.0 - 1j * self.z_foc_over_zr
         # Calculate the argument of the complex exponential
         exp_argument = -(x**2 + y**2) / (self.w0**2 * diffract_factor)
         # Get the profile
-        envelope = np.exp(
-            -stc_exponent
-            + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
-            +exp_argument
-        ) / diffract_factor
+        envelope = (
+            np.exp(
+                -stc_exponent
+                + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
+                + exp_argument
+            )
+            / diffract_factor
+        )
 
         return envelope
