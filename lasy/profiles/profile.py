@@ -39,6 +39,7 @@ class Profile(object):
         self.lambda0 = wavelength
         self.omega0 = 2 * np.pi * c / self.lambda0
         self.k0 = 2.0 * np.pi / wavelength
+
     def evaluate(self, x, y, t):
         """
         Return the envelope field of the laser.
