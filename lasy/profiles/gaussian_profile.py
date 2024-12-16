@@ -306,7 +306,7 @@ class STCGaussianProfile(Profile):
         # Get the profile
         envelope = (
             np.exp(
-                -stc_exponent
+                - stc_exponent
                 + exp_argument
                 + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
             )
