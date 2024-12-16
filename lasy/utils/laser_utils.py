@@ -953,6 +953,28 @@ def get_Phi2(dim, grid):
 
 
 def get_Zeta(dim, grid, k0):
+    r"""
+    Calculate the Group-delay dispersion of the laser.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with
+        the value of the envelope field and the associated metadata
+        that defines the points at which the laser is defined.
+
+     Return
+    ----------
+    zeta_x, zeta_y: Spatio-chirp in :math:`\zeta=dx_0/d(\omega_0)`
+    nu_x, nu_y: Spatio-chirp in :math:`\nu=d(\omega_0)/dx`
+    """
     assert dim == "xyt", "No spatial chirp for axis-sysmetric dimension"
     w0 = get_w0(grid, dim)
     tau = 2 * get_duration(grid, dim)
