@@ -134,7 +134,7 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
 
 class STCGaussianProfile(Profile):
     r"""
-    Class for the analytic profile of a Gaussian laser pulse.
+    Class for the analytic profile of a Gaussian laser pulse with spatio-temporal coupling.
 
     More precisely, the electric field corresponds to:
 
