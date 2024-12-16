@@ -161,12 +161,6 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
                 tau,
                 t_peak,
                 cep_phase,
-                beta=beta,
-                phi2=phi2,
-                zeta=zeta,
-                stc_theta=stc_theta,
-                w0=w0,
-                z_foc=z_foc,
             ),
             GaussianTransverseProfile(w0, z_foc, wavelength),
         )
