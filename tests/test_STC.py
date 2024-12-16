@@ -1,7 +1,8 @@
 import numpy as np
 import scipy.constants as scc
-from lasy.profiles.gaussian_profile import GaussianProfile, STCGaussianProfile
+
 from lasy.laser import Laser
+from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.utils.laser_utils import get_STC
 
 # Create profile.
