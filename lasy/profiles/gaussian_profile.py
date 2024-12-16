@@ -269,9 +269,10 @@ class STCGaussianProfile(Profile):
         envelope = (
             np.exp(
                 -stc_exponent
-                +exp_argument
+                + exp_argument
                 + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
-            )/ diffract_factor
             )
+            / diffract_factor
+        )
 
         return envelope

@@ -1,6 +1,8 @@
 import numpy as np
 
 from .longitudinal_profile import LongitudinalProfile
+
+
 class GaussianLongitudinalProfile(LongitudinalProfile):
     r"""
     Class for the analytic profile of a longitudinally-Gaussian laser pulse.
@@ -31,6 +33,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
         in the above formula (i.e. the phase of the laser
         oscillation, at the time where the laser envelope is maximum).
     """
+
     def __init__(self, wavelength, tau, t_peak, cep_phase=0):
         super().__init__(wavelength)
         self.tau = tau
@@ -40,6 +43,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
     def evaluate(self, t):
         """
         Return the longitudinal envelope.
+
         Parameters
         ----------
         t : ndarrays of floats
@@ -52,10 +56,11 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             specified points. This array has the same shape as the array t.
         """
         envelope = np.exp(
-               -((t - self.t_peak) ** 2) / self.tau**2
+            -((t - self.t_peak) ** 2) / self.tau**2
             + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
         )
         return envelope
+
 
 class STCGaussianLongitudinalProfile(LongitudinalProfile):
     r"""
