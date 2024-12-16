@@ -918,6 +918,28 @@ def get_w0(grid, dim):
 
 
 def get_Phi2(dim, grid):
+    r"""
+    Calculate the Group-delay dispersion of the laser.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with
+        the value of the envelope field and the associated metadata
+        that defines the points at which the laser is defined.
+
+     Return
+    ----------
+    Phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt`
+    phi2: Group-delayed dispersion in :math:`\phi^{(2)}=dt_0/d(\omega)`
+    """
     tau = 2 * get_duration(grid, dim)
     env = grid.get_temporal_field()
     env_abs = np.abs(env**2)
@@ -936,7 +958,6 @@ def get_Zeta(dim, grid, k0):
     tau = 2 * get_duration(grid, dim)
     env_spec = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
-
     # Get the spectral axis
     dt = grid.dx[-1]
     Nt = grid.shape[-1]
