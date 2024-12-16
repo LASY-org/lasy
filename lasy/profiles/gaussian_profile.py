@@ -243,6 +243,7 @@ class STCGaussianProfile(Profile):
         self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
+        self.z_foc = z_foc
         self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
         self.phi2 = phi2
         self.beta = beta
@@ -269,17 +270,17 @@ class STCGaussianProfile(Profile):
         """
         inv_tau2 = self.tau ** (-2)
         inv_complex_waist_2 = 1.0 / (
-            self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2))
+            self.w0**2 * (1.0 + 2.0j * self.z_foc/ (self.k0 * self.w0**2))
         )
         stretch_factor = (
             1
             + 4.0
-            * (-self.zeta + self.beta * self.z_foc_over_zr)
+            * (-self.zeta + self.beta * self.z_foc)
             * inv_tau2
-            * (-self.zeta + self.beta * self.z_foc_over_zr)
+            * (-self.zeta + self.beta * self.z_foc)
             * inv_complex_waist_2
             + 2.0j
-            * (self.phi2 - self.beta**2 * self.k0 * self.z_foc_over_zr)
+            * (self.phi2 - self.beta**2 * self.k0 * self.z_foc)
             * inv_tau2
         )
         stc_exponent = (
@@ -294,7 +295,7 @@ class STCGaussianProfile(Profile):
                 * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
                 - 2.0j
                 * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
-                * (-self.zeta - self.beta * self.z_foc_over_zr)
+                * (-self.zeta - self.beta * self.z_foc)
                 * inv_complex_waist_2
             )
             ** 2
