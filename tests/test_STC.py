@@ -3,7 +3,7 @@ import scipy.constants as scc
 
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import STCGaussianProfile
-from lasy.utils.laser_utils import get_Phi2, get_Zeta(dim, grid, k0)
+from lasy.utils.laser_utils import get_Phi2, get_Zeta
 
 # Create profile.
 profile = STCGaussianProfile(
