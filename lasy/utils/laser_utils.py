@@ -1097,11 +1097,11 @@ def get_Prop_angle(dim, grid, k0):
 
      Return
     ----------
-<<<<<<< HEAD
-   angle_x, angle_y: propagating angle in :math:` p=k_x or k_y/kz` (rad)
-=======
+    <<<<<<< HEAD
+    angle_x, angle_y: propagating angle in :math:` p=k_x or k_y/kz` (rad)
+    =======
     angle_x, angle_y: propagating angle in :math:` p=k_x or k_y/kz`
->>>>>>> refs/remotes/huixingjian/add_diag_util
+    >>>>>>> refs/remotes/huixingjian/add_diag_util
     """
     assert dim == "xyt", "Propagation always on-axis axis-sysmetric dimension"
     env = grid.get_temporal_field()
