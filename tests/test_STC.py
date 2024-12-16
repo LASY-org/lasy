@@ -35,9 +35,9 @@ laser_2d = Laser(
     profile=profile,
 )
 Phi2_3d = get_Phi2(laser_3d.dim, laser_3d.grid, k0=2 * scc.pi / 0.6e-6)
-#STC_2d = get_STC(laser_2d.dim, laser_2d.grid, k0=2 * scc.pi / 0.6e-6)
+# STC_2d = get_STC(laser_2d.dim, laser_2d.grid, k0=2 * scc.pi / 0.6e-6)
 print(Phi2_3d)
 np.testing.assert_approx_equal(Phi2_3d, 2.4e-27, significant=2)
-#np.testing.assert_approx_equal(STC_3d["phi2"], 2.4e-19, significant=2)
-#np.testing.assert_approx_equal(STC_3d["beta_y"], 3e-18, significant=2)
-#np.testing.assert_approx_equal(STC_3d["zeta_y"], 2.4e-24, significant=2)
+# np.testing.assert_approx_equal(STC_3d["phi2"], 2.4e-19, significant=2)
+# np.testing.assert_approx_equal(STC_3d["beta_y"], 3e-18, significant=2)
+# np.testing.assert_approx_equal(STC_3d["zeta_y"], 2.4e-24, significant=2)
