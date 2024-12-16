@@ -147,10 +147,6 @@ class GaussianProfile(CombinedLongitudinalTransverseProfile):
         t_peak,
         cep_phase=0,
         z_foc=0,
-        phi2=0,
-        beta=0,
-        zeta=0,
-        stc_theta=0,
     ):
         super().__init__(
             wavelength,
@@ -190,13 +186,7 @@ class STCGaussianProfile(Profile):
         self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
-        if z_foc == 0:
-            self.z_foc_over_zr = 0
-        else:
-            assert (
-                wavelength is not None
-            ), "You need to pass the wavelength, when `z_foc` is non-zero."
-            self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
+        self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
         self.phi2 = phi2
         self.beta = beta
         self.zeta = zeta
@@ -224,8 +214,6 @@ class STCGaussianProfile(Profile):
         inv_complex_waist_2 = (
             1.0
             / (self.w0**2 * (1.0 + 2.0j * self.z_foc_over_zr / (self.k0 * self.w0**2)))
-            if self.w0
-            else 0
         )
         stretch_factor = (
             1
