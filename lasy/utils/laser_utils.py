@@ -984,7 +984,9 @@ def get_Pft(dim, grid):
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     weight_xy_2d = np.mean(env_spec_abs2, axis=2)
-    z_centroids = np.sum(grid.axes[2] * env_abs2, axis=2) / np.sum(env_spec_abs2, axis=2)
+    z_centroids = np.sum(grid.axes[2] * env_abs2, axis=2) / np.sum(
+        env_spec_abs2, axis=2
+    )
     derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
     derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
     pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
@@ -996,9 +998,7 @@ def get_prop_angle(dim, grid, k0):
     assert dim == "rt", "Propagation always on-axis axis-sysmetric dimension"
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
-    phi_envelop_abs = np.unwrap(
-        np.array(np.arctan2(env.imag, env.real)), axis=2
-    )
+    phi_envelop_abs = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     angle_x = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
     angle_y = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
     return [angle_x, angle_y]
