@@ -983,9 +983,9 @@ def get_Pft(dim, grid):
     assert dim == "xyt", "No pulse front tilt for axis-sysmetric dimension"
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
-    weight_xy_2d = np.mean(env_spec_abs2, axis=2)
+    weight_xy_2d = np.mean(env_abs2, axis=2)
     z_centroids = np.sum(grid.axes[2] * env_abs2, axis=2) / np.sum(
-        env_spec_abs2, axis=2
+        env_abs2, axis=2
     )
     derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
     derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
@@ -994,7 +994,7 @@ def get_Pft(dim, grid):
     return [pft_x, pft_y]
 
 
-def get_prop_angle(dim, grid, k0):
+def get_Prop_angle(dim, grid, k0):
     assert dim == "xyt", "Propagation always on-axis axis-sysmetric dimension"
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
