@@ -2,11 +2,11 @@ import numpy as np
 import scipy.constants as scc
 
 from lasy.laser import Laser
-from lasy.profiles.gaussian_profile import STCGaussianProfile
+from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.utils.laser_utils import get_STC
 
 # Create profile.
-profile = STCGaussianProfile(
+profile = GaussianProfile(
     wavelength=0.6e-6,  # m
     pol=(1, 0),
     laser_energy=1.0,  # J
