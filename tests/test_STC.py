@@ -34,6 +34,7 @@ laser_2d = Laser(
     npoints=(60, 200),
     profile=profile,
 )
+
 Phi2_3d = get_Phi2(laser_3d.dim, laser_3d.grid)
 #STC_2d = get_STC(laser_2d.dim, laser_2d.grid, k0=2 * scc.pi / 0.6e-6)
 print(Phi2_3d)
