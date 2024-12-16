@@ -942,19 +942,19 @@ def get_Phi2(dim, grid):
     """
     tau = 2 * get_duration(grid, dim)
     env = grid.get_temporal_field()
-    env_abs = np.abs(env**2)
+    env_abs2 = np.abs(env**2)
     # Calculate group-delayed dispersion
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
-    Phi2 = np.average(pphi_pt2, weights=env_abs)
+    Phi2 = np.average(pphi_pt2, weights=env_abs2)
     phi2 = np.max(np.roots([4 * Phi2, -4, tau**4 * Phi2]))
     return Phi2, phi2
 
 
 def get_Zeta(dim, grid, k0):
     r"""
-    Calculate the Group-delay dispersion of the laser.
+    Calculate the spatio-chirp of the laser.
 
     Parameters
     ----------
@@ -1002,6 +1002,27 @@ def get_Zeta(dim, grid, k0):
 
 
 def get_Beta(dim, grid, k0):
+    r"""
+    Calculate the angular dispersion of the laser.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with
+        the value of the envelope field and the associated metadata
+        that defines the points at which the laser is defined.
+
+     Return
+    ----------
+    beta_x, beta_y: Angular dispersion in :math:` \beta = d\theta_0/d\omega`
+    """
     assert dim == "xyt", "No angular chirp for axis-sysmetric dimension"
     env_spec = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
@@ -1040,8 +1061,10 @@ def get_Prop_angle(dim, grid, k0):
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     phi_envelop_abs = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
-    angle_x = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
-    angle_y = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
+    pphi_px = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)
+    pphi_py = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)
+    angle_x=np.average(pphi_px , weights=env_abs2) / k0
+    angle_y=np.average(pphi_py , weights=env_abs2) / k0
     return [angle_x, angle_y]
 
 
