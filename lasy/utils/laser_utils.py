@@ -1044,33 +1044,8 @@ def get_Beta(dim, grid, k0):
 
 
 def get_Pft(dim, grid):
-    assert dim == "xyt", "No pulse front tilt for axis-sysmetric dimension"
-    env = grid.get_temporal_field()
-    env_abs2 = np.abs(env**2)
-    weight_xy_2d = np.mean(env_abs2, axis=2)
-    z_centroids = np.sum(grid.axes[2] * env_abs2, axis=2) / np.sum(env_abs2, axis=2)
-    derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
-    derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
-    pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
-    pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
-    return [pft_x, pft_y]
-
-
-def get_Prop_angle(dim, grid, k0):
-    assert dim == "xyt", "Propagation always on-axis axis-sysmetric dimension"
-    env = grid.get_temporal_field()
-    env_abs2 = np.abs(env**2)
-    phi_envelop_abs = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
-    pphi_px = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)
-    pphi_py = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)
-    angle_x=np.average(pphi_px , weights=env_abs2) / k0
-    angle_y=np.average(pphi_py , weights=env_abs2) / k0
-    return [angle_x, angle_y]
-
-
-def get_STC(dim, grid, k0):
     r"""
-    Calculate the spatio-temporal coupling factors of the laser.
+    Calculate the pulse-front-tilt dispersion of the laser.
 
     Parameters
     ----------
@@ -1086,105 +1061,50 @@ def get_STC(dim, grid, k0):
         the value of the envelope field and the associated metadata
         that defines the points at which the laser is defined.
 
-    k0 : scalar
-        Wavenumber of the field
-
-    Return
+     Return
     ----------
-    STC_fac : dict of floats
-        A dictionary of floats corresponding to the STC factors. The keys are:
-            Phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt`
-            phi2: Group-delayed dispersion in :math:`\phi^{(2)}=dt_0/d(\omega)`
-            nu_x, nu_y: Spatio-chirp in :math:`\nu=d(\omega_0)/dx`
-            zeta_x, zeta_y: Spatio-chirp in :math:`\zeta=dx_0/d(\omega_0)`
-            beta_x, beta_y: Angular dispersion in :math:` \beta = d\theta_0/d\omega`(Important note:
-                  for now beta is only correct when zeta and phi2 are 0!)
-            pft_x, pft_y: Pulse front tilt in :math:` p=dt/dx`
-    All those above units and definitions are taken from
-    `S. Akturk et al., Optics Express 12, 4399 (2004) <https://doi.org/10.1364/OPEX.12.004399>`__.
+   pft_x, pft_y: Pulse front tilt in :math:` p=dt/dx`
     """
-    tau = 2 * get_duration(grid, dim)
-    w0 = get_w0(grid, dim)
-
-    # Initialise the returned dictionary
-    STC_fac = {
-        "Phi2": 0,
-        "phi2": 0,
-        "nu_x": 0,
-        "nu_y": 0,
-        "zeta_x": 0,
-        "zeta_y": 0,
-        "beta_x": 0,
-        "beta_y": 0,
-        "pft_x": 0,
-        "pft_y": 0,
-    }
-
-    # Get temporal and spectral field
+    assert dim == "xyt", "No pulse front tilt for axis-sysmetric dimension"
     env = grid.get_temporal_field()
-    env_abs = np.abs(env**2)
-    env_spec = grid.get_spectral_field()
-    env_spec_abs = np.abs(env_spec**2)
+    env_abs2 = np.abs(env**2)
+    weight_xy_2d = np.mean(env_abs2, axis=2)
+    z_centroids = np.sum(grid.axes[2] * env_abs2, axis=2) / np.sum(env_abs2, axis=2)
+    derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
+    derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
+    pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
+    pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
+    return [pft_x, pft_y]
 
-    # Get the spectral axis
-    dt = grid.dx[-1]
-    Nt = grid.shape[-1]
-    omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
-    # Calculate group-delayed dispersion
-    phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
-    pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
-    pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
-    STC_fac["Phi2"] = np.average(pphi_pt2, weights=env_abs)
-    STC_fac["phi2"] = np.max(
-        np.roots([4 * STC_fac["Phi2"], -4, tau**4 * STC_fac["Phi2"]])
-    )
-    # No spatial chirp and angular chirp in 'rt' coordinate
-    if dim == "rt":
-        return STC_fac
-    # Calculate spatio- and angular dispersion
-    if dim == "xyt":
-        # Calculate dx0 and dy0 in (x,y,omega) space
-        weight_x_3d = np.transpose(env_spec_abs, (2, 1, 0))
-        weight_y_3d = np.transpose(env_spec_abs, (2, 0, 1))
-        xda = np.sum(grid.axes[0] * weight_x_3d, axis=2) / np.sum(weight_x_3d, axis=2)
-        yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2)
 
-        # Calculate spatial chirp zeta
-        derivative_x_zeta = np.gradient(xda, omega, axis=0)
-        derivative_y_zeta = np.gradient(yda, omega, axis=0)
-        weight_x_2d = np.mean(env_spec_abs, axis=0)
-        weight_y_2d = np.mean(env_spec_abs, axis=1)
-        zeta_x = np.average(derivative_x_zeta.T, weights=weight_x_2d)
-        zeta_y = np.average(derivative_y_zeta.T, weights=weight_y_2d)
-        STC_fac["zeta_x"] = zeta_x
-        STC_fac["zeta_y"] = zeta_y
-        STC_fac["nu_x"] = (
-            4 * STC_fac["zeta_x"] / (w0**2 * tau**2 + 4 * STC_fac["zeta_x"] ** 2)
-        )
-        STC_fac["nu_y"] = (
-            4 * STC_fac["zeta_y"] / (w0**2 * tau**2 + 4 * STC_fac["zeta_y"] ** 2)
-        )
+def get_Prop_angle(dim, grid, k0):
+    r"""
+    Calculate the propagating angle of the laser.
 
-        # Calculate angular dispersion beta
-        phi_envelop_abs = np.unwrap(
-            np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
-        )
-        angle_x = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
-        angle_y = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
-        derivative_x_beta = np.gradient(angle_y, omega, axis=2)
-        derivative_y_beta = np.gradient(angle_x, omega, axis=2)
-        beta_x = np.average(derivative_x_beta, weights=env_spec_abs)
-        beta_y = np.average(derivative_y_beta, weights=env_spec_abs)
-        STC_fac["beta_x"] = beta_x
-        STC_fac["beta_y"] = beta_y
-        # Calculate pulse front tilt
-        weight_xy_2d = np.mean(env_abs, axis=2)
-        z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
-        derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
-        derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
-        pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
-        pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
-        STC_fac["pft_x"] = pft_x
-        STC_fac["pft_y"] = pft_y
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-        return STC_fac
+    grid : a Grid object.
+        It contains an ndarray (V/m) with
+        the value of the envelope field and the associated metadata
+        that defines the points at which the laser is defined.
+
+     Return
+    ----------
+   angle_x, angle_y: propagating angle in :math:` p=k_x or k_y/kz`
+    """
+    assert dim == "xyt", "Propagation always on-axis axis-sysmetric dimension"
+    env = grid.get_temporal_field()
+    env_abs2 = np.abs(env**2)
+    phi_envelop_abs = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
+    pphi_px = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)
+    pphi_py = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)
+    angle_x=np.average(pphi_px , weights=env_abs2) / k0
+    angle_y=np.average(pphi_py , weights=env_abs2) / k0
+    return [angle_x, angle_y]
