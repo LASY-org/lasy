@@ -15,7 +15,7 @@ profile = STCGaussianProfile(
     t_peak=0.0,  # s
     beta=0,
     zeta=0,
-    phi2=2.4e-27,
+    phi2=2.4e-24,
     stc_theta=scc.pi / 2,
 )
 # Create laser with given profile in `xyt` geometry.
@@ -34,10 +34,10 @@ laser_2d = Laser(
     npoints=(60, 200),
     profile=profile,
 )
-Phi2_3d = get_Phi2(laser_3d.dim, laser_3d.grid, k0=2 * scc.pi / 0.6e-6)
+Phi2_3d = get_Phi2(laser_3d.dim, laser_3d.grid)
 #STC_2d = get_STC(laser_2d.dim, laser_2d.grid, k0=2 * scc.pi / 0.6e-6)
 print(Phi2_3d)
-np.testing.assert_approx_equal(Phi2_3d, 2.4e-27, significant=2)
+np.testing.assert_approx_equal(Phi2_3d, 2.4e-24, significant=2)
 #np.testing.assert_approx_equal(STC_3d["phi2"], 2.4e-19, significant=2)
 #np.testing.assert_approx_equal(STC_3d["beta_y"], 3e-18, significant=2)
 #np.testing.assert_approx_equal(STC_3d["zeta_y"], 2.4e-24, significant=2)
