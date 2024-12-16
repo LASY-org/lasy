@@ -192,15 +192,22 @@ class STCGaussianProfile(Profile):
     ):
         super().__init__(wavelength, pol)
         self.laser_energy = laser_energy
+        self.w0 = w0
         self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
-        self.beta = beta
+        if z_foc == 0:
+            self.z_foc_over_zr = 0
+        else:
+            assert (
+                wavelength is not None
+            ), "You need to pass the wavelength, when `z_foc` is non-zero."
+            self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
         self.phi2 = phi2
+        self.beta = beta
         self.zeta = zeta
-        self.w0 = w0
         self.stc_theta = stc_theta
-        self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
+
 
     def evaluate(self, t, x, y):
         """
