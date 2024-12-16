@@ -156,7 +156,7 @@ class STCGaussianLongitudinalProfile(LongitudinalProfile):
             ), "You need to pass the wavelength, when `z_foc` is non-zero."
             self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
 
-    def evaluate(self, t, x=0, y=0):
+    def evaluate(self, t, x, y):
         """
         Return the longitudinal envelope.
 

@@ -930,7 +930,7 @@ def get_Phi2(dim, grid):
     return Phi2, phi2
 
 
-def get_Zeta(dim, grid):
+def get_Zeta(dim, grid, k0):
     assert dim == "rt", "No spatial chirp for axis-sysmetric dimension"
     w0 = get_w0(grid, dim)
     tau = 2 * get_duration(grid, dim)
@@ -945,8 +945,7 @@ def get_Zeta(dim, grid):
     weight_x_3d = np.transpose(env_spec_abs2, (2, 1, 0))
     weight_y_3d = np.transpose(env_spec_abs2, (2, 0, 1))
     xda = np.sum(grid.axes[0] * weight_x_3d, axis=2) / np.sum(weight_x_3d, axis=2)
-    yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2)
-
+    yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2
     # Calculate spatial chirp zeta
     derivative_x_zeta = np.gradient(xda, omega, axis=0)
     derivative_y_zeta = np.gradient(yda, omega, axis=0)
@@ -983,9 +982,9 @@ def get_Beta(dim, grid, k0):
 def get_Pft(dim, grid):
     assert dim == "rt", "No pulse front tilt for axis-sysmetric dimension"
     env = grid.get_temporal_field()
-    env_abs = np.abs(env**2)
-    weight_xy_2d = np.mean(env_abs, axis=2)
-    z_centroids = np.sum(grid.axes[2] * env_abs, axis=2) / np.sum(env_abs, axis=2)
+    env_abs2 = np.abs(env**2)
+    weight_xy_2d = np.mean(env_spec_abs2, axis=2)
+    z_centroids = np.sum(grid.axes[2] * env_abs2, axis=2) / np.sum(env_spec_abs2, axis=2)
     derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
     derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
     pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
@@ -995,8 +994,10 @@ def get_Pft(dim, grid):
 
 def get_prop_angle(dim, grid, k0):
     assert dim == "rt", "Propagation always on-axis axis-sysmetric dimension"
+    env = grid.get_temporal_field()
+    env_abs2 = np.abs(env**2)
     phi_envelop_abs = np.unwrap(
-        np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
+        np.array(np.arctan2(env.imag, env.real)), axis=2
     )
     angle_x = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
     angle_y = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
