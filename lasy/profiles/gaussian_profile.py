@@ -208,7 +208,6 @@ class STCGaussianProfile(Profile):
         self.zeta = zeta
         self.stc_theta = stc_theta
 
-
     def evaluate(self, t, x, y):
         """
         Return the longitudinal envelope.
