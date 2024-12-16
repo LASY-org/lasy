@@ -15,7 +15,7 @@ profile = STCGaussianProfile(
     t_peak=0.0,  # s
     beta=3e-18,
     zeta=2.4e-24,
-    phi2=2.4e-19,
+    phi2=2.4e-27,
     stc_theta=scc.pi / 2,
 )
 # Create laser with given profile in `xyt` geometry.
