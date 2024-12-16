@@ -1063,7 +1063,7 @@ def get_Pft(dim, grid):
 
      Return
     ----------
-   pft_x, pft_y: Pulse front tilt in :math:` p=dt/dx` (second * meter^-1)
+    pft_x, pft_y: Pulse front tilt in :math:` p=dt/dx` (second * meter^-1)
     """
     assert dim == "xyt", "No pulse front tilt for axis-sysmetric dimension"
     env = grid.get_temporal_field()
@@ -1097,7 +1097,11 @@ def get_Prop_angle(dim, grid, k0):
 
      Return
     ----------
+<<<<<<< HEAD
    angle_x, angle_y: propagating angle in :math:` p=k_x or k_y/kz` (rad)
+=======
+    angle_x, angle_y: propagating angle in :math:` p=k_x or k_y/kz`
+>>>>>>> refs/remotes/huixingjian/add_diag_util
     """
     assert dim == "xyt", "Propagation always on-axis axis-sysmetric dimension"
     env = grid.get_temporal_field()
@@ -1105,6 +1109,6 @@ def get_Prop_angle(dim, grid, k0):
     phi_envelop_abs = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_px = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)
     pphi_py = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)
-    angle_x=np.average(pphi_px , weights=env_abs2) / k0
-    angle_y=np.average(pphi_py , weights=env_abs2) / k0
+    angle_x = np.average(pphi_px, weights=env_abs2) / k0
+    angle_y = np.average(pphi_py, weights=env_abs2) / k0
     return [angle_x, angle_y]
