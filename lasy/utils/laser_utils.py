@@ -959,7 +959,7 @@ def get_Zeta(dim, grid, k0):
 
 
 def get_Beta(dim, grid, k0):
-    assert dim is "xyt", "No angular chirp for axis-sysmetric dimension"
+    assert dim == "xyt", "No angular chirp for axis-sysmetric dimension"
     env_spec = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
     # Get the spectral axis
