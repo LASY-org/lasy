@@ -931,7 +931,7 @@ def get_Phi2(dim, grid):
 
 
 def get_Zeta(dim, grid, k0):
-    assert dim == "rt", "No spatial chirp for axis-sysmetric dimension"
+    assert dim == "xyt", "No spatial chirp for axis-sysmetric dimension"
     w0 = get_w0(grid, dim)
     tau = 2 * get_duration(grid, dim)
     env_spec = grid.get_spectral_field()
@@ -959,7 +959,7 @@ def get_Zeta(dim, grid, k0):
 
 
 def get_Beta(dim, grid, k0):
-    assert dim == "rt", "No angular chirp for axis-sysmetric dimension"
+    assert dim is "xyt", "No angular chirp for axis-sysmetric dimension"
     env_spec = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
     # Get the spectral axis
@@ -980,7 +980,7 @@ def get_Beta(dim, grid, k0):
 
 
 def get_Pft(dim, grid):
-    assert dim == "rt", "No pulse front tilt for axis-sysmetric dimension"
+    assert dim == "xyt", "No pulse front tilt for axis-sysmetric dimension"
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     weight_xy_2d = np.mean(env_spec_abs2, axis=2)
@@ -995,7 +995,7 @@ def get_Pft(dim, grid):
 
 
 def get_prop_angle(dim, grid, k0):
-    assert dim == "rt", "Propagation always on-axis axis-sysmetric dimension"
+    assert dim == "xyt", "Propagation always on-axis axis-sysmetric dimension"
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     phi_envelop_abs = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
