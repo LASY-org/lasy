@@ -937,8 +937,8 @@ def get_Phi2(dim, grid):
 
      Return
     ----------
-    Phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt`
-    phi2: Group-delayed dispersion in :math:`\phi^{(2)}=dt_0/d(\omega)`
+    Phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` (second^-2)
+    phi2: Group-delayed dispersion in :math:`\phi^{(2)}=dt_0/d(\omega)` (second^2)
     """
     tau = 2 * get_duration(grid, dim)
     env = grid.get_temporal_field()
@@ -972,8 +972,8 @@ def get_Zeta(dim, grid, k0):
 
      Return
     ----------
-    zeta_x, zeta_y: Spatio-chirp in :math:`\zeta=dx_0/d(\omega_0)`
-    nu_x, nu_y: Spatio-chirp in :math:`\nu=d(\omega_0)/dx`
+    zeta_x, zeta_y: Spatio-chirp in :math:`\zeta=dx_0/d(\omega_0)` (meter * second)
+    nu_x, nu_y: Spatio-chirp in :math:`\nu=d(\omega_0)/dx` (meter^-1 * second^-1)
     """
     assert dim == "xyt", "No spatial chirp for axis-sysmetric dimension"
     w0 = get_w0(grid, dim)
@@ -1021,7 +1021,7 @@ def get_Beta(dim, grid, k0):
 
      Return
     ----------
-    beta_x, beta_y: Angular dispersion in :math:` \beta = d\theta_0/d\omega`
+    beta_x, beta_y: Angular dispersion in :math:` \beta = d\theta_0/d\omega` (second)
     """
     assert dim == "xyt", "No angular chirp for axis-sysmetric dimension"
     env_spec = grid.get_spectral_field()
@@ -1063,7 +1063,7 @@ def get_Pft(dim, grid):
 
      Return
     ----------
-   pft_x, pft_y: Pulse front tilt in :math:` p=dt/dx`
+   pft_x, pft_y: Pulse front tilt in :math:` p=dt/dx` (second * meter^-1)
     """
     assert dim == "xyt", "No pulse front tilt for axis-sysmetric dimension"
     env = grid.get_temporal_field()
@@ -1097,7 +1097,7 @@ def get_Prop_angle(dim, grid, k0):
 
      Return
     ----------
-   angle_x, angle_y: propagating angle in :math:` p=k_x or k_y/kz`
+   angle_x, angle_y: propagating angle in :math:` p=k_x or k_y/kz` (rad)
     """
     assert dim == "xyt", "Propagation always on-axis axis-sysmetric dimension"
     env = grid.get_temporal_field()
