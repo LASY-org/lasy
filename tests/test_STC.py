@@ -44,4 +44,3 @@ np.testing.assert_approx_equal(Zeta[1], 2.4e-24, significant=2)
 #np.testing.assert_approx_equal(STC_3d["phi2"], 2.4e-19, significant=2)
 #np.testing.assert_approx_equal(STC_3d["beta_y"], 3e-18, significant=2)
 #np.testing.assert_approx_equal(STC_3d["zeta_y"], 2.4e-24, significant=2)
-
