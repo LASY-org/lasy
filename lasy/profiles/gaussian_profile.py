@@ -8,7 +8,7 @@ from .transverse import GaussianTransverseProfile
 
 class GaussianProfile(Profile):
     r"""
-    Class for the analytic profile of a Gaussian laser pulse with spatio-temporal coupling.
+    Class for the analytic profile of a Gaussian laser pulse.
 
     More precisely, the electric field corresponds to:
 
