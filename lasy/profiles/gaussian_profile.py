@@ -88,7 +88,7 @@ class GaussianProfile(Profile):
         Here :math:`x_0` is the beam center position.
 
     stc_theta :  float (in rad) optional (default '0')
-        Transverse direction along which spatio-temporal field couples.
+        Transverse direction along which there are chirps and spatio-temporal couplings.
         0 is along x axis.
 
     Examples
