@@ -185,7 +185,7 @@ class GaussianProfile(Profile):
         """
         inv_tau2 = self.tau ** (-2)
         inv_complex_waist_2 = 1.0 / (
-            self.w0**2 * (1.0 + 2.0j * self.z_foc/ (self.k0 * self.w0**2))
+            self.w0**2 * (1.0 + 2.0j * self.z_foc / (self.k0 * self.w0**2))
         )
         stretch_factor = (
             1
@@ -194,9 +194,7 @@ class GaussianProfile(Profile):
             * inv_tau2
             * (-self.zeta + self.beta * self.z_foc)
             * inv_complex_waist_2
-            + 2.0j
-            * (self.phi2 - self.beta**2 * self.k0 * self.z_foc)
-            * inv_tau2
+            + 2.0j * (self.phi2 - self.beta**2 * self.k0 * self.z_foc) * inv_tau2
         )
         stc_exponent = (
             1.0
