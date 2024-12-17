@@ -944,7 +944,7 @@ def get_phi2(dim, grid):
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
     phi2 = np.average(pphi_pt2, weights=env_abs2)
-    varphi2 = np.max(np.roots([4 * Phi2, -4, tau**4 * Phi2]))
+    varphi2 = np.max(np.roots([4 * phi2, -4, tau**4 * phi2]))
     return phi2, varphi2
 
 
