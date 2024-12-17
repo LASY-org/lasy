@@ -10,7 +10,7 @@ import numpy as np
 
 from lasy.laser import Laser
 from lasy.optical_elements import Axiparabola
-from lasy.profiles.gaussian_profile import CombinedLongitudinalTransverseProfile
+from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import SuperGaussianTransverseProfile
 
