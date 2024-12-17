@@ -3,7 +3,6 @@
 Test checks the implementation of the initialization and diagnostics to spatio-temporal coupling gaussian lasers
 by creating a gaussian pulse on focus and calculate the STC factors by the implemented functions in laser.utils.
 The correctness is also checked through comparing the gaussian profile and a combined gaussian profile off-focus.
-
 """
 
 import numpy as np
@@ -80,8 +79,8 @@ laser_2d_gaussian = Laser(
     npoints=(60, 200),
     profile=profile_gaussian,
 )
-env_combined = laser_2d_combined.grid.get_temporal_field()
-env_gaussian = laser_2d_gaussian.grid.get_temporal_field()
+env_combined = np.abs(laser_2d_combined.grid.get_temporal_field())
+env_gaussian = np.abs(laser_2d_gaussian.grid.get_temporal_field())
 err = np.average(env_combined - env_gaussian)
 
 Phi2_3d, phi2_3d = get_phi2(laser_3d.dim, laser_3d.grid)
