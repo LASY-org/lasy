@@ -56,6 +56,7 @@ trans_profile = GaussianTransverseProfile(w0, wavelength, z_foc)
 combined_profile = CombinedLongitudinalTransverseProfile(
     wavelength, pol, laser_energy, long_profile, trans_profile
 )
+
 profile_gaussian = GaussianProfile(
     wavelength=wavelength,
     pol=pol,
@@ -67,15 +68,15 @@ profile_gaussian = GaussianProfile(
 )
 laser_2d_combined = Laser(
     dim="rt",
-    lo=(-10e-6, -10e-14),
-    hi=(10e-6, +10e-14),
+    lo=(0e-6, -10e-14),
+    hi=(50e-6, +10e-14),
     npoints=(60, 200),
     profile=combined_profile,
 )
 laser_2d_gaussian = Laser(
     dim="rt",
-    lo=(-10e-6, -10e-14),
-    hi=(10e-6, +10e-14),
+    lo=(0e-6, -10e-14),
+    hi=(50e-6, +10e-14),
     npoints=(60, 200),
     profile=profile_gaussian,
 )
