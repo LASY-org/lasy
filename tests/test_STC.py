@@ -38,8 +38,8 @@ laser_2d = Laser(
 Phi2_3d, phi2_3d = get_Phi2(laser_3d.dim, laser_3d.grid)
 Phi2_2d, phi2_2d = get_Phi2(laser_2d.dim, laser_2d.grid)
 
-[, zeta_y],  = get_Zeta(laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6)
-[, beta_y] = get_Beta(laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6)
+[zeta_x, zeta_y],[nu_x, nu_y]  = get_Zeta(laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6)
+[beta_x, beta_y] = get_Beta(laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6)
 
 np.testing.assert_approx_equal(phi2_3d, 2.4e-24, significant=2)
 np.testing.assert_approx_equal(phi2_2d, 2.4e-24, significant=2)
