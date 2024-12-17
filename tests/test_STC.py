@@ -5,28 +5,29 @@ by creating a gaussian pulse on focus and calculate the STC factors by the imple
 The correctness is also checked through comparing the gaussian profile and a combined gaussian profile off-focus.
 
 """
+
 import numpy as np
 import scipy.constants as scc
 
 from lasy.laser import Laser
-from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.laser_utils import get_beta, get_phi2, get_zeta
 from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
+from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import GaussianTransverseProfile
+from lasy.utils.laser_utils import get_beta, get_phi2, get_zeta
 
-wavelength=0.6e-6  # m
-pol=(1, 0)
-laser_energy=1.0  # J
-w0=5e-6  # m
-tau=5e-14  # s
-t_peak=0.0  # s
-beta=3e-18  # s
-zeta=2.4e-22  # m * s
-phi2=2.4e-24  # s ^ 2
-stc_theta=scc.pi / 2  # rad
-z_r = (np.pi * w0**2)/wavelength
-z_foc = 3*z_r
+wavelength = 0.6e-6  # m
+pol = (1, 0)
+laser_energy = 1.0  # J
+w0 = 5e-6  # m
+tau = 5e-14  # s
+t_peak = 0.0  # s
+beta = 3e-18  # s
+zeta = 2.4e-22  # m * s
+phi2 = 2.4e-24  # s ^ 2
+stc_theta = scc.pi / 2  # rad
+z_r = (np.pi * w0**2) / wavelength
+z_foc = 3 * z_r
 # Create STC profile.
 profile = GaussianProfile(
     wavelength=wavelength,
@@ -51,17 +52,19 @@ laser_3d = Laser(
 )
 
 # Create laser with given profile in `rt` geometry.
-long_profile=GaussianLongitudinalProfile(wavelength, tau, t_peak)
+long_profile = GaussianLongitudinalProfile(wavelength, tau, t_peak)
 trans_profile = GaussianTransverseProfile(w0, wavelength, z_foc)
-combined_profile = CombinedLongitudinalTransverseProfile(wavelength, pol, laser_energy, long_profile, trans_profile)
-profile_gaussian =  GaussianProfile(
+combined_profile = CombinedLongitudinalTransverseProfile(
+    wavelength, pol, laser_energy, long_profile, trans_profile
+)
+profile_gaussian = GaussianProfile(
     wavelength=wavelength,
     pol=pol,
     laser_energy=laser_energy,
     w0=w0,
     tau=tau,
     t_peak=t_peak,
-    z_foc=z_foc
+    z_foc=z_foc,
 )
 laser_2d_combined = Laser(
     dim="rt",
@@ -79,7 +82,7 @@ laser_2d_gaussian = Laser(
 )
 env_combined = laser_2d_combined.grid.get_temporal_field()
 env_gaussian = laser_2d_gaussian.grid.get_temporal_field()
-err= np.average(env_combined - env_gaussian)
+err = np.average(env_combined - env_gaussian)
 
 Phi2_3d, phi2_3d = get_phi2(laser_3d.dim, laser_3d.grid)
 
