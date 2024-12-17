@@ -79,7 +79,7 @@ class GaussianProfile(Profile):
             \phi^{(2)} = \frac{dt}{d\omega}
 
     zeta : float (in meter * second) optional (default '0')
-        The spatio-chirp parameterized by:
+        The spatial chirp parameterized by:
 
         .. math::
 
