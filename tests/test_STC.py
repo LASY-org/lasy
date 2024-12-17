@@ -82,7 +82,8 @@ laser_2d_gaussian = Laser(
 )
 env_combined = laser_2d_combined.grid.get_temporal_field()
 env_gaussian = laser_2d_gaussian.grid.get_temporal_field()
-err_real = np.average(np.array(env_combined.real) - np.array(env_gaussian.real))
+err_real = np.average((np.array(env_combined.real) - np.array(env_gaussian.real))/(np.array(env_combined.real))
+err_imag = np.average(np.array(env_combined.imag) - np.array(env_gaussian.imag)/(np.array(env_combined.imag))
 
 Phi2_3d, phi2_3d = get_phi2(laser_3d.dim, laser_3d.grid)
 
@@ -90,7 +91,7 @@ Phi2_3d, phi2_3d = get_phi2(laser_3d.dim, laser_3d.grid)
     laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6
 )
 [beta_x, beta_y] = get_beta(laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6)
-np.testing.assert_approx_equal(err_real, 1e-3, significant=1)
+assert (err_real+err_imag)<1e-6
 np.testing.assert_approx_equal(phi2_3d, 2.4e-24, significant=2)
 np.testing.assert_approx_equal(zeta_y, 2.4e-22, significant=2)
 np.testing.assert_approx_equal(beta_y, 3e-18, significant=2)
