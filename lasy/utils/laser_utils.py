@@ -915,7 +915,7 @@ def get_w0(grid, dim):
     return sigma
 
 
-def get_Phi2(dim, grid):
+def get_phi2(dim, grid):
     r"""
     Calculate the Group-delay dispersion of the laser.
 
@@ -933,8 +933,8 @@ def get_Phi2(dim, grid):
 
      Return
     ----------
-    Phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` (second^-2)
-    phi2: Group-delayed dispersion in :math:`\phi^{(2)}=dt_0/d(\omega)` (second^2)
+    phi2: Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` (second^-2)
+    varphi2: Group-delayed dispersion in :math:`\varphi^{(2)}=dt_0/d(\omega)` (second^2)
     """
     tau = 2 * get_duration(grid, dim)
     env = grid.get_temporal_field()
@@ -943,12 +943,12 @@ def get_Phi2(dim, grid):
     phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
-    Phi2 = np.average(pphi_pt2, weights=env_abs2)
-    phi2 = np.max(np.roots([4 * Phi2, -4, tau**4 * Phi2]))
-    return Phi2, phi2
+    phi2 = np.average(pphi_pt2, weights=env_abs2)
+    varphi2 = np.max(np.roots([4 * Phi2, -4, tau**4 * Phi2]))
+    return phi2, varphi2
 
 
-def get_Zeta(dim, grid, k0):
+def get_zeta(dim, grid, k0):
     r"""
     Calculate the spatio-chirp of the laser.
 
@@ -995,7 +995,7 @@ def get_Zeta(dim, grid, k0):
     return [zeta_x, zeta_y], [nu_x, nu_y]
 
 
-def get_Beta(dim, grid, k0):
+def get_beta(dim, grid, k0):
     r"""
     Calculate the angular dispersion of the laser.
 
@@ -1036,7 +1036,7 @@ def get_Beta(dim, grid, k0):
     return [beta_x, beta_y]
 
 
-def get_Pft(dim, grid):
+def get_pft(dim, grid):
     r"""
     Calculate the pulse-front-tilt dispersion of the laser.
 
@@ -1070,7 +1070,7 @@ def get_Pft(dim, grid):
     return [pft_x, pft_y]
 
 
-def get_Prop_angle(dim, grid, k0):
+def get_propation_angle(dim, grid, k0):
     r"""
     Calculate the propagating angle of the laser.
 
