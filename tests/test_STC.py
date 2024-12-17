@@ -82,7 +82,7 @@ laser_2d_gaussian = Laser(
 )
 env_combined = np.abs(laser_2d_combined.grid.get_temporal_field())
 env_gaussian = np.abs(laser_2d_gaussian.grid.get_temporal_field())
-err = np.average(env_combined - env_gaussian)
+err = np.average(env_combined)
 
 Phi2_3d, phi2_3d = get_phi2(laser_3d.dim, laser_3d.grid)
 
