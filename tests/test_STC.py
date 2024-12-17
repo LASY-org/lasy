@@ -90,9 +90,9 @@ err_real = np.average(
     (np.array(env_combined.real) - np.array(env_gaussian.real))
     / np.array(env_combined.real)
 )
-err_imag = np.average((
-    np.array(env_combined.imag)
-    - np.array(env_gaussian.imag)) / np.array(env_combined.imag)
+err_imag = np.average(
+    (np.array(env_combined.imag) - np.array(env_gaussian.imag))
+    / np.array(env_combined.imag)
 )
 
 Phi2_3d, phi2_3d = get_phi2(laser_3d.dim, laser_3d.grid)
