@@ -66,6 +66,7 @@ profile_gaussian = GaussianProfile(
     t_peak=t_peak,
     z_foc=z_foc,
 )
+
 laser_2d_combined = Laser(
     dim="rt",
     lo=(0e-6, -10e-14),
@@ -73,6 +74,7 @@ laser_2d_combined = Laser(
     npoints=(60, 200),
     profile=combined_profile,
 )
+
 laser_2d_gaussian = Laser(
     dim="rt",
     lo=(0e-6, -10e-14),
@@ -80,15 +82,17 @@ laser_2d_gaussian = Laser(
     npoints=(60, 200),
     profile=profile_gaussian,
 )
+
 env_combined = laser_2d_combined.grid.get_temporal_field()
 env_gaussian = laser_2d_gaussian.grid.get_temporal_field()
+
 err_real = np.average(
     (np.array(env_combined.real) - np.array(env_gaussian.real))
     / np.array(env_combined.real)
 )
-err_imag = np.average(
+err_imag = np.average((
     np.array(env_combined.imag)
-    - np.array(env_gaussian.imag) / np.array(env_combined.imag)
+    - np.array(env_gaussian.imag)) / np.array(env_combined.imag)
 )
 
 Phi2_3d, phi2_3d = get_phi2(laser_3d.dim, laser_3d.grid)
