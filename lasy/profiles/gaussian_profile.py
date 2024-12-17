@@ -19,8 +19,7 @@ class GaussianProfile(Profile):
     where :math:`u` is either :math:`x` or :math:`y`, :math:`p_u` is
     the polarization vector, :math:`Re` represent the real part, and
     :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
-    to the propagation direction).
-    The other parameters in this formula are defined below.
+    to the propagation direction). The other parameters in this formula are defined below.
     This profile also supports some chirp parameters that are omitted in the expression above for clarity.
 
     Parameters
