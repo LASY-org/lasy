@@ -64,19 +64,19 @@ class GaussianProfile(Profile):
 
     phi2 : float (in second^2), optional (default: '0')
         The group-delay dispersion defined as:
-        .. math::
-            \phi^{(2)} = \frac{dt_0}{d\omega}
+            .. math::
+                \phi^{(2)} = \frac{dt_0}{d\omega}
 
     beta : float (in second), optional (default: '0')
         The angular dispersion defined as:
-        .. math::
-            \beta = \frac{d\theta_0}{d\omega}
+            .. math::
+                \beta = \frac{d\theta_0}{d\omega}
         Here :math:`\theta_0` is the propagation angle of this component.
 
     zeta : float (in meter * second), optional (default: '0')
         A spatial chirp defined as:
-        .. math::
-             \zeta = \frac{dx_0}{d\omega}
+            .. math::
+                \zeta = \frac{dx_0}{d\omega}
         Here :math:`x_0` is the beam center position.
         The definitions of beta, phi2, and zeta are taken from [S. Akturk et al., Optics Express 12, 4399 (2004)].
 
