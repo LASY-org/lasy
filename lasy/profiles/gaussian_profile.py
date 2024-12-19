@@ -64,7 +64,7 @@ class GaussianProfile(Profile):
 
     phi2 : float (in second^2), optional (default: '0')
         The group-delay dispersion defined as :math:`\phi^{(2)} = \frac{dt_0}{d\omega}. Here :math:`t_0` is the temporal position of this frequency component.
-        
+
     beta : float (in second), optional (default: '0')
         The angular dispersion defined as :math:`\beta = \frac{d\theta_0}{d\omega}`. Here :math:`\theta_0` is the propagation angle of this frequency component.
 
