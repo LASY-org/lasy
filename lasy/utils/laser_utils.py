@@ -1038,7 +1038,7 @@ def get_beta(dim, grid, k0):
 
 def get_pft(dim, grid):
     r"""
-    Calculate the pulse-front-tilt dispersion of the laser.
+    Calculate the pulse front tilt (PFT) of the laser.
 
     Parameters
     ----------
