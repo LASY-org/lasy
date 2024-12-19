@@ -155,7 +155,7 @@ class GaussianProfile(Profile):
         t : ndarrays of floats
             Define longitudinal points on which to evaluate the envelope
 
-        x,y : ndarrays of floats, necessary if spatio-temporal coupling exists
+        x,y : ndarrays of floats
             Define transverse points on which to evaluate the envelope
 
         Returns
