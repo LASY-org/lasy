@@ -66,7 +66,7 @@ class GaussianProfile(Profile):
         The group-delay dispersion defined as:
         .. math::
             \phi^{(2)} = \frac{dt}{d\omega}
-            
+
     beta : float (in seconds), optional (default: '0')
         The angular dispersion defined as:
         .. math::
