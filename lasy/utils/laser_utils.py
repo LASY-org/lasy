@@ -940,7 +940,7 @@ def get_phi2(dim, grid):
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     # Calculate group-delayed dispersion
-    phi_envelop = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
+    phi_envelop = np.unwrap(np.angle(env), axis=2)
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
     phi2 = np.average(pphi_pt2, weights=env_abs2)
@@ -1093,7 +1093,7 @@ def get_propation_angle(dim, grid, k0):
     assert dim == "xyt", "Propagation always on-axis axis-sysmetric dimension"
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
-    phi_envelop_abs = np.unwrap(np.array(np.arctan2(env.imag, env.real)), axis=2)
+    phi_envelop_abs = np.unwrap(np.angle(env), axis=2)
     pphi_px = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)
     pphi_py = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)
     angle_x = np.average(pphi_px, weights=env_abs2) / k0
