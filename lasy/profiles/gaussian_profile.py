@@ -62,25 +62,25 @@ class GaussianProfile(Profile):
     z_foc : float (in meter), optional
         Position of the focal plane. (The laser pulse is initialized at `z=0`.)
 
-    phi2 : float (in seconds^2), optional (default: '0')
+    phi2 : float (in second^2), optional (default: '0')
         The group-delay dispersion defined as:
         .. math::
             \phi^{(2)} = \frac{dt_0}{d\omega}
 
-    beta : float (in seconds), optional (default: '0')
+    beta : float (in second), optional (default: '0')
         The angular dispersion defined as:
         .. math::
             \beta = \frac{d\theta_0}{d\omega}
         Here :math:`\theta_0` is the propagation angle of this component.
 
-    zeta : float (in meters * seconds), optional (default: '0')
+    zeta : float (in meter * second), optional (default: '0')
         A spatial chirp defined as:
         .. math::
              \zeta = \frac{dx_0}{d\omega}
         Here :math:`x_0` is the beam center position.
         The definitions of beta, phi2, and zeta are taken from [S. Akturk et al., Optics Express 12, 4399 (2004)].
 
-    stc_theta : float (in radians), optional (default: '0')
+    stc_theta : float (in radian), optional (default: '0')
         Transverse direction along which there are chirps and spatio-temporal couplings.
         A value of 0 corresponds to the x-axis.
 
