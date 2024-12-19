@@ -2,7 +2,6 @@ import numpy as np
 
 from .profile import Profile
 
-
 class GaussianProfile(Profile):
     r"""
     Class for the analytic profile of a Gaussian laser pulse.
