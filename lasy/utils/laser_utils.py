@@ -931,8 +931,8 @@ def get_phi2(dim, grid):
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-     Return
-    ----------
+    Returns
+    -------
     phi2 : Group-delay dispersion in :math:`\Phi^{(2)} = \frac{d\omega_0}{dt}` (second^-2)
     varphi2 : Group-delay dispersion in :math:`\varphi^{(2)}=\frac{dt_0}{d\omega}` (second^2)
     """
@@ -1056,9 +1056,9 @@ def get_pft(dim, grid):
 
     Return
     ----------
-    pft_x, pft_y : Pulse front tilt in :math:` p=\frac{dt_0}{dx}` (second * meter^-1).
+    pft_x, pft_y : Pulse front tilt in :math:`p=\frac{dt_0}{dx}` (second * meter^-1).
     """
-    assert dim == "xyt", "No pulse front tilt for axis-symmetric dimension."
+    assert dim == "xyt", "No pulse front tilt for cylindrical symmetry."
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     weight_xy_2d = np.mean(env_abs2, axis=2)
