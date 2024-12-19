@@ -64,13 +64,13 @@ class GaussianProfile(Profile):
 
     phi2 : float (in second^2), optional (default: '0')
         The group-delay dispersion defined as:
-        .. math::
+    .. math::
 
                 \phi^{(2)} = \frac{dt_0}{d\omega}
 
     beta : float (in second), optional (default: '0')
         The angular dispersion defined as:
-        .. math::
+    .. math::
 
                 \beta = \frac{d\theta_0}{d\omega}
 
@@ -78,7 +78,7 @@ class GaussianProfile(Profile):
 
     zeta : float (in meter * second), optional (default: '0')
         A spatial chirp defined as:
-        .. math::
+    .. math::
 
                 \zeta = \frac{dx_0}{d\omega}
 
