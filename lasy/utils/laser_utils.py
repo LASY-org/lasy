@@ -917,7 +917,7 @@ def get_w0(grid, dim):
 
 def get_phi2(dim, grid):
     r"""
-    Calculate the Group-delay dispersion of the laser.
+    Calculate the group-delayed dispersion of the laser.
 
     Parameters
     ----------
@@ -950,7 +950,7 @@ def get_phi2(dim, grid):
 
 def get_zeta(dim, grid, k0):
     r"""
-    Calculate the spatio-chirp of the laser.
+    Calculate the spatial chirp of the laser.
 
     Parameters
     ----------
