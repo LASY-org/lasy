@@ -106,6 +106,6 @@ Phi2_3d, phi2_3d = get_phi2(laser_3d.dim, laser_3d.grid)
 [beta_x, beta_y] = get_beta(laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6)
 
 assert (err_real + err_imag) < 1e-6
-np.testing.assert_approx_equal(phi2_3d, 2.4e-24, significant=2)
-np.testing.assert_approx_equal(zeta_y, 2.4e-22, significant=2)
-np.testing.assert_approx_equal(beta_y, 3e-18, significant=2)
+np.testing.assert_approx_equal(phi2_3d, phi2, significant=2)
+np.testing.assert_approx_equal(zeta_y, zeta, significant=2)
+np.testing.assert_approx_equal(beta_y, beta, significant=2)
