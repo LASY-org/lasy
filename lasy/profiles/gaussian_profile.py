@@ -67,6 +67,7 @@ class GaussianProfile(Profile):
     .. math::
 
                 \phi^{(2)} = \frac{dt_0}{d\omega}
+        
         Here :math:`t_0` is the temporal position of this freqency component.
     beta : float (in second), optional (default: '0')
         The angular dispersion defined as:
