@@ -933,8 +933,8 @@ def get_phi2(dim, grid):
 
      Return
     ----------
-    phi2 : Group-delay dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` (second^-2)
-    varphi2 : Group-delay dispersion in :math:`\varphi^{(2)}=dt_0/d(\omega)` (second^2)
+    phi2 : Group-delay dispersion in :math:`\Phi^{(2)} = \frac{d\omega_0}{dt}` (second^-2)
+    varphi2 : Group-delay dispersion in :math:`\varphi^{(2)}=\frac{dt_0}{d\omega}` (second^2)
     """
     tau = 2 * get_duration(grid, dim)
     env = grid.get_temporal_field()
@@ -966,10 +966,10 @@ def get_zeta(dim, grid, k0):
 
      Return
     ----------
-    zeta_x, zeta_y : Spatial chirp in :math:`\zeta=dx_0/d(\omega_0)` (meter * second)
-    nu_x, nu_y: Spatial chirp in :math:`\nu=d(\omega_0)/dx` (meter^-1 * second^-1)
+    zeta_x, zeta_y : Spatial chirp in :math:`\zeta=\frac{dx_0}{d\omega}` (meter * second)
+    nu_x, nu_y: Spatial chirp in :math:`\nu=\frac{d\omega_0}{dx}` (meter^-1 * second^-1)
     """
-    assert dim == "xyt", "No spatial chirp for axis-sysmetric dimension"
+    assert dim == "xyt", "No spatial chirp for axis-symmetric dimension."
     w0 = get_w0(grid, dim)
     tau = 2 * get_duration(grid, dim)
     env_spec = grid.get_spectral_field()
@@ -1012,11 +1012,11 @@ def get_beta(dim, grid, k0):
         It contains an ndarray (V/m) with
         the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-     Return
+    Return
     ----------
-    beta_x, beta_y : Angular dispersion in :math:` \beta = d\theta_0/d\omega` (second)
+    beta_x, beta_y : Angular dispersion in :math:` \beta = \frac{d\theta_0}{d\omega}` (second)
     """
-    assert dim == "xyt", "No angular chirp for axis-sysmetric dimension"
+    assert dim == "xyt", "No angular chirp for axis-symmetric dimension."
     env_spec = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
     # Get the spectral axis
@@ -1056,9 +1056,9 @@ def get_pft(dim, grid):
 
     Return
     ----------
-    pft_x, pft_y : Pulse front tilt in :math:` p=dt_0/dx` (second * meter^-1).
+    pft_x, pft_y : Pulse front tilt in :math:` p=\frac{dt_0}{dx}` (second * meter^-1).
     """
-    assert dim == "xyt", "No pulse front tilt for axis-sysmetric dimension"
+    assert dim == "xyt", "No pulse front tilt for axis-symmetric dimension."
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     weight_xy_2d = np.mean(env_abs2, axis=2)
@@ -1086,11 +1086,11 @@ def get_propation_angle(dim, grid, k0):
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-     Return
+    Return
     ----------
-    angle_x, angle_y : propagating angle in :math:`p = k_x / k_z` or :math:`p = k_y / k_z` (in radians).
+    angle_x, angle_y : Propagating angle in :math:`p = \frac{k_x}{k_z}` or :math:`p = \frac{k_y}{k_z}` (in radians).
     """
-    assert dim == "xyt", "Propagation always on-axis axis-sysmetric dimension"
+    assert dim == "xyt", "Propagation is always on-axis for axis-symmetric dimension."
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     phi_envelop_abs = np.unwrap(np.angle(env), axis=2)
