@@ -67,14 +67,14 @@ class GaussianProfile(Profile):
     .. math::
 
                 \phi^{(2)} = \frac{dt_0}{d\omega}
-
+        Here :math:`t_0` is the temporal position of this freqency component.
     beta : float (in second), optional (default: '0')
         The angular dispersion defined as:
     .. math::
 
                 \beta = \frac{d\theta_0}{d\omega}
 
-        Here :math:`\theta_0` is the propagation angle of this component.
+        Here :math:`\theta_0` is the propagation angle of this freqency component.
 
     zeta : float (in meter * second), optional (default: '0')
         A spatial chirp defined as:
@@ -82,7 +82,7 @@ class GaussianProfile(Profile):
 
                 \zeta = \frac{dx_0}{d\omega}
 
-        Here :math:`x_0` is the beam center position.
+        Here :math:`x_0` is the transverse beam center position of this freqency component.
         The definitions of beta, phi2, and zeta are taken from [S. Akturk et al., Optics Express 12, 4399 (2004)].
 
     stc_theta : float (in radian), optional (default: '0')
