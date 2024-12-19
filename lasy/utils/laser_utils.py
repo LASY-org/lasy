@@ -917,7 +917,7 @@ def get_w0(grid, dim):
 
 def get_phi2(dim, grid):
     r"""
-    Calculate the group-delayed dispersion of the laser.
+    Calculate the group-delay dispersion of the laser.
 
     Parameters
     ----------
@@ -933,8 +933,8 @@ def get_phi2(dim, grid):
 
      Return
     ----------
-    phi2 : Group-delayed dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` (second^-2)
-    varphi2 : Group-delayed dispersion in :math:`\varphi^{(2)}=dt_0/d(\omega)` (second^2)
+    phi2 : Group-delay dispersion in :math:`\Phi^{(2)}=d(\omega_0)/dt` (second^-2)
+    varphi2 : Group-delay dispersion in :math:`\varphi^{(2)}=dt_0/d(\omega)` (second^2)
     """
     tau = 2 * get_duration(grid, dim)
     env = grid.get_temporal_field()
@@ -1056,7 +1056,7 @@ def get_pft(dim, grid):
 
     Return
     ----------
-    pft_x, pft_y : Pulse front tilt in :math:` p=dt/dx` (second * meter^-1).
+    pft_x, pft_y : Pulse front tilt in :math:` p=dt_0/dx` (second * meter^-1).
     """
     assert dim == "xyt", "No pulse front tilt for axis-sysmetric dimension"
     env = grid.get_temporal_field()
