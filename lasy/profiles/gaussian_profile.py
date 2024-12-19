@@ -84,7 +84,6 @@ class GaussianProfile(Profile):
         Transverse direction along which there are chirps and spatio-temporal couplings.
         A value of 0 corresponds to the x-axis.
 
-
     Examples
     --------
     >>> import matplotlib.pyplot as plt
