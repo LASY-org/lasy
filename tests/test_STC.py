@@ -1,7 +1,7 @@
 """
 Test the implementation of spatio-temporal coupling (STC).
 
-This test verifies the correct implementation of initialization and diagnostics for spatio-temporal coupling in Gaussian lasers. It does so by creating a Gaussian pulse at focus and calculating the STC factors using the implemented functions in `laser.utils`. 
+This test verifies the correct implementation of initialization and diagnostics for spatio-temporal coupling in Gaussian lasers. It does so by creating a Gaussian pulse at focus and calculating the STC factors using the implemented functions in `laser.utils`.
 
 Additionally, the correctness is validated by comparing the Gaussian profile at focus with a combined Gaussian profile out of focus.
 """
