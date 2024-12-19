@@ -73,7 +73,7 @@ class GaussianProfile(Profile):
         .. math::
 
                 \beta = \frac{d\theta_0}{d\omega}
-                
+
         Here :math:`\theta_0` is the propagation angle of this component.
 
     zeta : float (in meter * second), optional (default: '0')
@@ -81,7 +81,7 @@ class GaussianProfile(Profile):
         .. math::
 
                 \zeta = \frac{dx_0}{d\omega}
-                
+
         Here :math:`x_0` is the beam center position.
         The definitions of beta, phi2, and zeta are taken from [S. Akturk et al., Optics Express 12, 4399 (2004)].
 
