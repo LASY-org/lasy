@@ -50,7 +50,8 @@ def hermite_gauss_decomposition(
         in the decomposition. The keys of the dictionary are tuples
         corresponding to (`m`,`n`)
 
-    waist : Beam waist for which the decomposition is calculated.
+    waist : array of floats 
+        Beam waist for which the decomposition is calculated.
         It is computed as the waist for which the weight of order 0 is maximum.
     """
     # Check if the provided laserProfile is a transverse profile.
@@ -92,7 +93,7 @@ def hermite_gauss_decomposition(
     weights = {}
     for m in range(m_max):
         for n in range(n_max):
-            HGMode = HermiteGaussianTransverseProfile(w0, w0, m, n, wavelength)
+            HGMode = HermiteGaussianTransverseProfile(w0[0], w0[1], m, n, wavelength)
             coef = np.real(
                 np.sum(field * HGMode.evaluate(X, Y)) * dx * dy
             )  # modalDecomposition
@@ -126,8 +127,8 @@ def estimate_best_HG_waist(x, y, field, wavelength):
 
     Returns
     -------
-    w0 : scalar
-        The calculated waist.
+    w0 : array of floats
+        The calculated waist in x and y axis.
     """
     dx = x[1] - x[0]
     dy = y[1] - y[0]
@@ -136,20 +137,26 @@ def estimate_best_HG_waist(x, y, field, wavelength):
     X, Y = np.meshgrid(x, y)
 
     D4SigX, D4SigY = find_d4sigma(np.abs(field) ** 2)
-    w0Est = np.mean((D4SigX, D4SigY)) / 2 * dx  # convert this to a 1/e^2 width
+    # convert this to a 1/e^2 width
+    w0EstX = np.mean(D4SigX) / 2 * dx  
+    w0EstY = np.mean(D4SigY) / 2 * dy  
 
     # Scan around the waist obtained from the D4sigma calculation,
     # and keep the waist for which this HG mode has the highest scalar
     # product with the input profile.
-    waistTest = np.linspace(w0Est / 2, w0Est * 1.5, 30)
-    coeffTest = np.zeros_like(waistTest)
+    waistTestX = np.linspace(w0EstX / 2, w0EstX * 1.5, 30)
+    waistTestY = np.linspace(w0EstY / 2, w0EstY * 1.5, 30)
+    coeffTest  = np.zeros_like(waistTestX)
 
-    for i, wTest in enumerate(waistTest):
+    for i, wTest in enumerate(waistTestX):
         # create a gaussian
-        HGMode = HermiteGaussianTransverseProfile(wTest, wTest, 0, 0, wavelength)
+        HGMode = HermiteGaussianTransverseProfile(wTest, waistTestY[i], 0, 0, wavelength)
         profile = HGMode.evaluate(X, Y)
         coeffTest[i] = np.real(np.sum(profile * field))
-    w0 = waistTest[np.argmax(coeffTest)]
+    waistX = waistTestX[np.argmax(coeffTest)]
+    waistY = waistTestY[np.argmax(coeffTest)]
+    w0 = [waistX, waistY]
 
-    print("Estimated w0 = %.2f microns (1/e^2 width)" % (w0Est * 1e6))
+    print("Estimated w0(x-axis) = %.2f microns (1/e^2 width)" % (w0[0] * 1e6))
+    print("Estimated w0(y-axis) = %.2f microns (1/e^2 width)" % (w0[1] * 1e6))
     return w0
