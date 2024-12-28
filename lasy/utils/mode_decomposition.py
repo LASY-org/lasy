@@ -50,7 +50,7 @@ def hermite_gauss_decomposition(
         in the decomposition. The keys of the dictionary are tuples
         corresponding to (`m`,`n`)
 
-    waist : array of floats 
+    waist : array of floats
         Beam waist for which the decomposition is calculated.
         It is computed as the waist for which the weight of order 0 is maximum.
     """
@@ -138,19 +138,21 @@ def estimate_best_HG_waist(x, y, field, wavelength):
 
     D4SigX, D4SigY = find_d4sigma(np.abs(field) ** 2)
     # convert this to a 1/e^2 width
-    w0EstX = np.mean(D4SigX) / 2 * dx  
-    w0EstY = np.mean(D4SigY) / 2 * dy  
+    w0EstX = np.mean(D4SigX) / 2 * dx
+    w0EstY = np.mean(D4SigY) / 2 * dy
 
     # Scan around the waist obtained from the D4sigma calculation,
     # and keep the waist for which this HG mode has the highest scalar
     # product with the input profile.
     waistTestX = np.linspace(w0EstX / 2, w0EstX * 1.5, 30)
     waistTestY = np.linspace(w0EstY / 2, w0EstY * 1.5, 30)
-    coeffTest  = np.zeros_like(waistTestX)
+    coeffTest = np.zeros_like(waistTestX)
 
     for i, wTest in enumerate(waistTestX):
         # create a gaussian
-        HGMode = HermiteGaussianTransverseProfile(wTest, waistTestY[i], 0, 0, wavelength)
+        HGMode = HermiteGaussianTransverseProfile(
+            wTest, waistTestY[i], 0, 0, wavelength
+        )
         profile = HGMode.evaluate(X, Y)
         coeffTest[i] = np.real(np.sum(profile * field))
     waistX = waistTestX[np.argmax(coeffTest)]
