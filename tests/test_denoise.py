@@ -8,9 +8,6 @@ value.
 
 import numpy as np
 
-from lasy.profiles.transverse.super_gaussian_profile import (
-    GaussianTransverseProfile,
-)
 from lasy.utils.denoise import hg_reconstruction
 
 
@@ -18,11 +15,11 @@ def test_denoise_hg_reconstruction():
     # Parameters
     waist = 20e-6
     shape_parameter = 3
-    wavelength = 8e-7    
+    wavelength = 8e-7
     resolution = 0.2e-6
     lo = [-2e-4, -2e-4]
     hi = [2e-4, 2e-4]
-    
+
     # Define the transverse profile
     transverse_profile = SuperGaussianTransverseProfile(
         waist, shape_parameter
