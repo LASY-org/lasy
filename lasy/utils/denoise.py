@@ -46,9 +46,6 @@ def hg_reconstruction(
     waist : array of floats (meter)
         Beam waist for which the decomposition is calculated.
         It is computed as the waist for which the weight of order 0 is maximum.
-
-    energy_new : float
-        The total energy of the laser pulse after decomposition.
     """
     energy_new = 0
     assert isinstance(transverse_profile, TransverseProfile)
