@@ -18,14 +18,17 @@ def test_denoise_hg_reconstruction():
     # Parameters
     waist = 20e-6
     shape_parameter = 3
-    wavelength = 8e-7
-
+    wavelength = 8e-7    
+    resolution = 0.2e-6
+    lo = [-2e-4, -2e-4]
+    hi = [2e-4, 2e-4]
+    
     # Define the transverse profile
-    transverse_profile = GaussianTransverseProfile(
+    transverse_profile = SuperGaussianTransverseProfile(
         waist, shape_parameter
     )  # Super-Gaussian profile
     transverse_profile_cleaned, waist = hg_reconstruction(
-        transverse_profile, wavelength
+        transverse_profile, wavelength, resolution, lo, hi
     )  # Denoised profile
 
     # Calculate the error
