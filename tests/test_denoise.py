@@ -7,7 +7,7 @@ value.
 """
 
 import numpy as np
-
+from lasy.profiles.transverse.super_gaussian_profile import SuperGaussianTransverseProfile
 from lasy.utils.denoise import hg_reconstruction
 
 
