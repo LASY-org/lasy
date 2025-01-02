@@ -1,7 +1,7 @@
-"""Test the implementation of the denoise.
+"""Test the implementation of the HG recostruction.
 
-Test checks the implementation of the denoise
-by initializing a super-Gaussian pulse and denoise it. It then
+Test checks the implementation of the HG reconstruction. It does so
+by initializing a super-Gaussian pulse and denoising it. It then
 checks that the error remains positive and less than the predefined
 value.
 """
@@ -9,27 +9,27 @@ value.
 import numpy as np
 
 from lasy.profiles.transverse.super_gaussian_profile import (
-    SuperGaussianTransverseProfile,
+    GaussianTransverseProfile,
 )
-from lasy.utils.denoise import denoise_transverse_hg
+from lasy.utils.denoise import hg_reconstruction
 
 
-def test_denoise_transverse_hg():
+def test_denoise_hg_reconstruction():
     # Parameters
     waist = 20e-6
     shape_parameter = 3
     wavelength = 8e-7
 
     # Define the transverse profile
-    transverse_profile = SuperGaussianTransverseProfile(
+    transverse_profile = GaussianTransverseProfile(
         waist, shape_parameter
     )  # Super-Gaussian profile
-    transverse_profile_cleaned, waist, laser_energy_new = denoise_transverse_hg(
+    transverse_profile_cleaned, waist, laser_energy_new = hg_reconstruction(
         transverse_profile, wavelength
     )  # Denoised profile
 
     # Calculate the error
-    x = np.linspace(-5 * waist, 5 * waist, 500)
+    x = np.linspace(-5 * waist[0], 5 * waist[0], 500)
     X, Y = np.meshgrid(x, x)
     prof1 = np.abs(transverse_profile.evaluate(X, Y)) ** 2
     prof2 = np.abs(transverse_profile_cleaned.evaluate(X, Y)) ** 2
