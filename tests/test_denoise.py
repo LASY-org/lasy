@@ -24,7 +24,7 @@ def test_denoise_hg_reconstruction():
     transverse_profile = GaussianTransverseProfile(
         waist, shape_parameter
     )  # Super-Gaussian profile
-    transverse_profile_cleaned, waist, laser_energy_new = hg_reconstruction(
+    transverse_profile_cleaned, waist = hg_reconstruction(
         transverse_profile, wavelength
     )  # Denoised profile
 
