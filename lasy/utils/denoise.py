@@ -6,8 +6,13 @@ from lasy.utils.mode_decomposition import hermite_gauss_decomposition
 
 
 def hg_reconstruction(
-    transverse_profile, wavelength, resolution, lo, hi,
-    n_modes_x=10, n_modes_y=10,
+    transverse_profile,
+    wavelength,
+    resolution,
+    lo,
+    hi,
+    n_modes_x=10,
+    n_modes_y=10,
 ):
     """
     Denoise the transverse profile by decomposing it into a set of Hermite-Gaussian modes.
