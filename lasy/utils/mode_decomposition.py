@@ -54,9 +54,9 @@ def hermite_gauss_decomposition(
         It is computed as the waist for which the weight of order 0 is maximum.
     """
     # Check if the provided laserProfile is a transverse profile.
-    assert isinstance(
-        laserProfile, TransverseProfile
-    ), "laserProfile must be an instance of TransverseProfile"
+    assert isinstance(laserProfile, TransverseProfile), (
+        "laserProfile must be an instance of TransverseProfile"
+    )
 
     # Get the field, sensible spatial bounds for the profile
     lo0 = lo[0] + laserProfile.x_offset

@@ -261,15 +261,15 @@ class SpeckleProfile(Profile):
         assert relative_laser_bandwidth > 0, "laser_bandwidth must be greater than 0"
         assert np.size(n_beamlets) == 2, "has to be a size 2 array"
         if "SSD" in self.temporal_smoothing_type.upper():
-            assert (
-                ssd_number_color_cycles is not None
-            ), "must supply `ssd_number_color_cycles` to use SSD"
-            assert (
-                ssd_transverse_bandwidth_distribution is not None
-            ), "must supply `ssd_transverse_bandwidth_distribution` to use SSD"
-            assert (
-                ssd_phase_modulation_amplitude is not None
-            ), "must supply `ssd_phase_modulation_amplitude` to use SSD"
+            assert ssd_number_color_cycles is not None, (
+                "must supply `ssd_number_color_cycles` to use SSD"
+            )
+            assert ssd_transverse_bandwidth_distribution is not None, (
+                "must supply `ssd_transverse_bandwidth_distribution` to use SSD"
+            )
+            assert ssd_phase_modulation_amplitude is not None, (
+                "must supply `ssd_phase_modulation_amplitude` to use SSD"
+            )
             for q in (
                 ssd_number_color_cycles,
                 ssd_transverse_bandwidth_distribution,
