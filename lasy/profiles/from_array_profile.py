@@ -84,7 +84,7 @@ class FromArrayProfile(Profile):
 
             self.combined_field_interp = RegularGridInterpolator(
                 (r, axes["t"]),
-                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
+                np.abs(array[0]) + 1.0j * np.unwrap(np.angle(array[0]), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )
