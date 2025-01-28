@@ -11,6 +11,8 @@ from lasy.utils.laser_utils import (
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
+from lasy.utils.fraunhofer import calc_focus_fraunhofer, calc_fraunhofer_axis
+
 
 class Laser:
     """
@@ -437,3 +439,52 @@ class Laser:
         cb.set_label("$|E_{envelope}|$ (V/m)")
         plt.xlabel("t (s)")
         plt.ylabel("x (m)")
+
+    def go_to_farfield(self,f,N_pad=None,unpad_result=True):
+        if self.dim == "rt":
+            print('far field not implemented in rt coordinates')
+            return
+        x, y, o = np.meshgrid(self.grid.axes[0],self.grid.axes[1],
+                      self.omega_1d, # x, y, omega (omega in fft order)
+                      indexing="ij")
+        # warp input coordinates to have consistent output coordinates
+        dx_mod = self.grid.dx[0]*(self.profile.omega0/o)
+        dy_mod = self.grid.dx[1]*(self.profile.omega0/o)
+        
+        x = x*dx_mod/self.grid.dx[0]
+        y = y*dy_mod/self.grid.dx[1]
+        
+        # spectral field in warped coordinates
+        spectral_field = self.grid.get_spectral_field() # used for normalising each wavelength
+        spec_amp = np.sum(np.abs(spectral_field),axis=(0,1),keepdims=True)*(o/self.profile.omega0)
+        
+        E_xyomega = self.profile.trans_profile.evaluate(x,y) # transverse profile in warped coordinates
+        E_xyomega = E_xyomega/np.sum(E_xyomega,axis=(0,1),keepdims=True)*spec_amp # add spectral dependence
+        E_xyomega = E_xyomega.astype(np.complex128)
+        E_xyomega = E_xyomega*np.exp(-1j*np.arange(self.grid.npoints[time_axis_indx])*np.pi) # account for fft shift
+        
+        # angular frequency steps
+        df_x = self.grid.dx[0]/(f*self.profile.lambda0)
+        df_y = self.grid.dx[1]/(f*self.profile.lambda0)
+        
+        # sequentially compute fft's (allows for padding with minimum memory use)
+        E_xvomega = calc_focus_fraunhofer(E_xyomega, dx=df_x,axis=0,N_pad=N_pad,unpad_result=unpad_result)
+        E_uvomega = calc_focus_fraunhofer(E_xvomega, dx=df_y,axis=1,N_pad=N_pad,unpad_result=unpad_result)
+        E_uvomega = E_uvomega*f*self.profile.lambda0 # amplitude correction
+        
+        # new grid
+        u = calc_fraunhofer_axis(self.grid.npoints[0],self.grid.dx[0]/(f*self.profile.lambda0),
+                          N_pad=N_pad,unpad_result=unpad_result
+                         )
+        v = calc_fraunhofer_axis(self.grid.npoints[1],self.grid.dx[1]/(f*self.profile.lambda0),
+                          N_pad=N_pad,unpad_result=unpad_result
+                         )
+        new_grid = Grid(self.dim, 
+                        [np.min(u),np.min(v),self.grid.lo[time_axis_indx]], 
+                        [np.max(u),np.max(v),self.grid.hi[time_axis_indx]], 
+                        (len(u),len(v),len(self.omega_1d)))
+        
+        
+        # put results back into LASY
+        self.grid = new_grid
+        self.grid.set_spectral_field(E_uvomega)
