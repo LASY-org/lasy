@@ -4,6 +4,7 @@ from scipy.constants import c
 
 from lasy.utils.grid import Grid, time_axis_indx
 from lasy.utils.laser_utils import (
+    normalize_average_intensity,
     normalize_energy,
     normalize_peak_field_amplitude,
     normalize_peak_intensity,
@@ -147,7 +148,7 @@ class Laser:
 
     def normalize(self, value, kind="energy"):
         """
-        Normalize the pulse either to the energy, peak field amplitude or peak intensity.
+        Normalize the pulse either to the energy, peak field amplitude, peak intensity, or average intensity. The average intensity option operates on the envelope.
 
         Parameters
         ----------
@@ -155,7 +156,7 @@ class Laser:
             Value to which to normalize the field property that is defined in ``kind``
         kind : string (optional)
             Distance by which the laser pulse should be propagated
-            Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
+            Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'`` (default is ``'energy'``)
         """
         if kind == "energy":
             normalize_energy(self.dim, value, self.grid)
@@ -163,6 +164,8 @@ class Laser:
             normalize_peak_field_amplitude(value, self.grid)
         elif kind == "intensity":
             normalize_peak_intensity(value, self.grid)
+        elif kind == "average_intensity":
+            normalize_average_intensity(value, self.grid)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 

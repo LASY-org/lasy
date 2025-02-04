@@ -118,7 +118,7 @@ def normalize_peak_intensity(peak_intensity, grid):
     Parameters
     ----------
     peak_intensity : scalar (W/m^2)
-        Peak field amplitude of the laser pulse after normalization.
+        Peak intensity of the laser pulse after normalization.
 
     grid : a Grid object
         Contains value of the laser envelope and metadata.
@@ -130,7 +130,31 @@ def normalize_peak_intensity(peak_intensity, grid):
         if input_peak_intensity == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
         else:
-            grid.set_temporal_field(np.sqrt(peak_intensity / input_peak_intensity))
+            field *= np.sqrt(peak_intensity / input_peak_intensity)
+            grid.set_temporal_field(field)
+
+
+def normalize_average_intensity(average_intensity, grid):
+    """
+    Normalize energy of the laser pulse contained in grid.
+
+    Parameters
+    ----------
+    average_intensity : scalar (W/m^2)
+        Average intensity of the laser pulse envelope after normalization.
+
+    grid : a Grid object
+        Contains value of the laser envelope and metadata.
+    """
+    if average_intensity is not None:
+        field = grid.get_temporal_field()
+        intensity = np.abs(epsilon_0 * field**2 / 2 * c)
+        input_average_intensity = intensity.mean()
+        if input_average_intensity == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            field *= np.sqrt(average_intensity / input_average_intensity)
+            grid.set_temporal_field(field)
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
@@ -692,9 +716,9 @@ def create_grid(array, axes, dim, is_envelope=True):
         grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1, is_envelope=is_envelope)
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
-        assert (
-            array.ndim == 3
-        ), "Input array should be of dimension 3 [modes, radius, time]"
+        assert array.ndim == 3, (
+            "Input array should be of dimension 3 [modes, radius, time]"
+        )
         grid.set_temporal_field(array)
     return grid
 
@@ -877,3 +901,229 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
         field *= np.exp(1j * (z0 / c + t_axis) * omega0)
         grid.set_temporal_field(field)
+
+
+def get_w0(grid, dim):
+    r"""
+    Calculate the laser waist.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    Return
+    ----------
+    sigma : Standard deviation of a**2 in m
+    """
+    field = grid.get_temporal_field()
+    if dim == "xyt":
+        Nx, Ny, Nt = field.shape
+        A2 = (np.abs(field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
+        ax = grid.axes[1]
+    else:
+        A2 = (np.abs(field[0, :, :]) ** 2).sum(-1)
+        ax = grid.axes[0]
+        if ax[0] > 0:
+            A2 = np.r_[A2[::-1], A2]
+            ax = np.r_[-ax[::-1], ax]
+        else:
+            A2 = np.r_[A2[::-1][:-1], A2]
+            ax = np.r_[-ax[::-1][:-1], ax]
+
+    sigma = 2 * np.sqrt(np.average(ax**2, weights=A2))
+
+    return sigma
+
+
+def get_phi2(dim, grid):
+    r"""
+    Calculate the group-delay dispersion of the laser.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    Returns
+    -------
+    phi2 : Group-delay dispersion in :math:`\Phi^{(2)} = \frac{d\omega_0}{dt}` (second^-2)
+    varphi2 : Group-delay dispersion in :math:`\varphi^{(2)}=\frac{dt_0}{d\omega}` (second^2)
+    """
+    tau = 2 * get_duration(grid, dim)
+    env = grid.get_temporal_field()
+    env_abs2 = np.abs(env**2)
+    # Calculate group-delayed dispersion
+    phi_envelop = np.unwrap(np.angle(env), axis=2)
+    pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
+    pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
+    phi2 = np.average(pphi_pt2, weights=env_abs2)
+    varphi2 = np.max(np.roots([4 * phi2, -4, tau**4 * phi2]))
+    return phi2, varphi2
+
+
+def get_zeta(dim, grid, k0):
+    r"""
+    Calculate the spatial chirp of the laser.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+     Return
+    ----------
+    zeta_x, zeta_y : Spatial chirp in :math:`\zeta=\frac{dx_0}{d\omega}` (meter * second)
+    nu_x, nu_y: Spatial chirp in :math:`\nu=\frac{d\omega_0}{dx}` (meter^-1 * second^-1)
+    """
+    assert dim == "xyt", "No spatial chirp for axis-symmetric dimension."
+    w0 = get_w0(grid, dim)
+    tau = 2 * get_duration(grid, dim)
+    env_spec = grid.get_spectral_field()
+    env_spec_abs2 = np.abs(env_spec**2)
+    # Get the spectral axis
+    dt = grid.dx[-1]
+    Nt = grid.shape[-1]
+    omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
+    # Calculate dx0 and dy0 in (x,y,omega) space
+    weight_x_3d = np.transpose(env_spec_abs2, (2, 1, 0))
+    weight_y_3d = np.transpose(env_spec_abs2, (2, 0, 1))
+    xda = np.sum(grid.axes[0] * weight_x_3d, axis=2) / np.sum(weight_x_3d, axis=2)
+    yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2)
+    # Calculate spatial chirp zeta
+    derivative_x_zeta = np.gradient(xda, omega, axis=0)
+    derivative_y_zeta = np.gradient(yda, omega, axis=0)
+    weight_x_2d = np.mean(env_spec_abs2, axis=0)
+    weight_y_2d = np.mean(env_spec_abs2, axis=1)
+    zeta_x = np.average(derivative_x_zeta.T, weights=weight_x_2d)
+    zeta_y = np.average(derivative_y_zeta.T, weights=weight_y_2d)
+    nu_x = 4 * zeta_x / (w0**2 * tau**2 + 4 * zeta_x**2)
+    nu_y = 4 * zeta_y / (w0**2 * tau**2 + 4 * zeta_y**2)
+    return [zeta_x, zeta_y], [nu_x, nu_y]
+
+
+def get_beta(dim, grid, k0):
+    r"""
+    Calculate the angular dispersion of the laser.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with
+        the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    Return
+    ----------
+    beta_x, beta_y : Angular dispersion in :math:` \beta = \frac{d\theta_0}{d\omega}` (second)
+    """
+    assert dim == "xyt", "No angular chirp for axis-symmetric dimension."
+    env_spec = grid.get_spectral_field()
+    env_spec_abs2 = np.abs(env_spec**2)
+    # Get the spectral axis
+    dt = grid.dx[-1]
+    Nt = grid.shape[-1]
+    omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
+    # Calculate angular dispersion beta
+    phi_envelop_abs = np.unwrap(
+        np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
+    )
+    angle_x = np.gradient(phi_envelop_abs, grid.dx[1], axis=1) / k0
+    angle_y = np.gradient(phi_envelop_abs, grid.dx[0], axis=0) / k0
+    derivative_x_beta = np.gradient(angle_y, omega, axis=2)
+    derivative_y_beta = np.gradient(angle_x, omega, axis=2)
+    beta_x = np.average(derivative_x_beta, weights=env_spec_abs2)
+    beta_y = np.average(derivative_y_beta, weights=env_spec_abs2)
+    return [beta_x, beta_y]
+
+
+def get_pft(dim, grid):
+    r"""
+    Calculate the pulse front tilt (PFT) of the laser.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with
+        the value of the envelope field and the associated metadata
+        that defines the points at which the laser is defined.
+
+    Return
+    ----------
+    pft_x, pft_y : Pulse front tilt in :math:`p=\frac{dt_0}{dx}` (second * meter^-1).
+    """
+    assert dim == "xyt", "No pulse front tilt for cylindrical symmetry."
+    env = grid.get_temporal_field()
+    env_abs2 = np.abs(env**2)
+    weight_xy_2d = np.mean(env_abs2, axis=2)
+    z_centroids = np.sum(grid.axes[2] * env_abs2, axis=2) / np.sum(env_abs2, axis=2)
+    derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
+    derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
+    pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
+    pft_y = np.average(derivative_y_pft, weights=weight_xy_2d)
+    return [pft_x, pft_y]
+
+
+def get_propation_angle(dim, grid, k0):
+    r"""
+    Calculate the propagating angle of the laser.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    Return
+    ----------
+    angle_x, angle_y : Propagating angle in :math:`p = \frac{k_x}{k_z}` or :math:`p = \frac{k_y}{k_z}` (in radians).
+    """
+    assert dim == "xyt", "Propagation is always on-axis for axis-symmetric dimension."
+    env = grid.get_temporal_field()
+    env_abs2 = np.abs(env**2)
+    phi_envelop_abs = np.unwrap(np.angle(env), axis=2)
+    pphi_px = np.gradient(phi_envelop_abs, grid.dx[1], axis=1)
+    pphi_py = np.gradient(phi_envelop_abs, grid.dx[0], axis=0)
+    angle_x = np.average(pphi_px, weights=env_abs2) / k0
+    angle_y = np.average(pphi_py, weights=env_abs2) / k0
+    return [angle_x, angle_y]
