@@ -88,9 +88,9 @@ class FromArrayProfile(Profile):
             # For now, this only fix profiles with one mode.
             if len(array.shape) == 3:
                 assert array.shape[0] == 1, (
-                    'Handling `rt` profiles with more than one azimuthal mode still needs to be implemented.'
+                    "Handling `rt` profiles with more than one azimuthal mode still needs to be implemented."
                 )
-                array = array[0]                
+                array = array[0]
 
             self.combined_field_interp = RegularGridInterpolator(
                 (r, axes["t"]),
