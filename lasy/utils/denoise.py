@@ -43,7 +43,7 @@ def hg_reconstruction(
     transverse_profile_cleaned : class instance
         Denoised transverse profile after decomposition and recombination.
 
-    waist : array of floats (meter)
+    w0x, w0y : floats
         Beam waist for which the decomposition is calculated.
         It is computed as the waist for which the weight of order 0 is maximum.
     """
@@ -51,14 +51,14 @@ def hg_reconstruction(
     assert isinstance(transverse_profile, TransverseProfile)
 
     # Calculate the decomposition and waist of the laser pulse
-    modeCoeffs, waistX, waistY = hermite_gauss_decomposition(
+    modeCoeffs, w0x, w0y = hermite_gauss_decomposition(
         transverse_profile, wavelength, resolution, lo, hi, n_modes_x, n_modes_y
     )
 
     # Denosing the laser profile
     for i, mode_key in enumerate(list(modeCoeffs)):
         transverse_profile_temp = HermiteGaussianTransverseProfile(
-            waistX, waistY, mode_key[0], mode_key[1], wavelength
+            w0x, w0y, mode_key[0], mode_key[1], wavelength
         )  # Create a new profile for each mode
 
         energy_new += modeCoeffs[mode_key] ** 2  # Energy fraction of the mode
@@ -72,4 +72,4 @@ def hg_reconstruction(
     energy_loss = 1 - energy_new
     print(f"Energy loss: {energy_loss * 100:.2f}%")
 
-    return transverse_profile_cleaned, waistX, waistY
+    return transverse_profile_cleaned, w0x, w0Y
