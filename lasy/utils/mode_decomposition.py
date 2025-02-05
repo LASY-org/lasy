@@ -148,7 +148,7 @@ def estimate_best_HG_waist(x, y, field, wavelength):
     waistTestY = np.linspace(w0EstY / 2, w0EstY * 1.5, 30)
     coeffTest = np.zeros_like(waistTestX)
 
-    for i in range(0, 30):
+    for i in range(30):
         # create a gaussian
         HGMode = HermiteGaussianTransverseProfile(
             waistTestX[i], waistTestY[i], 0, 0, wavelength
