@@ -72,4 +72,4 @@ def hg_reconstruction(
     energy_loss = 1 - energy_new
     print(f"Energy loss: {energy_loss * 100:.2f}%")
 
-    return transverse_profile_cleaned, w0x, w0Y
+    return transverse_profile_cleaned, w0x, w0y
