@@ -85,9 +85,12 @@ class FromArrayProfile(Profile):
             # The `RegularGridInterpolator` below expects a 2D array.
             # However, when reading lasy envelope files, the array is 3D.
             # First dimension corresponds to the azimuthal mode decomposition.
-            # For now, we just take the first component to make the array 2D.
+            # For now, this only fix profiles with one mode.
             if len(array.shape) == 3:
-                array = array[0]
+                assert array.shape[0] == 1, (
+                    'Handling `rt` profiles with more than one azimuthal mode still needs to be implemented.'
+                )
+                array = array[0]                
 
             self.combined_field_interp = RegularGridInterpolator(
                 (r, axes["t"]),
