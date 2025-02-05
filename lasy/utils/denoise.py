@@ -51,14 +51,14 @@ def hg_reconstruction(
     assert isinstance(transverse_profile, TransverseProfile)
 
     # Calculate the decomposition and waist of the laser pulse
-    modeCoeffs, waist = hermite_gauss_decomposition(
+    modeCoeffs, waistX, waistY = hermite_gauss_decomposition(
         transverse_profile, wavelength, resolution, lo, hi, n_modes_x, n_modes_y
     )
 
     # Denosing the laser profile
     for i, mode_key in enumerate(list(modeCoeffs)):
         transverse_profile_temp = HermiteGaussianTransverseProfile(
-            waist[0], waist[1], mode_key[0], mode_key[1], wavelength
+            waistX, waistY, mode_key[0], mode_key[1], wavelength
         )  # Create a new profile for each mode
 
         energy_new += modeCoeffs[mode_key] ** 2  # Energy fraction of the mode
