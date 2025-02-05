@@ -16,7 +16,7 @@ from lasy.utils.denoise import hg_reconstruction
 
 def test_denoise_hg_reconstruction():
     # Parameters
-    waist = 20e-6
+    w0 = 20e-6
     shape_parameter = 3
     wavelength = 8e-7
     resolution = 0.2e-6
@@ -25,14 +25,14 @@ def test_denoise_hg_reconstruction():
 
     # Define the transverse profile
     transverse_profile = SuperGaussianTransverseProfile(
-        waist, shape_parameter
+        w0, shape_parameter
     )  # Super-Gaussian profile
-    transverse_profile_cleaned, waist = hg_reconstruction(
+    transverse_profile_cleaned, w0x, w0y = hg_reconstruction(
         transverse_profile, wavelength, resolution, lo, hi
     )  # Denoised profile
 
     # Calculate the error
-    x = np.linspace(-5 * waist[0], 5 * waist[0], 500)
+    x = np.linspace(-5 * w0x, 5 * w0x, 500)
     X, Y = np.meshgrid(x, x)
     prof1 = np.abs(transverse_profile.evaluate(X, Y)) ** 2
     prof2 = np.abs(transverse_profile_cleaned.evaluate(X, Y)) ** 2
