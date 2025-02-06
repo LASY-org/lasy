@@ -6,6 +6,8 @@ from .transverse_profile import TransverseProfile
 
 class FlattenedGaussianTransverseProfile(TransverseProfile):
     r"""
+    Class for the analytic profile of a Flattened-Gaussian laser pulse.
+
     Define a complex transverse profile with a flattened Gaussian intensity
     distribution **far from focus** that transform into a distribution
     with rings **in the focal plane**. (See `Santarsiero et al., J.
