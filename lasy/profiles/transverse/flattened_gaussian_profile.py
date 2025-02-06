@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.special import binom
+
 from .transverse_profile import TransverseProfile
 
 
@@ -80,7 +81,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         # Ensure that N is an integer
         self.N = int(round(N))
         # Calculate effective waist of the Laguerre-Gauss modes, at focus
-        self.w_foc = w0 * (self.N + 1)**.5
+        self.w_foc = w0 * (self.N + 1) ** 0.5
         # Calculate Rayleigh Length
         self.zr = np.pi * self.w_foc**2 / wavelength
         # Evaluation distance w.r.t focal position
@@ -89,8 +90,9 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         self.cn = np.empty(self.N + 1)
         for n in range(self.N + 1):
             m_values = np.arange(n, self.N + 1)
-            self.cn[n] = np.sum((1. / 2)**m_values * binom(m_values, n)) / (self.N + 1)
-
+            self.cn[n] = np.sum((1.0 / 2) ** m_values * binom(m_values, n)) / (
+                self.N + 1
+            )
 
     def _evaluate(self, x, y):
         """
@@ -109,7 +111,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
             This array has the same shape as the arrays x, y
         """
         # Term for wavefront curvature + Gouy phase
-        diffract_factor = 1. - 1j * self.z_eval / self.zr
+        diffract_factor = 1.0 - 1j * self.z_eval / self.zr
         w = self.w_foc * np.abs(diffract_factor)
         psi = np.angle(diffract_factor)
         # Argument for the Laguerre polynomials
@@ -123,10 +125,10 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
             # - `L1` represents $L_{n-1}$
             # - `L2` represents $L_{n-2}$
             if n == 0:
-                L = 1.
+                L = 1.0
             elif n == 1:
                 L1 = L
-                L = 1. - scaled_radius_squared
+                L = 1.0 - scaled_radius_squared
             else:
                 L2 = L1
                 L1 = L
