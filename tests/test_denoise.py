@@ -34,7 +34,7 @@ def test_denoise_hg_reconstruction():
     # Calculate the error
     x = np.linspace(-5 * w0x, 5 * w0x, 500)
     X, Y = np.meshgrid(x, x)
-    prof1 = np.abs(transverse_profile.evaluate(X, Y)) ** 2
-    prof2 = np.abs(transverse_profile_cleaned.evaluate(X, Y)) ** 2
-    error = (prof1 - prof2) / np.max(prof1)
-    assert 0 < np.max(error) < 0.2
+    prof1 = transverse_profile.evaluate(X, Y)
+    prof2 = transverse_profile_cleaned.evaluate(X, Y)
+    error = np.sum(np.abs(prof2-prof1)**2) / np.sum(np.abs(prof1)**2)
+    assert error < 0.02
