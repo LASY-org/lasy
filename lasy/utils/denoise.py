@@ -47,7 +47,6 @@ def hg_reconstruction(
         Beam waist for which the decomposition is calculated.
         It is computed as the waist for which the weight of order 0 is maximum.
     """
-    energy_new = 0
     assert isinstance(transverse_profile, TransverseProfile)
 
     # Calculate the decomposition and waist of the laser pulse
@@ -61,15 +60,9 @@ def hg_reconstruction(
             w0x, w0y, mode_key[0], mode_key[1], wavelength
         )  # Create a new profile for each mode
 
-        energy_new += modeCoeffs[mode_key] ** 2  # Energy fraction of the mode
-
         if i == 0:  # First mode (0,0)
             transverse_profile_cleaned = modeCoeffs[mode_key] * transverse_profile_temp
         else:  # All other modes
             transverse_profile_cleaned += modeCoeffs[mode_key] * transverse_profile_temp
-
-    # Energy loss due to decomposition
-    energy_loss = 1 - energy_new
-    print(f"Energy loss: {energy_loss * 100:.2f}%")
 
     return transverse_profile_cleaned, w0x, w0y
