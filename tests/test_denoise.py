@@ -36,5 +36,5 @@ def test_denoise_hg_reconstruction():
     X, Y = np.meshgrid(x, x)
     prof1 = transverse_profile.evaluate(X, Y)
     prof2 = transverse_profile_cleaned.evaluate(X, Y)
-    error = np.sum(np.abs(prof2-prof1)**2) / np.sum(np.abs(prof1)**2)
+    error = np.sum(np.abs(prof2 - prof1) ** 2) / np.sum(np.abs(prof1) ** 2)
     assert error < 0.02
