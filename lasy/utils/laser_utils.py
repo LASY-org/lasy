@@ -5,6 +5,7 @@ from scipy.constants import c, e, epsilon_0, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
 
+from .aximod_lib import PropagatorFFT2_mod
 from .grid import Grid
 
 
@@ -809,6 +810,83 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
         # Convert the spectral image to the spatial field representation
         FieldAxprp.import_field(np.moveaxis(field, -1, 0).copy())
         field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0)
+        field_z = np.moveaxis(field_z, 0, -1)
+        field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
+
+    return field_z
+
+
+
+def export_to_z_omega_slice(dim, grid, omega0, z_axis=None, slice_ind=None, slice_axis=0, z0=0.0, t0=0.0, backend="NP"):
+    """
+    Export laser pulse to spatial domain from temporal domain (internal LASY representation).
+    modified to make a transverse slice and maintain separate frequency elements to allow for external manipulation
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains a ndarrays (V/m) with
+        the value of the envelope field and the associated metadata
+        that defines the points at which the laser is defined.
+
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+
+    z_axis : 1D ndarray of doubles (optional)
+        Spatial `z` axis along which the field should be reconstructed.
+        If not provided, `z_axis = c * t_axis` is considered.
+
+    slice_ind: int or None
+        index of values to take from slice_axis. If None then the middle will be taken.
+
+    slice_axis: int 
+        axis to take slice of (this is the dimension that is lost)
+
+    z0 : scalar (optional)
+        Position from which the field is produced (emitted).
+
+    t0 : scalar (optional)
+        Moment of time at which the field is produced.
+
+    backend : string (optional)
+        Backend used by axiprop (see AVAILABLE_BACKENDS in axiprop
+        documentation for more information).
+    """
+    time_axis_indx = -1
+
+    t_axis = grid.axes[time_axis_indx]
+    if z_axis is None:
+        z_axis = t_axis * c
+
+    FieldAxprp = ScalarFieldEnvelope(omega0 / c, t_axis)
+
+    field = grid.get_temporal_field()
+
+    if dim == "rt":
+        print('not implemented in rt coordinates')
+        return
+    else:
+        # Construct the propagator
+        Nx, Ny, Nt = field.shape
+        Lx = grid.hi[0] - grid.lo[0]
+        Ly = grid.hi[1] - grid.lo[1]
+        prop = PropagatorFFT2_mod(
+            (Lx, Nx),
+            (Ly, Ny),
+            FieldAxprp.k_freq,
+            backend=backend,
+            verbose=False,
+        )
+        # Convert the spectral image to the spatial field representation
+        FieldAxprp.import_field(np.moveaxis(field, -1, 0).copy())
+        field_z = prop.t2z_slice(FieldAxprp.Field_ft, z_axis, slice_ind=slice_ind, slice_axis=slice_axis, z0=z0, t0=t0)
         field_z = np.moveaxis(field_z, 0, -1)
         field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
 
