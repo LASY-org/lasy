@@ -171,7 +171,7 @@ class Laser:
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
-    def apply_optics(self, optical_element):
+    def apply_optics(self, optical_element,remember_optics=False):
         """
         Propagate the laser pulse through a thin optical element.
 
@@ -181,6 +181,11 @@ class Laser:
             Represents a thin optical element, through which the laser
             propagates.
         """
+        if remember_optics:
+            if hasattr(self, 'optical_element_list'):
+                self.optical_element_list.append(optical_element)
+            else:
+                self.optical_element_list = [optical_element]
         # Apply optical element
         spectral_field = self.grid.get_spectral_field()
         if self.dim == "rt":
@@ -447,6 +452,7 @@ class Laser:
         x, y, o = np.meshgrid(self.grid.axes[0],self.grid.axes[1],
                       self.omega_1d, # x, y, omega (omega in fft order)
                       indexing="ij")
+        o = np.clip(o,1.0,None) # stop divide by zero or negatives due to excessive padding
         # warp input coordinates to have consistent output coordinates
         dx_mod = self.grid.dx[0]*(self.profile.omega0/o)
         dy_mod = self.grid.dx[1]*(self.profile.omega0/o)
@@ -459,10 +465,18 @@ class Laser:
         spec_amp = np.sum(np.abs(spectral_field),axis=(0,1),keepdims=True)*(o/self.profile.omega0)
         
         E_xyomega = self.profile.trans_profile.evaluate(x,y) # transverse profile in warped coordinates
-        E_xyomega = E_xyomega/np.sum(E_xyomega,axis=(0,1),keepdims=True)*spec_amp # add spectral dependence
+    
+        amp_mod = np.divide(spec_amp,np.sum(E_xyomega,axis=(0,1),keepdims=True), 
+                            out=np.zeros_like(spec_amp), where=np.sum(E_xyomega,axis=(0,1),keepdims=True)!=0)
+        E_xyomega = E_xyomega*amp_mod # add spectral dependence
         E_xyomega = E_xyomega.astype(np.complex128)
         E_xyomega = E_xyomega*np.exp(-1j*np.arange(self.grid.npoints[time_axis_indx])*np.pi) # account for fft shift
         
+        if hasattr(self, 'optical_element_list'):
+            for optical_element in self.optical_element_list:
+                E_xyomega *= optical_element.amplitude_multiplier(x, y, o)
+
+
         # angular frequency steps
         df_x = self.grid.dx[0]/(f*self.profile.lambda0)
         df_y = self.grid.dx[1]/(f*self.profile.lambda0)
