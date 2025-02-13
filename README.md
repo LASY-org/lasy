@@ -6,7 +6,7 @@
 
 More specifically, `lasy` offers many ways to define complex laser pulses (e.g. from commonly-known analytical formulas, from experimental measurements, etc.) and offers pre-processing functionalities (e.g. propagation, re-normalization, geometry conversion). The laser field is then exported in a standardized file, that can be read by external simulation codes.
 
-For an extended tutorial on `lasy` please check out LASY_Tutorial (https://github.com/LASY-org/lasy.git). 
+For an extended tutorial on `lasy` please check out LASY_Tutorial (https://github.com/LASY-org/lasy.git).
 
 ## Documentation
 
