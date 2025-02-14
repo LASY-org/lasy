@@ -68,9 +68,7 @@ class FromArrayProfile(Profile):
             )
         else:  # dim = "rt"
             assert axes_order in [["r", "t"], ["t", "r"]]
-            assert len(array.shape) == 3, (
-                "Field array is not 3D."
-            )
+            assert len(array.shape) == 3, "Field array is not 3D."
 
             if axes_order == ["t", "r"]:
                 self.array = np.swapaxes(array, 1, 2)
@@ -81,8 +79,10 @@ class FromArrayProfile(Profile):
             # to make correct interpolation within the first cell
             if axes["r"][0] != 0.0:
                 r = np.concatenate(([-axes["r"][0]], axes["r"]))
-                subarray = array[:,0,:]  # takes first element in second dimension
-                array = np.concatenate((subarray[:, np.newaxis, :], array), axis=1)  # add it at the beginning 
+                subarray = array[:, 0, :]  # takes first element in second dimension
+                array = np.concatenate(
+                    (subarray[:, np.newaxis, :], array), axis=1
+                )  # add it at the beginning
             else:
                 r = axes["r"]
 
