@@ -68,9 +68,12 @@ class FromArrayProfile(Profile):
             )
         else:  # dim = "rt"
             assert axes_order in [["r", "t"], ["t", "r"]]
+            assert len(array.shape) == 3, (
+                "Field array is not 3D."
+            )
 
             if axes_order == ["t", "r"]:
-                self.array = np.swapaxes(array, 0, 2)
+                self.array = np.swapaxes(array, 1, 2)
             else:
                 self.array = array
 
@@ -78,7 +81,8 @@ class FromArrayProfile(Profile):
             # to make correct interpolation within the first cell
             if axes["r"][0] != 0.0:
                 r = np.concatenate(([-axes["r"][0]], axes["r"]))
-                array = np.concatenate(([array[0]], array))
+                subarray = array[:,0,:]  # takes first element in second dimension
+                array = np.concatenate((subarray[:, np.newaxis, :], array), axis=1)  # add it at the beginning 
             else:
                 r = axes["r"]
 
@@ -86,11 +90,10 @@ class FromArrayProfile(Profile):
             # However, when reading lasy envelope files, the array is 3D.
             # First dimension corresponds to the azimuthal mode decomposition.
             # For now, this only fix profiles with one mode.
-            if len(array.shape) == 3:
-                assert array.shape[0] == 1, (
-                    "Handling `rt` profiles with more than one azimuthal mode still needs to be implemented."
-                )
-                array = array[0]
+            assert array.shape[0] == 1, (
+                "Handling `rt` profiles with more than one azimuthal mode still needs to be implemented."
+            )
+            array = array[0]
 
             self.combined_field_interp = RegularGridInterpolator(
                 (r, axes["t"]),
