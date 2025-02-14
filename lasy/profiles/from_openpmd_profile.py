@@ -1,7 +1,7 @@
 import numpy as np
 import openpmd_api as io
 from openpmd_viewer import OpenPMDTimeSeries
-from scipy.constants import c
+from scipy.constants import c, m_e, e
 
 from lasy.utils.laser_utils import create_grid, field_to_envelope
 from lasy.utils.openpmd_input import reorder_array
@@ -57,6 +57,10 @@ class FromOpenPMDProfile(FromArrayProfile):
         corresponding to the plane of observation given by `theta`;
         otherwise it returns a full 3D Cartesian array.
 
+    lambda0 : float or None, optional
+        Use this as the central wavelength.
+        Only used when envelope=True.
+
     phase_unwrap_nd : boolean (optional)
         If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
         If False, the phase unwrapping is done in t, treating each transverse cell
@@ -75,8 +79,10 @@ class FromOpenPMDProfile(FromArrayProfile):
         field,
         coord=None,
         is_envelope=None,
+        is_waket=None,
         prefix=None,
         theta=None,
+        lambda0=None,
         phase_unwrap_nd=False,
         verbose=False,
     ):
@@ -110,7 +116,16 @@ class FromOpenPMDProfile(FromArrayProfile):
         if not is_envelope:
             grid = create_grid(F, axes, dim, is_envelope=is_envelope)
             grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
-            array = grid.get_temporal_field()[0]
+            array = grid.get_temporal_field()
+        elif lambda0 > 0:
+            k0 = 2 * np.pi / lambda0
+            omg0 = k0 * c
+            array = (m_e * c**2 * k0 / e) * F
+        elif is_waket:
+            s = io.Series(path + "/" + prefix + "%T.h5", io.Access.read_only)
+            it = s.iterations[iteration]
+            omg0 = it.meshes["a"].get_attribute("angularFrequency")
+            array = F
         else:
             s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
             it = s.iterations[iteration]
