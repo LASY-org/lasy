@@ -117,20 +117,21 @@ class FromOpenPMDProfile(FromArrayProfile):
             grid = create_grid(F, axes, dim, is_envelope=is_envelope)
             grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
             array = grid.get_temporal_field()
-        elif lambda0 > 0:
-            k0 = 2 * np.pi / lambda0
-            omg0 = k0 * c
-            array = (m_e * c**2 * k0 / e) * F
-        elif is_waket:
-            s = io.Series(path + "/" + prefix + "%T.h5", io.Access.read_only)
-            it = s.iterations[iteration]
-            omg0 = it.meshes["a"].get_attribute("angularFrequency")
-            array = F
         else:
-            s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
+            if is_waket:
+                filepath = path + "/" + prefix + "%T.h5"
+            else:
+                filepath = path + "/" + prefix + "_%T.h5"
+            s = io.Series(filepath, io.Access.read_only)
             it = s.iterations[iteration]
-            omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
+            omg0 = it.meshes[field].get_attribute("angularFrequency")
             array = F
+
+        if lambda0:
+            omg0 = 2 * np.pi * c / lambda0
+
+        if field == "a":
+            array = (m_e * c * omg0 / e) * array
 
         wavelength = 2 * np.pi * c / omg0
         if verbose:
