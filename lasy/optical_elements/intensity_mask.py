@@ -1,6 +1,3 @@
-import numpy as np
-from scipy.constants import c
-
 from lasy.optical_elements.optical_element import OpticalElement
 
 
@@ -20,7 +17,9 @@ class IntensityMask(OpticalElement):
     """
 
     def __init__(self, R, center=(0, 0), aperture_type="aperture"):
-        assert aperture_type in ["aperture", "hole"], "aperture_type must be 'aperture' or 'hole'"
+        assert aperture_type in ["aperture", "hole"], (
+            "aperture_type must be 'aperture' or 'hole'"
+        )
         self.R = R
         self.center = center
         self.aperture_type = aperture_type
@@ -44,7 +43,7 @@ class IntensityMask(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        r_squared = (x - self.center[0])**2 + (y - self.center[1])**2
+        r_squared = (x - self.center[0]) ** 2 + (y - self.center[1]) ** 2
         mask = r_squared <= self.R**2  # True inside, False outside
 
         if self.aperture_type == "aperture":
