@@ -1,11 +1,7 @@
 import numpy as np
 import openpmd_api as io
-from openpmd_viewer import OpenPMDTimeSeries
 from scipy.constants import c
-
-from lasy.utils.laser_utils import create_grid, field_to_envelope
-from lasy.utils.openpmd_input import reorder_array
-
+from lasy.utils.laser_utils import create_grid, vector_potential_to_field
 from .from_array_profile import FromArrayProfile
 
 
@@ -17,117 +13,87 @@ class FromOpenPMDProfile(FromArrayProfile):
     ----------
     path : string
         Path to the openPMD file containing the laser field or envelope.
-        Passed directly OpenPMDTimeSeries.
 
     iteration : int
         Iteration at which the argument is read.
-        Passed directly OpenPMDTimeSeries.
-
-    pol : list of 2 complex numbers (dimensionless)
-        Polarization vector. It corresponds to :math:`p_u` in the above
-        formula ; :math:`p_x` is the first element of the list and
-        :math:`p_y` is the second element of the list. Using complex
-        numbers enables elliptical polarizations.
 
     field : string
         Name of the field containing the laser pulse
-        Passed directly OpenPMDTimeSeries.
-
-    coord : string
-        Name of the field containing the laser pulse
-        Passed directly OpenPMDTimeSeries.
-
-    is_envelope : boolean
-        Whether the field to read represents a laser envelope.
-        If not, the envelope is obtained from the electric field
-        using a Hilbert transform. If not specified, lasy will try to guess
-        whether the field is an envelope by checking whether it is a complex
-        array.
-
-    prefix : string
-        Prefix of the openPMD file from which the envelope is read.
-        Only used when envelope=True.
-        The provided iteration is read from <path>/<prefix>_%T.h5.
-
-    theta : float or None, optional
-        Only used if the openPMD input is in thetaMode geometry.
-        Directly passed to openpmd_viewer.OpenPMDTimeSeries.get_field.
-        The angle of the plane of observation, with respect to the x axis
-        If `theta` is not None, then this function returns a 2D array
-        corresponding to the plane of observation given by `theta`;
-        otherwise it returns a full 3D Cartesian array.
-
-    phase_unwrap_nd : boolean (optional)
-        If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
-        If False, the phase unwrapping is done in t, treating each transverse cell
-        separately. This should be less accurate but faster.
-        If set to True, scikit-image must be installed.
-
-    verbose : boolean (optional)
-        Whether to print extended information.
     """
 
     def __init__(
         self,
         path,
         iteration,
-        pol,
         field,
-        coord=None,
-        is_envelope=None,
-        prefix=None,
-        theta=None,
-        phase_unwrap_nd=False,
-        verbose=False,
+
     ):
-        ts = OpenPMDTimeSeries(path)
-        F, m = ts.get_field(iteration=iteration, field=field, coord=coord, theta=theta)
-
-        # If `is_envelope` is not given, assume that complex arrays are envelopes.
-        if is_envelope is None:
-            is_envelope = np.iscomplexobj(F)
-
-        if theta is None:  # Envelope obtained from the full 3D array
-            dim = "xyt"
-            axes_order = ["x", "y", "t"]
-
-        else:  # Envelope assumes axial symmetry processing RZ data
-            dim = "rt"
-            axes_order = ["r", "t"]
-
-        # Set r and t axes to the right dimension for LASY.
-        # Note that F is assumed 2D here, no azimuthal data.
-        F, axes = reorder_array(F, m, dim)
-
-        if dim == "rt" and F.ndim == 2:
-            F = F[np.newaxis, :]
-        elif F.ndim != 3:
-            raise ValueError(
-                f"F has the wrong number of dimensions: {F.ndim} (should be 3)"
-            )
-        # If array does not contain the envelope but the electric field,
-        # extract the envelope with a Hilbert transform
-        if not is_envelope:
-            grid = create_grid(F, axes, dim, is_envelope=is_envelope)
-            grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
-            array = grid.get_temporal_field()[0]
-        else:
-            s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
-            it = s.iterations[iteration]
-            omg0 = it.meshes["laserEnvelope"].get_attribute("angularFrequency")
-            array = F
-
+        series = io.Series(path, io.Access.read_only)
+        i = series.iterations[iteration]
+        m = i.meshes[field]
+        arr = m[io.Mesh_Record_Component.SCALAR].load_chunk()
+        print(arr.shape)
+        series.flush()
+        # data = np.transpose(arr).copy()
+        # print(data.shape)
+        omg0 = m.get_attribute("angularFrequency")
         wavelength = 2 * np.pi * c / omg0
-        if verbose:
-            print(
-                "Wavelength used in the definition of the envelope (nm):",
-                wavelength * 1.0e9,
-            )
+        pol = m.get_attribute("polarization")
+        grid = m.grid_global_offset 
+
+        if len(m.axis_labels) == 2: # 'rt'
+            n_r = int(arr.shape[2])
+            n_t = int(arr.shape[1] / 2)
+            
+            r = np.linspace(0, n_r * m.grid_spacing[1] , n_r)
+            t = np.linspace(-n_t * m.grid_spacing[0], n_t * m.grid_spacing[0] , 2*n_t)
+
+            axes = {"r": r, "t": t}
+            dim = "rt"
+            axes_order = m.axis_labels[::-1]
+                    
+        elif len(m.axis_labels) == 3: # 'xyt'
+            n_x = int(arr.shape[2] / 2)
+            n_y = int(arr.shape[1] / 2)
+            n_t = int(arr.shape[0] / 2)
+
+            x = np.linspace(-n_x * m.grid_spacing[2], n_x * m.grid_spacing[2], 2*n_x)
+            y = np.linspace(-n_y * m.grid_spacing[1], n_y * m.grid_spacing[1], 2*n_y)
+            t = np.linspace(-n_t * m.grid_spacing[0], n_t * m.grid_spacing[0], 2*n_t)
+
+            axes = {"x": x, "y": y, "t": t}
+            dim = "xyt"
+            axes_order = m.axis_labels[::-1]
+        
+        else:
+            print("Error: The dimension of the field is not supported. The valid dimensions are 'rt' and 'xyt'.")
+            return None
+        
+        # If the filed is stored in form of a vector potential
+        if m.get_attribute("envelopeField") == "normalized_vector_potential":
+            if dim == "rt":
+                grid = create_grid(np.transpose(arr, (0, 2, 1)), axes, dim)
+                data_rt = vector_potential_to_field(grid, omg0)
+                print(data_rt.shape)
+                data = data_rt[0, :, :]
+
+            else: 
+                grid = create_grid(np.transpose(arr, (2, 1, 0)), axes, dim)
+                data = vector_potential_to_field(grid, omg0)
+        else:
+            if dim == "rt":
+                data = np.transpose(arr[0, :, :], (1, 0))
+            else:
+                data = np.transpose(arr, (2, 1, 0))
+
+            
+        
+        data = data / np.max(np.abs(data)) # Normalization                                                                                                         
 
         super().__init__(
             wavelength=wavelength,
             pol=pol,
-            array=array,
+            array=data,
             dim=dim,
             axes=axes,
             axes_order=axes_order,
