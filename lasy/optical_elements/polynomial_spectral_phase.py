@@ -23,6 +23,8 @@ class PolynomialSpectralPhase(OpticalElement):
 
     Parameters
     ----------
+    omega0 : float (in rad/s)
+        Central angular frequency about which the polynomial is expanded
     delay : float (in s), optional
         Group delay (by default: ``delay=0``). Positive value delays the pulse, i.e. it arrives at a later time
     gdd : float (in s^2), optional
@@ -35,10 +37,6 @@ class PolynomialSpectralPhase(OpticalElement):
         arriving after the main pulse.
     fod : float (in s^4), optional
         Fourth-order Dispersion (by default: ``fod=0``).
-    delay : float (in s), optional
-        Group delay (by default: ``delay=0``). Positive value delays the pulse, i.e. it arrives at a later time
-    omega0 : float (in rad/s)
-        Central angular frequency about which the polynomial is expanded
     """
 
     def __init__(self, omega0, delay=0, gdd=0, tod=0, fod=0):
