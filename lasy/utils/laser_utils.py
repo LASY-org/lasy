@@ -248,7 +248,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 
 
 def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
-    """
+    r"""
     Get the frequency spectrum of an envelope or electric field.
 
     The spectrum can be calculated in three different ways, depending on the
@@ -904,7 +904,7 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
 
 
 def get_w0(grid, dim):
-    """
+    r"""
     Calculate the laser waist.
 
     Parameters
@@ -944,7 +944,7 @@ def get_w0(grid, dim):
 
 
 def get_phi2(dim, grid):
-    """
+    r"""
     Calculate the group-delay dispersion of the laser.
 
     Parameters
@@ -977,7 +977,7 @@ def get_phi2(dim, grid):
 
 
 def get_zeta(dim, grid, k0):
-    """
+    r"""
     Calculate the spatial chirp of the laser.
 
     Parameters
@@ -1024,7 +1024,7 @@ def get_zeta(dim, grid, k0):
 
 
 def get_beta(dim, grid, k0):
-    """
+    r"""
     Calculate the angular dispersion of the laser.
 
     Parameters
@@ -1065,7 +1065,7 @@ def get_beta(dim, grid, k0):
 
 
 def get_pft(dim, grid):
-    """
+    r"""
     Calculate the pulse front tilt (PFT) of the laser.
 
     Parameters
@@ -1099,7 +1099,7 @@ def get_pft(dim, grid):
 
 
 def get_propation_angle(dim, grid, k0):
-    """
+    r"""
     Calculate the propagating angle of the laser.
 
     Parameters
