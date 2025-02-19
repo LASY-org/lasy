@@ -33,8 +33,6 @@ class PolynomialSpectralPhase(OpticalElement):
         arriving after the main pulse.
     fod : float (in s^4), optional
         Fourth-order Dispersion (by default: ``fod=0``).
-    delay : float (in s), optional
-        Delay (by default: ``delay=0``). Positive delay moves pulse back in time. 
     omega0 : float (in rad/s)
         Central angular frequency about which the polynomial is expanded
     """
