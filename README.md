@@ -8,7 +8,7 @@ More specifically, `lasy` offers many ways to define complex laser pulses (e.g. 
 
 ## Installation
 
-For the most recent release of the code simply run:
+For the standard release of the code simply run:
 ```
 python3 -m pip install lasy
 ```
