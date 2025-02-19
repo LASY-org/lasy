@@ -39,12 +39,11 @@ class PolynomialSpectralPhase(OpticalElement):
         Central angular frequency about which the polynomial is expanded
     """
 
-    def __init__(self, omega0, gdd=0, tod=0, fod=0, delay=0):
+    def __init__(self, omega0, gdd=0, tod=0, fod=0):
         self.omega0 = omega0
         self.gdd = gdd
         self.tod = tod
         self.fod = fod
-        self.delay = delay
 
     def amplitude_multiplier(self, x, y, omega):
         """
@@ -67,7 +66,6 @@ class PolynomialSpectralPhase(OpticalElement):
             self.gdd / 2 * (omega - self.omega0) ** 2
             + self.tod / 6 * (omega - self.omega0) ** 3
             + self.fod / 24 * (omega - self.omega0) ** 4
-            + self.delay * (omega - self.omega0)
         )
 
         return np.exp(1j * spectral_phase)
