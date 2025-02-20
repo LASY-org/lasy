@@ -2,6 +2,7 @@
 
 import numpy as np
 import pytest
+import copy
 from scipy.constants import c
 
 from lasy.laser import Laser
@@ -23,7 +24,9 @@ from lasy.profiles.transverse import (
     SuperGaussianTransverseProfile,
     TransverseProfile,
     TransverseProfileFromData,
+    FlattenedGaussianTransverseProfile,
 )
+from lasy.profiles import CombinedLongitudinalTransverseProfile
 from lasy.utils.exp_data_utils import find_center_of_mass
 
 
@@ -533,3 +536,44 @@ def test_scale_trans_error_if_not_scalar():
         trans_profile_1 * trans_profile_1
     with pytest.raises(AssertionError):
         trans_profile_1 * [1.0, 2.0]
+
+def test_flattened_gaussian_profile():
+    w = 20e-3
+    N = 25
+    wl = 800e-9
+    tau = 30e-15
+    pol = (1,0)
+    energy = 1.0
+    focal_length = 1.0
+
+    w0 = focal_length * wl/np.pi/w
+
+    nf = FlattenedGaussianTransverseProfile(field_type='nearfield',w=w,N=N,wavelength=wl)
+    ff = FlattenedGaussianTransverseProfile(field_type='farfield',w=w0,N=N,wavelength=wl)
+
+    long = GaussianLongitudinalProfile(wl,tau,0)
+
+    nf_prof = CombinedLongitudinalTransverseProfile(wl,pol,energy,long,nf)
+    ff_prof = CombinedLongitudinalTransverseProfile(wl,pol,energy,long,ff)
+
+    dim = 'rt'
+    lo = (0,-100e-15)
+    hi_ff = (1000e-6,100e-15)
+    hi_nf = (40e-3,100e-15)
+    npoints = (5000,200)
+
+    las_nf =  Laser(dim, lo, hi_nf, npoints, nf_prof)
+    las_ff =  Laser(dim, lo, hi_ff, npoints, ff_prof)
+
+    las_nf_cp = copy.deepcopy(las_nf)
+
+    OAP = ParabolicMirror(f=focal_length)
+    las_nf_cp.apply_optics(OAP)
+    las_nf_cp.propagate(focal_length,grid=Grid(dim, lo, hi_ff, npoints,n_azimuthal_modes=1))
+
+    radlineout_nf = np.abs(las_nf_cp.grid.get_temporal_field()[0,:,int(npoints[1]/2)])**2
+    radlineout_ff = np.abs(las_ff.grid.get_temporal_field()[0,:,int(npoints[1]/2)])**2
+
+    err = np.sum(np.abs(las_nf_cp.grid.get_temporal_field()[0,:,:]-las_ff.grid.get_temporal_field()[0,:,:])**2)
+    
+    assert(err<1)
