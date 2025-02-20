@@ -1,6 +1,7 @@
+import math
+
 import numpy as np
 from scipy.special import binom
-import math
 
 from .transverse_profile import TransverseProfile
 
@@ -37,7 +38,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
 
     - For :math:`N\rightarrow\infty`, this is a Jinc profile: :math:`E\propto \frac{J_1(r/w0)}{r/w0}`.
 
-    The equivalent expression for the collimated beam in the near field which produces this focus is 
+    The equivalent expression for the collimated beam in the near field which produces this focus is
     given by:
 
     .. math::
@@ -50,7 +51,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
 
     - Note that a beam defined using the near field definition would be equivalent to a beam defined with
     the corresponding parameters in the far field, but without the parabolic phase arising from being defined
-    far from the focus. 
+    far from the focus.
 
     - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w_(z)^2}\right)`.
 
@@ -64,9 +65,9 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         of or has been directly propagated from the focus. In this case there
         can be a large defocus in the spatial phase.
     w : float (in meter)
-        The waist of the laser pulse. If field_type == 'farfield' then this 
+        The waist of the laser pulse. If field_type == 'farfield' then this
          variable corresponds to :math:`w_{0}` in the above far field formula.
-         if field_type == 'nearfield' then this variable corresponds to 
+         if field_type == 'nearfield' then this variable corresponds to
          :math:`w(z)` in the above near field formula.
     N: int
         Determines the "flatness" of the transverse profile, far from
@@ -75,7 +76,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
     wavelength : float (in meter)
         The main laser wavelength :math:`\lambda_0` of the laser.
     z_foc : float (in meter), optional
-        Only required if defining the pulse in the far field. Gives the position 
+        Only required if defining the pulse in the far field. Gives the position
         of the focal plane. (The laser pulse is initialized at
         ``z=0``.)
 
@@ -96,10 +97,10 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         super().__init__()
         # Ensure that N is an integer
         self.N = int(round(N))
-        assert field_type in ['nearfield', 'farfield']
+        assert field_type in ["nearfield", "farfield"]
         self.field_type = field_type
 
-        if field_type == 'farfield':
+        if field_type == "farfield":
             w0 = w
             # Calculate effective waist of the Laguerre-Gauss modes, at focus
             self.w_foc = w0 * (self.N + 1) ** 0.5
@@ -117,7 +118,6 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         else:
             self.w = w
 
-
     def _evaluate(self, x, y):
         """
         Return the transverse envelope.
@@ -134,8 +134,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-
-        if self.field_type == 'farfield':
+        if self.field_type == "farfield":
             # Term for wavefront curvature + Gouy phase
             diffract_factor = 1.0 - 1j * self.z_eval / self.zr
             w = self.w_foc * np.abs(diffract_factor)
@@ -167,17 +166,18 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
             envelope = laguerre_sum * np.exp(exp_argument) / diffract_factor
 
             return envelope
-        
+
         else:
             N = self.N
             w = self.w
-            
+
             sumseries = 0
             if N > 0:
                 for n in range(N):
-                    sumseries += 1/math.factorial(n) * ((N+1)*(x**2+y**2)/w**2)**n
-                
-            envelope = np.exp( - (N+1)*(x**2+y**2) / w**2) * sumseries
-            
-            return envelope
+                    sumseries += (
+                        1 / math.factorial(n) * ((N + 1) * (x**2 + y**2) / w**2) ** n
+                    )
 
+            envelope = np.exp(-(N + 1) * (x**2 + y**2) / w**2) * sumseries
+
+            return envelope
