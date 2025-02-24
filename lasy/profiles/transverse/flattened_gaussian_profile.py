@@ -31,11 +31,16 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         \exp\left(-\frac{r^2}{(N+1)w0^2}\right)
         \sum_{n=0}^N c'_n L^0_n\left(\frac{2\,r^2}{(N+1)w0^2}\right)
 
-    with Laguerre polynomials :math:`L^0_n` and :math:`\qquad c'_n = \sum_{m=n}^{N}\frac{1}{2^m}\binom{m}{n}`
+    
+    with Laguerre polynomials :math:`L^0_n` and 
+    
+    .. math::
+
+        \qquad c'_n=\sum_{m=n}^{N}\frac{1}{2^m}\binom{m}{n}
 
     - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w0^2}\right)`.
 
-    - For :math:`N\rightarrow\infty`, this is a Jinc profile: :math:`E\propto \frac{J_1(r/w0)}{r/w0}`.
+    - For :math:`N\rightarrow\infty`, this is a Jinc profile: :math:`E\propto\frac{J_1(r/w0)}{r/w0}`.
 
     The equivalent expression for the collimated beam in the near field which produces this focus is
     given by:
@@ -49,31 +54,35 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
     with :math:`\qquad w(z) = \frac{\lambda_0}{\pi w0}|z-z_{foc}|`
 
     - Note that a beam defined using the near field definition would be equivalent to a beam defined with
-    the corresponding parameters in the far field, but without the parabolic phase arising from being defined
-    far from the focus.
+      the corresponding parameters in the far field, but without the parabolic phase arising from being defined
+      far from the focus.
 
-    - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w_(z)^2}\right)`.
+    - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w(z)^2}\right)`.
 
-    - For :math:`N\rightarrow\infty`, this is a flat profile: :math:`E\propto \Theta(w(z)-r)`.
+    - For :math:`N\rightarrow\infty`, this is a flat profile: :math:`E\propto\Theta(w(z)-r)`.
 
     Parameters
     ----------
     field_type : string
         Options: 'nearfield', when the beam is defined far from focus and
-        has been collimated, or 'farfield', when the beam is in the vincinity
+        has been collimated, or 'farfield', when the beam is in the vicinity
         of or has been directly propagated from the focus. In this case there
         can be a large defocus in the spatial phase.
+
     w : float (in meter)
         The waist of the laser pulse. If field_type == 'farfield' then this
          variable corresponds to :math:`w_{0}` in the above far field formula.
          if field_type == 'nearfield' then this variable corresponds to
          :math:`w(z)` in the above near field formula.
-    N: int
+
+    N : int
         Determines the "flatness" of the transverse profile, far from
         focus (see the above formula).
         Default: ``N=6`` ; somewhat close to an 8th order supergaussian.
+
     wavelength : float (in meter)
         The main laser wavelength :math:`\lambda_0` of the laser.
+
     z_foc : float (in meter), optional
         Only required if defining the pulse in the far field. Gives the position
         of the focal plane. (The laser pulse is initialized at
