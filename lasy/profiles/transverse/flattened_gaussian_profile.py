@@ -46,7 +46,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         E(x,y,z=\infty) \propto
         \exp\left(-\frac{(N+1)r^2}{w(z)^2}\right)
         \sum_{n=0}^N \frac{1}{n!}\left(\frac{(N+1)\,r^2}{w(z)^2}\right)^n
-
+        
         \mathrm{with} \qquad w(z) = \frac{\lambda_0}{\pi w0}|z-z_{foc}|
 
     - Note that a beam defined using the near field definition would be equivalent to a beam defined with

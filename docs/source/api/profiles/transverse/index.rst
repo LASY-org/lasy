@@ -14,3 +14,4 @@ Transverse Laser Profiles
    super_gaussian_profile
    jinc_profile
    transverse_profile_from_data
+   flattened_gaussian
