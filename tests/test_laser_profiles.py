@@ -33,7 +33,8 @@ from lasy.profiles.transverse import (
     TransverseProfileFromData,
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
-
+from lasy.optical_elements.parabolic_mirror import ParabolicMirror
+from lasy.utils.grid import Grid
 
 class MockProfile(Profile):
     """A mock Profile class that always returns a constant value."""
@@ -581,13 +582,6 @@ def test_flattened_gaussian_profile():
     las_nf_cp.apply_optics(OAP)
     las_nf_cp.propagate(
         focal_length, grid=Grid(dim, lo, hi_ff, npoints, n_azimuthal_modes=1)
-    )
-
-    radlineout_nf = (
-        np.abs(las_nf_cp.grid.get_temporal_field()[0, :, int(npoints[1] / 2)]) ** 2
-    )
-    radlineout_ff = (
-        np.abs(las_ff.grid.get_temporal_field()[0, :, int(npoints[1] / 2)]) ** 2
     )
 
     err = np.sum(
