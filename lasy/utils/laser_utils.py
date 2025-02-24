@@ -824,9 +824,9 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
     dim : string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with
@@ -912,9 +912,9 @@ def get_w0(grid, dim):
     dim : string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
@@ -952,9 +952,9 @@ def get_phi2(dim, grid):
     dim : string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
@@ -985,9 +985,9 @@ def get_zeta(dim, grid, k0):
     dim : string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
@@ -1039,9 +1039,9 @@ def get_beta(dim, grid, k0):
     dim : string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with
@@ -1080,9 +1080,9 @@ def get_pft(dim, grid):
     dim : string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with
@@ -1114,9 +1114,9 @@ def get_propation_angle(dim, grid, k0):
     dim : string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
