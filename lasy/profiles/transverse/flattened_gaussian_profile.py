@@ -11,7 +11,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
     Class for the analytic profile of a Flattened-Gaussian laser pulse.
 
     Define a complex transverse profile with a flattened Gaussian intensity
-    distribution **far from focus** that transform into a distribution
+    distribution **far from focus** that transforms into a distribution
     with rings **in the focal plane**. (See `Santarsiero et al., J.
     Modern Optics, 1997 <http://doi.org/10.1080/09500349708232927>`_)
 
@@ -31,15 +31,13 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         \exp\left(-\frac{r^2}{(N+1)w0^2}\right)
         \sum_{n=0}^N c'_n L^0_n\left(\frac{2\,r^2}{(N+1)w0^2}\right)
 
-    
-    with Laguerre polynomials :math:`L^0_n` and 
-    
+    with Laguerre polynomials :math:`L^0_n` and  
+
     .. math::
 
-        \qquad c'_n=\sum_{m=n}^{N}\frac{1}{2^m}\binom{m}{n}
+        c'_n=\sum_{m=n}^{N}\frac{1}{2^m}\binom{m}{n}
 
     - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w0^2}\right)`.
-
     - For :math:`N\rightarrow\infty`, this is a Jinc profile: :math:`E\propto\frac{J_1(r/w0)}{r/w0}`.
 
     The equivalent expression for the collimated beam in the near field which produces this focus is
@@ -51,14 +49,18 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         \exp\left(-\frac{(N+1)r^2}{w(z)^2}\right)
         \sum_{n=0}^N \frac{1}{n!}\left(\frac{(N+1)\,r^2}{w(z)^2}\right)^n
 
-    with :math:`\qquad w(z) = \frac{\lambda_0}{\pi w0}|z-z_{foc}|`
+    with  
 
-    - Note that a beam defined using the near field definition would be equivalent to a beam defined with
-      the corresponding parameters in the far field, but without the parabolic phase arising from being defined
-      far from the focus.
+    .. math::
+
+        w(z) = \frac{\lambda_0}{\pi w0}|z-z_{foc}|
+
+    - Note that a beam defined using the near field definition would be 
+      equivalent to a beam defined with the corresponding parameters in 
+      the far field, but without the parabolic phase arising from being 
+      defined far from the focus.
 
     - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w(z)^2}\right)`.
-
     - For :math:`N\rightarrow\infty`, this is a flat profile: :math:`E\propto\Theta(w(z)-r)`.
 
     Parameters
@@ -70,10 +72,10 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         can be a large defocus in the spatial phase.
 
     w : float (in meter)
-        The waist of the laser pulse. If field_type == 'farfield' then this
-         variable corresponds to :math:`w_{0}` in the above far field formula.
-         if field_type == 'nearfield' then this variable corresponds to
-         :math:`w(z)` in the above near field formula.
+        The waist of the laser pulse. If ``field_type == 'farfield'`` then this
+        variable corresponds to :math:`w_{0}` in the above far field formula.
+        If ``field_type == 'nearfield'`` then this variable corresponds to
+        :math:`w(z)` in the above near field formula.
 
     N : int
         Determines the "flatness" of the transverse profile, far from
@@ -85,21 +87,22 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
 
     z_foc : float (in meter), optional
         Only required if defining the pulse in the far field. Gives the position
-        of the focal plane. (The laser pulse is initialized at
-        ``z=0``.)
+        of the focal plane. (The laser pulse is initialized at ``z=0``.)
 
     Warnings
     --------
+    
     In order to initialize the pulse out of focus, you can either:
 
-    - Use a non-zero ``z_foc``
-    - Use ``z_foc=0`` (i.e. initialize the pulse at focus) and then call
-      ``laser.propagate(-z_foc)``
+    - Use a non-zero ``z_foc``.
+    - Use ``z_foc=0`` (i.e., initialize the pulse at focus) and then call
+      ``laser.propagate(-z_foc)``.
 
     Both methods are in principle equivalent, but note that the first
     method uses the paraxial approximation, while the second method does
     not make this approximation.
     """
+
 
     def __init__(self, field_type, w, N, wavelength, z_foc=0):
         super().__init__()
