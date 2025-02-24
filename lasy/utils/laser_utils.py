@@ -258,7 +258,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     electric field :math:`E(t)`.
 
     .. math::
-    
+
         \int E(t) e^{-i \omega t} dt
 
     neglecting the negative frequencies. If ``method=="raw"``, no further
