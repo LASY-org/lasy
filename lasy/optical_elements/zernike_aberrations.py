@@ -1,8 +1,9 @@
 import numpy as np
-from scipy.constants import c
+
+from lasy.utils.zernike import zernike
 
 from .optical_element import OpticalElement
-from lasy.utils.zernike import zernike
+
 
 class ZernikeAberrations(OpticalElement):
     r"""
@@ -20,7 +21,7 @@ class ZernikeAberrations(OpticalElement):
     ordered according the OSA/ANSI indexing. The Zernike polynomials are normalized
     such that their integral over the unit disk is equal to :math:`\pi`. In the above
     formula, the total phase added to the pulse is a weighted sum of these Zernike
-    polynomials with weights :math:`a_j`. 
+    polynomials with weights :math:`a_j`.
 
     For more information see: https://en.wikipedia.org/wiki/Zernike_polynomials
 
@@ -29,13 +30,13 @@ class ZernikeAberrations(OpticalElement):
     ----------
     pupil_coords : tuple of floats (meters)
         A tuple of floats (cgx,cgy,r) with the first two elements corresponding to the center
-        point and third element the radius of the pupil on which the zernike polynomial is 
+        point and third element the radius of the pupil on which the zernike polynomial is
         defined.
     zernike_amplitudes : dict
-        A dictionary with integer keys representing the OSA/ANSI indexing of the 
+        A dictionary with integer keys representing the OSA/ANSI indexing of the
         individual Zernike Polynomials. The values corresponding to these keys
-        are floats giving the amplitudes / weights of the relevant Zernike polynomials. 
-    
+        are floats giving the amplitudes / weights of the relevant Zernike polynomials.
+
     """
 
     def __init__(self, pupil_coords, zernike_amplitudes):
@@ -51,7 +52,7 @@ class ZernikeAberrations(OpticalElement):
         x, y, omega : ndarrays of floats
             Define points on which to evaluate the multiplier.
             These arrays need to all have the same shape.
-            
+
         Returns
         -------
         multiplier : ndarray of complex numbers
@@ -62,7 +63,6 @@ class ZernikeAberrations(OpticalElement):
         phase = np.zeros_like(rr)
 
         for j in self.zernike_amplitudes:
-            phase += self.zernike_amplitudes[j]*zernike(x, y, self.pupil_coords, j)
+            phase += self.zernike_amplitudes[j] * zernike(x, y, self.pupil_coords, j)
 
-
-        return np.exp( 1j * phase )
+        return np.exp(1j * phase)
