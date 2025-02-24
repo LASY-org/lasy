@@ -28,8 +28,8 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
     .. math::
 
         E(x,y,z=zf) \propto
-        \exp\left(-\frac{r^2}{(N+1)w0^2}\right)
-        \sum_{n=0}^N c'_n L^0_n\left(\frac{2\,r^2}{(N+1)w0^2}\right)
+        \exp\left(-\frac{r^2}{(N+1)w_0^2}\right)
+        \sum_{n=0}^N c'_n L^0_n\left(\frac{2\,r^2}{(N+1)w_0^2}\right)
 
 
     with Laguerre polynomials :math:`L^0_n` and
@@ -38,9 +38,9 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
 
         \qquad c'_n=\sum_{m=n}^{N}\frac{1}{2^m}\binom{m}{n}
 
-    - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w0^2}\right)`.
+    - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w_0^2}\right)`.
 
-    - For :math:`N\rightarrow\infty`, this is a Jinc profile: :math:`E\propto\frac{J_1(r/w0)}{r/w0}`.
+    - For :math:`N\rightarrow\infty`, this is a Jinc profile: :math:`E\propto\frac{J_1(r/w_0)}{r/w_0}`.
 
     The equivalent expression for the collimated beam in the near field which produces this focus is
     given by:
@@ -55,7 +55,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
 
     .. math::
 
-        w(z) = \frac{\lambda_0}{\pi w0}|z-z_{foc}|
+        w(z) = \frac{\lambda_0}{\pi w_0}|z-z_{foc}|
 
     - Note that a beam defined using the near field definition would be
       equivalent to a beam defined with the corresponding parameters in
