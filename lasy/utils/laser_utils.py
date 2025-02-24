@@ -732,9 +732,9 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
     dim : string
         Dimensionality of the array. Options are:
         - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        Cartesian (x,y) transversely, and temporal (t) longitudinally.
         - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains a ndarrays (V/m) with
