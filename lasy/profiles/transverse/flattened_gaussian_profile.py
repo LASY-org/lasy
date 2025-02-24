@@ -31,12 +31,12 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         \exp\left(-\frac{r^2}{(N+1)w0^2}\right)
         \sum_{n=0}^N c'_n L^0_n\left(\frac{2\,r^2}{(N+1)w0^2}\right)
 
-<<<<<<< HEAD
-    with Laguerre polynomials :math:`L^0_n` and  
-=======
+    <<<<<<< HEAD
+    with Laguerre polynomials :math:`L^0_n` and
+    =======
 
     with Laguerre polynomials :math:`L^0_n` and
->>>>>>> b0b79d8f1dccaa42345c4eda0b5660faf52b09c0
+    >>>>>>> b0b79d8f1dccaa42345c4eda0b5660faf52b09c0
 
     .. math::
 
@@ -54,15 +54,15 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         \exp\left(-\frac{(N+1)r^2}{w(z)^2}\right)
         \sum_{n=0}^N \frac{1}{n!}\left(\frac{(N+1)\,r^2}{w(z)^2}\right)^n
 
-    with  
+    with
 
     .. math::
 
         w(z) = \frac{\lambda_0}{\pi w0}|z-z_{foc}|
 
-    - Note that a beam defined using the near field definition would be 
-      equivalent to a beam defined with the corresponding parameters in 
-      the far field, but without the parabolic phase arising from being 
+    - Note that a beam defined using the near field definition would be
+      equivalent to a beam defined with the corresponding parameters in
+      the far field, but without the parabolic phase arising from being
       defined far from the focus.
 
     - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w(z)^2}\right)`.
@@ -96,7 +96,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
 
     Warnings
     --------
-    
+
     In order to initialize the pulse out of focus, you can either:
 
     - Use a non-zero ``z_foc``.
@@ -107,7 +107,6 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
     method uses the paraxial approximation, while the second method does
     not make this approximation.
     """
-
 
     def __init__(self, field_type, w, N, wavelength, z_foc=0):
         super().__init__()
