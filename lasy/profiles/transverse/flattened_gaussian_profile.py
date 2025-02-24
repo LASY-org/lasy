@@ -30,7 +30,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         E(x,y,z=zf) \propto
         \exp\left(-\frac{r^2}{(N+1)w0^2}\right)
         \sum_{n=0}^N c'_n L^0_n\left(\frac{2\,r^2}{(N+1)w0^2}\right)
-    
+
     with Laguerre polynomials :math:`L^0_n` and :math:`\qquad c'_n = \sum_{m=n}^{N}\frac{1}{2^m}\binom{m}{n}`
 
     - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w0^2}\right)`.
@@ -45,7 +45,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         E(x,y,z=\infty) \propto
         \exp\left(-\frac{(N+1)r^2}{w(z)^2}\right)
         \sum_{n=0}^N \frac{1}{n!}\left(\frac{(N+1)\,r^2}{w(z)^2}\right)^n
-    
+
     with :math:`\qquad w(z) = \frac{\lambda_0}{\pi w0}|z-z_{foc}|`
 
     - Note that a beam defined using the near field definition would be equivalent to a beam defined with
