@@ -25,7 +25,7 @@ def get_zernike_nm(j):
     return int(m), int(n)
 
 
-def zernike(x, y, pupilCoords, j):
+def zernike(x, y, pupil_coords, j):
     """
     Calculate the Zernike Polynomials to arbitrary order.
 
@@ -36,7 +36,7 @@ def zernike(x, y, pupilCoords, j):
     x, y : ndarrays (meters)
         The position at which to calculate the profile
 
-    pupilCoords : tuple of floats (meters)
+    pupil_coords : tuple of floats (meters)
         A tuple of floats (cgx,cgy,r) with the first two elements corresponding to the center
         of the zernike mode and the third the radius of the mode
 
@@ -49,7 +49,7 @@ def zernike(x, y, pupilCoords, j):
         The Zernike mode
     """
     # Setup
-    (cgx, cgy, r) = pupilCoords
+    (cgx, cgy, r) = pupil_coords
     rho = np.sqrt((x - cgx) ** 2 + (y - cgy) ** 2) / r
     theta = np.arctan2(y - cgy, x - cgx)
 
