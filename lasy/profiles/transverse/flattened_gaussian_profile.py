@@ -94,7 +94,8 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
     Warnings
     --------
 
-    In order to initialize the pulse out of focus, you can either:
+    In order to initialize the pulse in the far field but out of focus, you 
+    must select ``field_type == 'farfield'`` and then you can either:
 
     - Use a non-zero ``z_foc``.
     - Use ``z_foc=0`` (i.e., initialize the pulse at focus) and then call
