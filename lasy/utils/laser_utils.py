@@ -258,6 +258,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     electric field :math:`E(t)`.
 
     ..math::
+    
         \int E(t) e^{-i \omega t} dt
 
     neglecting the negative frequencies. If ``method=="raw"``, no further
@@ -268,6 +269,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     For the other methods, the spectral energy density is calculated as
 
     ..math::
+
         \frac{\epsilon_0 c}{2\pi} |\int E(t) e^{-i \omega t} dt| ^ 2
 
     If ``method=="on_axis"``, a 1D real array with on-axis value of the
@@ -277,6 +279,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     spectral energy density is calculated:
 
     ..math::
+    
         \frac{\epsilon_0 c}{2\pi} \int |\int E(t) e^{-i \omega t} dt| ^ 2 dx dy
 
     The units of this array are :math:`\mathrm{J / (rad Hz)}`
