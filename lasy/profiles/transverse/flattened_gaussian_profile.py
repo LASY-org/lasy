@@ -31,7 +31,12 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         \exp\left(-\frac{r^2}{(N+1)w0^2}\right)
         \sum_{n=0}^N c'_n L^0_n\left(\frac{2\,r^2}{(N+1)w0^2}\right)
 
+<<<<<<< HEAD
     with Laguerre polynomials :math:`L^0_n` and  
+=======
+
+    with Laguerre polynomials :math:`L^0_n` and
+>>>>>>> b0b79d8f1dccaa42345c4eda0b5660faf52b09c0
 
     .. math::
 
