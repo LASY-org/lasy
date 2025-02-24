@@ -919,8 +919,8 @@ def get_w0(grid, dim):
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-    Return
-    ----------
+    Returns
+    -------
     sigma : Standard deviation of a**2 in m
     """
     field = grid.get_temporal_field()
@@ -992,8 +992,8 @@ def get_zeta(dim, grid, k0):
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-     Return
-    ----------
+    Returns
+    -------
     zeta_x, zeta_y : Spatial chirp in :math:`\zeta=\frac{dx_0}{d\omega}` (meter * second)
     nu_x, nu_y: Spatial chirp in :math:`\nu=\frac{d\omega_0}{dx}` (meter^-1 * second^-1)
     """
@@ -1047,8 +1047,8 @@ def get_beta(dim, grid, k0):
         It contains an ndarray (V/m) with
         the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-    Return
-    ----------
+    Returns
+    -------
     beta_x, beta_y : Angular dispersion in :math:` \beta = \frac{d\theta_0}{d\omega}` (second)
     """
     assert dim == "xyt", "No angular chirp for axis-symmetric dimension."
@@ -1089,8 +1089,8 @@ def get_pft(dim, grid):
         the value of the envelope field and the associated metadata
         that defines the points at which the laser is defined.
 
-    Return
-    ----------
+    Returns
+    -------
     pft_x, pft_y : Pulse front tilt in :math:`p=\frac{dt_0}{dx}` (second * meter^-1).
     """
     assert dim == "xyt", "No pulse front tilt for cylindrical symmetry."
@@ -1121,8 +1121,8 @@ def get_propation_angle(dim, grid, k0):
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-    Return
-    ----------
+    Returns
+    -------
     angle_x, angle_y : Propagating angle in :math:`p = \frac{k_x}{k_z}` or :math:`p = \frac{k_y}{k_z}` (in radians).
     """
     assert dim == "xyt", "Propagation is always on-axis for axis-symmetric dimension."
