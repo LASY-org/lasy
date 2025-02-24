@@ -7,6 +7,7 @@ import pytest
 from scipy.constants import c
 
 from lasy.laser import Laser
+from lasy.optical_elements.parabolic_mirror import ParabolicMirror
 from lasy.profiles import (
     CombinedLongitudinalTransverseProfile,
     FromArrayProfile,
@@ -33,8 +34,8 @@ from lasy.profiles.transverse import (
     TransverseProfileFromData,
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
-from lasy.optical_elements.parabolic_mirror import ParabolicMirror
 from lasy.utils.grid import Grid
+
 
 class MockProfile(Profile):
     """A mock Profile class that always returns a constant value."""
