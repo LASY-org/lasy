@@ -58,9 +58,7 @@ def test_delay():
     # Compute the analtical expression in real space for a Gaussian
     t = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
 
-    E_analytical = (
-        E0 * np.exp(-1.0  * ((t-delay) / tau) ** 2)
-    )
+    E_analytical = E0 * np.exp(-1.0 * ((t - delay) / tau) ** 2)
 
     # Compare the on-axis field with the analytical formula
     tol = 1.2e-3
