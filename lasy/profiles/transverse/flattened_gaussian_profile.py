@@ -31,18 +31,15 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         \exp\left(-\frac{r^2}{(N+1)w0^2}\right)
         \sum_{n=0}^N c'_n L^0_n\left(\frac{2\,r^2}{(N+1)w0^2}\right)
 
-<<<<<<< HEAD
-    with Laguerre polynomials :math:`L^0_n` and  
-=======
 
     with Laguerre polynomials :math:`L^0_n` and
->>>>>>> b0b79d8f1dccaa42345c4eda0b5660faf52b09c0
 
     .. math::
 
-        c'_n=\sum_{m=n}^{N}\frac{1}{2^m}\binom{m}{n}
+        \qquad c'_n=\sum_{m=n}^{N}\frac{1}{2^m}\binom{m}{n}
 
     - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w0^2}\right)`.
+
     - For :math:`N\rightarrow\infty`, this is a Jinc profile: :math:`E\propto\frac{J_1(r/w0)}{r/w0}`.
 
     The equivalent expression for the collimated beam in the near field which produces this focus is
