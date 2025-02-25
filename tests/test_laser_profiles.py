@@ -587,13 +587,15 @@ def test_flattened_gaussian_profile():
     )
 
     radlineout_nf_cp = (
-    np.abs(las_nf_cp.grid.get_temporal_field()[0, :, int(npoints[1] / 2)]) ** 2
+        np.abs(las_nf_cp.grid.get_temporal_field()[0, :, int(npoints[1] / 2)]) ** 2
     )
     radlineout_ff = (
         np.abs(las_ff.grid.get_temporal_field()[0, :, int(npoints[1] / 2)]) ** 2
     )
 
-    err = np.sum(np.abs(np.abs(radlineout_nf_cp)**2-np.abs(radlineout_ff)**2))/np.sum(np.abs(radlineout_ff)**2)
+    err = np.sum(
+        np.abs(np.abs(radlineout_nf_cp) ** 2 - np.abs(radlineout_ff) ** 2)
+    ) / np.sum(np.abs(radlineout_ff) ** 2)
 
     assert err < 1e-2
 
@@ -601,6 +603,6 @@ def test_flattened_gaussian_profile():
     energy_nf_cp = compute_laser_energy(dim,las_nf_cp.grid)
     assert(np.abs(energy_ff -energy_nf_cp)/energy_ff < 1e-4)
 
-    w0_ff = get_w0(las_ff.grid,dim)
-    w0_nf_cp = get_w0(las_nf_cp.grid,dim)
-    assert(np.abs(w0_nf_cp - w0_ff)/w0_ff < 1e-2)
+    w0_ff = get_w0(las_ff.grid, dim)
+    w0_nf_cp = get_w0(las_nf_cp.grid, dim)
+    assert np.abs(w0_nf_cp - w0_ff) / w0_ff < 1e-2

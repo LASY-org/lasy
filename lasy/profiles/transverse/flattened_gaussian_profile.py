@@ -186,7 +186,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
             w = self.w
 
             sumseries = 0
-            for n in range(N+1):
+            for n in range(N + 1):
                 sumseries += (
                     1 / math.factorial(n) * ((N + 1) * (x**2 + y**2) / w**2) ** n
                 )
