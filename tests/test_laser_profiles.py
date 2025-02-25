@@ -35,6 +35,7 @@ from lasy.profiles.transverse import (
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
 from lasy.utils.grid import Grid
+from lasy.utils.laser_utils import compute_laser_energy, get_w0
 
 
 class MockProfile(Profile):
@@ -585,12 +586,21 @@ def test_flattened_gaussian_profile():
         focal_length, grid=Grid(dim, lo, hi_ff, npoints, n_azimuthal_modes=1)
     )
 
-    err = np.sum(
-        np.abs(
-            las_nf_cp.grid.get_temporal_field()[0, :, :]
-            - las_ff.grid.get_temporal_field()[0, :, :]
-        )
-        ** 2
+    radlineout_nf_cp = (
+    np.abs(las_nf_cp.grid.get_temporal_field()[0, :, int(npoints[1] / 2)]) ** 2
+    )
+    radlineout_ff = (
+        np.abs(las_ff.grid.get_temporal_field()[0, :, int(npoints[1] / 2)]) ** 2
     )
 
-    assert err < 1
+    err = np.sum(np.abs(np.abs(radlineout_nf_cp)**2-np.abs(radlineout_ff)**2))/np.sum(np.abs(radlineout_ff)**2)
+
+    assert err < 1e-2
+
+    energy_ff = compute_laser_energy(dim,las_ff.grid)
+    energy_nf_cp = compute_laser_energy(dim,las_nf_cp.grid)
+    assert(np.abs(energy_ff -energy_nf_cp)/energy_ff < 1e-5)
+
+    w0_ff = get_w0(las_ff.grid,dim)
+    w0_nf_cp = get_w0(las_nf_cp.grid,dim)
+    assert(np.abs(w0_nf_cp - w0_ff)/w0_ff < 1e-2)
