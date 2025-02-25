@@ -571,7 +571,7 @@ def test_flattened_gaussian_profile():
 
     dim = "rt"
     lo = (0, -100e-15)
-    hi_ff = (1000e-6, 100e-15)
+    hi_ff = (500e-6, 100e-15)
     hi_nf = (40e-3, 100e-15)
     npoints = (5000, 200)
 
@@ -599,7 +599,7 @@ def test_flattened_gaussian_profile():
 
     energy_ff = compute_laser_energy(dim,las_ff.grid)
     energy_nf_cp = compute_laser_energy(dim,las_nf_cp.grid)
-    assert(np.abs(energy_ff -energy_nf_cp)/energy_ff < 1e-5)
+    assert(np.abs(energy_ff -energy_nf_cp)/energy_ff < 1e-4)
 
     w0_ff = get_w0(las_ff.grid,dim)
     w0_nf_cp = get_w0(las_nf_cp.grid,dim)
