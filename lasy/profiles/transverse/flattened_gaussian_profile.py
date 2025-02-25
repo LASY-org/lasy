@@ -109,9 +109,10 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
     def __init__(self, field_type, w, N, wavelength, z_foc=0):
         super().__init__()
         # Ensure that N is an integer
-        self.N = int(round(N))
+        assert isinstance(N, int) and N >= 0
         assert field_type in ["nearfield", "farfield"]
         self.field_type = field_type
+        self.N = N
 
         if field_type == "farfield":
             w0 = w
@@ -185,11 +186,10 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
             w = self.w
 
             sumseries = 0
-            if N > 0:
-                for n in range(N):
-                    sumseries += (
-                        1 / math.factorial(n) * ((N + 1) * (x**2 + y**2) / w**2) ** n
-                    )
+            for n in range(N+1):
+                sumseries += (
+                    1 / math.factorial(n) * ((N + 1) * (x**2 + y**2) / w**2) ** n
+                )
 
             envelope = np.exp(-(N + 1) * (x**2 + y**2) / w**2) * sumseries
 
