@@ -599,9 +599,9 @@ def test_flattened_gaussian_profile():
 
     assert err < 1e-2
 
-    energy_ff = compute_laser_energy(dim,las_ff.grid)
-    energy_nf_cp = compute_laser_energy(dim,las_nf_cp.grid)
-    assert(np.abs(energy_ff -energy_nf_cp)/energy_ff < 1e-4)
+    energy_ff = compute_laser_energy(dim, las_ff.grid)
+    energy_nf_cp = compute_laser_energy(dim, las_nf_cp.grid)
+    assert np.abs(energy_ff - energy_nf_cp) / energy_ff < 1e-4
 
     w0_ff = get_w0(las_ff.grid, dim)
     w0_nf_cp = get_w0(las_nf_cp.grid, dim)
