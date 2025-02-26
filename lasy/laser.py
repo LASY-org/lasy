@@ -185,8 +185,10 @@ class Laser:
             r, omega = np.meshgrid(self.grid.axes[0], self.omega_1d, indexing="ij")
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
-            # `r` as `x` and 0 as `y`
-            multiplier = optical_element.amplitude_multiplier(r, 0, omega)
+            # `r` as `x` and an array of 0s as `y`
+            multiplier = optical_element.amplitude_multiplier(
+                r, np.zeros_like(r), omega
+            )
             # The azimuthal modes are the components of the Fourier transform
             # along theta (FT_theta). Because the multiplier is assumed to be
             # cylindrically symmetric (i.e. theta-independent):

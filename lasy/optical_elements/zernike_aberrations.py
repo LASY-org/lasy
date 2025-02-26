@@ -62,12 +62,18 @@ class ZernikeAberrations(OpticalElement):
         rr = np.sqrt(x**2 + y**2)
         phase = np.zeros_like(rr)
 
-        _, _, nw = x.shape
+        nw = x.shape[-1]
 
         for j in list(self.zernike_amplitudes):
-            phase += self.zernike_amplitudes[j] * np.tile(
-                zernike(x[:, :, 0], y[:, :, 0], self.pupil_coords, j)[:, :, np.newaxis],
-                (1, 1, nw),
+            # Create the zernike phase and ensure it has the same number of dimensions as phase
+            zernike_phase = zernike(x[..., 0], y[..., 0], self.pupil_coords, j)[
+                ..., None
+            ]  # Expand last axis
+
+            # Increase the length of the frequency dimension such that the shape is suitable to be added
+            # to the phase array, then add it
+            phase += self.zernike_amplitudes[j] * np.broadcast_to(
+                zernike_phase, phase.shape
             )
 
         return np.exp(1j * phase)
