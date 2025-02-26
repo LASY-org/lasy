@@ -543,7 +543,7 @@ def field_to_vector_potential(grid, omega0):
 
 def vector_potential_to_field(grid, omega0, direct=True):
     """
-    Convert envelope from electric field (V/m) to normalized vector potential.
+    Convert envelope from vector potential to electric field (V/m).
 
     Parameters
     ----------
