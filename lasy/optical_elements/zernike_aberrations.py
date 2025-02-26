@@ -62,7 +62,6 @@ class ZernikeAberrations(OpticalElement):
         rr = np.sqrt(x**2 + y**2)
         phase = np.zeros_like(rr)
 
-        nw = x.shape[-1]
 
         for j in list(self.zernike_amplitudes):
             # Create the zernike phase and ensure it has the same number of dimensions as phase
