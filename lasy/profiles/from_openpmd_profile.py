@@ -75,7 +75,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             )
             return None
 
-        # If the filed is stored as vector potential
+        # If the field is stored as vector potential, convert it to field
         if m.get_attribute("envelopeField") == "normalized_vector_potential":
             if dim == "rt":
                 grid = create_grid(np.transpose(arr, (0, 2, 1)), axes, dim)
