@@ -91,8 +91,6 @@ class FromOpenPMDProfile(FromArrayProfile):
             else:
                 data = np.transpose(arr, (2, 1, 0))
 
-        data = data / np.max(np.abs(data))  # Normalization
-
         super().__init__(
             wavelength=wavelength,
             pol=pol,
