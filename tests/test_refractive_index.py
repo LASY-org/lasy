@@ -1,3 +1,4 @@
+import scipy.constants as ct
 from math import isclose
 from lasy.utils.refractive_index import RefractiveIndexDatabase, Material
 
@@ -50,3 +51,11 @@ def test_formulas():
     m = Material('organic', 'urea', 'Rosker-e', db=db)
     n = m.calc_n(0.96)
     assert isclose(n, 1.5915, rel_tol=1e-4)
+
+
+def test_spectral_phase_expansion():
+    db = RefractiveIndexDatabase()
+    m = Material(name='fused silica')
+    omega0 = 2 * ct.pi * ct.c / 800e-9
+    dphi, dphi2, dphi3 = m.calc_spectral_phase_expansion(omega0)
+    assert isclose(dphi2, 3.6162e-26, rel_tol=1e-4)

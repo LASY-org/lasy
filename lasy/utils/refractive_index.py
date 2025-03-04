@@ -6,14 +6,13 @@ Inspired somewhat by https://github.com/toftul/refractiveindex/tree/master
 
 import os
 import yaml
-import sys
-import argparse
 import numpy as np
+import scipy.constants as ct
 from scipy.interpolate import CubicSpline
+from scipy.misc import derivative
 
 
 # TODO: write tests for k
-# TODO: add dn/dl and higher order calcs, figure out conversions
 
 
 known_materials = {
@@ -122,17 +121,18 @@ class Material:
             if name in known_materials.keys():
                 shelf, book, page = known_materials[name]
             else:
-                raise f'Name {name} not known!'
+                raise RuntimeError(f'Name "{name}" not known!')
 
         self._get_filename(shelf, book, page)
 
         self._load_data()
 
     def _get_filename(self, shelf_name, book_name, page_name):
-        # Iterate through the database to get filename
+        """ Iterate through the database to get filename """
         if self.db is None:
             self.db = RefractiveIndexDatabase()
         db = self.db.database
+
         shelf = next(iter(s for s in db if s['SHELF'] == shelf_name), None)
         if shelf is None:
             raise RuntimeError(f'Shelf {shelf_name} not in database!')
@@ -198,7 +198,7 @@ class Material:
                     self.interp_k = CubicSpline(self.wavelengths_k,
                                                 self.data_k, **interp_kw)
 
-    def calc_n(self, wavelength_um):
+    def calc_n(self, lambda_um):
         """
         Calculate refractive index for this material.
         Performs the calculation and checks for wavelength
@@ -206,7 +206,7 @@ class Material:
 
         Parameters
         ----------
-        wavelength_um: float or iterable
+        lambda_um: float or iterable
             Wavelength(s) at which to evaluate the refractive
             index. Must be in microns.
 
@@ -217,25 +217,25 @@ class Material:
             returned for wavelengths outside the applicable range
         """
         # Make inputs into a proper array
-        if isinstance(wavelength_um, (list, set)):
-            wavelength_um = np.array(wavelength_um)
-        if isinstance(wavelength_um, float):
-            wavelength_um = np.array((wavelength_um,))
+        if isinstance(lambda_um, (list, set)):
+            lambda_um = np.array(lambda_um)
+        if isinstance(lambda_um, float):
+            lambda_um = np.array((lambda_um,))
 
-        mask = ((self.wavelength_range_n[0] < wavelength_um) &
-                (wavelength_um < self.wavelength_range_n[1]))
+        mask = ((self.wavelength_range_n[0] < lambda_um) &
+                (lambda_um < self.wavelength_range_n[1]))
 
         if 'formula' in self.type_n:
-            n = self.equation_n(wavelength_um, *self.coefficients_n)
+            n = self.equation_n(lambda_um, *self.coefficients_n)
         else:
-            n = self.interp_n(wavelength_um)
+            n = self.interp_n(lambda_um)
 
         n[np.logical_not(mask)] = 0.
         if len(n) == 1:
             return n[0]
         return n
 
-    def calc_k(self, wavelength_um):
+    def calc_k(self, lambda_um):
         """
         Calculate extinction coefficient for this material.
         Performs the calculation and checks for wavelength
@@ -243,13 +243,13 @@ class Material:
 
         Parameters
         ----------
-        wavelength_um: float or iterable
+        lambda_um: float or iterable
             Wavelength(s) at which to evaluate the extinction
             coefficient. Must be in microns.
 
         Returns
         -------
-        n: float or np.array
+        k: float or np.array
             Extinction coefficient, same shape as `lam0`. 0 is
             returned for wavelengths outside the applicable range
         """
@@ -259,20 +259,62 @@ class Material:
             return None
 
         # Make inputs into a proper array
-        if isinstance(wavelength_um, (list, set)):
-            wavelength_um = np.array(wavelength_um)
-        if isinstance(wavelength_um, float):
-            wavelength_um = np.array((wavelength_um,))
+        if isinstance(lambda_um, (list, set)):
+            lambda_um = np.array(lambda_um)
+        if isinstance(lambda_um, float):
+            lambda_um = np.array((lambda_um,))
 
-        mask = ((self.wavelength_range_k[0] < wavelength_um) &
-                (wavelength_um < self.wavelength_range_k[1]))
+        mask = ((self.wavelength_range_k[0] < lambda_um) &
+                (lambda_um < self.wavelength_range_k[1]))
 
-        k = self.interp_k(wavelength_um)
+        k = self.interp_k(lambda_um)
 
-        n[np.logical_not(mask)] = 0.
+        k[np.logical_not(mask)] = 0.
         if len(k) == 1:
-            return n[0]
+            return k[0]
         return k
+
+    def calc_spectral_phase_expansion(self, omega0):
+        """
+        Returns an array of first three spectral phase terms,
+        ie dphi/domega, d2phi/domega2, d3phi/domega3,
+        evaluated at omega0.
+
+        The returned values are in SI.
+
+        Parameters
+        ----------
+        omega0: float
+            Central frequency at which to evaluate the
+            spectral phase expansion terms.
+
+        Returns
+        -------
+        dphi_dw: float
+            First term, in units s/m
+
+        d2phi_dw2: float
+            Second term (GVD), in units s^2/m
+
+        d3phi_dw3: float
+            Third term (TOD), in units s^3/m
+        """
+        lam = 2 * np.pi * ct.c / omega0  # Sellmeier and everything uses dn/dlambda!
+        lambda_mu = 1e6 * lam
+        dphi = (self.calc_n(lambda_mu) -
+                lam * self._dn_dw(lambda_mu, 1)) / ct.c
+        ddphi = lam**3 / (2 * np.pi * ct.c ** 2) * self._dn_dw(lambda_mu, 2)
+        dddphi = -1 / (omega0 ** 2 * ct.c) * (
+                    3 * lambda_mu ** 2 * self._dn_dw(lambda_mu, 2) +
+                    lambda_mu ** 3 * self._dn_dw(lambda_mu, 3))
+
+        # Returns in s^n/m
+        return dphi, ddphi * 1e12, dddphi
+
+    def _dn_dw(self, lambda_mu, order=1):
+        h = lambda_mu * 1e-3
+        dn_dw = derivative(self.calc_n, lambda_mu, dx=h, n=order, order=5)
+        return dn_dw
 
 
 def formula1(lam, c1, c2, c3, c4, c5, c6, c7):
