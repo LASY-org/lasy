@@ -1,0 +1,324 @@
+import os
+import yaml
+import sys
+import argparse
+import numpy as np
+from scipy.interpolate import CubicSpline
+
+
+# TODO: add missing formulas
+# TODO: make into package
+# TODO: write tests
+# TODO: make calc method handle floats
+
+
+known_materials = {
+    'fused silica': ('glass', 'fused_silica', 'Malitson'),
+    'BK7': ('popular_glass', 'BK7', 'SCHOTT')}
+
+
+class RefractiveIndexDatabase:
+    """
+    Class that opens and stores the refractiveindex.info
+    YAML database. The entire database will be downloaded
+    on the first time it is run.
+    """
+    __database_version = '2025-02-23'
+    def __init__(self, database_path=None, auto_download=True):
+        """
+        Initialise the database and download data, if it does
+        not exist and requested.
+
+        Parameters
+        ----------
+        database_path: str or None
+            Is None, defaults to user home directory. If passed,
+            should be the directory containing the database
+            structure.
+
+        auto_download: bool, default is True
+            If True, database will be downloaded. If False and
+            no database found, an error will be thrown.
+        """
+        if database_path is None:
+            database_path = os.path.join(os.path.expanduser('~'),
+                                         '.refractiveindex.info-database')
+
+        if not os.path.exists(database_path) and auto_download:
+            import tempfile, urllib.request, zipfile, shutil
+            with tempfile.TemporaryDirectory() as tempdir:
+                zip_filename = os.path.join(tempdir, 'db.zip')
+
+                print('Downloading refractiveindex.info database...', end='')
+                url = 'https://github.com/polyanskiy/'\
+                      'refractiveindex.info-database/archive/'\
+                      f'refs/tags/v{self.__database_version}.zip'
+                urllib.request.urlretrieve(url, zip_filename)
+
+                print(' extracting zip file...', end='')
+                with zipfile.ZipFile(zip_filename, 'r') as zf:
+                    zf.extractall(tempdir)
+                tempdb = os.path.join(tempdir,
+                                      'refractiveindex.info-database-' +
+                                      self.__database_version,
+                                      'database')
+                shutil.move(tempdb, database_path)
+                print(' Done!')
+
+        self.database_path = os.path.normpath(database_path)
+        self.database_file = os.path.join(database_path, 'catalog-nk.yml')
+
+        # Clean the file of the 'DIVIDER' items
+        clean_text = []
+        with open(self.database_file) as f:
+            for line in f:
+                if 'DIVIDER' not in line:
+                    clean_text.append(line)
+        clean_text = ''.join(clean_text)
+
+        #with open(self.database_file) as f:
+        #    self.database = yaml.load(f, Loader=yaml.BaseLoader)
+
+        self.database = yaml.load(clean_text, Loader=yaml.BaseLoader)
+
+class Material:
+    """
+    Class that contains material specific data:
+    its refractive index and extinction coefficient.
+    """
+    def __init__(self, shelf=None, book=None, page=None, name=None, db=None):
+        """
+        Initialise the Material. Input arguments can either be a known
+        name defined in the dict above or a combination of shelf, book
+        and page. The latter follow the definitions on
+        refractiveindex.info website.
+
+
+        Parameters
+        ----------
+        name: str or None
+            A known name, defined in the dict above.
+
+        shelf: str or None
+            refractiveindex.info shelf name.
+
+        book: str or None
+            refractiveindex.info book name.
+
+        page: str or None
+            refractiveindex.info page name.
+        """
+        self.db = db
+        if name is not None:
+            if name in known_materials.keys():
+                shelf, book, page = known_materials[name]
+            else:
+                raise f'Name {name} not known!'
+
+        self._get_filename(shelf, book, page)
+
+        self._load_data()
+
+    def _get_filename(self, shelf_name, book_name, page_name):
+        # Iterate through the database to get filename
+        if self.db is None:
+            self.db = RefractiveIndexDatabase()
+        db = self.db.database
+        shelf = next(iter(s for s in db if s['SHELF'] == shelf_name), None)
+        if shelf is None:
+            raise f'Shelf {shelf_name} not in database!'
+
+        book = next(iter(b for b in shelf['content'] if b['BOOK'] == book_name), None)
+        if book is None:
+            raise f'Book {book_name} not on shelf {shelf_name}!'
+
+        page = next(iter(p for p in book['content'] if p['PAGE'] == page_name), None)
+        if page is None:
+            raise f'Page {page_name} not in book {book_name}!'
+
+        self.filename = os.path.join(self.db.database_path,
+                                     'data', page['data'])
+
+    def _load_data(self):
+        with open(self.filename) as f:
+            mat_dict = yaml.load(f, Loader=yaml.BaseLoader)
+
+        self.reference = mat_dict.get('REFERENCES')
+        self.conditions = mat_dict.get('CONDITIONS')
+        self.properties = mat_dict.get('PROPERTIES')
+        self.comments = mat_dict.get('COMMENTS')
+
+        data_list = mat_dict.get('DATA')
+        if data_list is None:
+            raise f'No usable data found in {self.filename}'
+        for data in data_list:
+            type = data.get('type').replace(' ', '')
+
+            # Parse different types of data we know about
+            if 'formula' in type:
+                self.type_n = type
+                self.wavelength_range_n = np.fromstring(data.get('wavelength_range', 'nan nan'), sep=' ')
+                self.coefficients_n = np.fromstring(data.get('coefficients', '0 0'), sep=' ')
+                self.equation_n = globals().get(self.type_n)
+            else:
+                self.type_n = 'interp'
+                self.data_raw = np.fromstring(data.get('data', '0 0\n0 0'), sep=' ')
+                n_cols = 3 if 'nk' in type else 2
+                self.data_raw = np.reshape(self.data_raw, (len(self.data_raw)//n_cols, n_cols))
+                interp_kw = {} # dict(bounds_error=False, fill_value=0.)
+
+                if 'n' in type:
+                    self.wavelengths_n = self.data_raw[:, 0]
+                    self.wavelength_range_n = [min(self.wavelengths_n),
+                                               max(self.wavelengths_n)]
+                    self.data_n = self.data_raw[:, 1]
+                    self.interp_n = CubicSpline(self.wavelengths_n, self.data_n,
+                                            **interp_kw)
+                if 'k' in type:
+                    self.wavelengths_k = self.data_raw[:, 0]
+                    self.wavelength_range_k = [min(self.wavelengths_k),
+                                               max(self.wavelengths_k)]
+                    self.data_k = self.data_raw[:, 2] if 'nk' in type \
+                                    else self.data_raw[:, 1]
+                    self.interp_k = CubicSpline(self.wavelengths_k, self.data_k,
+                                            **interp_kw)
+
+    def calc_n(self, wavelength_um):
+        """
+        Calculate refractive index for this material.
+        Performs the calculation and checks for wavelength
+        being in the required range.
+
+        Parameters
+        ----------
+        wavelength_um: float or iterable
+            Wavelength(s) at which to evaluate the refractive
+            index. Must be in microns.
+
+        Returns
+        -------
+        n: float or np.array
+            Refractive index value, same shape as `lam0`. 0 is
+            returned for wavelengths outside the applicable range
+        """
+        # Make inputs into a proper array
+        if isinstance(wavelength_um, (list, set)):
+            wavelength_um = np.array(wavelength_um)
+        if isinstance(wavelength_um, float):
+            wavelength_um = np.array((wavelength_um,))
+
+        mask = ((self.wavelength_range_n[0] < wavelength_um) &
+                (wavelength_um < self.wavelength_range_n[1]))
+
+        if 'formula' in self.type_n:
+            n = self.equation_n(wavelength_um, *self.coefficients_n)
+        else:
+            n = self.interp_n(wavelength_um)
+
+        n[np.logical_not(mask)] = 0.
+        if len(n) == 1:
+            return n[0]
+        return n
+
+    def calc_k(self, wavelength_um):
+        """
+        Calculate extinction coefficient for this material.
+        Performs the calculation and checks for wavelength
+        being in the required range.
+
+        Parameters
+        ----------
+        wavelength_um: float or iterable
+            Wavelength(s) at which to evaluate the extinction
+            coefficient. Must be in microns.
+
+        Returns
+        -------
+        n: float or np.array
+            Extinction coefficient, same shape as `lam0`. 0 is
+            returned for wavelengths outside the applicable range
+        """
+        # Check we have some data for this!
+        if not hasattr(self, 'interp_k'):
+            print('No extinction data for this material!')
+            return None
+
+        # Make inputs into a proper array
+        if isinstance(wavelength_um, (list, set)):
+            wavelength_um = np.array(wavelength_um)
+        if isinstance(wavelength_um, float):
+            wavelength_um = np.array((wavelength_um,))
+
+        mask = ((self.wavelength_range_k[0] < wavelength_um) &
+                (wavelength_um < self.wavelength_range_k[1]))
+
+        k = self.interp_k(wavelength_um)
+
+        n[np.logical_not(mask)] = 0.
+        if len(k) == 1:
+            return n[0]
+        return k
+
+
+def formula1(lam, c1, c2, c3, c4, c5, c6, c7):
+    # eg specs/vitron/infrared/IG6.yml
+    l2 = lam ** 2
+    n2 = 1 + c1 + c2**2*l2/(l2-c3) + c4**2*l2/(l2-c5) + c6**2*l2/(l2-c7)
+    return np.sqrt(n2)
+
+
+def formula2(lam, c1, c2, c3, c4, c5, c6, c7):
+    # eg specs/ohara/optical/LAH78.yml
+    l2 = lam ** 2
+    n2 = 1 + c1 + c2*l2/(l2-c3**2) + c4*l2/(l2-c5**2) + c6*l2/(l2-c7**2)
+    return np.sqrt(n2)
+
+
+def formula3(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11):
+    # eg specs/sumita/optical/K-BOC20.yml
+    n2 = c1 + c2*lam**c3 + c4*lam**c5 + c6*lam**c7 + c8*lam**c9 + c10*lam**c11
+    return np.sqrt(n2)
+
+
+def formula4(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11):
+    # eg main/BaGa4Se7/nk/Kato-beta.yml
+    l2 = lam ** 2
+    n2 = c1 + c2*lam**c3/(l2-c4**c5) + c6*lam**c7/(l2-c8**c9) + c10*lam**c11
+    return np.sqrt(n2)
+
+
+def formula5(lam, c1, c2, c3, c4, c5, c6, c7)
+    # eg xylene/nk/Li.yml
+    n2 = c1 + c2*lam**c3 + c4*lam**c5 + c6*lam**c7
+    return np.sqrt(n2)
+
+
+def formula6(lam, c1, c2, c3, c4, c5)
+    # eg main/He/nk/Mansfield.yml
+    l2 = lam ** 2
+    n2 = 1 + c1 + c2*l2/(l2-c3) + c4*l2/(l2-c5)
+    return np.sqrt(n2)
+
+
+def formula7(lam, c1, c2, c3, c4, c5)
+    # eg main/Si/nk/Edwards.yml
+    l2 = lam ** 2
+    n = c1 + c2/(l2-0.028) + c3/(l2-0.028)**2 + c4*l2 + c5*lam**4
+    return n
+
+
+def formula8(lam, c1, c2, c3, c4):
+    # eg main/AgBr/nk/Schroter.yml
+    l2 = lam ** 2
+    RHS = c1 + c2*l2/(l2-c3) + c4*l2
+
+
+def formula9(lam, c1, c2, c3, c4, c5, c6):
+    # eg organic/CH4N2O - urea/nk/Rosker-e.yml
+    lc5= lam - c5
+    n2 = c1 + c2/(lam**2-c3) + c4*lc5/(lc5**2+c6)
+    return np.sqrt(n2)
+
+
+if __name__ == '__main__':
+    db = RefractiveIndexDatabase()
