@@ -43,12 +43,12 @@ class FromOpenPMDProfile(FromArrayProfile):
         omg0 = m.get_attribute("angularFrequency")
         wavelength = 2 * np.pi * c / omg0
         pol = m.get_attribute("polarization")
+        grid_offset = m.get_attribute("gridGlobalOffset")
 
         # Define parameters to create a profile
         if len(m.axis_labels) == 2:  # 'rt'
             n_t = array.shape[1]
             n_r = array.shape[2]
-            grid_offset = m.get_attribute("gridGlobalOffset")
             t = np.linspace(
                 grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t
             )
@@ -63,7 +63,6 @@ class FromOpenPMDProfile(FromArrayProfile):
             n_x = array.shape[2]
             n_y = array.shape[1]
             n_t = array.shape[0]
-            grid_offset = m.get_attribute("gridGlobalOffset")
             x = np.linspace(
                 grid_offset[2], grid_offset[2] + (n_x - 1) * m.grid_spacing[2], n_x
             )
