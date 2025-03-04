@@ -2,7 +2,11 @@ import numpy as np
 import openpmd_api as io
 from scipy.constants import c
 
-from lasy.utils.laser_utils import create_grid, vector_potential_to_field, field_to_envelope
+from lasy.utils.laser_utils import (
+    create_grid,
+    field_to_envelope,
+    vector_potential_to_field,
+)
 
 from .from_array_profile import FromArrayProfile
 
@@ -21,7 +25,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     field : string
         Name of the field containing the laser pulse
-    
+
     is_envelope : boolean
         Whether the field to read represents a laser envelope.
         If not, the envelope is obtained from the electric field
@@ -43,7 +47,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         field,
         is_envelope=False,
         phase_unwrap_nd=False,
-        polarization= None,
+        polarization=None,
         coord="r",
     ):
         series = io.Series(path, io.Access.read_only)
@@ -87,7 +91,7 @@ class FromOpenPMDProfile(FromArrayProfile):
                 "Error: The dimension of the field is not supported. The valid dimensions are 'rt' and 'xyt'."
             )
             return None
-        
+
         # If array does not contain the envelope but the electric field,
         # extract the envelope with a Hilbert transform
         if is_envelope == True:
