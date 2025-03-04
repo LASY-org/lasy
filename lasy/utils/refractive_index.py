@@ -12,9 +12,6 @@ from scipy.interpolate import CubicSpline
 from scipy.misc import derivative
 
 
-# TODO: write tests for k
-
-
 known_materials = {
     'fused silica': ('glass', 'fused_silica', 'Malitson'),
     'BK7': ('popular_glass', 'BK7', 'SCHOTT'),
@@ -378,7 +375,3 @@ def formula9(lam, c1, c2, c3, c4, c5, c6):
     lc5= lam - c5
     n2 = c1 + c2/(lam**2-c3) + c4*lc5/(lc5**2+c6)
     return np.sqrt(n2)
-
-
-if __name__ == '__main__':
-    db = RefractiveIndexDatabase()
