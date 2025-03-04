@@ -1,3 +1,9 @@
+"""
+refractiveindex.info database parser/client.
+
+Inspired somewhat by https://github.com/toftul/refractiveindex/tree/master
+"""
+
 import os
 import yaml
 import sys
@@ -6,7 +12,7 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 
 
-# TODO: write tests
+# TODO: write tests for k
 # TODO: add dn/dl and higher order calcs, figure out conversions
 
 
@@ -85,19 +91,16 @@ class Material:
     Class that contains material specific data:
     its refractive index and extinction coefficient.
     """
-    def __init__(self, shelf=None, book=None, page=None, name=None, db=None):
+    def __init__(self, shelf=None, book=None, page=None,
+                 name=None, db=None):
         """
         Initialise the Material. Input arguments can either be a known
         name defined in the dict above or a combination of shelf, book
         and page. The latter follow the definitions on
         refractiveindex.info website.
 
-
         Parameters
-        ----------
-        name: str or None
-            A known name, defined in the dict above.
-
+        ---------
         shelf: str or None
             refractiveindex.info shelf name.
 
@@ -106,6 +109,13 @@ class Material:
 
         page: str or None
             refractiveindex.info page name.
+
+        name: str or None
+            A known name, defined in the dict above.
+
+        db: RefractiveIndexDatabase instance or None
+            An instance of RefractiveIndexDatabase can be
+            given, which speeds up material initialisation.
         """
         self.db = db
         if name is not None:
@@ -125,15 +135,17 @@ class Material:
         db = self.db.database
         shelf = next(iter(s for s in db if s['SHELF'] == shelf_name), None)
         if shelf is None:
-            raise f'Shelf {shelf_name} not in database!'
+            raise RuntimeError(f'Shelf {shelf_name} not in database!')
 
-        book = next(iter(b for b in shelf['content'] if b['BOOK'] == book_name), None)
+        book = next(iter(
+            b for b in shelf['content'] if b['BOOK'] == book_name), None)
         if book is None:
-            raise f'Book {book_name} not on shelf {shelf_name}!'
+            raise RuntimeError(f'Book {book_name} not on shelf {shelf_name}!')
 
-        page = next(iter(p for p in book['content'] if p['PAGE'] == page_name), None)
+        page = next(iter(
+            p for p in book['content'] if p['PAGE'] == page_name), None)
         if page is None:
-            raise f'Page {page_name} not in book {book_name}!'
+            raise RuntimeError(f'Page {page_name} not in book {book_name}!')
 
         self.filename = os.path.join(self.db.database_path,
                                      'data', page['data'])
@@ -156,13 +168,17 @@ class Material:
             # Parse different types of data we know about
             if 'formula' in type:
                 self.type_n = type
-                self.wavelength_range_n = np.fromstring(data.get('wavelength_range', 'nan nan'), sep=' ')
-                self.coefficients_n = np.fromstring(data.get('coefficients', '0 0'), sep=' ')
+                self.wavelength_range_n = np.fromstring(
+                        data.get('wavelength_range', 'nan nan'), sep=' ')
+                self.coefficients_n = np.fromstring(
+                        data.get('coefficients', '0 0'), sep=' ')
                 self.equation_n = globals().get(self.type_n)
             else:
-                self.data_raw = np.fromstring(data.get('data', '0 0\n0 0'), sep=' ')
+                self.data_raw = np.fromstring(
+                    data.get('data', '0 0\n0 0'), sep=' ')
                 n_cols = 3 if 'nk' in type else 2
-                self.data_raw = np.reshape(self.data_raw, (len(self.data_raw)//n_cols, n_cols))
+                self.data_raw = np.reshape(self.data_raw,
+                                       (len(self.data_raw)//n_cols, n_cols))
                 interp_kw = {} # dict(bounds_error=False, fill_value=0.)
 
                 if 'n' in type:
@@ -171,16 +187,16 @@ class Material:
                     self.wavelength_range_n = [min(self.wavelengths_n),
                                                max(self.wavelengths_n)]
                     self.data_n = self.data_raw[:, 1]
-                    self.interp_n = CubicSpline(self.wavelengths_n, self.data_n,
-                                            **interp_kw)
+                    self.interp_n = CubicSpline(self.wavelengths_n,
+                                                self.data_n, **interp_kw)
                 if 'k' in type:
                     self.wavelengths_k = self.data_raw[:, 0]
                     self.wavelength_range_k = [min(self.wavelengths_k),
                                                max(self.wavelengths_k)]
                     self.data_k = self.data_raw[:, 2] if 'nk' in type \
                                     else self.data_raw[:, 1]
-                    self.interp_k = CubicSpline(self.wavelengths_k, self.data_k,
-                                            **interp_kw)
+                    self.interp_k = CubicSpline(self.wavelengths_k,
+                                                self.data_k, **interp_kw)
 
     def calc_n(self, wavelength_um):
         """
