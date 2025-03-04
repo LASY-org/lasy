@@ -1,0 +1,52 @@
+from math import isclose
+from lasy.utils.refractive_index import RefractiveIndexDatabase, Material
+
+
+def test_formulas():
+    # Test that all formulas give correct values of n
+    db = RefractiveIndexDatabase()
+
+    # Formula 1
+    m = Material(name='fused silica', db=db)
+    n = m.calc_n(0.9)
+    assert isclose(n, 1.4518, rel_tol=1e-4)
+
+    # Formula 2
+    m = Material('specs', 'OHARA-optical', 'LAH78', db=db)
+    n = m.calc_n(1.05)
+    assert isclose(n, 1.8718, rel_tol=1e-4)
+
+    # Formula 3
+    m = Material('specs', 'SUMITA-optical', 'K-BOC20', db=db)
+    n = m.calc_n(1.01)
+    assert isclose(n, 1.9705, rel_tol=1e-4)
+
+    # Formula 4
+    m = Material('main', 'Lu2O3', 'Kaminskii', db=db)
+    n = m.calc_n(0.87)
+    assert isclose(n, 1.9156, rel_tol=1e-4)
+
+    # Formula 5
+    m = Material('main', 'H2O', 'Bashkatov', db=db)
+    n = m.calc_n(0.81)
+    assert isclose(n, 1.3272, rel_tol=1e-4)
+
+    # Formula 6
+    m = Material(name='air', db=db)
+    n = m.calc_n(0.97)
+    assert isclose(n, 1.00027426, rel_tol=1e-8)
+
+    # Formula 7
+    m = Material('main', 'Si', 'Edwards', db=db)
+    n = m.calc_n(2.7)
+    assert isclose(n, 3.4395, rel_tol=1e-4)
+
+    # Formula 8
+    m = Material('main', 'AgBr', 'Schröter', db=db)
+    n = m.calc_n(0.6)
+    assert isclose(n, 2.2531, rel_tol=1e-4)
+
+    # Formula 9
+    m = Material('organic', 'urea', 'Rosker-e', db=db)
+    n = m.calc_n(0.96)
+    assert isclose(n, 1.5915, rel_tol=1e-4)

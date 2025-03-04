@@ -6,15 +6,14 @@ import numpy as np
 from scipy.interpolate import CubicSpline
 
 
-# TODO: add missing formulas
-# TODO: make into package
 # TODO: write tests
-# TODO: make calc method handle floats
+# TODO: add dn/dl and higher order calcs, figure out conversions
 
 
 known_materials = {
     'fused silica': ('glass', 'fused_silica', 'Malitson'),
-    'BK7': ('popular_glass', 'BK7', 'SCHOTT')}
+    'BK7': ('popular_glass', 'BK7', 'SCHOTT'),
+    'air': ('other', 'air', 'Ciddor')}
 
 
 class RefractiveIndexDatabase:
@@ -161,13 +160,13 @@ class Material:
                 self.coefficients_n = np.fromstring(data.get('coefficients', '0 0'), sep=' ')
                 self.equation_n = globals().get(self.type_n)
             else:
-                self.type_n = 'interp'
                 self.data_raw = np.fromstring(data.get('data', '0 0\n0 0'), sep=' ')
                 n_cols = 3 if 'nk' in type else 2
                 self.data_raw = np.reshape(self.data_raw, (len(self.data_raw)//n_cols, n_cols))
                 interp_kw = {} # dict(bounds_error=False, fill_value=0.)
 
                 if 'n' in type:
+                    self.type_n = 'interp'
                     self.wavelengths_n = self.data_raw[:, 0]
                     self.wavelength_range_n = [min(self.wavelengths_n),
                                                max(self.wavelengths_n)]
@@ -263,14 +262,14 @@ class Material:
 def formula1(lam, c1, c2, c3, c4, c5, c6, c7):
     # eg specs/vitron/infrared/IG6.yml
     l2 = lam ** 2
-    n2 = 1 + c1 + c2**2*l2/(l2-c3) + c4**2*l2/(l2-c5) + c6**2*l2/(l2-c7)
+    n2 = 1 + c1 + c2*l2/(l2-c3**2) + c4*l2/(l2-c5**2) + c6*l2/(l2-c7**2)
     return np.sqrt(n2)
 
 
 def formula2(lam, c1, c2, c3, c4, c5, c6, c7):
     # eg specs/ohara/optical/LAH78.yml
     l2 = lam ** 2
-    n2 = 1 + c1 + c2*l2/(l2-c3**2) + c4*l2/(l2-c5**2) + c6*l2/(l2-c7**2)
+    n2 = 1 + c1 + c2*l2/(l2-c3) + c4*l2/(l2-c5) + c6*l2/(l2-c7)
     return np.sqrt(n2)
 
 
@@ -280,27 +279,27 @@ def formula3(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11):
     return np.sqrt(n2)
 
 
-def formula4(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11):
+def formula4(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10=0, c11=0):
     # eg main/BaGa4Se7/nk/Kato-beta.yml
     l2 = lam ** 2
     n2 = c1 + c2*lam**c3/(l2-c4**c5) + c6*lam**c7/(l2-c8**c9) + c10*lam**c11
     return np.sqrt(n2)
 
 
-def formula5(lam, c1, c2, c3, c4, c5, c6, c7)
+def formula5(lam, c1, c2, c3, c4, c5, c6, c7):
     # eg xylene/nk/Li.yml
-    n2 = c1 + c2*lam**c3 + c4*lam**c5 + c6*lam**c7
-    return np.sqrt(n2)
+    n = c1 + c2*lam**c3 + c4*lam**c5 + c6*lam**c7
+    return n
 
 
-def formula6(lam, c1, c2, c3, c4, c5)
+def formula6(lam, c1, c2, c3, c4=0, c5=0):
     # eg main/He/nk/Mansfield.yml
-    l2 = lam ** 2
-    n2 = 1 + c1 + c2*l2/(l2-c3) + c4*l2/(l2-c5)
-    return np.sqrt(n2)
+    l2 = lam ** -2
+    n = 1 + c1 + c2/(c3-l2) + c4/(c5-l2)
+    return n
 
 
-def formula7(lam, c1, c2, c3, c4, c5)
+def formula7(lam, c1, c2, c3, c4, c5):
     # eg main/Si/nk/Edwards.yml
     l2 = lam ** 2
     n = c1 + c2/(l2-0.028) + c3/(l2-0.028)**2 + c4*l2 + c5*lam**4
@@ -311,6 +310,8 @@ def formula8(lam, c1, c2, c3, c4):
     # eg main/AgBr/nk/Schroter.yml
     l2 = lam ** 2
     RHS = c1 + c2*l2/(l2-c3) + c4*l2
+    n2 = (2*RHS + 1) / (1 - RHS)
+    return np.sqrt(n2)
 
 
 def formula9(lam, c1, c2, c3, c4, c5, c6):
