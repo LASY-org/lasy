@@ -4,7 +4,6 @@ from scipy.constants import c
 
 from lasy.utils.laser_utils import (
     create_grid,
-    field_to_envelope,
     vector_potential_to_field,
 )
 
