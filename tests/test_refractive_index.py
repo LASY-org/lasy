@@ -3,7 +3,7 @@ from math import isclose
 from lasy.utils.refractive_index import RefractiveIndexDatabase, Material
 
 
-def test_formulas():
+def test_n_formulas():
     # Test that all formulas give correct values of n
     db = RefractiveIndexDatabase()
 
@@ -55,7 +55,16 @@ def test_formulas():
 
 def test_spectral_phase_expansion():
     db = RefractiveIndexDatabase()
-    m = Material(name='fused silica')
+    m = Material(name='fused silica', db=db)
     omega0 = 2 * ct.pi * ct.c / 800e-9
     dphi, dphi2, dphi3 = m.calc_spectral_phase_expansion(omega0)
+    assert isclose(dphi, 4.8477e-09, rel_tol=1e-3)
     assert isclose(dphi2, 3.6162e-26, rel_tol=1e-4)
+    assert isclose(dphi3, 2.747e-41, rel_tol=5e-3)
+
+
+def test_k():
+    db = RefractiveIndexDatabase()
+    m = Material(name='BK7', db=db)
+    k = m.calc_k(0.7)
+    assert isclose(k, 8.9305e-9, rel_tol=1e-4)

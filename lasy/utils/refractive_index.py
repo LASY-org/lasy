@@ -280,7 +280,8 @@ class Material:
         ie dphi/domega, d2phi/domega2, d3phi/domega3,
         evaluated at omega0.
 
-        The returned values are in SI.
+        Definitions can be found at
+        https://www.newport.com/n/the-effect-of-dispersion-on-ultrashort-pulses
 
         Parameters
         ----------
