@@ -49,8 +49,12 @@ class FromOpenPMDProfile(FromArrayProfile):
             n_t = array.shape[1]
             n_r = array.shape[2]
             grid_offset = m.get_attribute("gridGlobalOffset")
-            t = np.linspace(grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t)
-            r = np.linspace(grid_offset[1], grid_offset[1] + (n_r - 1) * m.grid_spacing[1], n_r)
+            t = np.linspace(
+                grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t
+            )
+            r = np.linspace(
+                grid_offset[1], grid_offset[1] + (n_r - 1) * m.grid_spacing[1], n_r
+            )
             axes = {"r": r, "t": t}
             dim = "rt"
             axes_order = m.axis_labels[::-1]
@@ -60,9 +64,15 @@ class FromOpenPMDProfile(FromArrayProfile):
             n_y = array.shape[1]
             n_t = array.shape[0]
             grid_offset = m.get_attribute("gridGlobalOffset")
-            x = np.linspace(grid_offset[2], grid_offset[2] + (n_x - 1) * m.grid_spacing[2], n_x)
-            y = np.linspace(grid_offset[1], grid_offset[1] + (n_y - 1) * m.grid_spacing[1], n_y)
-            t = np.linspace(grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t)
+            x = np.linspace(
+                grid_offset[2], grid_offset[2] + (n_x - 1) * m.grid_spacing[2], n_x
+            )
+            y = np.linspace(
+                grid_offset[1], grid_offset[1] + (n_y - 1) * m.grid_spacing[1], n_y
+            )
+            t = np.linspace(
+                grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t
+            )
             axes = {"x": x, "y": y, "t": t}
             dim = "xyt"
             axes_order = m.axis_labels[::-1]
