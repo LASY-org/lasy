@@ -79,15 +79,13 @@ class FromOpenPMDProfile(FromArrayProfile):
         if m.get_attribute("envelopeField") == "normalized_vector_potential":
             if dim == "rt":
                 grid = create_grid(np.transpose(arr, (0, 2, 1)), axes, dim)
-                data_rt = vector_potential_to_field(grid, omg0)
-                data = data_rt[0, :, :]
-
+                data = vector_potential_to_field(grid, omg0)
             else:
                 grid = create_grid(np.transpose(arr, (2, 1, 0)), axes, dim)
                 data = vector_potential_to_field(grid, omg0)
         else:
             if dim == "rt":
-                data = np.transpose(arr[0, :, :], (1, 0))
+                data = np.transpose(arr, (0, 2, 1))
             else:
                 data = np.transpose(arr, (2, 1, 0))
 
