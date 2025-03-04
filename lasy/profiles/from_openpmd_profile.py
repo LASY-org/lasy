@@ -36,7 +36,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         series = io.Series(path, io.Access.read_only)
         i = series.iterations[iteration]
         m = i.meshes[field]
-        arr = m[io.Mesh_Record_Component.SCALAR].load_chunk()
+        array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
         series.flush()
 
         # Extract the required parameters
@@ -46,29 +46,27 @@ class FromOpenPMDProfile(FromArrayProfile):
 
         # Define parameters to create a profile
         if len(m.axis_labels) == 2:  # 'rt'
-            n_r = int(arr.shape[2])
-            n_t = int(arr.shape[1] / 2)
-
-            r = np.linspace(0, n_r * m.grid_spacing[1], n_r)
-            t = np.linspace(-n_t * m.grid_spacing[0], n_t * m.grid_spacing[0], 2 * n_t)
-
+            n_t = array.shape[1]
+            n_r = array.shape[2]
+            grid_offset = m.get_attribute("gridGlobalOffset")
+            t = np.linspace(grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t)
+            r = np.linspace(grid_offset[1], grid_offset[1] + (n_r - 1) * m.grid_spacing[1], n_r)
             axes = {"r": r, "t": t}
             dim = "rt"
             axes_order = m.axis_labels[::-1]
-
+            array = np.transpose(array, (0, 2, 1))
         elif len(m.axis_labels) == 3:  # 'xyt'
-            n_x = int(arr.shape[2] / 2)
-            n_y = int(arr.shape[1] / 2)
-            n_t = int(arr.shape[0] / 2)
-
-            x = np.linspace(-n_x * m.grid_spacing[2], n_x * m.grid_spacing[2], 2 * n_x)
-            y = np.linspace(-n_y * m.grid_spacing[1], n_y * m.grid_spacing[1], 2 * n_y)
-            t = np.linspace(-n_t * m.grid_spacing[0], n_t * m.grid_spacing[0], 2 * n_t)
-
+            n_x = array.shape[2]
+            n_y = array.shape[1]
+            n_t = array.shape[0]
+            grid_offset = m.get_attribute("gridGlobalOffset")
+            x = np.linspace(grid_offset[2], grid_offset[2] + (n_x - 1) * m.grid_spacing[2], n_x)
+            y = np.linspace(grid_offset[1], grid_offset[1] + (n_y - 1) * m.grid_spacing[1], n_y)
+            t = np.linspace(grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t)
             axes = {"x": x, "y": y, "t": t}
             dim = "xyt"
             axes_order = m.axis_labels[::-1]
-
+            array = np.transpose(array, (2, 1, 0))
         else:
             print(
                 "Error: The dimension of the field is not supported. The valid dimensions are 'rt' and 'xyt'."
@@ -77,22 +75,13 @@ class FromOpenPMDProfile(FromArrayProfile):
 
         # If the field is stored as vector potential, convert it to field
         if m.get_attribute("envelopeField") == "normalized_vector_potential":
-            if dim == "rt":
-                grid = create_grid(np.transpose(arr, (0, 2, 1)), axes, dim)
-                data = vector_potential_to_field(grid, omg0)
-            else:
-                grid = create_grid(np.transpose(arr, (2, 1, 0)), axes, dim)
-                data = vector_potential_to_field(grid, omg0)
-        else:
-            if dim == "rt":
-                data = np.transpose(arr, (0, 2, 1))
-            else:
-                data = np.transpose(arr, (2, 1, 0))
+            grid = create_grid(array, axes, dim)
+            array = vector_potential_to_field(grid, omg0)
 
         super().__init__(
             wavelength=wavelength,
             pol=pol,
-            array=data,
+            array=array,
             dim=dim,
             axes=axes,
             axes_order=axes_order,
