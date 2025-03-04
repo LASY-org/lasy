@@ -25,19 +25,6 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     field : string
         Name of the field containing the laser pulse
-
-    is_envelope : boolean
-        Whether the field to read represents a laser envelope.
-        If not, the envelope is obtained from the electric field
-        using a Hilbert transform. If not specified, lasy will try to guess
-        whether the field is an envelope by checking whether it is a complex
-        array.
-
-    phase_unwrap_nd : boolean (optional)
-        If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
-        If False, the phase unwrapping is done in t, treating each transverse cell
-        separately. This should be less accurate but faster.
-        If set to True, scikit-image must be installed.
     """
 
     def __init__(
@@ -45,23 +32,20 @@ class FromOpenPMDProfile(FromArrayProfile):
         path,
         iteration,
         field,
-        is_envelope=False,
-        phase_unwrap_nd=False,
-        polarization=None,
-        coord="r",
     ):
+        # Read the data
         series = io.Series(path, io.Access.read_only)
         i = series.iterations[iteration]
         m = i.meshes[field]
         arr = m[io.Mesh_Record_Component.SCALAR].load_chunk()
         series.flush()
+
+        # Extract the required parameters
         omg0 = m.get_attribute("angularFrequency")
         wavelength = 2 * np.pi * c / omg0
-        if polarization is None:
-            pol = m.get_attribute("polarization")
-        else:
-            pol = polarization
+        pol = m.get_attribute("polarization")
 
+        # Define parameters to create a profile
         if len(m.axis_labels) == 2:  # 'rt'
             n_r = int(arr.shape[2])
             n_t = int(arr.shape[1] / 2)
@@ -92,16 +76,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             )
             return None
 
-        # If array does not contain the envelope but the electric field,
-        # extract the envelope with a Hilbert transform
-        if is_envelope == True:
-            grid = create_grid(arr, axes, dim, is_envelope=is_envelope)
-            grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
-            data = grid.get_temporal_field()[0]
-        else:
-            pass
-
-        # If the filed is stored in form of a vector potential
+        # If the filed is stored as vector potential
         if m.get_attribute("envelopeField") == "normalized_vector_potential":
             if dim == "rt":
                 grid = create_grid(np.transpose(arr, (0, 2, 1)), axes, dim)
