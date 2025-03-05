@@ -7,3 +7,4 @@ Utils
 
    grid
    gerchberg_saxton
+   refractive_index

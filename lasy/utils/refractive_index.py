@@ -44,10 +44,10 @@ class RefractiveIndexDatabase:
 
     def __init__(self, database_path=None, auto_download=True):
         """
-        Initialise the database.
+        Initialise the refractive index database.
 
-        Data is also downloaded, if it does
-        not exist and requested.
+        Data will be downloaded, if it does not exist
+        and download is requested.
 
         Parameters
         ----------
@@ -246,7 +246,7 @@ class Material:
         Returns
         -------
         n: float or np.array
-            Refractive index value, same shape as `lam0`. 0 is
+            Refractive index value, same shape as `lambda_mu`. 0 is
             returned for wavelengths outside the applicable range
         """
         # Make inputs into a proper array
@@ -284,7 +284,7 @@ class Material:
         Returns
         -------
         k: float or np.array
-            Extinction coefficient, same shape as `lam0`. 0 is
+            Extinction coefficient, same shape as `lambda_mu`. 0 is
             returned for wavelengths outside the applicable range
         """
         # Check we have some data for this!
@@ -295,8 +295,6 @@ class Material:
         # Make inputs into a proper array
         if isinstance(lambda_um, (list, set)):
             lambda_um = np.array(lambda_um)
-        if isinstance(lambda_um, float):
-            lambda_um = np.array((lambda_um,))
 
         mask = (self.wavelength_range_k[0] < lambda_um) & (
             lambda_um < self.wavelength_range_k[1]
@@ -304,25 +302,32 @@ class Material:
 
         k = self.interp_k(lambda_um)
 
-        k[np.logical_not(mask)] = 0.0
-        if len(k) == 1:
-            return k[0]
-        return k
+        if isinstance(mask, (bool, np.bool_)):
+            return k * int(mask)
+        else:
+            k[np.logical_not(mask)] = 0.0
+            return k
 
     def calc_spectral_phase_expansion(self, omega0):
         """
         Calculate spectral phase expansion terms.
 
-        Returns an array of first three spectral phase terms,
-        ie dphi/domega, d2phi/domega2, d3phi/domega3,
-        evaluated at omega0.
+        More precisely, the first three terms of the Taylor
+        expansion of the spectral phase around :math:`omega0`
+        are calculated:
+
+        .. math::
+
+            \frac{\mathrm{d}\phi}{\mathrm{d}/omega},
+            \frac{\mathrm{d}^2\phi}{\mathrm{d}/omega^2},
+            \frac{\mathrm{d}^3\phi}{\mathrm{d}/omega^3}
 
         Definitions can be found at
         https://www.newport.com/n/the-effect-of-dispersion-on-ultrashort-pulses
 
         Parameters
         ----------
-        omega0: float
+        omega0: float (in rad/s)
             Central frequency at which to evaluate the
             spectral phase expansion terms.
 
@@ -338,15 +343,15 @@ class Material:
             Third term (TOD), in units s^3/m
         """
         lam = 2 * np.pi * ct.c / omega0  # Sellmeier and everything uses dn/dlambda!
-        lambda_mu = 1e6 * lam
-        dphi = (self.calc_n(lambda_mu) - lam * self._dn_dw(lambda_mu, 1)) / ct.c
-        ddphi = lam**3 / (2 * np.pi * ct.c**2) * self._dn_dw(lambda_mu, 2)
+        lam_mu = 1e6 * lam
+        dphi = (self.calc_n(lam_mu) - lam * self._dn_dw(lam_mu, 1)) / ct.c
+        ddphi = lam**3 / (2 * np.pi * ct.c**2) * self._dn_dw(lam_mu, 2)
         dddphi = (
             -1
             / (omega0**2 * ct.c)
             * (
-                3 * lambda_mu**2 * self._dn_dw(lambda_mu, 2)
-                + lambda_mu**3 * self._dn_dw(lambda_mu, 3)
+                3 * lam_mu**2 * self._dn_dw(lam_mu, 2)
+                + lam_mu**3 * self._dn_dw(lam_mu, 3)
             )
         )
 
