@@ -309,7 +309,7 @@ class Material:
             return k
 
     def calc_spectral_phase_expansion(self, omega0):
-        """
+        r"""
         Calculate spectral phase expansion terms.
 
         More precisely, the first three terms of the Taylor
