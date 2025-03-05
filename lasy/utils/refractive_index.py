@@ -100,9 +100,6 @@ class RefractiveIndexDatabase:
                     clean_text.append(line)
         clean_text = "".join(clean_text)
 
-        # with open(self.database_file) as f:
-        #    self.database = yaml.load(f, Loader=yaml.BaseLoader)
-
         self.database = yaml.load(clean_text, Loader=yaml.BaseLoader)
 
 
