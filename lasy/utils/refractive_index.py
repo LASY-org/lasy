@@ -196,7 +196,7 @@ class Material:
                 self.coefficients_n = np.fromstring(
                     data.get("coefficients", "0 0"), sep=" "
                 )
-                self.equation_n = globals().get('_'+self.type_n)
+                self.equation_n = globals().get("_" + self.type_n)
             else:
                 self.data_raw = np.fromstring(data.get("data", "0 0\n0 0"), sep=" ")
                 n_cols = 3 if "nk" in type else 2
