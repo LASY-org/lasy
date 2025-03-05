@@ -2,5 +2,5 @@ axiprop>=0.5.3
 numpy
 openpmd-api
 openpmd-viewer
-scipy
 pyyaml
+scipy
