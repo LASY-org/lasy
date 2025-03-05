@@ -5,12 +5,20 @@ Inspired somewhat by https://github.com/toftul/refractiveindex/tree/master
 """
 
 import os
-
 import numpy as np
 import scipy.constants as ct
 import yaml
+import warnings
 from scipy.interpolate import CubicSpline
-from scipy.misc import derivative
+
+try:
+    import numdifftools as nd
+    have_nd = True
+except ImportError:
+    warnings.warn('numdifftools not available! '
+                  'Using fixed numerical expressions for spectral '
+                  'phase expansion calculations.')
+    have_nd = False
 
 known_materials = {
     "fused silica": ("glass", "fused_silica", "Malitson"),
@@ -243,8 +251,6 @@ class Material:
         # Make inputs into a proper array
         if isinstance(lambda_um, (list, set)):
             lambda_um = np.array(lambda_um)
-        if isinstance(lambda_um, float):
-            lambda_um = np.array((lambda_um,))
 
         mask = (self.wavelength_range_n[0] < lambda_um) & (
             lambda_um < self.wavelength_range_n[1]
@@ -255,10 +261,11 @@ class Material:
         else:
             n = self.interp_n(lambda_um)
 
-        n[np.logical_not(mask)] = 0.0
-        if len(n) == 1:
-            return n[0]
-        return n
+        if isinstance(mask, (bool, np.bool_)):
+            return n * int(mask)
+        else:
+            n[np.logical_not(mask)] = 0.0
+            return n
 
     def calc_k(self, lambda_um):
         """
@@ -346,9 +353,20 @@ class Material:
         return dphi, ddphi * 1e12, dddphi
 
     def _dn_dw(self, lambda_mu, order=1):
-        h = lambda_mu * 1e-3
-        dn_dw = derivative(self.calc_n, lambda_mu, dx=h, n=order, order=5)
-        return dn_dw
+        if have_nd:
+            dn_dw = nd.Derivative(self.calc_n, n=order)
+            return 1.*dn_dw(lambda_mu)
+
+        else:
+            h = lambda_mu * 1e-4
+            l0 = lambda_mu
+            f = self.calc_n
+            if order == 1:
+                return (f(l0+h) - f(l0-h)) / (2*h)
+            elif order == 2:
+                return (f(l0 + h) - 2 * f(l0) + f(l0 - h)) / (h ** 2)
+            elif order == 3:
+                return (f(l0+2*h) - 2*f(l0+h) + 2*f(l0-h) - f(l0-2*h)) / (2*h**3)
 
 
 def _formula1(lam, c1, c2, c3, c4, c5, c6, c7):
