@@ -5,19 +5,23 @@ Inspired somewhat by https://github.com/toftul/refractiveindex/tree/master
 """
 
 import os
+import warnings
+
 import numpy as np
 import scipy.constants as ct
 import yaml
-import warnings
 from scipy.interpolate import CubicSpline
 
 try:
     import numdifftools as nd
+
     have_nd = True
 except ImportError:
-    warnings.warn('numdifftools not available! '
-                  'Using fixed numerical expressions for spectral '
-                  'phase expansion calculations.')
+    warnings.warn(
+        "numdifftools not available! "
+        "Using fixed numerical expressions for spectral "
+        "phase expansion calculations."
+    )
     have_nd = False
 
 known_materials = {
@@ -352,18 +356,20 @@ class Material:
     def _dn_dw(self, lambda_mu, order=1):
         if have_nd:
             dn_dw = nd.Derivative(self.calc_n, n=order)
-            return 1.*dn_dw(lambda_mu)
+            return 1.0 * dn_dw(lambda_mu)
 
         else:
             h = lambda_mu * 1e-4
             l0 = lambda_mu
             f = self.calc_n
             if order == 1:
-                return (f(l0+h) - f(l0-h)) / (2*h)
+                return (f(l0 + h) - f(l0 - h)) / (2 * h)
             elif order == 2:
-                return (f(l0 + h) - 2 * f(l0) + f(l0 - h)) / (h ** 2)
+                return (f(l0 + h) - 2 * f(l0) + f(l0 - h)) / (h**2)
             elif order == 3:
-                return (f(l0+2*h) - 2*f(l0+h) + 2*f(l0-h) - f(l0-2*h)) / (2*h**3)
+                return (
+                    f(l0 + 2 * h) - 2 * f(l0 + h) + 2 * f(l0 - h) - f(l0 - 2 * h)
+                ) / (2 * h**3)
 
 
 def _formula1(lam, c1, c2, c3, c4, c5, c6, c7):
