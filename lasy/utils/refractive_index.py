@@ -188,7 +188,7 @@ class Material:
                 self.coefficients_n = np.fromstring(
                     data.get("coefficients", "0 0"), sep=" "
                 )
-                self.equation_n = globals().get(self.type_n)
+                self.equation_n = globals().get('_'+self.type_n)
             else:
                 self.data_raw = np.fromstring(data.get("data", "0 0\n0 0"), sep=" ")
                 n_cols = 3 if "nk" in type else 2
@@ -351,7 +351,7 @@ class Material:
         return dn_dw
 
 
-def formula1(lam, c1, c2, c3, c4, c5, c6, c7):
+def _formula1(lam, c1, c2, c3, c4, c5, c6, c7):
     # eg specs/vitron/infrared/IG6.yml
     l2 = lam**2
     n2 = (
@@ -364,20 +364,20 @@ def formula1(lam, c1, c2, c3, c4, c5, c6, c7):
     return np.sqrt(n2)
 
 
-def formula2(lam, c1, c2, c3, c4, c5, c6, c7):
+def _formula2(lam, c1, c2, c3, c4, c5, c6, c7):
     # eg specs/ohara/optical/LAH78.yml
     l2 = lam**2
     n2 = 1 + c1 + c2 * l2 / (l2 - c3) + c4 * l2 / (l2 - c5) + c6 * l2 / (l2 - c7)
     return np.sqrt(n2)
 
 
-def formula3(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11):
+def _formula3(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11):
     # eg specs/sumita/optical/K-BOC20.yml
     n2 = c1 + c2 * lam**c3 + c4 * lam**c5 + c6 * lam**c7 + c8 * lam**c9 + c10 * lam**c11
     return np.sqrt(n2)
 
 
-def formula4(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10=0, c11=0):
+def _formula4(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10=0, c11=0):
     # eg main/BaGa4Se7/nk/Kato-beta.yml
     l2 = lam**2
     n2 = (
@@ -389,27 +389,27 @@ def formula4(lam, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10=0, c11=0):
     return np.sqrt(n2)
 
 
-def formula5(lam, c1, c2, c3, c4, c5, c6, c7):
+def _formula5(lam, c1, c2, c3, c4, c5, c6, c7):
     # eg xylene/nk/Li.yml
     n = c1 + c2 * lam**c3 + c4 * lam**c5 + c6 * lam**c7
     return n
 
 
-def formula6(lam, c1, c2, c3, c4=0, c5=0):
+def _formula6(lam, c1, c2, c3, c4=0, c5=0):
     # eg main/He/nk/Mansfield.yml
     l2 = lam**-2
     n = 1 + c1 + c2 / (c3 - l2) + c4 / (c5 - l2)
     return n
 
 
-def formula7(lam, c1, c2, c3, c4, c5):
+def _formula7(lam, c1, c2, c3, c4, c5):
     # eg main/Si/nk/Edwards.yml
     l2 = lam**2
     n = c1 + c2 / (l2 - 0.028) + c3 / (l2 - 0.028) ** 2 + c4 * l2 + c5 * lam**4
     return n
 
 
-def formula8(lam, c1, c2, c3, c4):
+def _formula8(lam, c1, c2, c3, c4):
     # eg main/AgBr/nk/Schroter.yml
     l2 = lam**2
     RHS = c1 + c2 * l2 / (l2 - c3) + c4 * l2
@@ -417,7 +417,7 @@ def formula8(lam, c1, c2, c3, c4):
     return np.sqrt(n2)
 
 
-def formula9(lam, c1, c2, c3, c4, c5, c6):
+def _formula9(lam, c1, c2, c3, c4, c5, c6):
     # eg organic/CH4N2O - urea/nk/Rosker-e.yml
     lc5 = lam - c5
     n2 = c1 + c2 / (lam**2 - c3) + c4 * lc5 / (lc5**2 + c6)
