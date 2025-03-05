@@ -21,6 +21,8 @@ known_materials = {
 
 class RefractiveIndexDatabase:
     """
+    Refractive index database for various materials.
+
     Class that opens and stores the refractiveindex.info
     YAML database. The entire database will be downloaded
     on the first time it is run.
@@ -30,7 +32,9 @@ class RefractiveIndexDatabase:
 
     def __init__(self, database_path=None, auto_download=True):
         """
-        Initialise the database and download data, if it does
+        Initialise the database.
+
+        Data is also downloaded, if it does
         not exist and requested.
 
         Parameters
@@ -96,12 +100,16 @@ class RefractiveIndexDatabase:
 
 class Material:
     """
+    Description of material and its optical properties.
+
     Class that contains material specific data:
     its refractive index and extinction coefficient.
     """
 
     def __init__(self, shelf=None, book=None, page=None, name=None, db=None):
         """
+        Initialise the Material container.
+
         Initialise the Material. Input arguments can either be a known
         name defined in the dict above or a combination of shelf, book
         and page. The latter follow the definitions on
@@ -137,7 +145,7 @@ class Material:
         self._load_data()
 
     def _get_filename(self, shelf_name, book_name, page_name):
-        """Iterate through the database to get filename"""
+        """Iterate through the database to get filename."""
         if self.db is None:
             self.db = RefractiveIndexDatabase()
         db = self.db.database
@@ -216,6 +224,7 @@ class Material:
     def calc_n(self, lambda_um):
         """
         Calculate refractive index for this material.
+
         Performs the calculation and checks for wavelength
         being in the required range.
 
@@ -254,6 +263,7 @@ class Material:
     def calc_k(self, lambda_um):
         """
         Calculate extinction coefficient for this material.
+
         Performs the calculation and checks for wavelength
         being in the required range.
 
@@ -293,6 +303,8 @@ class Material:
 
     def calc_spectral_phase_expansion(self, omega0):
         """
+        Calculate spectral phase expansion terms.
+
         Returns an array of first three spectral phase terms,
         ie dphi/domega, d2phi/domega2, d3phi/domega3,
         evaluated at omega0.
