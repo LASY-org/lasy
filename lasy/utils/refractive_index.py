@@ -318,11 +318,11 @@ class Material:
 
         .. math::
 
-            \phi_1 = \left.\frac{\mathrm{d}\phi}{\mathrm{d}\omega}\right\vert_\omega_0
+            \phi_1 = \left.\frac{\mathrm{d}\phi}{\mathrm{d}\omega}\right\vert_{\omega_0}
 
-            \phi_2 = \left.\frac{\mathrm{d}^2\phi}{\mathrm{d}\omega^2}\right\vert_\omega_0
+            \phi_2 = \left.\frac{\mathrm{d}^2\phi}{\mathrm{d}\omega^2}\right\vert_{\omega_0}
 
-            \phi_3 = \left.\frac{\mathrm{d}^3\phi}{\mathrm{d}\omega^3}\right\vert_\omega_0
+            \phi_3 = \left.\frac{\mathrm{d}^3\phi}{\mathrm{d}\omega^3}\right\vert_{\omega_0}
 
         Definitions can be found at
         https://www.newport.com/n/the-effect-of-dispersion-on-ultrashort-pulses
@@ -336,7 +336,7 @@ class Material:
         Returns
         -------
         dphi_dw: float
-            First term, in units s/m
+            First term (group delay), in units s/m
 
         d2phi_dw2: float
             Second term (GVD), in units s^2/m
