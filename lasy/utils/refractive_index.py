@@ -313,14 +313,16 @@ class Material:
         Calculate spectral phase expansion terms.
 
         More precisely, the first three terms of the Taylor
-        expansion of the spectral phase around :math:`omega0`
+        expansion of the spectral phase around :math:`\omega_0`
         are calculated:
 
         .. math::
 
-            \frac{\mathrm{d}\phi}{\mathrm{d}/omega},
-            \frac{\mathrm{d}^2\phi}{\mathrm{d}/omega^2},
-            \frac{\mathrm{d}^3\phi}{\mathrm{d}/omega^3}
+            \phi_1 = \left.\frac{\mathrm{d}\phi}{\mathrm{d}\omega}\right\vert_\omega_0
+
+            \phi_2 = \left.\frac{\mathrm{d}^2\phi}{\mathrm{d}\omega^2}\right\vert_\omega_0
+
+            \phi_3 = \left.\frac{\mathrm{d}^3\phi}{\mathrm{d}\omega^3}\right\vert_\omega_0
 
         Definitions can be found at
         https://www.newport.com/n/the-effect-of-dispersion-on-ultrashort-pulses
