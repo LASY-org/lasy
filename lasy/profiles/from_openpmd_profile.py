@@ -42,8 +42,13 @@ class FromOpenPMDProfile(FromArrayProfile):
         # Extract the required parameters
         omg0 = m.get_attribute("angularFrequency")
         wavelength = 2 * np.pi * c / omg0
-        pol = m.get_attribute("polarization")
         grid_offset = m.get_attribute("gridGlobalOffset")
+        
+        try:
+            pol = m.polarization
+        except AttributeError:
+            print('Polarization not found. Defaulting to (1, 0)')
+            pol = (1, 0)
 
         # Define parameters to create a profile
         if len(m.axis_labels) == 2:  # 'rt'
@@ -82,8 +87,21 @@ class FromOpenPMDProfile(FromArrayProfile):
             )
             return None
 
-        # If the field is stored as vector potential, convert it to field
-        if m.get_attribute("envelopeField") == "normalized_vector_potential":
+        # If longitudinal dimension was `z`, change to `t`
+        if "z" in m.axis_labels:
+            t = (t - t[0]) / c
+            array = np.flip(array, axis=-1)
+
+        # If the field is stored as vector potential,
+        # convert it to electric field
+        vector_to_field = False
+        try:
+            if m.envelopeField == "normalized_vector_potential":
+                vector_to_field = True
+        except AttributeError:
+            if field == "a":
+                vector_to_field = True
+        if vector_to_field:
             grid = create_grid(array, axes, dim)
             array = vector_potential_to_field(grid, omg0)
 
