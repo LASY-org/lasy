@@ -58,7 +58,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             axes = {"r": r, "t": t}
             dim = "rt"
             axes_order = m.axis_labels[::-1]
-            array = np.transpose(array, (0, 2, 1))
+            array = np.swapaxes(array, 1, 2)
         elif len(m.axis_labels) == 3:  # 'xyt'
             n_x = array.shape[2]
             n_y = array.shape[1]
@@ -75,7 +75,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             axes = {"x": x, "y": y, "t": t}
             dim = "xyt"
             axes_order = m.axis_labels[::-1]
-            array = np.transpose(array, (2, 1, 0))
+            array = np.swapaxes(array, 0, 2)
         else:
             print(
                 "Error: The dimension of the field is not supported. The valid dimensions are 'rt' and 'xyt'."
