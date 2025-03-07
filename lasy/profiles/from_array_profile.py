@@ -70,7 +70,7 @@ class FromArrayProfile(Profile):
             assert axes_order in [["r", "t"], ["t", "r"]]
 
             if axes_order == ["t", "r"]:
-                self.array = np.swapaxes(array, 0, 2)
+                self.array = np.swapaxes(array, 1, 2)
             else:
                 self.array = array
 
