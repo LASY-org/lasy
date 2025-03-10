@@ -42,48 +42,96 @@ class FromOpenPMDProfile(FromArrayProfile):
         # Extract the required parameters
         omg0 = m.get_attribute("angularFrequency")
         wavelength = 2 * np.pi * c / omg0
-        pol = m.get_attribute("polarization")
         grid_offset = m.get_attribute("gridGlobalOffset")
+        grid_spacing = m.get_attribute("gridSpacing")
+        pos = m.get_attribute("position")  # cell or node centered info
+
+        try:
+            pol = m.get_attribute("polarization")
+        except io.ErrorNoSuchAttribute:
+            print('Polarization not found. Defaulting to (1, 0)')
+            pol = (1, 0)
 
         # Define parameters to create a profile
         if len(m.axis_labels) == 2:  # 'rt'
-            n_t = array.shape[1]
-            n_r = array.shape[2]
+            if m.axis_labels[0] == "r":
+                ir = 0
+                it = 1
+            else:
+                it = 0
+                ir = 1
+
+            n_t = array.shape[it + 1]
+            n_r = array.shape[ir + 1]
             t = np.linspace(
-                grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t
+                grid_offset[it], grid_offset[it] + (n_t - 1) * grid_spacing[it], n_t
             )
             r = np.linspace(
-                grid_offset[1], grid_offset[1] + (n_r - 1) * m.grid_spacing[1], n_r
+                grid_offset[ir], grid_offset[ir] + (n_r - 1) * grid_spacing[ir], n_r
             )
-            axes = {"r": r, "t": t}
+    
             dim = "rt"
-            axes_order = m.axis_labels[::-1]
-            array = np.swapaxes(array, 1, 2)
+            axes = {"r": r, "t": t}
+            axes_order = ["r", "t"]
+            if m.axis_labels[1] == "r":
+                array = np.swapaxes(array, 1, 2)
+                pos = pos[::-1]
+
         elif len(m.axis_labels) == 3:  # 'xyt'
-            n_x = array.shape[2]
-            n_y = array.shape[1]
-            n_t = array.shape[0]
+            if m.axis_labels[0] == "x":
+                ix = 0
+                iy = 1
+                it = 2
+            else:
+                ix = 2
+                iy = 1
+                it = 0
+
+            n_x = array.shape[ix]
+            n_y = array.shape[iy]
+            n_t = array.shape[it]
             x = np.linspace(
-                grid_offset[2], grid_offset[2] + (n_x - 1) * m.grid_spacing[2], n_x
+                grid_offset[ix], grid_offset[ix] + (n_x - 1) * grid_spacing[ix], n_x
             )
             y = np.linspace(
-                grid_offset[1], grid_offset[1] + (n_y - 1) * m.grid_spacing[1], n_y
+                grid_offset[iy], grid_offset[iy] + (n_y - 1) * grid_spacing[iy], n_y
             )
             t = np.linspace(
-                grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t
+                grid_offset[it], grid_offset[it] + (n_t - 1) * grid_spacing[it], n_t
             )
-            axes = {"x": x, "y": y, "t": t}
             dim = "xyt"
-            axes_order = m.axis_labels[::-1]
-            array = np.swapaxes(array, 0, 2)
+            axes = {"x": x, "y": y, "t": t}
+            axes_order = ["x", "y", "t"]
+            if m.axis_labels[2] == "x":
+                array = np.swapaxes(array, 0, 2)
+                pos = pos[::-1]
         else:
             print(
                 "Error: The dimension of the field is not supported. The valid dimensions are 'rt' and 'xyt'."
             )
             return None
 
-        # If the field is stored as vector potential, convert it to field
-        if m.get_attribute("envelopeField") == "normalized_vector_potential":
+        # If longitudinal dimension was `z`, change it to `t`
+        if "z" in m.axis_labels:
+            axes["t"] = (axes["t"] - axes["t"][0]) / c
+            array = np.flip(array, axis=-1)
+
+        # Shift axes by half grid spacing if field is cell centered (pos=0.5)
+        for i, p in enumerate(pos):
+            if p > 0.0:
+                axes[axes_order[i]] = axes[axes_order[i]] \
+                    + p * (axes[axes_order[i]][1] - axes[axes_order[i]][0]) 
+
+        # If the field is stored as vector potential,
+        # convert it to electric field
+        vector_to_field = False
+        try:
+            if m.get_attribute("envelopeField") == "normalized_vector_potential":
+                vector_to_field = True
+        except io.ErrorNoSuchAttribute:
+            if field == "a":
+                vector_to_field = True
+        if vector_to_field:
             grid = create_grid(array, axes, dim)
             array = vector_potential_to_field(grid, omg0)
 
