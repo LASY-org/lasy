@@ -713,7 +713,7 @@ def create_grid(array, axes, dim, is_envelope=True):
         lo = (axes["r"][0], axes["t"][0])
         hi = (axes["r"][-1], axes["t"][-1])
         npoints = (axes["r"].size, axes["t"].size)
-        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1, is_envelope=is_envelope)
+        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=array.shape[0], is_envelope=is_envelope)
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
         assert array.ndim == 3, (
