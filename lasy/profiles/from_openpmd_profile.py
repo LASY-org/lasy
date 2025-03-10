@@ -46,8 +46,8 @@ class FromOpenPMDProfile(FromArrayProfile):
         grid_spacing = m.get_attribute("gridSpacing")
 
         try:
-            pol = m.polarization
-        except AttributeError:
+            pol = m.get_attribute("polarization")
+        except io.ErrorNoSuchAttribute:
             print('Polarization not found. Defaulting to (1, 0)')
             pol = (1, 0)
 
@@ -119,7 +119,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         try:
             if m.get_attribute("envelopeField") == "normalized_vector_potential":
                 vector_to_field = True
-        except AttributeError:
+        except io.ErrorNoSuchAttribute:
             if field == "a":
                 vector_to_field = True
         if vector_to_field:
