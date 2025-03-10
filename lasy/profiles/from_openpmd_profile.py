@@ -44,6 +44,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         wavelength = 2 * np.pi * c / omg0
         grid_offset = m.get_attribute("gridGlobalOffset")
         grid_spacing = m.get_attribute("gridSpacing")
+        pos = m.get_attribute("position")  # cell or node centered info
 
         try:
             pol = m.get_attribute("polarization")
@@ -74,6 +75,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             axes_order = ["r", "t"]
             if m.axis_labels[1] == "r":
                 array = np.swapaxes(array, 1, 2)
+                pos = pos[::-1]
 
         elif len(m.axis_labels) == 3:  # 'xyt'
             if m.axis_labels[0] == "x":
@@ -102,6 +104,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             axes_order = ["x", "y", "t"]
             if m.axis_labels[2] == "x":
                 array = np.swapaxes(array, 0, 2)
+                pos = pos[::-1]
         else:
             print(
                 "Error: The dimension of the field is not supported. The valid dimensions are 'rt' and 'xyt'."
@@ -112,6 +115,12 @@ class FromOpenPMDProfile(FromArrayProfile):
         if "z" in m.axis_labels:
             axes["t"] = (axes["t"] - axes["t"][0]) / c
             array = np.flip(array, axis=-1)
+
+        # Shift axes by half grid spacing if field is cell centered (pos=0.5)
+        for i, p in enumerate(pos):
+            if p > 0.0:
+                axes[axes_order[i]] = axes[axes_order[i]] \
+                    + p * (axes[axes_order[i]][1] - axes[axes_order[i]][0]) 
 
         # If the field is stored as vector potential,
         # convert it to electric field
