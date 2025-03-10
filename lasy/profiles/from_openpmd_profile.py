@@ -117,7 +117,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         # convert it to electric field
         vector_to_field = False
         try:
-            if m.envelopeField == "normalized_vector_potential":
+            if m.get_attribute("envelopeField") == "normalized_vector_potential":
                 vector_to_field = True
         except AttributeError:
             if field == "a":
