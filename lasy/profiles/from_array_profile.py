@@ -79,7 +79,7 @@ class FromArrayProfile(Profile):
             if axes["r"][0] != 0.0:
                 r = np.concatenate(([-axes["r"][0]], axes["r"]))
                 subarray = array[:, 0, :]  # takes first element in second dimension
-                array = np.concatenate(
+                self.array = np.concatenate(
                     (subarray[:, np.newaxis, :], array), axis=1
                 )  # add it at the beginning
             else:
@@ -89,15 +89,15 @@ class FromArrayProfile(Profile):
             # However, when reading lasy envelope files, the array is 3D.
             # First dimension corresponds to the azimuthal mode decomposition.
             # For now, this only fix profiles with one mode.
-            if len(array.shape) == 3:
-                assert array.shape[0] == 1, (
+            if len(self.array.shape) == 3:
+                assert self.array.shape[0] == 1, (
                     "Handling `rt` profiles with more than one azimuthal mode still needs to be implemented."
                 )
-                array = array[0]
+                self.array = self.array[0]
 
             self.combined_field_interp = RegularGridInterpolator(
                 (r, axes["t"]),
-                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
+                np.abs(self.array) + 1.0j * np.unwrap(np.angle(self.array), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )

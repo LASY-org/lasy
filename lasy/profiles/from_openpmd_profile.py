@@ -39,88 +39,57 @@ class FromOpenPMDProfile(FromArrayProfile):
         array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
         series.flush()
 
-        # Extract the required parameters
-        omg0 = m.get_attribute("angularFrequency")
-        wavelength = 2 * np.pi * c / omg0
+        # Extract the required parameters to set the grid
         grid_offset = m.get_attribute("gridGlobalOffset")
         grid_spacing = m.get_attribute("gridSpacing")
-        pos = m.get_attribute("position")  # cell or node centered info
+        grid_position = m.get_attribute("position")  # node (0.0) or cell (0.5) centered info for each axis
+        axis_labels = m.get_attribute("axisLabels")
 
-        try:
-            pol = m.get_attribute("polarization")
-        except io.ErrorNoSuchAttribute:
-            print('Polarization not found. Defaulting to (1, 0)')
-            pol = (1, 0)
-
-        # Define parameters to create a profile
-        if len(m.axis_labels) == 2:  # 'rt'
-            if m.axis_labels[0] == "r":
-                ir = 0
-                it = 1
-            else:
-                it = 0
-                ir = 1
-
-            n_t = array.shape[it + 1]
-            n_r = array.shape[ir + 1]
-            t = np.linspace(
-                grid_offset[it], grid_offset[it] + (n_t - 1) * grid_spacing[it], n_t
-            )
-            r = np.linspace(
-                grid_offset[ir], grid_offset[ir] + (n_r - 1) * grid_spacing[ir], n_r
-            )
-    
+        if len(axis_labels) == 2:
+            idx_offset = 1
             dim = "rt"
-            axes = {"r": r, "t": t}
-            axes_order = ["r", "t"]
-            if m.axis_labels[1] == "r":
-                array = np.swapaxes(array, 1, 2)
-                pos = pos[::-1]
-
-        elif len(m.axis_labels) == 3:  # 'xyt'
-            if m.axis_labels[0] == "x":
-                ix = 0
-                iy = 1
-                it = 2
-            else:
-                ix = 2
-                iy = 1
-                it = 0
-
-            n_x = array.shape[ix]
-            n_y = array.shape[iy]
-            n_t = array.shape[it]
-            x = np.linspace(
-                grid_offset[ix], grid_offset[ix] + (n_x - 1) * grid_spacing[ix], n_x
-            )
-            y = np.linspace(
-                grid_offset[iy], grid_offset[iy] + (n_y - 1) * grid_spacing[iy], n_y
-            )
-            t = np.linspace(
-                grid_offset[it], grid_offset[it] + (n_t - 1) * grid_spacing[it], n_t
-            )
+        elif len(axis_labels) == 3:
+            idx_offset = 0
             dim = "xyt"
-            axes = {"x": x, "y": y, "t": t}
-            axes_order = ["x", "y", "t"]
-            if m.axis_labels[2] == "x":
-                array = np.swapaxes(array, 0, 2)
-                pos = pos[::-1]
         else:
             print(
                 "Error: The dimension of the field is not supported. The valid dimensions are 'rt' and 'xyt'."
             )
             return None
 
-        # If longitudinal dimension was `z`, change it to `t`
-        if "z" in m.axis_labels:
-            axes["t"] = (axes["t"] - axes["t"][0]) / c
-            array = np.flip(array, axis=-1)
+        # Define parameters to create a profile
+        axes = {}
+        axes_order = []
+        for idx, label in enumerate(axis_labels):
 
-        # Shift axes by half grid spacing if field is cell centered (pos=0.5)
-        for i, p in enumerate(pos):
-            if p > 0.0:
-                axes[axes_order[i]] = axes[axes_order[i]] \
-                    + p * (axes[axes_order[i]][1] - axes[axes_order[i]][0]) 
+            # Define the axis array
+            N = array.shape[idx + idx_offset]
+            axis = np.linspace(
+                grid_offset[idx] + grid_position[idx] * grid_spacing[idx], 
+                grid_offset[idx] + (N - 1 + grid_position[idx]) * grid_spacing[idx], 
+                N
+            )
+
+            # If label is `z`, change it to `t`
+            if label == "z":
+                axis = (axis - axis[0]) / c
+                array = np.flip(array, axis=idx + idx_offset)
+                label = "t"
+
+            # Add axis to the dictionary and label to the list
+            axes[label] = axis
+            axes_order.append(label)
+
+        # Set the LASY order here. 
+        # (If not, `create_grid` will fail below when converting 
+        # from vector potential to electric field.)
+        if axes_order[0] == 't':
+            axes_order = axes_order[::-1]
+            array = np.swapaxes(array, idx_offset, 2)
+
+        # Read angular frequency
+        omg0 = m.get_attribute("angularFrequency")
+        wavelength = 2 * np.pi * c / omg0
 
         # If the field is stored as vector potential,
         # convert it to electric field
@@ -131,9 +100,17 @@ class FromOpenPMDProfile(FromArrayProfile):
         except io.ErrorNoSuchAttribute:
             if field == "a":
                 vector_to_field = True
+
         if vector_to_field:
             grid = create_grid(array, axes, dim)
             array = vector_potential_to_field(grid, omg0)
+
+        # Read/set polarization.
+        try:
+            pol = m.get_attribute("polarization")
+        except io.ErrorNoSuchAttribute:
+            print('Polarization not found. Defaulting to (1, 0)')
+            pol = (1, 0)
 
         super().__init__(
             wavelength=wavelength,
