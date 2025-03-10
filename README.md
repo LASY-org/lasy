@@ -6,6 +6,8 @@
 
 More specifically, `lasy` offers many ways to define complex laser pulses (e.g. from commonly-known analytical formulas, from experimental measurements, etc.) and offers pre-processing functionalities (e.g. propagation, re-normalization, geometry conversion). The laser field is then exported in a standardized file, that can be read by external simulation codes.
 
+For an extended tutorial on `lasy` please check out [our tutorial](https://lasydoc.readthedocs.io/en/latest/tutorials/index.html).
+
 ## Documentation
 
 LASY manipulates laser pulses, and operates on the laser envelope. In 3D (x,y,t) Cartesian coordinates, the definition used is:

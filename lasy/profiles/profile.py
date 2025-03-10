@@ -88,22 +88,22 @@ class SummedProfile(Profile):
     def __init__(self, *profiles):
         """Initialize the summed profile."""
         # Check that all profiles are Profile objects
-        assert all(
-            [isinstance(p, Profile) for p in profiles]
-        ), "All summands must be Profile objects."
+        assert all([isinstance(p, Profile) for p in profiles]), (
+            "All summands must be Profile objects."
+        )
         self.profiles = profiles
         # Get the wavelength values from each profile
         lambda0s = [p.lambda0 for p in self.profiles]
         pols = [p.pol for p in self.profiles]
         # Check that all wavelengths are the same
-        assert np.allclose(
-            lambda0s, lambda0s[0]
-        ), "Added profiles must have the same wavelength."
+        assert np.allclose(lambda0s, lambda0s[0]), (
+            "Added profiles must have the same wavelength."
+        )
         lambda0 = profiles[0].lambda0
         # Check that all polarizations are the same
-        assert np.allclose(
-            pols, pols[0]
-        ), "Added profiles must have the same polarization."
+        assert np.allclose(pols, pols[0]), (
+            "Added profiles must have the same polarization."
+        )
         pol = profiles[0].pol
         # Initialize the parent class
         super().__init__(lambda0, pol)

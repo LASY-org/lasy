@@ -7,6 +7,7 @@ from lasy.utils.grid import Grid, time_axis_indx
 from lasy.utils.laser_utils import (
     get_duration,
     get_w0,
+    normalize_average_intensity,
     normalize_energy,
     normalize_peak_field_amplitude,
     normalize_peak_intensity,
@@ -150,7 +151,7 @@ class Laser:
 
     def normalize(self, value, kind="energy"):
         """
-        Normalize the pulse either to the energy, peak field amplitude or peak intensity.
+        Normalize the pulse either to the energy, peak field amplitude, peak intensity, or average intensity. The average intensity option operates on the envelope.
 
         Parameters
         ----------
@@ -158,7 +159,7 @@ class Laser:
             Value to which to normalize the field property that is defined in ``kind``
         kind : string (optional)
             Distance by which the laser pulse should be propagated
-            Options: ``'energy``', ``'field'``, ``'intensity'`` (default is ``'energy'``)
+            Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'`` (default is ``'energy'``)
         """
         if kind == "energy":
             normalize_energy(self.dim, value, self.grid)
@@ -166,6 +167,8 @@ class Laser:
             normalize_peak_field_amplitude(value, self.grid)
         elif kind == "intensity":
             normalize_peak_intensity(value, self.grid)
+        elif kind == "average_intensity":
+            normalize_average_intensity(value, self.grid)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
@@ -185,8 +188,10 @@ class Laser:
             r, omega = np.meshgrid(self.grid.axes[0], self.omega_1d, indexing="ij")
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
-            # `r` as `x` and 0 as `y`
-            multiplier = optical_element.amplitude_multiplier(r, 0, omega)
+            # `r` as `x` and an array of 0s as `y`
+            multiplier = optical_element.amplitude_multiplier(
+                r, np.zeros_like(r), omega
+            )
             # The azimuthal modes are the components of the Fourier transform
             # along theta (FT_theta). Because the multiplier is assumed to be
             # cylindrically symmetric (i.e. theta-independent):

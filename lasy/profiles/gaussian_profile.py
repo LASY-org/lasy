@@ -54,6 +54,9 @@ class GaussianProfile(Profile):
         The time at which the laser envelope reaches its maximum amplitude,
         i.e. :math:`t_{peak}` in the above formula.
 
+    x0 , y0 : float (in meter) optional (default: '0')
+        Transverse centroid for the laser pulse
+
     cep_phase : float (in radian), optional
         The Carrier Envelope Phase (CEP), i.e. :math:`\phi_{cep}`
         in the above formula (i.e. the phase of the laser
@@ -126,6 +129,8 @@ class GaussianProfile(Profile):
         w0,
         tau,
         t_peak,
+        x0=0,
+        y0=0,
         cep_phase=0,
         z_foc=0,
         phi2=0,
@@ -145,6 +150,8 @@ class GaussianProfile(Profile):
         self.beta = beta
         self.zeta = zeta
         self.stc_theta = stc_theta
+        self.x0 = x0
+        self.y0 = y0
 
     def evaluate(self, x, y, t):
         """
@@ -197,7 +204,9 @@ class GaussianProfile(Profile):
         # Term for wavefront curvature + Gouy phase
         diffract_factor = 1.0 - 1j * self.z_foc_over_zr
         # Calculate the argument of the complex exponential
-        exp_argument = -(x**2 + y**2) / (self.w0**2 * diffract_factor)
+        exp_argument = -((x - self.x0) ** 2 + (y - self.y0) ** 2) / (
+            self.w0**2 * diffract_factor
+        )
         # Get the profile
         envelope = (
             np.exp(

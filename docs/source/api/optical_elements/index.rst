@@ -8,3 +8,4 @@ Optical elements
    polynomial_spectral_phase
    axiparabola
    axicon
+   zernike_aberrations

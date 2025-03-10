@@ -118,7 +118,7 @@ def normalize_peak_intensity(peak_intensity, grid):
     Parameters
     ----------
     peak_intensity : scalar (W/m^2)
-        Peak field amplitude of the laser pulse after normalization.
+        Peak intensity of the laser pulse after normalization.
 
     grid : a Grid object
         Contains value of the laser envelope and metadata.
@@ -130,7 +130,31 @@ def normalize_peak_intensity(peak_intensity, grid):
         if input_peak_intensity == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
         else:
-            grid.set_temporal_field(np.sqrt(peak_intensity / input_peak_intensity))
+            field *= np.sqrt(peak_intensity / input_peak_intensity)
+            grid.set_temporal_field(field)
+
+
+def normalize_average_intensity(average_intensity, grid):
+    """
+    Normalize energy of the laser pulse contained in grid.
+
+    Parameters
+    ----------
+    average_intensity : scalar (W/m^2)
+        Average intensity of the laser pulse envelope after normalization.
+
+    grid : a Grid object
+        Contains value of the laser envelope and metadata.
+    """
+    if average_intensity is not None:
+        field = grid.get_temporal_field()
+        intensity = np.abs(epsilon_0 * field**2 / 2 * c)
+        input_average_intensity = intensity.mean()
+        if input_average_intensity == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            field *= np.sqrt(average_intensity / input_average_intensity)
+            grid.set_temporal_field(field)
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
@@ -692,9 +716,9 @@ def create_grid(array, axes, dim, is_envelope=True):
         grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1, is_envelope=is_envelope)
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
-        assert (
-            array.ndim == 3
-        ), "Input array should be of dimension 3 [modes, radius, time]"
+        assert array.ndim == 3, (
+            "Input array should be of dimension 3 [modes, radius, time]"
+        )
         grid.set_temporal_field(array)
     return grid
 
@@ -985,8 +1009,15 @@ def get_zeta(dim, grid, k0):
     # Calculate dx0 and dy0 in (x,y,omega) space
     weight_x_3d = np.transpose(env_spec_abs2, (2, 1, 0))
     weight_y_3d = np.transpose(env_spec_abs2, (2, 0, 1))
-    xda = np.sum(grid.axes[0] * weight_x_3d, axis=2) / np.sum(weight_x_3d, axis=2)
-    yda = np.sum(grid.axes[1] * weight_y_3d, axis=2) / np.sum(weight_y_3d, axis=2)
+    weight_x_2d = np.sum(weight_x_3d, axis=2)
+    weight_y_2d = np.sum(weight_y_3d, axis=2)
+    # Calculate xda and yda, avoiding division by zero
+    xda = np.where(
+        weight_x_2d != 0, np.sum(grid.axes[0] * weight_x_3d, axis=2) / weight_x_2d, 0
+    )
+    yda = np.where(
+        weight_y_2d != 0, np.sum(grid.axes[1] * weight_y_3d, axis=2) / weight_y_2d, 0
+    )
     # Calculate spatial chirp zeta
     derivative_x_zeta = np.gradient(xda, omega, axis=0)
     derivative_y_zeta = np.gradient(yda, omega, axis=0)
