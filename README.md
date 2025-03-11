@@ -13,17 +13,17 @@ For the standard release of the code simply run:
 python3 -m pip install lasy
 ```
 
-If you would prefer the most recent version of the code with the latest functionality, then run:
+If you would prefer the most recent version of the code with the latest functionalities, then run:
 ```
 python3 -m pip install git+https://github.com/LASY-org/lasy.git
 ```
 
 ## Tutorials
-An interactive Google Colab tutorial showing some of the main functionality of lasy can be found [here](https://colab.research.google.com/drive/1nPwgIUea6Jhzc9CSPDZXCcviWCmebjF1?usp=sharing)
+An interactive Google Colab tutorial showing some of the main functionalities of lasy can be found [here](https://colab.research.google.com/drive/1nPwgIUea6Jhzc9CSPDZXCcviWCmebjF1?usp=sharing).
 
-This document is updated on a best effort basis to keep track with developments in the lasy code base.
+This document is updated on a best-effort basis to keep track with developments in the lasy code base.
 
-Additionally, a set of static (automatically tested) examples can be found [here](https://lasydoc.readthedocs.io/en/latest/tutorials/index.html)
+Additionally, a set of static (automatically tested) examples can be found [here](https://lasydoc.readthedocs.io/en/latest/tutorials/index.html).
 
 
 ## Documentation
