@@ -39,53 +39,78 @@ class FromOpenPMDProfile(FromArrayProfile):
         array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
         series.flush()
 
-        # Extract the required parameters
-        omg0 = m.get_attribute("angularFrequency")
-        wavelength = 2 * np.pi * c / omg0
-        pol = m.get_attribute("polarization")
+        # Extract the required parameters to set the grid
         grid_offset = m.get_attribute("gridGlobalOffset")
+        grid_spacing = m.get_attribute("gridSpacing")
+        grid_position = m.get_attribute("position")  # node (0.0) or cell (0.5) centered info for each axis
+        axis_labels = m.get_attribute("axisLabels")
 
-        # Define parameters to create a profile
-        if len(m.axis_labels) == 2:  # 'rt'
-            n_t = array.shape[1]
-            n_r = array.shape[2]
-            t = np.linspace(
-                grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t
-            )
-            r = np.linspace(
-                grid_offset[1], grid_offset[1] + (n_r - 1) * m.grid_spacing[1], n_r
-            )
-            axes = {"r": r, "t": t}
+        if len(axis_labels) == 2:
+            idx_offset = 1
             dim = "rt"
-            axes_order = m.axis_labels[::-1]
-            array = np.transpose(array, (0, 2, 1))
-        elif len(m.axis_labels) == 3:  # 'xyt'
-            n_x = array.shape[2]
-            n_y = array.shape[1]
-            n_t = array.shape[0]
-            x = np.linspace(
-                grid_offset[2], grid_offset[2] + (n_x - 1) * m.grid_spacing[2], n_x
-            )
-            y = np.linspace(
-                grid_offset[1], grid_offset[1] + (n_y - 1) * m.grid_spacing[1], n_y
-            )
-            t = np.linspace(
-                grid_offset[0], grid_offset[0] + (n_t - 1) * m.grid_spacing[0], n_t
-            )
-            axes = {"x": x, "y": y, "t": t}
+        elif len(axis_labels) == 3:
+            idx_offset = 0
             dim = "xyt"
-            axes_order = m.axis_labels[::-1]
-            array = np.transpose(array, (2, 1, 0))
         else:
             print(
                 "Error: The dimension of the field is not supported. The valid dimensions are 'rt' and 'xyt'."
             )
             return None
 
-        # If the field is stored as vector potential, convert it to field
-        if m.get_attribute("envelopeField") == "normalized_vector_potential":
+        # Define parameters to create a profile
+        axes = {}
+        axes_order = []
+        for idx, label in enumerate(axis_labels):
+
+            # Define the axis array
+            N = array.shape[idx + idx_offset]
+            axis = np.linspace(
+                grid_offset[idx] + grid_position[idx] * grid_spacing[idx], 
+                grid_offset[idx] + (N - 1 + grid_position[idx]) * grid_spacing[idx], 
+                N
+            )
+
+            # If label is `z`, change it to `t`
+            if label == "z":
+                axis = (axis - axis[0]) / c
+                array = np.flip(array, axis=idx + idx_offset)
+                label = "t"
+
+            # Add axis to the dictionary and label to the list
+            axes[label] = axis
+            axes_order.append(label)
+
+        # Set the LASY order here. 
+        # (If not, `create_grid` will fail below when converting 
+        # from vector potential to electric field.)
+        if axes_order[0] == 't':
+            axes_order = axes_order[::-1]
+            array = np.swapaxes(array, idx_offset, 2)
+
+        # Read angular frequency
+        omg0 = m.get_attribute("angularFrequency")
+        wavelength = 2 * np.pi * c / omg0
+
+        # If the field is stored as vector potential,
+        # convert it to electric field
+        vector_to_field = False
+        try:
+            if m.get_attribute("envelopeField") == "normalized_vector_potential":
+                vector_to_field = True
+        except io.ErrorNoSuchAttribute:
+            if field == "a":
+                vector_to_field = True
+
+        if vector_to_field:
             grid = create_grid(array, axes, dim)
             array = vector_potential_to_field(grid, omg0)
+
+        # Read/set polarization.
+        try:
+            pol = m.get_attribute("polarization")
+        except io.ErrorNoSuchAttribute:
+            print('Polarization not found. Defaulting to (1, 0)')
+            pol = (1, 0)
 
         super().__init__(
             wavelength=wavelength,
