@@ -42,7 +42,9 @@ class FromOpenPMDProfile(FromArrayProfile):
         # Extract the required parameters to set the grid
         grid_offset = m.get_attribute("gridGlobalOffset")
         grid_spacing = m.get_attribute("gridSpacing")
-        grid_position = m.get_attribute("position")  # node (0.0) or cell (0.5) centered info for each axis
+        grid_position = m.get_attribute(
+            "position"
+        )  # node (0.0) or cell (0.5) centered info for each axis
         axis_labels = m.get_attribute("axisLabels")
 
         if len(axis_labels) == 2:
@@ -61,13 +63,12 @@ class FromOpenPMDProfile(FromArrayProfile):
         axes = {}
         axes_order = []
         for idx, label in enumerate(axis_labels):
-
             # Define the axis array
             N = array.shape[idx + idx_offset]
             axis = np.linspace(
-                grid_offset[idx] + grid_position[idx] * grid_spacing[idx], 
-                grid_offset[idx] + (N - 1 + grid_position[idx]) * grid_spacing[idx], 
-                N
+                grid_offset[idx] + grid_position[idx] * grid_spacing[idx],
+                grid_offset[idx] + (N - 1 + grid_position[idx]) * grid_spacing[idx],
+                N,
             )
 
             # If label is `z`, change it to `t`
@@ -80,10 +81,10 @@ class FromOpenPMDProfile(FromArrayProfile):
             axes[label] = axis
             axes_order.append(label)
 
-        # Set the LASY order here. 
-        # (If not, `create_grid` will fail below when converting 
+        # Set the LASY order here.
+        # (If not, `create_grid` will fail below when converting
         # from vector potential to electric field.)
-        if axes_order[0] == 't':
+        if axes_order[0] == "t":
             axes_order = axes_order[::-1]
             array = np.swapaxes(array, idx_offset, 2)
 
@@ -109,7 +110,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         try:
             pol = m.get_attribute("polarization")
         except io.ErrorNoSuchAttribute:
-            print('Polarization not found. Defaulting to (1, 0)')
+            print("Polarization not found. Defaulting to (1, 0)")
             pol = (1, 0)
 
         super().__init__(
