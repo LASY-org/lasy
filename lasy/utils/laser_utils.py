@@ -19,10 +19,10 @@ def compute_laser_energy(dim, grid):
     dim : string
         Dimensionality of the array. Options are:
 
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with
@@ -65,10 +65,10 @@ def normalize_energy(dim, energy, grid):
     dim : string
         Dimensionality of the array. Options are:
 
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     energy : scalar (J)
         Energy of the laser pulse after normalization.
@@ -257,7 +257,8 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     Initially, the spectrum is calculated as the Fourier transform of the
     electric field :math:`E(t)`.
 
-    ..math::
+    .. math::
+
         \int E(t) e^{-i \omega t} dt
 
     neglecting the negative frequencies. If ``method=="raw"``, no further
@@ -267,7 +268,8 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
 
     For the other methods, the spectral energy density is calculated as
 
-    ..math::
+    .. math::
+
         \frac{\epsilon_0 c}{2\pi} |\int E(t) e^{-i \omega t} dt| ^ 2
 
     If ``method=="on_axis"``, a 1D real array with on-axis value of the
@@ -276,7 +278,8 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     Otherwise, if ``method=="sum"`` (default), the transverse integral of the
     spectral energy density is calculated:
 
-    ..math::
+    .. math::
+
         \frac{\epsilon_0 c}{2\pi} \int |\int E(t) e^{-i \omega t} dt| ^ 2 dx dy
 
     The units of this array are :math:`\mathrm{J / (rad Hz)}`
@@ -288,13 +291,13 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
         spectrum is computed, and the associated metadata. The last axis must
         be the longitudinal dimension.
 
-    dim : string (optional)
+    dim : string
         Dimensionality of the array. Options are:
 
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     range : list of float (optional)
         List of two values indicating the minimum and maximum frequency of the
@@ -399,14 +402,13 @@ def get_frequency(
         be the longitudinal dimension.
         Can be the full electric field or the envelope.
 
-    dim : string (optional)
-        Dimensionality of the array.
-        Options are:
+    dim : string
+        Dimensionality of the array. Options are:
 
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     is_hilbert : boolean (optional)
         If True, the field argument is assumed to be a Hilbert transform, and
@@ -495,8 +497,14 @@ def get_duration(grid, dim):
     ----------
     grid : Grid
         The grid with the envelope to analyze.
-    dim : str
-        Dimensionality of the grid.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     Returns
     -------
@@ -584,8 +592,13 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     grid : Grid
         The field from which to extract the envelope.
 
-    dim : str
-        Dimensions of the field. Possible values are `'xyt'` or `'rt'`.
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     phase_unwrap_nd : boolean (optional)
         If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
@@ -641,8 +654,14 @@ def get_grid_cell_volume(grid, dim):
     ----------
     grid : Grid
         The grid form which to compute the cell volume
-    dim : str
-        Dimensionality of the grid.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     Returns
     -------
@@ -688,10 +707,17 @@ def create_grid(array, axes, dim, is_envelope=True):
     ----------
     array : ndarray
         The input field array.
+
     axes : dict
         Dictionary with the information of the array axes.
-    dim : {'xyt, 'rt'}
-        The dimensionality of the array.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     Returns
     -------
@@ -731,10 +757,11 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
     ----------
     dim : string
         Dimensionality of the array. Options are:
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains a ndarrays (V/m) with
@@ -823,10 +850,11 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
     ----------
     dim : string
         Dimensionality of the array. Options are:
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with
@@ -911,16 +939,17 @@ def get_w0(grid, dim):
     ----------
     dim : string
         Dimensionality of the array. Options are:
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-    Return
-    ----------
+    Returns
+    -------
     sigma : Standard deviation of a**2 in m
     """
     field = grid.get_temporal_field()
@@ -951,10 +980,11 @@ def get_phi2(dim, grid):
     ----------
     dim : string
         Dimensionality of the array. Options are:
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
@@ -984,16 +1014,17 @@ def get_zeta(dim, grid, k0):
     ----------
     dim : string
         Dimensionality of the array. Options are:
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-     Return
-    ----------
+    Returns
+    -------
     zeta_x, zeta_y : Spatial chirp in :math:`\zeta=\frac{dx_0}{d\omega}` (meter * second)
     nu_x, nu_y: Spatial chirp in :math:`\nu=\frac{d\omega_0}{dx}` (meter^-1 * second^-1)
     """
@@ -1038,17 +1069,18 @@ def get_beta(dim, grid, k0):
     ----------
     dim : string
         Dimensionality of the array. Options are:
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with
         the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-    Return
-    ----------
+    Returns
+    -------
     beta_x, beta_y : Angular dispersion in :math:` \beta = \frac{d\theta_0}{d\omega}` (second)
     """
     assert dim == "xyt", "No angular chirp for axis-symmetric dimension."
@@ -1079,18 +1111,19 @@ def get_pft(dim, grid):
     ----------
     dim : string
         Dimensionality of the array. Options are:
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with
         the value of the envelope field and the associated metadata
         that defines the points at which the laser is defined.
 
-    Return
-    ----------
+    Returns
+    -------
     pft_x, pft_y : Pulse front tilt in :math:`p=\frac{dt_0}{dx}` (second * meter^-1).
     """
     assert dim == "xyt", "No pulse front tilt for cylindrical symmetry."
@@ -1113,16 +1146,17 @@ def get_propation_angle(dim, grid, k0):
     ----------
     dim : string
         Dimensionality of the array. Options are:
-        - 'xyt': The laser pulse is represented on a 3D grid:
-                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - 'rt' : The laser pulse is represented on a 2D grid:
-                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     grid : a Grid object.
         It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
 
-    Return
-    ----------
+    Returns
+    -------
     angle_x, angle_y : Propagating angle in :math:`p = \frac{k_x}{k_z}` or :math:`p = \frac{k_y}{k_z}` (in radians).
     """
     assert dim == "xyt", "Propagation is always on-axis for axis-symmetric dimension."
