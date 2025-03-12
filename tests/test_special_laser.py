@@ -1,5 +1,5 @@
 """
-Test the implementation of continuous wave laser and plane wave laser
+Test the implementation of continuous wave laser and plane wave laser.
 
 This test file verifys the correct implementation of these special cases of the laser object and
 additionally checks the implementation of the peak_intensity and peak_power normalizations
