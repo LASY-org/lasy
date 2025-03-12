@@ -19,6 +19,7 @@ class TransverseProfile(object):
         # Initialise x and y spatial offsets as placeholders
         self.x_offset = 0
         self.y_offset = 0
+        self.is_plane_wave = False
 
     def _evaluate(self, x, y):
         """

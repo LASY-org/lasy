@@ -8,6 +8,7 @@ from lasy.utils.laser_utils import (
     normalize_energy,
     normalize_peak_field_amplitude,
     normalize_peak_intensity,
+    normalize_peak_power,
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
@@ -142,9 +143,13 @@ class Laser:
                 )
             self.grid.set_temporal_field(field)
 
-        # For profiles that define the energy, normalize the amplitude
+        # For profiles that define the energy, peak intensity or peak power, normalize the amplitude
         if hasattr(profile, "laser_energy"):
             self.normalize(profile.laser_energy, kind="energy")
+        elif hasattr(profile, "peak_intensity"):
+            self.normalize(profile.peak_intensity, kind="intensity")
+        elif hasattr(profile, "peak_power"):
+            self.normalize(profile.peak_power, kind="power")
 
     def normalize(self, value, kind="energy"):
         """
@@ -166,6 +171,8 @@ class Laser:
             normalize_peak_intensity(value, self.grid)
         elif kind == "average_intensity":
             normalize_average_intensity(value, self.grid)
+        elif kind == "power":
+            normalize_peak_power(self.dim, value,self.grid)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 

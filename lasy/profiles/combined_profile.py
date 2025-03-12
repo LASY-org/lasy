@@ -32,11 +32,6 @@ class CombinedLongitudinalTransverseProfile(Profile):
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
 
-    laser_energy : float (in Joule)
-        The total energy of the laser pulse. The amplitude of the laser
-        field (:math:`E_0` in the above formula) is automatically
-        calculated so that the pulse has the prescribed energy.
-
     long_profile : :class:`.LongitudinalProfile`
         Defines the longitudinal envelope of the laser, i.e. the
         function :math:`\mathcal{L}(t)` in the above formula.
@@ -44,13 +39,48 @@ class CombinedLongitudinalTransverseProfile(Profile):
     transverse_profile : :class:`.TransverseProfile`
         Defines the transverse envelope of the laser, i.e. the
         function :math:`\mathcal{T}(x, y)` in the above formula.
+
+    laser_energy : float (in Joule)
+        The total energy of the laser pulse. The amplitude of the laser
+        field (:math:`E_0` in the above formula) is automatically
+        calculated so that the pulse has the prescribed energy.
+        Only used in case where laser is neither a plane wave or a continuous wave laser
+
+    peak_intensity : float (in W/m^2)
+        The peak intensity of the laser pulse. The amplitude of the laser
+        field (:math:`E_0` in the above formula) is automatically
+        calculated so that the pulse has the peak intensity.
+        Only used in case where laser is a continuous wave laser
+
+    peak_power : float (in W)
+        The peak power of the laser pulse. The amplitude of the laser
+        field (:math:`E_0` in the above formula) is automatically
+        calculated so that the pulse has the peak power.
+        Only used in case where laser is a plane wave laser
     """
 
-    def __init__(self, wavelength, pol, laser_energy, long_profile, trans_profile):
+    def __init__(self, wavelength, pol, long_profile, trans_profile, 
+                 laser_energy = None, peak_intensity = None, peak_power = None):
         super().__init__(wavelength, pol)
-        self.laser_energy = laser_energy
+        if long_profile.is_cw:
+            assert laser_energy == None
+            assert peak_power == None
+            self.peak_intensity = peak_intensity
+            self.is_cw = long_profile.is_cw
+        elif trans_profile.is_plane_wave:
+            assert laser_energy == None
+            assert peak_intensity == None
+            self.peak_power = peak_power
+            self.is_plane_wave = trans_profile.is_plane_wave
+        else:
+            assert peak_power == None
+            assert peak_intensity == None
+            self.laser_energy = laser_energy
         self.long_profile = long_profile
         self.trans_profile = trans_profile
+        
+        
+
 
     def evaluate(self, x, y, t):
         """

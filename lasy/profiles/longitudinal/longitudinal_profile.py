@@ -13,6 +13,7 @@ class LongitudinalProfile(object):
     def __init__(self, wavelength):
         self.lambda0 = wavelength
         self.omega0 = 2 * pi * c / self.lambda0
+        self.is_cw = False
 
     def evaluate(self, t):
         """

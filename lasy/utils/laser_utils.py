@@ -157,6 +157,40 @@ def normalize_average_intensity(average_intensity, grid):
             grid.set_temporal_field(field)
 
 
+def normalize_peak_power(dim, peak_power,grid):
+    """
+    Normalize energy of the laser pulse contained in grid.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    peak_power : scalar (W)
+        Peak power of the laser pulse after normalization.
+
+    grid : a Grid object
+        Contains value of the laser envelope and metadata.
+    """
+    if peak_power is not None:
+        field = grid.get_temporal_field()
+        intensity = np.abs(epsilon_0 * field**2 / 2 * c)
+        dz = grid.dx[-1] * c
+        unit_area = get_grid_cell_volume(grid, dim)/dz
+        power = intensity.sum(axis=tuple(range(intensity.ndim - 1))) * unit_area
+        input_peak_power = power.max()
+        if input_peak_power == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            field *= np.sqrt(peak_power / input_peak_power)
+            grid.set_temporal_field(field)
+
+
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     """
     Reconstruct the laser pulse with carrier frequency on the default grid.
