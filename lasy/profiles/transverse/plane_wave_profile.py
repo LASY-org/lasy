@@ -13,7 +13,7 @@ class PlaneWaveProfile(TransverseProfile):
 
     def __init__(self):
         super().__init__()
-        self.is_plane_wave = True
+        self.__update_is_plane_wave__(True)
 
     def _evaluate(self, x, y):
         """

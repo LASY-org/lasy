@@ -52,6 +52,10 @@ class TransverseProfile(object):
     def __rmul__(self, factor):
         """Return the scaled transverse profile."""
         return ScaledTransverseProfile(self, factor)
+    
+    def __update_is_plane_wave__(self,value):
+        """updates state of is_plane_wave variable"""
+        self.is_plane_wave = value
 
     def evaluate(self, x, y):
         """

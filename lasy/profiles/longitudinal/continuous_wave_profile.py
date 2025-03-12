@@ -17,7 +17,7 @@ class ContinuousWaveProfile(LongitudinalProfile):
 
     def __init__(self, wavelength):
         super().__init__(wavelength)
-        self.is_cw = True
+        self.__update_is_cw__(True)
 
     def evaluate(self, t):
         """
