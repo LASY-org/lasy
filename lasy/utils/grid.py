@@ -57,7 +57,7 @@ class Grid:
             if len(self.axes[i]) > 1:
                 self.dx.append(self.axes[i][1] - self.axes[i][0])
             else:
-                self.dx.append(hi[i]-lo[i])
+                self.dx.append(hi[i] - lo[i])
 
         self.lo = lo
         self.hi = hi

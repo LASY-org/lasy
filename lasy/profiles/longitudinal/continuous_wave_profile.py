@@ -18,7 +18,6 @@ class ContinuousWaveProfile(LongitudinalProfile):
     def __init__(self, wavelength):
         super().__init__(wavelength)
 
-
     def evaluate(self, t):
         """
         Return the longitudinal envelope.
@@ -34,5 +33,4 @@ class ContinuousWaveProfile(LongitudinalProfile):
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
         """
-        
-        return np.ones_like(t+0*1j)
+        return np.ones_like(t + 0 * 1j)

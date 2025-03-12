@@ -13,7 +13,6 @@ class PlaneWaveProfile(TransverseProfile):
 
     def __init__(self):
         super().__init__()
-        
 
     def _evaluate(self, x, y):
         """
@@ -31,5 +30,4 @@ class PlaneWaveProfile(TransverseProfile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-
         return np.ones_like(x**2 + y**2)

@@ -2,6 +2,7 @@ from .gaussian_profile import GaussianTransverseProfile
 from .hermite_gaussian_profile import HermiteGaussianTransverseProfile
 from .jinc_profile import JincTransverseProfile
 from .laguerre_gaussian_profile import LaguerreGaussianTransverseProfile
+from .plane_wave_profile import PlaneWaveProfile
 from .super_gaussian_profile import SuperGaussianTransverseProfile
 from .transverse_profile import (
     ScaledTransverseProfile,
@@ -9,7 +10,6 @@ from .transverse_profile import (
     TransverseProfile,
 )
 from .transverse_profile_from_data import TransverseProfileFromData
-from .plane_wave_profile import PlaneWaveProfile
 
 __all__ = [
     "GaussianTransverseProfile",
