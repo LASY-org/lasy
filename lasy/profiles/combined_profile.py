@@ -59,8 +59,16 @@ class CombinedLongitudinalTransverseProfile(Profile):
         Only used in case where laser is a plane wave laser
     """
 
-    def __init__(self, wavelength, pol, long_profile, trans_profile, 
-                 laser_energy = None, peak_intensity = None, peak_power = None):
+    def __init__(
+        self,
+        wavelength,
+        pol,
+        long_profile,
+        trans_profile,
+        laser_energy=None,
+        peak_intensity=None,
+        peak_power=None,
+    ):
         super().__init__(wavelength, pol)
         if long_profile.is_cw:
             assert laser_energy == None
@@ -78,9 +86,6 @@ class CombinedLongitudinalTransverseProfile(Profile):
             self.laser_energy = laser_energy
         self.long_profile = long_profile
         self.trans_profile = trans_profile
-        
-        
-
 
     def evaluate(self, x, y, t):
         """

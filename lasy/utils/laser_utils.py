@@ -157,7 +157,7 @@ def normalize_average_intensity(average_intensity, grid):
             grid.set_temporal_field(field)
 
 
-def normalize_peak_power(dim, peak_power,grid):
+def normalize_peak_power(dim, peak_power, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
@@ -181,7 +181,7 @@ def normalize_peak_power(dim, peak_power,grid):
         field = grid.get_temporal_field()
         intensity = np.abs(epsilon_0 * field**2 / 2 * c)
         dz = grid.dx[-1] * c
-        unit_area = get_grid_cell_volume(grid, dim)/dz
+        unit_area = get_grid_cell_volume(grid, dim) / dz
         power = intensity.sum(axis=tuple(range(intensity.ndim - 1))) * unit_area
         input_peak_power = power.max()
         if input_peak_power == 0.0:

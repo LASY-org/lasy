@@ -172,7 +172,7 @@ class Laser:
         elif kind == "average_intensity":
             normalize_average_intensity(value, self.grid)
         elif kind == "power":
-            normalize_peak_power(self.dim, value,self.grid)
+            normalize_peak_power(self.dim, value, self.grid)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
