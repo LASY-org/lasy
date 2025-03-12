@@ -33,7 +33,7 @@ class LongitudinalProfile(object):
         # The base class only defines dummy fields
         # (This should be replaced by any class that inherits from this one.)
         return np.zeros(t.shape, dtype="complex128")
-    
-    def __update_is_cw__(self,value):
-        """updates state of is_cw variable"""
+
+    def __update_is_cw__(self, value):
+        """Updates state of is_cw variable"""
         self.is_cw = value
