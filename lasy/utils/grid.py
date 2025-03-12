@@ -34,9 +34,16 @@ class Grid:
         Whether the field provided uses the (complex) envelope representation, as
         used internally in lasy. If False, field is assumed to represent the
         the full (real) electric field (with fast oscillations).
+
+    is_cw : bool (optional)
+        Whether the laser pulse longitudinal profile is a continuous wave laer profile
+        or not.
+
+    is_plane_wave : bool (optional)
+        Whether the laser pulse transverse profile is a plane wave laer profile or not.
     """
 
-    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None, is_envelope=True):
+    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None, is_envelope=True, is_cw=False, is_plane_wave=False):
         # Metadata
         ndims = 2 if dim == "rt" else 3
         assert dim in ["rt", "xyt"]
@@ -45,14 +52,24 @@ class Grid:
 
         lo = list(lo)
         hi = list(hi)
+
+        if is_cw:
+            lo[-1] = -1.0
+            hi[-1] = 1.0
+        if is_plane_wave:
+            if dim == 'rt':
+                lo[0] = 0.0
+                hi[0] = 1.0
+            else:
+                lo[0] = -1.0
+                hi[0] = 1.0
+                lo[1] = -1.0
+                hi[1] = 1.0
+            
         self.npoints = npoints
         self.axes = []
         self.dx = []
         for i in range(ndims):
-            # Account for case where a blank dimension is sent
-            if (lo[i] is None) and (hi[i] is None):
-                lo[i] = 0
-                hi[i] = 1
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
             if len(self.axes[i]) > 1:
                 self.dx.append(self.axes[i][1] - self.axes[i][0])

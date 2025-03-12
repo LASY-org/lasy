@@ -107,7 +107,7 @@ class Laser:
     def __init__(
         self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1, n_theta_evals=None
     ):
-        self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
+        self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes,is_cw=profile.is_cw,is_plane_wave=profile.is_plane_wave)
         self.dim = dim
         self.profile = profile
         self.output_iteration = 0  # Incremented each time write_to_file is called
