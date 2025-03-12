@@ -43,14 +43,24 @@ class Grid:
         assert len(lo) == ndims
         assert len(hi) == ndims
 
-        self.lo = list(lo)
-        self.hi = list(hi)
+        lo = list(lo)
+        hi = list(hi)
         self.npoints = npoints
         self.axes = []
         self.dx = []
         for i in range(ndims):
+            # Account for case where a blank dimension is sent
+            if (lo[i] is None) and (hi[i] is None):
+                lo[i] = 0
+                hi[i] = 1
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
-            self.dx.append(self.axes[i][1] - self.axes[i][0])
+            if len(self.axes[i]) > 1:
+                self.dx.append(self.axes[i][1] - self.axes[i][0])
+            else:
+                self.dx.append(hi[i]-lo[i])
+
+        self.lo = lo
+        self.hi = hi
 
         if dim == "rt":
             self.n_azimuthal_modes = n_azimuthal_modes

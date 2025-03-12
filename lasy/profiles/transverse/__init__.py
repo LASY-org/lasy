@@ -9,6 +9,7 @@ from .transverse_profile import (
     TransverseProfile,
 )
 from .transverse_profile_from_data import TransverseProfileFromData
+from .plane_wave_profile import PlaneWaveProfile
 
 __all__ = [
     "GaussianTransverseProfile",
@@ -20,4 +21,5 @@ __all__ = [
     "TransverseProfile",
     "SummedTransverseProfile",
     "ScaledTransverseProfile",
+    "PlaneWaveProfile",
 ]
