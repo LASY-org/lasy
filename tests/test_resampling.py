@@ -114,7 +114,7 @@ def test_resampling_laguerre():
     LongitProfile = GaussianLongitudinalProfile(wavelength, tau, t_peak)
     TransvProfile = LaguerreGaussianTransverseProfile(w0, p, m, wavelength=800e-9)
     pulseProfile = CombinedLongitudinalTransverseProfile(
-        wavelength, pol, LongitProfile, TransvProfile,laser_energy=laser_energy
+        wavelength, pol, LongitProfile, TransvProfile, laser_energy=laser_energy
     )
 
     laser = Laser(dim, lo, hi, npoints, pulseProfile, n_azimuthal_modes=2)
