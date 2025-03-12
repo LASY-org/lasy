@@ -43,7 +43,17 @@ class Grid:
         Whether the laser pulse transverse profile is a plane wave laer profile or not.
     """
 
-    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None, is_envelope=True, is_cw=False, is_plane_wave=False):
+    def __init__(
+        self,
+        dim,
+        lo,
+        hi,
+        npoints,
+        n_azimuthal_modes=None,
+        is_envelope=True,
+        is_cw=False,
+        is_plane_wave=False,
+    ):
         # Metadata
         ndims = 2 if dim == "rt" else 3
         assert dim in ["rt", "xyt"]
@@ -57,7 +67,7 @@ class Grid:
             lo[-1] = -1.0
             hi[-1] = 1.0
         if is_plane_wave:
-            if dim == 'rt':
+            if dim == "rt":
                 lo[0] = 0.0
                 hi[0] = 1.0
             else:
@@ -65,7 +75,7 @@ class Grid:
                 hi[0] = 1.0
                 lo[1] = -1.0
                 hi[1] = 1.0
-            
+
         self.npoints = npoints
         self.axes = []
         self.dx = []
