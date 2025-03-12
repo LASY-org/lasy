@@ -2,7 +2,7 @@
 
 ## Overview
 
-Hi everyone!
+Hi everyone!!
 
 `lasy` is a Python library that facilitates the initialization of complex laser pulses, in simulations of laser-plasma interactions.
 
