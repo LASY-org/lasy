@@ -71,18 +71,18 @@ class CombinedLongitudinalTransverseProfile(Profile):
     ):
         super().__init__(wavelength, pol)
         if long_profile.is_cw:
-            assert laser_energy == None
-            assert peak_power == None
+            assert laser_energy is None
+            assert peak_power is None
             self.peak_intensity = peak_intensity
             self.is_cw = long_profile.is_cw
         elif trans_profile.is_plane_wave:
-            assert laser_energy == None
-            assert peak_intensity == None
+            assert laser_energy is None
+            assert peak_intensity is None
             self.peak_power = peak_power
             self.is_plane_wave = trans_profile.is_plane_wave
         else:
-            assert peak_power == None
-            assert peak_intensity == None
+            assert peak_power is None
+            assert peak_intensity is None
             self.laser_energy = laser_energy
         self.long_profile = long_profile
         self.trans_profile = trans_profile
