@@ -57,7 +57,7 @@ long_profile = GaussianLongitudinalProfile(wavelength, tau, t_peak)
 trans_profile = GaussianTransverseProfile(w0, wavelength, z_foc)
 
 combined_profile = CombinedLongitudinalTransverseProfile(
-    wavelength, pol, long_profile, trans_profile, laser_energy = laser_energy
+    wavelength, pol, long_profile, trans_profile, laser_energy=laser_energy
 )
 
 gaussian_profile = GaussianProfile(

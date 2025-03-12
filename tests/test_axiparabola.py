@@ -28,7 +28,7 @@ def test_axiparabola():
         polarization,
         GaussianLongitudinalProfile(wavelength, pulse_duration, t_peak),
         SuperGaussianTransverseProfile(spot_size, n_order=16),
-        laser_energy = energy
+        laser_energy=energy,
     )
 
     # Define the laser on a grid
