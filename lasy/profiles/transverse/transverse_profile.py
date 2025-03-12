@@ -54,7 +54,7 @@ class TransverseProfile(object):
         return ScaledTransverseProfile(self, factor)
 
     def __update_is_plane_wave__(self, value):
-        """Updates state of is_plane_wave variable."""
+        """Update state of is_plane_wave variable."""
         self.is_plane_wave = value
 
     def evaluate(self, x, y):
