@@ -35,5 +35,5 @@ class LongitudinalProfile(object):
         return np.zeros(t.shape, dtype="complex128")
 
     def __update_is_cw__(self, value):
-        """Updates state of is_cw variable"""
+        """Updates state of is_cw variable."""
         self.is_cw = value
