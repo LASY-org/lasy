@@ -179,7 +179,7 @@ def normalize_peak_power(dim, peak_power, grid):
     """
     if peak_power is not None:
         field = grid.get_temporal_field()
-        power = get_laser_power(dim,grid)
+        power = get_laser_power(dim, grid)
         input_peak_power = power.max()
         if input_peak_power == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
@@ -187,7 +187,8 @@ def normalize_peak_power(dim, peak_power, grid):
             field *= np.sqrt(peak_power / input_peak_power)
             grid.set_temporal_field(field)
 
-def get_laser_power(dim,grid):
+
+def get_laser_power(dim, grid):
     r"""
     Calculate the instantaneous power of the laser along the time axis.
 
