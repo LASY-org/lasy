@@ -7,7 +7,11 @@ class PlaneWaveProfile(TransverseProfile):
     r"""
     Class representing a plane wave.
 
-    Specifically, the transverse profile will be represented by a constant value
+    Specifically, the transverse profile will be represented by a constant value.
+
+    Note that using this profile will force the number of points in each transverse
+    dimension to 1. Additionally, it will force the area of the transverse plane to
+    1 m^2. 
 
     """
 

@@ -7,7 +7,11 @@ class ContinuousWaveProfile(LongitudinalProfile):
     r"""
     Class representing a continous wave laser longitudinal profile.
 
-    Specifically, the longitudinal profile will be represented by a constant value
+    Specifically, the longitudinal profile will be represented by a constant value.
+
+    Note that using this profile will force the number of points in the longitudinal
+    dimension to 1. Additionally, it will force the length of the longitudinal axis
+    1 s. 
 
     Parameters
     ----------
