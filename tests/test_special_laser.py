@@ -46,7 +46,7 @@ def test_continuous_wave_laser():
 
     field = laser.grid.get_temporal_field()
     intensity = np.abs(epsilon_0 * field**2 / 2 * c)
-    fluence = np.sum(intensity,axis=-1)*laser.grid.dx[-1]
+    fluence = np.sum(intensity, axis=-1) * laser.grid.dx[-1]
     measured_peak_fluence = fluence.max()
 
     assert np.abs(measured_peak_fluence - peak_fluence) / peak_fluence < 1e-6

@@ -149,7 +149,7 @@ def normalize_peak_fluence(peak_fluence, grid):
     if peak_fluence is not None:
         field = grid.get_temporal_field()
         intensity = np.abs(epsilon_0 * field**2 / 2 * c)
-        fluence = np.sum(intensity,axis=-1)*grid.dx[-1]
+        fluence = np.sum(intensity, axis=-1) * grid.dx[-1]
         input_peak_fluence = fluence.max()
         if input_peak_fluence == 0.0:
             print("Field is zero everywhere, normalization will be skipped")

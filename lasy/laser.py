@@ -7,9 +7,9 @@ from lasy.utils.laser_utils import (
     normalize_average_intensity,
     normalize_energy,
     normalize_peak_field_amplitude,
+    normalize_peak_fluence,
     normalize_peak_intensity,
     normalize_peak_power,
-    normalize_peak_fluence,
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
