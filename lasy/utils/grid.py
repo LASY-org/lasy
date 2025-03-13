@@ -62,6 +62,7 @@ class Grid:
 
         lo = list(lo)
         hi = list(hi)
+        npoints = list(npoints)
 
         if is_cw:
             lo[-1] = -0.5
