@@ -46,16 +46,16 @@ class CombinedLongitudinalTransverseProfile(Profile):
         calculated so that the pulse has the prescribed energy.
         Only used in case where laser is neither a plane wave or a continuous wave laser
 
-    peak_intensity : float (in W/m^2)
-        The peak intensity of the laser pulse. The amplitude of the laser
+    peak_fluence : float (in J/m^2)
+        The peak fluence of the laser pulse. The amplitude of the laser
         field (:math:`E_0` in the above formula) is automatically
-        calculated so that the pulse has the peak intensity.
+        calculated so that the pulse has the prescribed peak fluence.
         Only used in case where laser is a continuous wave laser
 
     peak_power : float (in W)
         The peak power of the laser pulse. The amplitude of the laser
         field (:math:`E_0` in the above formula) is automatically
-        calculated so that the pulse has the peak power.
+        calculated so that the pulse has the prescribed peak power.
         Only used in case where laser is a plane wave laser
     """
 
@@ -66,24 +66,24 @@ class CombinedLongitudinalTransverseProfile(Profile):
         long_profile,
         trans_profile,
         laser_energy=None,
-        peak_intensity=None,
+        peak_fluence=None,
         peak_power=None,
     ):
         super().__init__(wavelength, pol)
         if long_profile.is_cw:
             assert laser_energy is None
             assert peak_power is None
-            self.peak_intensity = peak_intensity
+            self.peak_fluence = peak_fluence
             self.__update_is_cw__(long_profile.is_cw)
 
         elif trans_profile.is_plane_wave:
             assert laser_energy is None
-            assert peak_intensity is None
+            assert peak_fluence is None
             self.peak_power = peak_power
             self.__update_is_plane_wave__(trans_profile.is_plane_wave)
         else:
             assert peak_power is None
-            assert peak_intensity is None
+            assert peak_fluence is None
             self.laser_energy = laser_energy
         self.long_profile = long_profile
         self.trans_profile = trans_profile

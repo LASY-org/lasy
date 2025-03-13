@@ -2,7 +2,7 @@
 Test the implementation of continuous wave laser and plane wave laser.
 
 This test file verifys the correct implementation of these special cases of the laser object and
-additionally checks the implementation of the peak_intensity and peak_power normalizations
+additionally checks the implementation of the peak_fluence and peak_power normalizations
 as well as some measurement functionality from laser utils
 """
 
@@ -25,7 +25,7 @@ from lasy.utils.laser_utils import (
 
 def test_continuous_wave_laser():
     # Physical Parameters
-    peak_intensity = 1.0e10  # W/m^2
+    peak_fluence = 1e4  # J/m^2
     spot_size = 10e-3
     wavelength = 800e-9
     pol = (1, 0)
@@ -33,7 +33,7 @@ def test_continuous_wave_laser():
     long_prof = ContinuousWaveProfile(wavelength)
     tran_prof = GaussianTransverseProfile(spot_size)
     profile = CombinedLongitudinalTransverseProfile(
-        wavelength, pol, long_prof, tran_prof, peak_intensity=peak_intensity
+        wavelength, pol, long_prof, tran_prof, peak_fluence=peak_fluence
     )
 
     # Computational Grid
@@ -46,9 +46,10 @@ def test_continuous_wave_laser():
 
     field = laser.grid.get_temporal_field()
     intensity = np.abs(epsilon_0 * field**2 / 2 * c)
-    measured_peak_intensity = intensity.max()
+    fluence = np.sum(intensity,axis=-1)*laser.grid.dx[-1]
+    measured_peak_fluence = fluence.max()
 
-    assert np.abs(measured_peak_intensity - peak_intensity) / peak_intensity < 1e-6
+    assert np.abs(measured_peak_fluence - peak_fluence) / peak_fluence < 1e-6
     assert np.abs(get_w0(laser.grid, laser.dim) - spot_size) / spot_size < 1e-6
 
 
