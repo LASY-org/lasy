@@ -71,7 +71,7 @@ class Grid:
             # set bounds such that in plane wave case energy [J] == fluence [J/m^2]
             if dim == "rt":
                 lo[0] = 0.0
-                hi[0] = np.sqrt(1/np.pi)
+                hi[0] = np.sqrt(1 / np.pi)
             else:
                 lo[0] = -0.5
                 hi[0] = 0.5
