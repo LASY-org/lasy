@@ -66,15 +66,19 @@ class Grid:
         if is_cw:
             lo[-1] = -0.5
             hi[-1] = 0.5
+            npoints[-1] = 1
         if is_plane_wave:
             if dim == "rt":
                 lo[0] = 0.0
                 hi[0] = np.sqrt(1 / np.pi)
+                npoints[0] = 1
             else:
                 lo[0] = -0.5
                 hi[0] = 0.5
+                npoints[0] = 1
                 lo[1] = -0.5
                 hi[1] = 0.5
+                npoints[1] = 1
 
         self.npoints = npoints
         self.axes = []
