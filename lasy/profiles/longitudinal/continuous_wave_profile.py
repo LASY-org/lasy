@@ -11,7 +11,7 @@ class ContinuousWaveProfile(LongitudinalProfile):
 
     Note that using this profile will force the number of points in the longitudinal
     dimension to 1. Additionally, it will force the length of the longitudinal axis
-    1 s. 
+    1 s.
 
     Parameters
     ----------

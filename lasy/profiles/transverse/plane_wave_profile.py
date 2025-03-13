@@ -11,7 +11,7 @@ class PlaneWaveProfile(TransverseProfile):
 
     Note that using this profile will force the number of points in each transverse
     dimension to 1. Additionally, it will force the area of the transverse plane to
-    1 m^2. 
+    1 m^2.
 
     """
 
