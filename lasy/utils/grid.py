@@ -64,11 +64,9 @@ class Grid:
         hi = list(hi)
 
         if is_cw:
-            # set bounds such that in cw case energy [J] == power [J/s]
             lo[-1] = -0.5
             hi[-1] = 0.5
         if is_plane_wave:
-            # set bounds such that in plane wave case energy [J] == fluence [J/m^2]
             if dim == "rt":
                 lo[0] = 0.0
                 hi[0] = np.sqrt(1/np.pi)
