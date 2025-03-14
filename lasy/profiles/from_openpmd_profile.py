@@ -3,10 +3,9 @@ import openpmd_api as io
 from scipy.constants import c
 
 from lasy.utils.laser_utils import (
+    chunk_to_slice,
     create_grid,
     vector_potential_to_field,
-    chunk_to_slice,
-    get_frequency,
 )
 
 from .from_array_profile import FromArrayProfile
@@ -26,7 +25,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     field : string
         Name of the field containing the laser pulse
-    
+
     compontent : string
         Name of the component of the field to be read
     """
@@ -59,7 +58,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         else:
             array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
             series.flush()
-        
+
         # This is rqeuired for creating the grid
         array = array.astype(np.complex128)
         # Extract the required parameters to set the grid
