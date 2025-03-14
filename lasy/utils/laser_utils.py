@@ -1175,3 +1175,13 @@ def get_propation_angle(dim, grid, k0):
     angle_x = np.average(pphi_px, weights=env_abs2) / k0
     angle_y = np.average(pphi_py, weights=env_abs2) / k0
     return [angle_x, angle_y]
+
+
+def chunk_to_slice(chunk):
+    """
+    Convert an openPMD_api.ChunkInfo to slice
+    """
+    stops = [a + b for a, b in zip(chunk.offset, chunk.extent)]
+    indices_per_dim = zip(chunk.offset, stops)
+    index_tuple = map(lambda s: slice(s[0], s[1], None), indices_per_dim)
+    return tuple(index_tuple)

@@ -5,6 +5,8 @@ from scipy.constants import c
 from lasy.utils.laser_utils import (
     create_grid,
     vector_potential_to_field,
+    chunk_to_slice,
+    get_frequency,
 )
 
 from .from_array_profile import FromArrayProfile
@@ -24,6 +26,9 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     field : string
         Name of the field containing the laser pulse
+    
+    compontent : string
+        Name of the component of the field to be read
     """
 
     def __init__(
@@ -31,20 +36,41 @@ class FromOpenPMDProfile(FromArrayProfile):
         path,
         iteration,
         field,
+        component=None,
     ):
         # Read the data
         series = io.Series(path, io.Access.read_only)
         i = series.iterations[iteration]
         m = i.meshes[field]
-        array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
-        series.flush()
+        if component is not None:
+            component = m[component]
+            chunks = component.available_chunks()
+            for chunk in chunks:
+                chunk_slice = chunk_to_slice(chunk)
+                volume = 1
+                for csl in chunk_slice:
+                    volume *= csl.stop - csl.start
+                if volume == 0:
+                    continue
 
+            # read only valid region
+            array = component[chunk_slice]
+            series.flush()
+        else:
+            array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
+            series.flush()
+        
+        # This is rqeuired for creating the grid
+        array = array.astype(np.complex128)
         # Extract the required parameters to set the grid
         grid_offset = m.get_attribute("gridGlobalOffset")
         grid_spacing = m.get_attribute("gridSpacing")
-        grid_position = m.get_attribute(
-            "position"
-        )  # node (0.0) or cell (0.5) centered info for each axis
+        try:
+            grid_position = m.get_attribute(
+                "position"
+            )  # node (0.0) or cell (0.5) centered info for each axis
+        except io.ErrorNoSuchAttribute:
+            grid_position = component.get_attribute("position")
         axis_labels = m.get_attribute("axisLabels")
 
         if len(axis_labels) == 2:
@@ -70,7 +96,6 @@ class FromOpenPMDProfile(FromArrayProfile):
                 grid_offset[idx] + (N - 1 + grid_position[idx]) * grid_spacing[idx],
                 N,
             )
-
             # If label is `z`, change it to `t`
             if label == "z":
                 axis = (axis - axis[0]) / c
@@ -89,7 +114,10 @@ class FromOpenPMDProfile(FromArrayProfile):
             array = np.swapaxes(array, idx_offset, 2)
 
         # Read angular frequency
-        omg0 = m.get_attribute("angularFrequency")
+        try:
+            omg0 = m.get_attribute("angularFrequency")
+        except io.ErrorNoSuchAttribute:
+            print("Extraction of angular frequency from Wake-T is not supported yet.")
         wavelength = 2 * np.pi * c / omg0
 
         # If the field is stored as vector potential,
