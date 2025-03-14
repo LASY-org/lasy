@@ -1178,8 +1178,7 @@ def get_propation_angle(dim, grid, k0):
 
 
 def chunk_to_slice(chunk):
-    """
-    Convert an openPMD_api.ChunkInfo to slice
+    """Convert an openPMD_api.ChunkInfo to slice
     """
     stops = [a + b for a, b in zip(chunk.offset, chunk.extent)]
     indices_per_dim = zip(chunk.offset, stops)
