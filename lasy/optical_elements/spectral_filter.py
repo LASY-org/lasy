@@ -42,7 +42,6 @@ class SpectralFilter(OpticalElement):
         multiplier : ndarray of complex numbers
             Contains the value of the multiplier at the specified points.
         """
-
         # Sort the transmission function and angular frequencies to
         # eliminate problems with interpolation (e.g. due to fftshifted data)
         order = np.argsort(self.omega_in)
@@ -50,8 +49,7 @@ class SpectralFilter(OpticalElement):
         self.transmission = self.transmission[order]
 
         # interpolate transmission function to omega axis of the laser
-        transmission = np.interp(omega, self.omega_in,
-                                 self.transmission)
+        transmission = np.interp(omega, self.omega_in, self.transmission)
 
         # return the square root of the energy/intensity transmission
         return np.sqrt(transmission)

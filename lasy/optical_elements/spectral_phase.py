@@ -50,7 +50,6 @@ class SpectralPhase(OpticalElement):
         self.phase = self.phase[order]
 
         # interpolate transmission function to omega axis of the laser
-        phase = np.interp(omega, self.omega_in,
-                          self.phase)
+        phase = np.interp(omega, self.omega_in, self.phase)
 
         return np.exp(1j * phase)

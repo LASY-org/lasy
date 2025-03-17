@@ -2,9 +2,9 @@ from .axicon import Axicon
 from .axiparabola import Axiparabola
 from .parabolic_mirror import ParabolicMirror
 from .polynomial_spectral_phase import PolynomialSpectralPhase
-from .zernike_aberrations import ZernikeAberrations
 from .spectral_filter import SpectralFilter
 from .spectral_phase import SpectralPhase
+from .zernike_aberrations import ZernikeAberrations
 
 __all__ = [
     "ParabolicMirror",
