@@ -24,10 +24,13 @@ class FromOpenPMDProfile(FromArrayProfile):
         Iteration at which the argument is read.
 
     field : string
-        Name of the field containing the laser pulse
+        Name of the field containing the laser pulse.
+
+    omega0 : float
+        Angular frequency at which laser envelope is defined.
 
     compontent : string
-        Name of the component of the field to be read
+        Name of the component of the field to be read.
     """
 
     def __init__(
@@ -35,6 +38,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         path,
         iteration,
         field,
+        omega0,
         component=None,
     ):
         # Read the data
@@ -116,7 +120,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         try:
             omg0 = m.get_attribute("angularFrequency")
         except io.ErrorNoSuchAttribute:
-            print("Extraction of angular frequency from Wake-T is not supported yet.")
+            omg0 = omega0
         wavelength = 2 * np.pi * c / omg0
 
         # If the field is stored as vector potential,
