@@ -5,7 +5,7 @@ from .optical_element import OpticalElement
 
 class SpectralPhase(OpticalElement):
     r"""
-    Class for an optical element that adds a spectral phase to a laser pulse
+    Class for an optical element that adds a spectral phase to a laser pulse.
 
     The amplitude multiplier corresponds to:
 
@@ -14,7 +14,6 @@ class SpectralPhase(OpticalElement):
         T(\omega) = \exp(i(\phi(\omega)))
 
     where :math:`\phi(\omega)` is the spectral phase.
-
 
     Parameters
     ----------
