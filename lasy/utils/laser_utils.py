@@ -614,7 +614,7 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     assert not grid.is_envelope
 
     # Get central wavelength from array
-    omg0_h = get_frequency(
+    _, omg0_h = get_frequency(
         grid,
         dim=dim,
         is_hilbert=False,
