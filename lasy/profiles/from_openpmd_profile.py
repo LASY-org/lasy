@@ -31,7 +31,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     compontent : string
         Name of the component of the field to be read.
-    
+
     is_envelope : bool
         Whether the field provided uses the (complex) envelope representation, as
         used internally in lasy. If False, field is assumed to represent the
@@ -43,8 +43,8 @@ class FromOpenPMDProfile(FromArrayProfile):
         path,
         iteration,
         field,
-        omega0 = None,
-        component = None,
+        omega0=None,
+        component=None,
         is_envelope=True,
     ):
         # Read the data
