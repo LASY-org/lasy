@@ -17,9 +17,9 @@ class SpectralPhase(OpticalElement):
 
     Parameters
     ----------
-    phase : ndarray of floats (in rad)
+    phase : 1D ndarray of floats (in rad)
         Phase that should be applied to the laser pulse. The phase is assumed to be unwrapped.
-    omega : ndarray of floats (in rad/s)
+    omega : 1D ndarray of floats (in rad/s)
         Angular frequencies at which the phase is defined.
     """
 
