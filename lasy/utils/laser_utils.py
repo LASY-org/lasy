@@ -457,8 +457,8 @@ def get_frequency(
         if dim == "xyt" and phase_unwrap_nd:
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
-        h = field if is_hilbert else hilbert_transform(grid)
-        h = np.squeeze(field)
+        h = field if is_hilbert else hilbert_transform(field)
+        h = np.squeeze(h)
         if phase_unwrap_nd:
             try:
                 from skimage.restoration import unwrap_phase
@@ -613,23 +613,18 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     """
     assert not grid.is_envelope
 
-    field = grid.get_temporal_field()
-
-    # hilbert transform needs inverted time axis.
-    field = hilbert_transform(field)
-
     # Get central wavelength from array
-    omg_h, omg0_h = get_frequency(
+    omg0_h = get_frequency(
         grid,
         dim=dim,
-        is_hilbert=True,
+        is_hilbert=False,
         phase_unwrap_nd=phase_unwrap_nd,
     )
-    field *= np.exp(1j * omg0_h * grid.axes[-1])
+    field = grid.get_temporal_field() * np.exp(1j * omg0_h * grid.axes[-1])
     grid.set_is_envelope(True)
     grid.set_temporal_field(field)
 
-    return grid, omg0_h
+    return omg0_h
 
 
 def hilbert_transform(field):
