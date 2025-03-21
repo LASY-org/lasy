@@ -609,7 +609,7 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     Returns
     -------
     tuple
-        A tuple with the envelope array and the central wavelength.
+        The central wavelength.
     """
     assert not grid.is_envelope
 
