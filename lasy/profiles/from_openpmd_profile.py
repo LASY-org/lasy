@@ -31,6 +31,11 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     compontent : string
         Name of the component of the field to be read.
+    
+    is_envelope : bool
+        Whether the field provided uses the (complex) envelope representation, as
+        used internally in lasy. If False, field is assumed to represent the
+        the full (real) electric field (with fast oscillations).
     """
 
     def __init__(
@@ -38,8 +43,9 @@ class FromOpenPMDProfile(FromArrayProfile):
         path,
         iteration,
         field,
-        omega0,
-        component=None,
+        omega0 = None,
+        component = None,
+        is_envelope=True,
     ):
         # Read the data
         series = io.Series(path, io.Access.read_only)
@@ -64,7 +70,10 @@ class FromOpenPMDProfile(FromArrayProfile):
             series.flush()
 
         # This is rqeuired for creating the grid
-        array = array.astype(np.complex128)
+        if is_envelope:
+            array = array.astype(np.complex128)
+        else:
+            array = array.astype(np.float64)
         # Extract the required parameters to set the grid
         grid_offset = m.get_attribute("gridGlobalOffset")
         grid_spacing = m.get_attribute("gridSpacing")
@@ -86,7 +95,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             print(
                 "Error: The dimension of the field is not supported. The valid dimensions are 'rt' and 'xyt'."
             )
-            return None
+            raise ValueError
 
         # Define parameters to create a profile
         axes = {}
