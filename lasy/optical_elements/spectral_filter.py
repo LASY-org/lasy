@@ -17,9 +17,9 @@ class SpectralFilter(OpticalElement):
 
     Parameters
     ----------
-    transmission : ndarray of floats
+    transmission : 1D ndarray of floats
         Intensity/Energy transmission of the filter.
-    omega : ndarray of floats (in rad/s)
+    omega : 1D ndarray of floats (in rad/s)
         Angular frequencies at which the transmission is defined.
     """
 
