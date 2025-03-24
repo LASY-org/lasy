@@ -8,6 +8,11 @@ class Profile(object):
 
     Any new laser profile should inherit from this class, and define its own
     `evaluate` method, using the same signature as the method below.
+    For most cases, use derived classes instead of this base class.
+
+    Common operators (addition and multiplication by a scalar) are provided as part of this base class.
+    For such operations, the user is responsible for handling the complex phase and weights of summed profiles.
+    In particular, summing between different types of profiles is not recommended.
 
     Parameters
     ----------
@@ -33,6 +38,7 @@ class Profile(object):
         self.pol = np.array([pol[0] / norm_pol, pol[1] / norm_pol])
         self.lambda0 = wavelength
         self.omega0 = 2 * np.pi * c / self.lambda0
+        self.k0 = 2.0 * np.pi / wavelength
 
     def evaluate(self, x, y, t):
         """
@@ -40,13 +46,13 @@ class Profile(object):
 
         Parameters
         ----------
-        x, y, t: ndarrays of floats
+        x, y, t : ndarrays of floats
             Define points on which to evaluate the envelope
             These arrays need to all have the same shape.
 
         Returns
         -------
-        envelope: ndarray of complex numbers
+        envelope : ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
         """
@@ -75,29 +81,29 @@ class SummedProfile(Profile):
 
     Parameters
     ----------
-    profiles: list of Profile objects
+    profiles : list of Profile objects
         List of profiles to be summed.
     """
 
     def __init__(self, *profiles):
         """Initialize the summed profile."""
         # Check that all profiles are Profile objects
-        assert all(
-            [isinstance(p, Profile) for p in profiles]
-        ), "All summands must be Profile objects."
+        assert all([isinstance(p, Profile) for p in profiles]), (
+            "All summands must be Profile objects."
+        )
         self.profiles = profiles
         # Get the wavelength values from each profile
         lambda0s = [p.lambda0 for p in self.profiles]
         pols = [p.pol for p in self.profiles]
         # Check that all wavelengths are the same
-        assert np.allclose(
-            lambda0s, lambda0s[0]
-        ), "Added profiles must have the same wavelength."
+        assert np.allclose(lambda0s, lambda0s[0]), (
+            "Added profiles must have the same wavelength."
+        )
         lambda0 = profiles[0].lambda0
         # Check that all polarizations are the same
-        assert np.allclose(
-            pols, pols[0]
-        ), "Added profiles must have the same polarization."
+        assert np.allclose(pols, pols[0]), (
+            "Added profiles must have the same polarization."
+        )
         pol = profiles[0].pol
         # Initialize the parent class
         super().__init__(lambda0, pol)
@@ -116,9 +122,9 @@ class ScaledProfile(Profile):
 
     Parameters
     ----------
-    profiles: Profile object
+    profiles : Profile object
         Profile to be scaled.
-    factor: int or float
+    factor : int or float
         Factor by which to scale the profile.
     """
 

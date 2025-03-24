@@ -5,7 +5,7 @@ from .longitudinal_profile import LongitudinalProfile
 
 class CosineLongitudinalProfile(LongitudinalProfile):
     r"""
-    Derived class for the analytic longitudinal truncated cosine profile of a laser pulse.
+    Class for the analytic longitudinal truncated cosine profile of a laser pulse.
 
     More precisely, the longitudinal envelope
     (to be used in the :class:CombinedLongitudinalTransverseProfile class)
@@ -50,12 +50,12 @@ class CosineLongitudinalProfile(LongitudinalProfile):
 
         Parameters
         ----------
-        t: ndarrays of floats
+        t : ndarrays of floats
             Define points on which to evaluate the envelope
 
         Returns
         -------
-        envelope: ndarray of complex numbers
+        envelope : ndarray of complex numbers
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
         """

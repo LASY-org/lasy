@@ -6,6 +6,7 @@ matplotlib
 nbsphinx
 numpydoc
 pydata-sphinx-theme
+scikit-image
 sphinx-copybutton
 sphinx-design
 sphinx-gallery

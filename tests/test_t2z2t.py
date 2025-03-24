@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import pytest
-
 import numpy as np
+import pytest
+from scipy.constants import c
+
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.laser_utils import import_from_z, export_to_z
-from scipy.constants import c
+from lasy.utils.laser_utils import export_to_z, import_from_z
 
 
 @pytest.fixture(scope="function")
@@ -24,9 +24,9 @@ def gaussian():
 
 
 def get_laser_z_analytic(profile, z_axis, r_axis):
-    w0 = profile.trans_profile.w0
-    tau = profile.long_profile.tau
-    omega0 = profile.long_profile.omega0
+    w0 = profile.w0
+    tau = profile.tau
+    omega0 = profile.omega0
     k0 = omega0 / c
     lambda0 = 2 * np.pi / k0
 
@@ -54,10 +54,11 @@ def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
         laser_t_out.dim, laser_t_out.grid, laser_t_out.profile.omega0, laser_z, z_axis
     )
 
-    ind0 = laser_t_in.grid.field.shape[0] // 2 - 1
+    field = laser_t_in.grid.get_temporal_field()
+    ind0 = field.shape[0] // 2 - 1
 
-    laser_t_in_2d = laser_t_in.grid.field[ind0]
-    laser_t_out_2d = laser_t_out.grid.field[ind0]
+    laser_t_in_2d = field[ind0]
+    laser_t_out_2d = field[ind0]
     laser_z_2d = laser_z[ind0]
 
     assert np.allclose(laser_t_in_2d, laser_t_out_2d, atol=2e-7, rtol=0)
@@ -67,8 +68,8 @@ def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
 
 def test_RT_case(gaussian):
     dim = "rt"
-    w0 = gaussian.trans_profile.w0
-    tau = gaussian.long_profile.tau
+    w0 = gaussian.w0
+    tau = gaussian.tau
     lo = (0, -3.5 * tau)
     hi = (5 * w0, 3.5 * tau)
     npoints = (128, 65)
@@ -90,8 +91,8 @@ def test_RT_case(gaussian):
 def test_3D_case(gaussian):
     # - 3D case
     dim = "xyt"
-    w0 = gaussian.trans_profile.w0
-    tau = gaussian.long_profile.tau
+    w0 = gaussian.w0
+    tau = gaussian.tau
     lo = (-5 * w0, -5 * w0, -3.5 * tau)
     hi = (5 * w0, 5 * w0, 3.5 * tau)
     npoints = (160, 164, 65)
