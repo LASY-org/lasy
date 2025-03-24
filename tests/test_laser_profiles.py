@@ -8,7 +8,7 @@ from lasy.laser import Laser
 from lasy.profiles import FromArrayProfile, GaussianProfile, SpeckleProfile
 from lasy.profiles.longitudinal import (
     CosineLongitudinalProfile,
-    FlatTopLongitudinalProfile
+    FlatTopLongitudinalProfile,
     GaussianLongitudinalProfile,
     LongitudinalProfileFromData,
     SuperGaussianLongitudinalProfile,
