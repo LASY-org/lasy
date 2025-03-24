@@ -8,7 +8,7 @@ class CosineLongitudinalProfile(LongitudinalProfile):
     Class for the analytic longitudinal truncated cosine profile of a laser pulse.
 
     More precisely, the longitudinal envelope
-    (to be used in the :class:CombinedLongitudinalTransverseProfile class)
+    (to be used in the :class:`.CombinedLongitudinalTransverseProfile` class)
     corresponds to:
 
     .. math::
