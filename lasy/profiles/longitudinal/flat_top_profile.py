@@ -67,7 +67,16 @@ class FlatTopLongitudinalProfile(LongitudinalProfile):
         If equal to `cos2`, :math:`\mathcal{R} is a math:`\cos^2` function.
     """
 
-    def __init__(self, wavelength, t_start, t_rise, t_flat, t_down, cep_phase=0, rise_type="linear"):
+    def __init__(
+        self,
+        wavelength,
+        t_start,
+        t_rise,
+        t_flat,
+        t_down,
+        cep_phase=0,
+        rise_type="linear",
+    ):
         super().__init__(wavelength)
         self.t_start = t_start
         self.t_rise = t_rise
@@ -95,31 +104,24 @@ class FlatTopLongitudinalProfile(LongitudinalProfile):
         t2 = t1 + self.t_rise
         t3 = t2 + self.t_flat
         t4 = t3 + self.t_down
-        print(t1,t2,t3,t4)
-        tcep = 0.5*(t3 + t2)
+        print(t1, t2, t3, t4)
+        tcep = 0.5 * (t3 + t2)
 
-
-        if (self.rise_type == "linear"):
+        if self.rise_type == "linear":
             envelope = (
-                (
-                    (t >= t1)*(t < t2)*(t - t1)/(t2 - t1) +
-                    (t >= t2)*(t < t3) +
-                    (t >= t3)*(t < t4)*(t - t4)/(t3 - t4)
-                )
-                * np.exp(+1.0j * (self.cep_phase + self.omega0 * tcep))
-            )
+                (t >= t1) * (t < t2) * (t - t1) / (t2 - t1)
+                + (t >= t2) * (t < t3)
+                + (t >= t3) * (t < t4) * (t - t4) / (t3 - t4)
+            ) * np.exp(+1.0j * (self.cep_phase + self.omega0 * tcep))
             return envelope
-        elif (self.rise_type == "cos2"):
+        elif self.rise_type == "cos2":
             envelope = (
-                (
-                    (t >= t1)*(t < t2)*np.cos(0.5 * np.pi * (t - t2)/(t2-t1))**2 +
-                    (t >= t2)*(t < t3) +
-                    (t >= t3)*(t < t4)*np.cos(0.5 * np.pi * (t - t3)/(t3-t4))**2
-                )
-                * np.exp(+1.0j * (self.cep_phase + self.omega0 * tcep))
-            )
+                (t >= t1) * (t < t2) * np.cos(0.5 * np.pi * (t - t2) / (t2 - t1)) ** 2
+                + (t >= t2) * (t < t3)
+                + (t >= t3) * (t < t4) * np.cos(0.5 * np.pi * (t - t3) / (t3 - t4)) ** 2
+            ) * np.exp(+1.0j * (self.cep_phase + self.omega0 * tcep))
             return envelope
-        else :
+        else:
             raise Exception("rise type must be either 'linear' or 'cos2'")
 
         return envelope
