@@ -458,7 +458,7 @@ def get_frequency(
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
         h = field if is_hilbert else hilbert_transform(field)
-        h = np.squeeze(h)
+
         if phase_unwrap_nd:
             try:
                 from skimage.restoration import unwrap_phase
@@ -620,7 +620,11 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
         is_hilbert=False,
         phase_unwrap_nd=phase_unwrap_nd,
     )
-    field = grid.get_temporal_field() * np.exp(1j * omg0_h * grid.axes[-1])
+    # Hilbert transform
+    field = hilbert_transform(grid.get_temporal_field())
+    # Remove carrier frequency
+    field *= np.exp(1j * omg0_h * grid.axes[-1])
+    # Store envelope
     grid.set_is_envelope(True)
     grid.set_temporal_field(field)
 
@@ -628,7 +632,7 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
 
 
 def hilbert_transform(field):
-    """Make a hilbert transform of the grid field.
+    """Make a hilbert transform of the field.
 
     Currently the arrays need to be flipped along t (both the input field and
     its transform) to get the imaginary part (and thus the phase) with the
@@ -636,8 +640,8 @@ def hilbert_transform(field):
 
     Parameters
     ----------
-    grid : Grid
-        The lasy grid whose field should be transformed.
+    field : 3d numpy array
+        The field whose field should be transformed.
     """
     return hilbert(field[:, :, ::-1])[:, :, ::-1]
 

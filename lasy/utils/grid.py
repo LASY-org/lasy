@@ -72,7 +72,6 @@ class Grid:
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
-
     def set_is_envelope(self, is_envelope):
         """
         Set is_envelope attribute. Also set dtype accordingly.
