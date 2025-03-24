@@ -11,6 +11,7 @@ from lasy.profiles import GaussianProfile, FromArrayProfile
 from lasy.profiles.longitudinal import (
     GaussianLongitudinalProfile,
     CosineLongitudinalProfile,
+    FlatTopLongitudinalProfile
 )
 from lasy.profiles.transverse import (
     GaussianTransverseProfile,
@@ -207,6 +208,11 @@ def test_longitudinal_profiles():
     print("cep_phase_th = ", cep_phase)
     print("cep_phase = ", cep_phase_cos)
     assert np.abs(cep_phase_cos - cep_phase) / cep_phase < 0.02
+
+    # FlatTopLongitudinalProfile
+    print("FlatTopLongitudinalProfile")
+    profile_flat_top_linear = FlatTopLongitudinalProfile(wavelength, t_start, t_rise, t_flat, t_down, cep_phase "linear")
+    profile_flat_top_cos2 = FlatTopLongitudinalProfile(wavelength, t_start, t_rise, t_flat, t_down, cep_phase "cos2")
 
 
 def test_profile_gaussian_3d_cartesian(gaussian):

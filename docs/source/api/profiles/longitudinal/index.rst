@@ -6,5 +6,6 @@ Longitudinal Profiles
    :hidden:
 
    cosine
+   flat_top
    gaussian
    longitudinal_profile_from_data
