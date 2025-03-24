@@ -211,8 +211,30 @@ def test_longitudinal_profiles():
 
     # FlatTopLongitudinalProfile
     print("FlatTopLongitudinalProfile")
-    profile_flat_top_linear = FlatTopLongitudinalProfile(wavelength, t_start, t_rise, t_flat, t_down, cep_phase "linear")
-    profile_flat_top_cos2 = FlatTopLongitudinalProfile(wavelength, t_start, t_rise, t_flat, t_down, cep_phase "cos2")
+
+    t_start = 2.0e-15
+    t_rise = 10e-15
+    t_flat = 12e-15
+    t_down = 8e-15
+    profile_flat_top_linear = FlatTopLongitudinalProfile(wavelength, t_start, t_rise, t_flat, t_down, cep_phase, "linear")
+    profile_flat_top_cos2 = FlatTopLongitudinalProfile(wavelength, t_start, t_rise, t_flat, t_down, cep_phase, "cos2")
+
+    tft = np.linspace(t_start - 2.0e-15, (t_start + t_rise + t_flat + t_down) + 2.0e-15, npoints)
+
+    field_flat_top_linear = profile_flat_top_linear.evaluate(tft)
+    field_flat_top_cos2= profile_flat_top_cos2.evaluate(tft)
+
+    t_fc = t_start + t_rise + t_flat*0.5
+    std_flat_top_linear = np.sqrt(np.average((ttft - t_fc) ** 2, weights=np.abs(field_flat_top_linear)))
+    std_flat_top_cos2 = np.sqrt(np.average((tft - t_fc) ** 2, weights=np.abs(field_flat_top_cos2)))
+    std_flat_top_linear_th = np.sqrt(12) * (t_flat) # + ...
+    std_flat_top_cos2_th = np.sqrt(12) * (t_flat) # + ...
+    print("std_linear_th = ", std_flat_top_linear_th)
+    print("std_linear = ", std_flat_top_linear)
+    print("std_cos2_th = ", std_flat_top_cos2_th)
+    print("std_cos2 = ", std_flat_top_cos2)
+    assert np.abs(std_flat_top_linear - std_flat_top_linear_th) / std_flat_top_linear_th < 0.01
+    assert np.abs(std_flat_top_cos2 - std_flat_top_cos2_th) / std_flat_top_cos2_th < 0.01
 
 
 def test_profile_gaussian_3d_cartesian(gaussian):

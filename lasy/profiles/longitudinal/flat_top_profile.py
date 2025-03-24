@@ -95,7 +95,6 @@ class FlatTopLongitudinalProfile(LongitudinalProfile):
         t2 = t1 + self.t_rise
         t3 = t2 + self.t_flat
         t4 = t3 + self.t_down
-        print(t1,t2,t3,t4)
         tcep = 0.5*(t3 + t2)
 
 
