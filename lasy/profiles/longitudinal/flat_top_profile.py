@@ -104,7 +104,7 @@ class FlatTopLongitudinalProfile(LongitudinalProfile):
         t2 = t1 + self.t_rise
         t3 = t2 + self.t_flat
         t4 = t3 + self.t_down
-        tcep = 0.5*(t3 + t2)
+        tcep = 0.5 * (t3 + t2)
 
         if self.rise_type == "linear":
             envelope = (
