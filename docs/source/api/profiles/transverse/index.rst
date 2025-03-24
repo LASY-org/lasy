@@ -1,6 +1,9 @@
 Transverse Laser Profiles
 =========================
 
+.. autoclass:: lasy.profiles.transverse.TransverseProfile
+    :members:
+
 .. toctree::
    :maxdepth: 4
    :hidden:

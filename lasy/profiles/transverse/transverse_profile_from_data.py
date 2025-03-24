@@ -1,12 +1,14 @@
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
+
 from lasy.utils.exp_data_utils import find_center_of_mass
+
 from .transverse_profile import TransverseProfile
 
 
 class TransverseProfileFromData(TransverseProfile):
     """
-    Derived class for transverse laser profile.
+    Class for transverse laser profile.
 
     Created using data from an experimental measurement or from
     the output of another code.

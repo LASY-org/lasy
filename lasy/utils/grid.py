@@ -1,9 +1,11 @@
 import numpy as np
 
+time_axis_indx = -1
+
 
 class Grid:
     """
-    Store an array (typically the envelope) and corresponding metadata.
+    Store the envelope in temporal and spectral space and corresponding metadata.
 
     Parameters
     ----------
@@ -27,9 +29,14 @@ class Grid:
     n_azimuthal_modes : int (optional)
         Only used if ``dim`` is ``'rt'``. The number of azimuthal modes
         used in order to represent the laser field.
+
+    is_envelope : bool (optional)
+        Whether the field provided uses the (complex) envelope representation, as
+        used internally in lasy. If False, field is assumed to represent the
+        the full (real) electric field (with fast oscillations).
     """
 
-    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None):
+    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None, is_envelope=True):
         # Metadata
         ndims = 2 if dim == "rt" else 3
         assert dim in ["rt", "xyt"]
@@ -53,11 +60,132 @@ class Grid:
 
         # Data
         if dim == "xyt":
-            self.field = np.zeros(self.npoints, dtype="complex128")
+            self.shape = self.npoints
         elif dim == "rt":
             # Azimuthal modes are arranged in the following order:
             # 0, 1, 2, ..., n_azimuthal_modes-1, -n_azimuthal_modes+1, ..., -1
             ncomp = 2 * self.n_azimuthal_modes - 1
-            self.field = np.zeros(
-                (ncomp, self.npoints[0], self.npoints[1]), dtype="complex128"
-            )
+            self.shape = (ncomp, self.npoints[0], self.npoints[1])
+
+        self.set_is_envelope(is_envelope)
+        self.temporal_field = np.zeros(self.shape, dtype=self.dtype)
+        self.temporal_field_valid = False
+        self.spectral_field = np.zeros(self.shape, dtype="complex128")
+        self.spectral_field_valid = False
+
+    def set_is_envelope(self, is_envelope):
+        """
+        Set is_envelope attribute. Also set dtype accordingly.
+
+        Parameters
+        ----------
+        is_envelope : boolean
+            Whether the grid should represent an envelope (True) or a full electric field (False)
+        """
+        assert is_envelope in [True, False]
+        if is_envelope:
+            self.dtype = "complex128"
+        else:
+            self.dtype = "float64"
+        if hasattr(self, "temporal_field"):
+            self.temporal_field = self.temporal_field.astype(dtype=self.dtype)
+        self.is_envelope = is_envelope
+
+    def set_temporal_field(self, field):
+        """
+        Set the temporal field.
+
+        Parameters
+        ----------
+        field : ndarray of complexs
+            The temporal field.
+        """
+        assert field.shape == self.temporal_field.shape
+        assert field.dtype == self.dtype
+        self.temporal_field[:, :, :] = field
+        self.temporal_field_valid = True
+        self.spectral_field_valid = False  # Invalidates the spectral field
+
+    def set_spectral_field(self, field):
+        """
+        Set the spectral field.
+
+        Parameters
+        ----------
+        field : ndarray of complexs
+            The spectral field.
+        """
+        assert field.shape == self.spectral_field.shape
+        assert field.dtype == "complex128"
+        self.spectral_field[:, :, :] = field
+        self.spectral_field_valid = True
+        self.temporal_field_valid = False  # Invalidates the temporal field
+
+    def get_temporal_field(self):
+        """
+        Return a copy of the temporal field.
+
+        (Modifying the returned object will not modify the original field stored
+        in the Grid object ; one must use set_temporal_field to do so.)
+
+        Returns
+        -------
+        field : ndarray of complexs
+            The temporal field.
+        """
+        # We return a copy, so that the user cannot modify
+        # the original field, unless get_temporal_field is called
+        if self.temporal_field_valid:
+            return self.temporal_field.copy()
+        elif self.spectral_field_valid:
+            self.spectral2temporal_fft()
+            return self.temporal_field.copy()
+        else:
+            raise ValueError("Both temporal and spectral fields are invalid")
+
+    def get_spectral_field(self):
+        """
+        Return a copy of the spectral field.
+
+        (Modifying the returned object will not modify the original field stored
+        in the Grid object ; one must use set_spectral_field to do so.)
+
+        Returns
+        -------
+        field : ndarray of complexs
+            The spectral field.
+        """
+        # We return a copy, so that the user cannot modify
+        # the original field, unless set_spectral_field is called
+        assert self.is_envelope
+        if self.spectral_field_valid:
+            return self.spectral_field.copy()
+        elif self.temporal_field_valid:
+            self.temporal2spectral_fft()
+            return self.spectral_field.copy()
+        else:
+            raise ValueError("Both temporal and spectral fields are invalid")
+
+    def temporal2spectral_fft(self):
+        """
+        Perform the Fourier transform of field from temporal to spectral space.
+
+        (Only along the time axis, not along the transverse spatial coordinates.)
+        """
+        assert self.temporal_field_valid
+        self.spectral_field = np.fft.ifft(
+            self.temporal_field, axis=time_axis_indx, norm="backward"
+        )
+        self.spectral_field_valid = True
+
+    def spectral2temporal_fft(self):
+        """
+        Perform the Fourier transform of field from spectral to temporal space.
+
+        (Only along the time axis, not along the transverse spatial coordinates.)
+        """
+        assert self.spectral_field_valid
+        self.temporal_field = np.fft.fft(
+            self.spectral_field, axis=time_axis_indx, norm="backward"
+        )
+        self.temporal_field_valid = True

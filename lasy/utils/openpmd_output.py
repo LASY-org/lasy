@@ -1,12 +1,24 @@
+import os
+
 import numpy as np
 import openpmd_api as io
 from scipy.constants import c
-from .laser_utils import field_to_vector_potential
+
 from lasy import __version__ as lasy_version
+
+from .laser_utils import field_to_vector_potential
 
 
 def write_to_openpmd_file(
-    dim, file_prefix, file_format, grid, wavelength, pol, save_as_vector_potential=False
+    dim,
+    write_dir,
+    file_prefix,
+    file_format,
+    iteration,
+    grid,
+    wavelength,
+    pol,
+    save_as_vector_potential=False,
 ):
     """
     Write the laser field into an openPMD file.
@@ -24,8 +36,14 @@ def write_to_openpmd_file(
     file_prefix : string
         The file name will start with this prefix.
 
+    write_dir : string
+        The directory where the file will be written.
+
     file_format : string
         Format to be used for the output file. Options are "h5" and "bp".
+
+    iteration : int
+        The iteration number for the file to be written.
 
     grid : Grid
         A grid object containing the 3-dimensional array
@@ -41,13 +59,17 @@ def write_to_openpmd_file(
         Whether the envelope is converted to normalized vector potential
         before writing to file.
     """
-    array = grid.field
+    array = grid.get_temporal_field()
 
     # Create file
-    series = io.Series("{}_%05T.{}".format(file_prefix, file_format), io.Access.create)
+    full_filepath = os.path.join(
+        write_dir, "{}_%05T.{}".format(file_prefix, file_format)
+    )
+    os.makedirs(write_dir, exist_ok=True)
+    series = io.Series(full_filepath, io.Access.create)
     series.set_software("lasy", lasy_version)
 
-    i = series.iterations[0]
+    i = series.iterations[iteration]
 
     # Define the mesh
     m = i.meshes["laserEnvelope"]

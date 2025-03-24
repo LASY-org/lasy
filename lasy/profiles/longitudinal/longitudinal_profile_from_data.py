@@ -6,7 +6,7 @@ from .longitudinal_profile import LongitudinalProfile
 
 class LongitudinalProfileFromData(LongitudinalProfile):
     """
-    Derived class for longitudinal laser profile created using data.
+    Class for longitudinal laser profile created using data.
 
     The data used can either come from an experimental measurement
     or from the output of another code. This data is then used to
@@ -25,13 +25,18 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
         datatype : string
             The domain in which the data has been passed. Options
-            are 'spectral' and 'temporal'
+            are 'spectral' and 'temporal'.
+
+        axis_is_wavelength : boolean (optional, default True)
+            If True, the axis represents wavelength in [m] (SI).
+            If False, it represents frequency in [1/s] (SI).
 
         axis : ndarrays of floats
-            The horizontal axis of the pulse duration measurement
-            When datatype is 'spectral' axis is wavelength in
-            meters
-            When datatype is 'temporal' axis is time in seconds
+            The horizontal axis of the pulse duration measurement.
+            The array must be monotonically increasing or decreasing.
+            When datatype is 'spectral' axis is wavelength in meters OR
+            frequency in 1/seconds.
+            When datatype is 'temporal' axis is time in seconds.
 
         intensity : ndarrays of floats
             The vertical axis of the pulse duration measurement.
@@ -60,13 +65,28 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
     def __init__(self, data, lo, hi):
         if data["datatype"] == "spectral":
-            # First find central frequency
-            wavelength = data["axis"]
-            spectral_intensity = data["intensity"]
+            axis_is_wavelength = True  # Set to wavelength data by default
+            if "axis_is_wavelength" in data:
+                axis_is_wavelength = data["axis_is_wavelength"]
+            if axis_is_wavelength:
+                wavelength = data["axis"]  # Accept as wavelength
+                spectral_intensity = data["intensity"]
+            else:
+                wavelength = 2.0 * np.pi * c / data["axis"]  # Convert to wavelength
+                spectral_intensity = (
+                    data["intensity"] * 2.0 * np.pi * c / wavelength**2
+                )  # Convert spectral data
+            assert np.all(np.diff(wavelength) > 0) or np.all(np.diff(wavelength) < 0), (
+                'data["axis"] must be in monotonically increasing or decreasing order.'
+            )
             if data.get("phase") is None:
                 spectral_phase = np.zeros_like(wavelength)
             else:
                 spectral_phase = data["phase"]
+            if np.all(np.diff(wavelength) < 0):  # Flip arrays
+                wavelength = wavelength[::-1]
+                spectral_intensity = spectral_intensity[::-1]
+                spectral_phase = spectral_phase[::-1]
             dt = data["dt"]
             cwl = np.sum(spectral_intensity * wavelength) / np.sum(spectral_intensity)
             cfreq = c / cwl

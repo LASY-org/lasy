@@ -5,7 +5,7 @@ from .transverse_profile import TransverseProfile
 
 class GaussianTransverseProfile(TransverseProfile):
     r"""
-    Derived class for the analytic profile of a Gaussian laser pulse.
+    Class for the analytic profile of a Gaussian laser pulse.
 
     More precisely, at focus (``z_foc=0``), the transverse envelope
     (to be used in the :class:`.CombinedLongitudinalTransverseLaser` class)
@@ -47,9 +47,9 @@ class GaussianTransverseProfile(TransverseProfile):
         if z_foc == 0:
             self.z_foc_over_zr = 0
         else:
-            assert (
-                wavelength is not None
-            ), "You need to pass the wavelength, when `z_foc` is non-zero."
+            assert wavelength is not None, (
+                "You need to pass the wavelength, when `z_foc` is non-zero."
+            )
             self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
 
     def _evaluate(self, x, y):

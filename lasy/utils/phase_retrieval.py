@@ -1,4 +1,5 @@
 import copy
+
 import numpy as np
 
 
@@ -50,29 +51,36 @@ def gerchberg_saxton_algo(
     """
     laser1 = copy.deepcopy(laserPos1)
     laser2 = copy.deepcopy(laserPos2)
-    amp1 = np.abs(laser1.grid.field)
+    amp1 = np.abs(laser1.grid.get_temporal_field())
     amp1_summed = np.sum(amp1)
-    amp2 = np.abs(laser2.grid.field)
+    amp2 = np.abs(laser2.grid.get_temporal_field())
     phase1 = np.zeros_like(amp1)
 
     if condition == "max_iterations":
-        breakout = lambda i: i < max_iterations
+
+        def breakout(i):
+            return i < max_iterations
+
         cond = 0
     elif condition == "amplitude_error":
-        breakout = lambda amp: amp / amp1_summed > amplitude_error
+
+        def breakout(amp):
+            return amp / amp1_summed > amplitude_error
+
         cond = 9e30
 
     i = 0
     while breakout(cond):
-        laser1.grid.field = amp1 * np.exp(1j * phase1)
+        laser1.grid.set_temporal_field(amp1 * np.exp(1j * phase1))
         laser1.propagate(dz, show_progress=False)
 
-        phase2 = np.angle(laser1.grid.field)
-        laser2.grid.field = amp2 * np.exp(1j * phase2)
+        phase2 = np.angle(laser1.grid.get_temporal_field())
+        laser2.grid.set_temporal_field(amp2 * np.exp(1j * phase2))
         laser2.propagate(-dz, show_progress=False)
 
-        phase1 = np.angle(laser2.grid.field)
-        amp1_calc = np.abs(laser2.grid.field)
+        field2 = laser2.grid.get_temporal_field()
+        phase1 = np.angle(field2)
+        amp1_calc = np.abs(field2)
         amp_error_summed = np.sum(np.abs(amp1_calc) - amp1)
         if debug:
             i += 1

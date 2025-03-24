@@ -1,103 +1,110 @@
-from lasy.profiles.transverse.transverse_profile import TransverseProfile
-from lasy.profiles.transverse.transverse_profile_from_data import (
-    TransverseProfileFromData,
-)
+import math
+
+import numpy as np
+
 from lasy.profiles.transverse.hermite_gaussian_profile import (
     HermiteGaussianTransverseProfile,
 )
+from lasy.profiles.transverse.transverse_profile import TransverseProfile
 from lasy.utils.exp_data_utils import find_d4sigma
 
-import numpy as np
-import math
 
-
-def hermite_gauss_decomposition(laserProfile, n_x_max=12, n_y_max=12, res=1e-6):
+def hermite_gauss_decomposition(
+    laserProfile,
+    wavelength,
+    res,
+    lo,
+    hi,
+    m_max=12,
+    n_max=12,
+):
     """
     Decomposes a laser profile into a set of hermite-gaussian modes.
 
-    The function takes either an instance of `TransverseProfile` or an
-    instance of `Laser` (that is, either a transverse profile or the
-    full 3D laser profile defined on a grid). In the case that an
-    instance of `Laser` is passed then the intensity of this profile
-    is projected onto an x-y plane for the decomposition.
+    The function takes an instance of `TransverseProfile`.
 
     Parameters
     ----------
     laserProfile : class instance
         An instance of a class or sub-class of TransverseLaserProfile
 
-    n_x_max, n_y_max : ints
-        The maximum values of `n_x` and `n_y` out to which the expansion
-        will be performed
+    wavelength : float (in meter)
+        Central wavelength at which the Hermite-Gauss beams are to be defined.
 
     res : float
         The resolution of grid points in x and y that will be used
         during the decomposition calculation
+
+    lo, hi : array of floats
+        The lower and upper bounds of the spatial grid on which the
+        decomposition will be performed.
+
+    m_max, n_max : ints
+        The maximum values of `m` and `n` up to which the expansion
+        will be performed
 
     Returns
     -------
     weights : dict of floats
         A dictionary of floats corresponding to the weights of each mode
         in the decomposition. The keys of the dictionary are tuples
-        corresponding to (`n_x`,`n_y`)
+        corresponding to (`m`,`n`)
 
-    waist : Beam waist for which the decomposition is calculated.
+    w0x, w0y : floats
+        Beam waist for which the decomposition is calculated.
         It is computed as the waist for which the weight of order 0 is maximum.
     """
-    # Check if the provided laserProfile is a full laser profile or a
-    # transverse profile.
-
-    assert isinstance(
-        laserProfile, TransverseProfile
-    ), "laserProfile must be an instance of TransverseProfile"
+    # Check if the provided laserProfile is a transverse profile.
+    assert isinstance(laserProfile, TransverseProfile), (
+        "laserProfile must be an instance of TransverseProfile"
+    )
 
     # Get the field, sensible spatial bounds for the profile
-    lo = [None, None]
-    hi = [None, None]
-    if isinstance(laserProfile, TransverseProfileFromData):
-        lo[0] = laserProfile.field_interp.grid[0].min() + laserProfile.x_offset
-        lo[1] = laserProfile.field_interp.grid[1].min() + laserProfile.x_offset
-        hi[0] = laserProfile.field_interp.grid[0].max() + laserProfile.y_offset
-        hi[1] = laserProfile.field_interp.grid[1].max() + laserProfile.y_offset
+    lo0 = lo[0] + laserProfile.x_offset
+    lo1 = lo[1] + laserProfile.x_offset
+    hi0 = hi[0] + laserProfile.y_offset
+    hi1 = hi[1] + laserProfile.y_offset
 
-    else:
-        lo[0] = -laserProfile.w0 * 5 + laserProfile.x_offset
-        lo[1] = -laserProfile.w0 * 5 + laserProfile.x_offset
-        hi[0] = laserProfile.w0 * 5 + laserProfile.x_offset
-        hi[1] = laserProfile.w0 * 5 + laserProfile.x_offset
-
-    N_pts_x = int((hi[0] - lo[0]) / res)
-    N_pts_y = int((hi[1] - lo[1]) / res)
+    Nx = int((hi0 - lo0) // (2 * res) * 2) + 2
+    Ny = int((hi1 - lo1) // (2 * res) * 2) + 2
 
     # Define spatial arrays
-    x = np.linspace(lo[0], hi[0], N_pts_x)
-    y = np.linspace(lo[1], hi[1], N_pts_y)
+    x = np.linspace(
+        (lo0 + hi0) / 2 - (Nx - 1) / 2 * res,
+        (lo0 + hi0) / 2 + (Nx - 1) / 2 * res,
+        Nx,
+    )
+    y = np.linspace(
+        (lo1 + hi1) / 2 - (Ny - 1) / 2 * res,
+        (lo1 + hi1) / 2 + (Ny - 1) / 2 * res,
+        Ny,
+    )
     X, Y = np.meshgrid(x, y)
-    dx = x[2] - x[1]
-    dy = y[2] - y[1]
+    dx = x[1] - x[0]
+    dy = y[1] - y[0]
 
     # Get the field on this grid
     field = laserProfile.evaluate(X, Y)
 
     # Get estimate of w0
-    w0 = estimate_best_HG_waist(x, y, field)
+    w0x, w0y = estimate_best_HG_waist(x, y, field, wavelength)
 
     # Next we loop over the modes and calculate the relevant weights
     weights = {}
-    for i in range(n_x_max):
-        for j in range(n_y_max):
-            HGMode = HermiteGaussianTransverseProfile(w0, i, j)
+    for m in range(m_max):
+        for n in range(n_max):
+            HGMode = HermiteGaussianTransverseProfile(w0x, w0y, m, n, wavelength)
             coef = np.real(
                 np.sum(field * HGMode.evaluate(X, Y)) * dx * dy
             )  # modalDecomposition
             if math.isnan(coef):
                 coef = 0
-            weights[(i, j)] = coef
+            weights[(m, n)] = coef
 
-    return weights, w0
+    return weights, w0x, w0y
 
 
-def estimate_best_HG_waist(x, y, field):
+def estimate_best_HG_waist(x, y, field, wavelength):
     """
     Estimate the waist that maximises the weighting of the first mode.
 
@@ -115,32 +122,42 @@ def estimate_best_HG_waist(x, y, field):
     field : 2D numpy array representing the field (not the laser intensity).
         the laser field profile in a 2D slice.
 
+    wavelength : float (in meter)
+        Central wavelength at which the Hermite-Gauss beams are to be defined.
+
     Returns
     -------
-    w0 : scalar
-        The calculated waist.
+    w0x, w0y : floats
+        The calculated waist in x and y axis.
     """
     dx = x[1] - x[0]
     dy = y[1] - y[0]
-    assert dx == dy
+    assert np.isclose(dx, dy, rtol=1e-10)
 
     X, Y = np.meshgrid(x, y)
 
     D4SigX, D4SigY = find_d4sigma(np.abs(field) ** 2)
-    w0Est = np.mean((D4SigX, D4SigY)) / 2 * dx  # convert this to a 1/e^2 width
+    # convert this to a 1/e^2 width
+    w0EstX = np.mean(D4SigX) / 2 * dx
+    w0EstY = np.mean(D4SigY) / 2 * dy
 
     # Scan around the waist obtained from the D4sigma calculation,
     # and keep the waist for which this HG mode has the highest scalar
     # product with the input profile.
-    waistTest = np.linspace(w0Est / 2, w0Est * 1.5, 30)
-    coeffTest = np.zeros_like(waistTest)
+    waistTestX = np.linspace(w0EstX / 2, w0EstX * 1.5, 30)
+    waistTestY = np.linspace(w0EstY / 2, w0EstY * 1.5, 30)
+    coeffTest = np.zeros_like(waistTestX)
 
-    for i, wTest in enumerate(waistTest):
+    for i in range(30):
         # create a gaussian
-        HGMode = HermiteGaussianTransverseProfile(wTest, 0, 0)
+        HGMode = HermiteGaussianTransverseProfile(
+            waistTestX[i], waistTestY[i], 0, 0, wavelength
+        )
         profile = HGMode.evaluate(X, Y)
         coeffTest[i] = np.real(np.sum(profile * field))
-    w0 = waistTest[np.argmax(coeffTest)]
+    w0x = waistTestX[np.argmax(coeffTest)]
+    w0y = waistTestY[np.argmax(coeffTest)]
 
-    print("Estimated w0 = %.2f microns" % (w0Est * 1e6))
-    return w0
+    print("Estimated w0(x-axis) = %.2f microns (1/e^2 width)" % (w0x * 1e6))
+    print("Estimated w0(y-axis) = %.2f microns (1/e^2 width)" % (w0y * 1e6))
+    return w0x, w0y

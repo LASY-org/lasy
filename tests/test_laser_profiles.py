@@ -1,36 +1,35 @@
 # -*- coding: utf-8 -*-
 
-import pytest
 import numpy as np
-from scipy.special import gamma as gamma
+import pytest
 from scipy.constants import c
 
 from lasy.laser import Laser
-from lasy.profiles.profile import Profile, SummedProfile, ScaledProfile
-from lasy.profiles import GaussianProfile, FromArrayProfile
+from lasy.profiles import FromArrayProfile, GaussianProfile, SpeckleProfile
 from lasy.profiles.longitudinal import (
-    GaussianLongitudinalProfile,
     CosineLongitudinalProfile,
     FlatTopLongitudinalProfile
+    GaussianLongitudinalProfile,
+    LongitudinalProfileFromData,
+    SuperGaussianLongitudinalProfile,
 )
+from lasy.profiles.profile import Profile, ScaledProfile, SummedProfile
 from lasy.profiles.transverse import (
     GaussianTransverseProfile,
-    LaguerreGaussianTransverseProfile,
-    SuperGaussianTransverseProfile,
     HermiteGaussianTransverseProfile,
     JincTransverseProfile,
-    TransverseProfileFromData,
-    TransverseProfile,
-    SummedTransverseProfile,
+    LaguerreGaussianTransverseProfile,
     ScaledTransverseProfile,
+    SummedTransverseProfile,
+    SuperGaussianTransverseProfile,
+    TransverseProfile,
+    TransverseProfileFromData,
 )
 from lasy.utils.exp_data_utils import find_center_of_mass
 
 
 class MockProfile(Profile):
-    """
-    A mock Profile class that always returns a constant value.
-    """
+    """A mock Profile class that always returns a constant value."""
 
     def __init__(self, wavelength, pol, value):
         super().__init__(wavelength, pol)
@@ -41,9 +40,7 @@ class MockProfile(Profile):
 
 
 class MockTransverseProfile(TransverseProfile):
-    """
-    A mock TransverseProfile class that always returns a constant value.
-    """
+    """A mock TransverseProfile class that always returns a constant value."""
 
     def __init__(self, value):
         super().__init__()
@@ -82,18 +79,6 @@ def test_transverse_profiles_rt():
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
 
-    # LaguerreGaussianTransverseProfile
-    print("LaguerreGaussianTransverseProfile")
-    p = 2
-    m = 0
-    std_th = np.sqrt(5 / 2) * w0
-    profile = LaguerreGaussianTransverseProfile(w0, p, m)
-    field = profile.evaluate(r, np.zeros_like(r))
-    std = np.sqrt(np.average(r**2, weights=r * np.abs(field) ** 2))
-    print("std_th = ", std_th)
-    print("std = ", std)
-    assert np.abs(std - std_th) / std_th < 0.01
-
     # SuperGaussianTransverseProfile
     print("SuperGaussianTransverseProfile")
     n_order = 100  # close to flat-top, compared with flat-top theory
@@ -115,24 +100,42 @@ def test_transverse_profiles_rt():
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.1
 
-
-def test_transverse_profiles_3d():
-    npoints = 200
-    w0 = 10.0e-6
-
-    # HermiteGaussianTransverseProfile
-    print("HermiteGaussianTransverseProfile")
-    n_x = 2
-    n_y = 2
-    std_th = np.sqrt(5.0 / 4) * w0
-    profile = HermiteGaussianTransverseProfile(w0, n_x, n_y)
-    x = np.linspace(-4 * w0, 4 * w0, npoints)
-    y = np.zeros_like(x)
-    field = profile.evaluate(x, y)
-    std = np.sqrt(np.average(x**2, weights=np.abs(field) ** 2))
+    # LaguerreGaussianTransverseProfile
+    print("LaguerreGaussianTransverseProfile")
+    p = 2
+    m = 0
+    std_th = np.sqrt((2 * p + m + 1) / 2) * w0
+    profile = LaguerreGaussianTransverseProfile(w0, p, m, wavelength=800e-9)
+    field = profile.evaluate(r, np.zeros_like(r))
+    std = np.sqrt(np.average(r**2, weights=np.abs(r) * np.abs(field) ** 2))
     print("std_th = ", std_th)
     print("std = ", std)
     assert np.abs(std - std_th) / std_th < 0.01
+
+
+def test_transverse_profiles_3d():
+    w0_x = 10.0e-6
+    w0_y = 12.0e-6
+
+    # HermiteGaussianTransverseProfile
+    print("HermiteGaussianTransverseProfile")
+    m = 2
+    n = 2
+    std_th_x = np.sqrt(5.0 / 4) * w0_x
+    std_th_y = np.sqrt(5.0 / 4) * w0_y
+    profile = HermiteGaussianTransverseProfile(w0_x, w0_y, m, n, wavelength=800e-9)
+    x = np.linspace(-4 * w0_x, 4 * w0_x, 200)
+    y = np.linspace(-4 * w0_y, 4 * w0_y, 150)
+    field_x = profile.evaluate(x, np.zeros_like(x))
+    field_y = profile.evaluate(np.zeros_like(y), y)
+    std_x = np.sqrt(np.average(x**2, weights=np.abs(field_x) ** 2))
+    std_y = np.sqrt(np.average(y**2, weights=np.abs(field_y) ** 2))
+    print("std_th_x = ", std_th_x)
+    print("std_x = ", std_x)
+    print("std_th_y = ", std_th_y)
+    print("std_y = ", std_y)
+    assert np.abs(std_x - std_th_x) / std_th_x < 0.01
+    assert np.abs(std_y - std_th_y) / std_th_y < 0.01
 
     # TransverseProfileFromData
     print("TransverseProfileFromData")
@@ -158,11 +161,14 @@ def test_longitudinal_profiles():
 
     wavelength = 800e-9
     tau_fwhm = 30.0e-15
+    omega_fwhm = 4 * np.log(2) / tau_fwhm  # Assumes fully-compressed
     t_peak = 1.0 * tau_fwhm
     cep_phase = 0.5 * np.pi
     omega_0 = 2.0 * np.pi * c / wavelength
 
     t = np.linspace(t_peak - 4 * tau_fwhm, t_peak + 4 * tau_fwhm, npoints)
+    omega = np.linspace(omega_0 - 4 * omega_fwhm, omega_0 + 4 * omega_fwhm, npoints)
+    wavelength_axis = 2.0 * np.pi * c / omega  # Note: monotonically decreasing
 
     # GaussianLongitudinalProfile
     print("GaussianLongitudinalProfile")
@@ -186,6 +192,36 @@ def test_longitudinal_profiles():
     print("cep_phase_th = ", cep_phase)
     print("cep_phase = ", cep_phase_gaussian)
     assert np.abs(cep_phase_gaussian - cep_phase) / cep_phase < 0.02
+
+    # SuperGaussianLongitudinalProfile
+    print("SuperGaussianLongitudinalProfile")
+    n_order = 2  # ordinary gaussian
+    tau = tau_fwhm / np.sqrt(2 * np.power(np.log(2), n_order / 2))
+    profile_super_gaussian = SuperGaussianLongitudinalProfile(
+        wavelength, tau, t_peak, n_order, cep_phase
+    )
+    field_super_gaussian = profile_super_gaussian.evaluate(t)
+
+    std_super_gauss = np.sqrt(
+        np.average((t - t_peak) ** 2, weights=np.abs(field_super_gaussian))
+    )
+    std_super_gauss_th = tau / np.sqrt(2.0)
+    print("std_th = ", std_super_gauss_th)
+    print("std = ", std_super_gauss)
+    assert np.abs(std_super_gauss - std_super_gauss_th) / std_super_gauss_th < 0.01
+
+    t_peak_super_gaussian = t[np.argmax(np.abs(field_super_gaussian))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_super_gaussian)
+    assert np.abs(t_peak_super_gaussian - t_peak) / t_peak < 0.01
+
+    ff_super_gaussian = field_super_gaussian * np.exp(-1.0j * omega_0 * t)
+    cep_phase_super_gaussian = np.angle(
+        ff_super_gaussian[np.argmax(np.abs(field_super_gaussian))]
+    )
+    print("cep_phase_th = ", cep_phase)
+    print("cep_phase = ", cep_phase_super_gaussian)
+    assert np.abs(cep_phase_super_gaussian - cep_phase) / cep_phase < 0.02
 
     # CosineLongitudinalProfile
     print("CosineLongitudinalProfile")
@@ -235,6 +271,91 @@ def test_longitudinal_profiles():
     print("std_cos2 = ", std_flat_top_cos2)
     assert np.abs(std_flat_top_linear - std_flat_top_linear_th) / std_flat_top_linear_th < 0.01
     assert np.abs(std_flat_top_cos2 - std_flat_top_cos2_th) / std_flat_top_cos2_th < 0.01
+
+    # LongitudinalProfileFromData
+    print("LongitudinalProfileFromData")
+    data = {}  # Generate spectral data assuming analytic Fourier transform of GaussianLongitudinalProfile
+    data["datatype"] = "spectral"
+    data["dt"] = 1e-16
+    profile = np.exp(
+        -(tau**2) * ((omega - omega_0) ** 2) / 4.0 + 1.0j * (cep_phase + omega * t_peak)
+    )
+    spectral_intensity = np.abs(profile) ** 2 / np.max(np.abs(profile) ** 2)
+    spectral_phase = np.unwrap(np.angle(profile))
+
+    print("Case 1: monotonically decreasing data on wavelength axis")
+    data["axis"] = wavelength_axis
+    data["intensity"] = spectral_intensity
+    data["phase"] = spectral_phase
+    profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
+    field_data = profile_data.evaluate(t)
+
+    std_gauss_data = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_data)))
+    std_gauss_th = tau / np.sqrt(2.0)
+    print("std_th = ", std_gauss_th)
+    print("std = ", std_gauss_data)
+    assert np.abs(std_gauss_data - std_gauss_th) / std_gauss_th < 0.01
+
+    t_peak_gaussian_data = t[np.argmax(np.abs(field_data))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_gaussian_data)
+    assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
+
+    print("Case 2: monotonically increasing data on wavelength axis")
+    data["axis"] = wavelength_axis[::-1]
+    data["intensity"] = spectral_intensity[::-1]
+    data["phase"] = spectral_phase[::-1]
+    profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
+    field_data = profile_data.evaluate(t)
+
+    std_gauss_data = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_data)))
+    std_gauss_th = tau / np.sqrt(2.0)
+    print("std_th = ", std_gauss_th)
+    print("std = ", std_gauss_data)
+    assert np.abs(std_gauss_data - std_gauss_th) / std_gauss_th < 0.01
+
+    t_peak_gaussian_data = t[np.argmax(np.abs(field_data))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_gaussian_data)
+    assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
+
+    print("Case 3: monotonically increasing data on angular frequency axis")
+    data["axis"] = omega
+    data["intensity"] = spectral_intensity
+    data["phase"] = spectral_phase
+    data["axis_is_wavelength"] = False
+    profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
+    field_data = profile_data.evaluate(t)
+
+    std_gauss_data = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_data)))
+    std_gauss_th = tau / np.sqrt(2.0)
+    print("std_th = ", std_gauss_th)
+    print("std = ", std_gauss_data)
+    assert np.abs(std_gauss_data - std_gauss_th) / std_gauss_th < 0.01
+
+    t_peak_gaussian_data = t[np.argmax(np.abs(field_data))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_gaussian_data)
+    assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
+
+    print("Case 4: monotonically decreasing data on angular frequency axis")
+    data["axis"] = omega[::-1]
+    data["intensity"] = spectral_intensity[::-1]
+    data["phase"] = spectral_phase[::-1]
+    data["axis_is_wavelength"] = False
+    profile_data = LongitudinalProfileFromData(data, np.min(t), np.max(t))
+    field_data = profile_data.evaluate(t)
+
+    std_gauss_data = np.sqrt(np.average((t - t_peak) ** 2, weights=np.abs(field_data)))
+    std_gauss_th = tau / np.sqrt(2.0)
+    print("std_th = ", std_gauss_th)
+    print("std = ", std_gauss_data)
+    assert np.abs(std_gauss_data - std_gauss_th) / std_gauss_th < 0.01
+
+    t_peak_gaussian_data = t[np.argmax(np.abs(field_data))]
+    print("t_peak_th = ", t_peak)
+    print("t_peak = ", t_peak_gaussian_data)
+    assert np.abs(t_peak_gaussian_data - t_peak) / t_peak < 0.01
 
 
 def test_profile_gaussian_3d_cartesian(gaussian):
@@ -300,6 +421,43 @@ def test_from_array_profile():
     print("theory width  : ", wx)
     print("Measured width: ", width)
     assert np.abs((width - wx) / wx) < 1.0e-5
+
+
+def test_speckle_profile():
+    # - speckled laser case
+    print("SpeckledProfile")
+    wavelength = 0.351e-6  # Laser wavelength in meters
+    polarization = (1, 0)  # Linearly polarized in the x direction
+    laser_energy = 1.0  # J (this is the laser energy stored in the box defined by `lo` and `hi` below)
+    focal_length = 3.5  # m
+    beam_aperture = [0.35, 0.5]  # m
+    n_beamlets = [24, 32]
+    temporal_smoothing_type = "GP ISI"
+    relative_laser_bandwidth = 0.005
+
+    profile = SpeckleProfile(
+        wavelength,
+        polarization,
+        laser_energy,
+        focal_length,
+        beam_aperture,
+        n_beamlets,
+        temporal_smoothing_type=temporal_smoothing_type,
+        relative_laser_bandwidth=relative_laser_bandwidth,
+    )
+    dimensions = "xyt"
+    dx = wavelength * focal_length / beam_aperture[0]
+    dy = wavelength * focal_length / beam_aperture[1]
+    Lx = 1.8 * dx * n_beamlets[0]
+    Ly = 3.1 * dy * n_beamlets[1]
+    nu_laser = c / wavelength
+    t_max = 50 / nu_laser
+    lo = (0, 0, 0)
+    hi = (Lx, Ly, t_max)
+    npoints = (200, 250, 2)
+
+    laser = Laser(dimensions, lo, hi, npoints, profile)
+    laser.write_to_file("speckledProfile")
 
 
 def test_add_profiles():

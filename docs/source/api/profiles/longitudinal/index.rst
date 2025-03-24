@@ -8,4 +8,5 @@ Longitudinal Profiles
    cosine
    flat_top
    gaussian
+   super_gaussian_profile
    longitudinal_profile_from_data

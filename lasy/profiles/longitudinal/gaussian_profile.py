@@ -5,7 +5,7 @@ from .longitudinal_profile import LongitudinalProfile
 
 class GaussianLongitudinalProfile(LongitudinalProfile):
     r"""
-    Derived class for the analytic profile of a longitudinally-Gaussian laser pulse.
+    Class for the analytic profile of a longitudinally-Gaussian laser pulse.
 
     More precisely, the longitudinal envelope
     (to be used in the :class:`.CombinedLongitudinalTransverseProfile` class)
@@ -31,7 +31,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
     cep_phase : float (in radian), optional
         The Carrier Enveloppe Phase (CEP), i.e. :math:`\phi_{cep}`
         in the above formula (i.e. the phase of the laser
-        oscillation, at the time where the laser envelope is maximum)
+        oscillation, at the time where the laser envelope is maximum).
     """
 
     def __init__(self, wavelength, tau, t_peak, cep_phase=0):
@@ -46,12 +46,12 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
 
         Parameters
         ----------
-        t: ndarrays of floats
-            Define points on which to evaluate the envelope
+        t : ndarrays of floats
+            Define longitudinal points on which to evaluate the envelope
 
         Returns
         -------
-        envelope: ndarray of complex numbers
+        envelope : ndarray of complex numbers
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
         """
@@ -59,5 +59,4 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             -((t - self.t_peak) ** 2) / self.tau**2
             + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
         )
-
         return envelope
