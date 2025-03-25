@@ -9,3 +9,5 @@ Optical elements
    axiparabola
    axicon
    zernike_aberrations
+   spectral_filter
+   spectral_phase
