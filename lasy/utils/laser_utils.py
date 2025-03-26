@@ -60,6 +60,8 @@ def normalize_energy(dim, energy, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching laser energy to an energy given as an input.
+
     Parameters
     ----------
     dim : string
@@ -93,6 +95,8 @@ def normalize_peak_field_amplitude(amplitude, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching laser field amplitude to a peak field amplitude given as an input.
+
     Parameters
     ----------
     amplitude : scalar (V/m)
@@ -114,6 +118,8 @@ def normalize_peak_field_amplitude(amplitude, grid):
 def normalize_peak_intensity(peak_intensity, grid):
     """
     Normalize energy of the laser pulse contained in grid.
+
+    Normalizes by matching laser intensity to a peak intensity given as an input.
 
     Parameters
     ----------
@@ -138,6 +144,8 @@ def normalize_peak_fluence(peak_fluence, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching laser fluence to a peak fluence given as an input.
+
     Parameters
     ----------
     peak_fluence : scalar (J/m^2)
@@ -161,6 +169,8 @@ def normalize_average_intensity(average_intensity, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching average laser intensity to an average intensity given as an input.
+
     Parameters
     ----------
     average_intensity : scalar (W/m^2)
@@ -183,6 +193,8 @@ def normalize_average_intensity(average_intensity, grid):
 def normalize_peak_power(dim, peak_power, grid):
     """
     Normalize energy of the laser pulse contained in grid.
+
+    Normalizes by matching laser power to a peak power given as an input.
 
     Parameters
     ----------
