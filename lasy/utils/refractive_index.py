@@ -451,7 +451,7 @@ class Material:
                     )
 
     def _load_data_n2(self, mat_n2s):
-        """Load all n2 data available for this material"""
+        """Load all n2 data available for this material. """
         self.data_n2 = {}
         for mat_key, mat_dict in mat_n2s.items():
             mat = {}
