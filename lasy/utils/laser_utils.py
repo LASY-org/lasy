@@ -147,6 +147,7 @@ def normalize_peak_fluence(peak_fluence, grid):
         Contains value of the laser envelope and metadata.
     """
     if peak_fluence is not None:
+        field = grid.get_temporal_field()
         fluence = get_laser_fluence(grid)
         input_peak_fluence = fluence.max()
         if input_peak_fluence == 0.0:
