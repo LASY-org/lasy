@@ -147,9 +147,7 @@ def normalize_peak_fluence(peak_fluence, grid):
         Contains value of the laser envelope and metadata.
     """
     if peak_fluence is not None:
-        field = grid.get_temporal_field()
-        intensity = np.abs(epsilon_0 * field**2 / 2 * c)
-        fluence = np.sum(intensity, axis=-1) * grid.dx[-1]
+        fluence = get_laser_fluence(grid)
         input_peak_fluence = fluence.max()
         if input_peak_fluence == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
@@ -240,6 +238,28 @@ def get_laser_power(dim, grid):
     power = intensity.sum(axis=tuple(range(intensity.ndim - 1))) * unit_area
 
     return power
+
+
+def get_laser_fluence(grid):
+    r"""
+    Calculate the fluence of the laser in space.
+
+    Parameters
+    ----------
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    Returns
+    -------
+    fluence : ndarray (J/m^2)
+        The fluence of the laser pulse in space.
+    """
+    field = grid.get_temporal_field()
+    intensity = np.abs(epsilon_0 * field**2 / 2 * c)
+    fluence = np.squeeze(np.sum(intensity, axis=-1) * grid.dx[-1])
+
+    
+    return fluence
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
