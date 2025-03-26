@@ -404,7 +404,7 @@ class Material:
 
         data_list = mat_dict.get("DATA")
         if data_list is None:
-            raise "No usable data found"
+            raise RuntimeError("No usable data found")
         for data in data_list:
             type = data.get("type").replace(" ", "")
 
