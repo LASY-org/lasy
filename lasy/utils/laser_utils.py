@@ -202,14 +202,13 @@ def normalize_peak_power(dim, peak_power, grid):
         Contains value of the laser envelope and metadata.
     """
     if peak_power is not None:
-        field = grid.get_temporal_field()
         power = get_laser_power(dim, grid)
         input_peak_power = power.max()
         if input_peak_power == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
         else:
-            field *= np.sqrt(peak_power / input_peak_power)
-            grid.set_temporal_field(field)
+            field = grid.get_temporal_field()
+            grid.set_temporal_field(field * np.sqrt(peak_power / input_peak_power))
 
 
 def get_laser_power(dim, grid):
