@@ -51,11 +51,13 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         \exp\left(-\frac{(N+1)r^2}{w^2}\right)
         \sum_{n=0}^N \frac{1}{n!}\left(\frac{(N+1)\,r^2}{w^2}\right)^n
 
-    with
+    with the relationship between the spot sizes of the beams in the far field and in the near field given by;
 
     .. math::
 
         w = \frac{\lambda_0}{\pi w_0}|z_{\mathrm{foc}}|
+
+    where $z_{\mathrm{foc}$ is the distance between the far field and near field planes. 
 
     - Note that a beam defined using the near field definition would be
       equivalent to a beam defined with the corresponding parameters far from focus in
@@ -88,12 +90,6 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         Only required if defining the pulse in the far field. Gives the position
         of the focal plane. (The laser pulse is initialized at ``z=0``.)
 
-    Warnings
-    --------
-
-    Both methods are in principle equivalent, but note that the first
-    method uses the paraxial approximation, while the second method does
-    not make this approximation.
     """
 
     def __init__(self, field_type, w, N, wavelength, z_foc=0):
