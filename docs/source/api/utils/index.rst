@@ -8,3 +8,4 @@ Utils
    grid
    gerchberg_saxton
    refractive_index
+   laser_utils
