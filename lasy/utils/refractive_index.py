@@ -4,17 +4,19 @@ refractiveindex.info database parser/client.
 Inspired somewhat by https://github.com/toftul/refractiveindex/tree/master
 """
 
-import os
 import json
-import yaml
+import os
 import warnings
+from pprint import pprint
+
 import numpy as np
 import scipy.constants as ct
+import yaml
 from scipy.interpolate import CubicSpline
-from pprint import pprint
 
 try:
     import numdifftools as nd
+
     have_nd = True
 except ImportError:
     warnings.warn(
@@ -35,7 +37,7 @@ known_materials_nk = {
     "soda lime glass": ("glass", "soda-lime", "Rubin-clear"),
     "CaF2": ("main", "CaF2", "Malitson"),
     "MgF2": ("main", "MgF2", "Li-o"),
-    "Sapphire": ("main", "Al2O3", "Malitson-o")
+    "Sapphire": ("main", "Al2O3", "Malitson-o"),
 }
 
 known_materials_n2 = {
@@ -46,7 +48,7 @@ known_materials_n2 = {
     "argon": ("main", "Ar"),
     "CaF2": ("main", "CaF2"),
     "MgF2": ("main", "MgF2"),
-    "Sapphire": ("main", "Al2O3")
+    "Sapphire": ("main", "Al2O3"),
 }
 
 
@@ -80,8 +82,9 @@ class RefractiveIndexDatabase:
             no database found, an error will be thrown.
         """
         # Load the json database shipped with lasy
-        lasy_db_file = os.path.join(os.path.dirname(__file__),
-                                    "refractive_index_db.json")
+        lasy_db_file = os.path.join(
+            os.path.dirname(__file__), "refractive_index_db.json"
+        )
         if os.path.isfile(lasy_db_file):
             with open(lasy_db_file, "r") as f:
                 self.json_db = json.load(f)
@@ -136,8 +139,9 @@ class RefractiveIndexDatabase:
             clean_text_n2 = _clean_yaml_file(database_file_n2)
             self.database_n2 = yaml.load(clean_text_n2, Loader=yaml.BaseLoader)
 
-    def get_nk_database_entry(self, shelf_name=None, book_name=None,
-                              page_name=None, name=None):
+    def get_nk_database_entry(
+        self, shelf_name=None, book_name=None, page_name=None, name=None
+    ):
         """
         Return requested nk database entry.
 
@@ -176,9 +180,8 @@ class RefractiveIndexDatabase:
             else:
                 raise RuntimeError(f'Name "{name}" not known in local nk database!')
 
-
         if not hasattr(self, "database_nk"):
-            raise RuntimeError(f"Full database not available!")
+            raise RuntimeError("Full database not available!")
 
         db = self.database_nk
         shelf = next(iter(s for s in db if s["SHELF"] == shelf_name), None)
@@ -199,8 +202,7 @@ class RefractiveIndexDatabase:
             mat_dict = yaml.load(f, Loader=yaml.BaseLoader)
         return mat_dict
 
-    def get_n2_database_entries(self, shelf_name=None, book_name=None,
-                                name=None):
+    def get_n2_database_entries(self, shelf_name=None, book_name=None, name=None):
         """
         Return requested n2 database entries.
 
@@ -237,7 +239,7 @@ class RefractiveIndexDatabase:
                 return {}
 
         if not hasattr(self, "database_n2"):
-            raise RuntimeError(f"Full database not available!")
+            raise RuntimeError("Full database not available!")
 
         db = self.database_n2
         shelf = next(iter(s for s in db if s["SHELF"] == shelf_name), None)
@@ -258,7 +260,7 @@ class RefractiveIndexDatabase:
             data_dict[mat_key] = mat_dict
         return data_dict
 
-    def get_shelves(self, db='nk'):
+    def get_shelves(self, db="nk"):
         """
         Get a list of shelves available in a database.
 
@@ -279,7 +281,7 @@ class RefractiveIndexDatabase:
 
         return [s["SHELF"] for s in db]
 
-    def get_books(self, shelf_name, db='nk'):
+    def get_books(self, shelf_name, db="nk"):
         """
         Get a list of books on a shelf in a given database.
 
@@ -305,9 +307,9 @@ class RefractiveIndexDatabase:
         if shelf is None:
             raise RuntimeError(f"Shelf {shelf_name} not in {db} database!")
 
-        return [s["BOOK"] for s in shelf['content']]
+        return [s["BOOK"] for s in shelf["content"]]
 
-    def get_pages(self, shelf_name, book_name, db='nk'):
+    def get_pages(self, shelf_name, book_name, db="nk"):
         """
         Get a list of pages in a book on a shelf.
 
@@ -342,6 +344,7 @@ class RefractiveIndexDatabase:
 
         return [b["PAGE"] for b in book["content"]]
 
+
 class Material:
     """
     Description of material and its optical properties.
@@ -350,8 +353,7 @@ class Material:
     its refractive index and extinction coefficient.
     """
 
-    def __init__(self, shelf=None, book=None, page=None,
-                 name=None, db=None):
+    def __init__(self, shelf=None, book=None, page=None, name=None, db=None):
         """
         Initialise the Material container.
 
@@ -385,17 +387,16 @@ class Material:
             mat_nk = db.get_nk_database_entry(shelf, book, page, name)
             if mat_nk is not None:
                 self._load_data_nk(mat_nk)
-        except RuntimeError as err:
-            print(f'Error loading nk data for {shelf}, {book}, {page}')
+        except RuntimeError:
+            print(f"Error loading nk data for {shelf}, {book}, {page}")
         try:
             mat_n2s = db.get_n2_database_entries(shelf, book, name)
             if mat_n2s is not None:
                 self._load_data_n2(mat_n2s)
         except RuntimeError:
-            print(f'Error loading n2 data for {shelf}, {book}')
+            print(f"Error loading n2 data for {shelf}, {book}")
 
     def _load_data_nk(self, mat_dict):
-
         self.reference = mat_dict.get("REFERENCES")
         self.conditions = mat_dict.get("CONDITIONS")
         self.properties = mat_dict.get("PROPERTIES")
@@ -450,19 +451,19 @@ class Material:
                     )
 
     def _load_data_n2(self, mat_n2s):
-        """ Load all n2 data available for this material """
+        """Load all n2 data available for this material"""
         self.data_n2 = {}
         for mat_key, mat_dict in mat_n2s.items():
             mat = {}
-            mat['reference'] = mat_dict.get("REFERENCES")
-            mat['comments'] = mat_dict.get("COMMENTS")
-            mat['conditions'] = mat_dict.get("CONDITIONS")
-            data_list = mat_dict.get('DATA')
+            mat["reference"] = mat_dict.get("REFERENCES")
+            mat["comments"] = mat_dict.get("COMMENTS")
+            mat["conditions"] = mat_dict.get("CONDITIONS")
+            data_list = mat_dict.get("DATA")
             for data in data_list:
-                if data['type'] == 'tabulated n2':
+                if data["type"] == "tabulated n2":
                     data_raw = np.fromstring(data.get("data", "0 0\n0 0"), sep=" ")
                     data_raw = np.reshape(data_raw, (len(data_raw) // 2, 2))
-                    mat['data'] = data_raw
+                    mat["data"] = data_raw
             self.data_n2[mat_key] = mat
 
     def calc_n(self, lambda_um):
@@ -636,13 +637,13 @@ class Material:
 
         if page is not None:
             if page in self.data_n2.keys():
-                return self.data_n2[page]['data']
+                return self.data_n2[page]["data"]
 
         # If page was not passed, we loop through all data
         n2_data, pages = [], []
         for page_name, data_dict in self.data_n2.items():
             # If we have only one lambda, check it's correct
-            lambdas, n2s = data_dict['data'][:, 0], data_dict['data'][:, 1]
+            lambdas, n2s = data_dict["data"][:, 0], data_dict["data"][:, 1]
             if len(lambdas) == 1:
                 if lambdas[0] == lambda_mu:
                     n2_data.append(n2s[0])
@@ -663,7 +664,7 @@ class Material:
             return np.array(n2_data), pages
 
     def print_n2_data(self):
-        """ Nicely print out all the known data for n2. """
+        """Nicely print out all the known data for n2."""
         if self.data_n2:
             pprint(self.data_n2)
 
@@ -779,20 +780,19 @@ def _create_lasy_material_database():
     data is then extracted based on the entries in
     `known_materials`.
     """
-    lasy_db_file = os.path.join(os.path.dirname(__file__),
-                                "refractive_index_db.json")
+    lasy_db_file = os.path.join(os.path.dirname(__file__), "refractive_index_db.json")
     if os.path.isfile(lasy_db_file):
         os.remove(lasy_db_file)
 
     db = RefractiveIndexDatabase(auto_download=True)
     db_dict = {"nk": {}, "n2": {}}
     for material, entry in known_materials_nk.items():
-        print(f'Creating nk record for {material}')
+        print(f"Creating nk record for {material}")
         mat_dict = db.get_nk_database_entry(name=material)
         db_dict["nk"][material] = mat_dict
 
     for material, entry in known_materials_n2.items():
-        print(f'Creating n2 record for {material}')
+        print(f"Creating n2 record for {material}")
         mat_n2s = db.get_n2_database_entries(name=material)
         db_dict["n2"][material] = mat_n2s
 
