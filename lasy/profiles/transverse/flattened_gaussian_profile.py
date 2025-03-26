@@ -57,7 +57,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
 
         w = \frac{\lambda_0}{\pi w_0}|z_{\mathrm{foc}}|
 
-    where $z_{\mathrm{foc}$ is the distance between the far field and near field planes.
+    where :math:`z_{\mathrm{foc}` is the distance between the far field and near field planes.
 
     - Note that a beam defined using the near field definition would be
       equivalent to a beam defined with the corresponding parameters far from focus in
