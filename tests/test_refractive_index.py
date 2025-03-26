@@ -7,7 +7,7 @@ from lasy.utils.refractive_index import Material, RefractiveIndexDatabase
 
 def test_n_formulas():
     # Test that all formulas give correct values of n
-    db = RefractiveIndexDatabase()
+    db = RefractiveIndexDatabase(auto_download=True)
 
     # Formula 1
     m = Material(name="fused silica", db=db)
