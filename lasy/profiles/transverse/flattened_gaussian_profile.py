@@ -77,7 +77,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         The waist of the laser pulse. If ``field_type == 'farfield'`` then this
         variable corresponds to :math:`w_{0}` in the above far field formula.
         If ``field_type == 'nearfield'`` then this variable corresponds to
-        :math:`w(z)` in the above near field formula.
+        :math:`w` in the above near field formula.
 
     N : int
         Determines the "flatness" of the transverse profile, far from
