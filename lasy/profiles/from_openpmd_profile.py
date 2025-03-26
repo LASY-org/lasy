@@ -4,8 +4,8 @@ from scipy.constants import c
 
 from lasy.utils.laser_utils import (
     create_grid,
+    field_to_envelope,
     vector_potential_to_field,
-    field_to_envelope
 )
 
 from .from_array_profile import FromArrayProfile
@@ -27,7 +27,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         Name of the field containing the laser pulse.
 
     coordinate : string
-        Name of the component of the field to be read.        
+        Name of the component of the field to be read.
 
     omega0 : float
         Angular frequency at which laser envelope is defined.
@@ -62,7 +62,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             array = array.astype(np.complex128)
         else:
             array = array.astype(np.float64)
-        
+
         # Extract the required parameters to set the grid
         grid_offset = m.get_attribute("gridGlobalOffset")
         grid_spacing = m.get_attribute("gridSpacing")
@@ -128,7 +128,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             try:
                 omg0 = m.get_attribute("angularFrequency")
             except io.ErrorNoSuchAttribute:
-                temp_grid = create_grid(array, axes, dim,is_envelope=False)
+                temp_grid = create_grid(array, axes, dim, is_envelope=False)
                 grid, omg0 = field_to_envelope(temp_grid, dim)
 
         wavelength = 2 * np.pi * c / omg0
