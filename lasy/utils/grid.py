@@ -55,7 +55,8 @@ class Grid:
         if dim == "rt":
             self.n_azimuthal_modes = n_azimuthal_modes
             self.azimuthal_modes = np.r_[
-                np.arange(n_azimuthal_modes), np.arange(-n_azimuthal_modes + 1, 0, 1)
+                np.arange(
+                    n_azimuthal_modes), np.arange(-n_azimuthal_modes + 1, 0, 1)
             ]
 
         # Data
@@ -173,9 +174,10 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
+
         self.spectral_field = np.fft.ifft(
-            self.temporal_field, axis=time_axis_indx, norm="backward"
-        )
+            np.fft.fftshift(self.temporal_field, axes=-1), axis=-1)
+
         self.spectral_field_valid = True
 
     def spectral2temporal_fft(self):
@@ -188,4 +190,6 @@ class Grid:
         self.temporal_field = np.fft.fft(
             self.spectral_field, axis=time_axis_indx, norm="backward"
         )
+        self.temporal_field = np.fft.fftshift(self.temporal_field, axes=-1)
+
         self.temporal_field_valid = True
