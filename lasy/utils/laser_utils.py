@@ -258,7 +258,6 @@ def get_laser_fluence(grid):
     intensity = np.abs(epsilon_0 * field**2 / 2 * c)
     fluence = np.squeeze(np.sum(intensity, axis=-1) * grid.dx[-1])
 
-    
     return fluence
 
 
