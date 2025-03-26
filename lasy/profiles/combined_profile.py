@@ -69,8 +69,11 @@ class CombinedLongitudinalTransverseProfile(Profile):
         peak_power=None,
     ):
         super().__init__(wavelength, pol)
-        assert (laser_energy is not None) ^ (peak_fluence is not None) ^ (peak_power is not None), \
-        "Exactly one of laser_energy, peak_fluence, or peak_power must be specified"
+        assert (
+            (laser_energy is not None)
+            ^ (peak_fluence is not None)
+            ^ (peak_power is not None)
+        ), "Exactly one of laser_energy, peak_fluence, or peak_power must be specified"
         if long_profile.is_cw:
             assert peak_fluence is not None
             self.peak_fluence = peak_fluence
