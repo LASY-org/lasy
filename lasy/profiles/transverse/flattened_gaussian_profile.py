@@ -68,10 +68,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
     Parameters
     ----------
     field_type : string
-        Options: 'nearfield', when the beam is defined far from focus and
-        has been collimated, or 'farfield', when the beam is in the vicinity
-        of or has been directly propagated from the focus. In this case there
-        can be a large defocus in the spatial phase.
+        Options: 'nearfield', when the beam is defined far from focus (e.g., right before the focusing optics), or 'farfield', when the beam is in the vicinity of the focus.
 
     w : float (in meter)
         The waist of the laser pulse. If ``field_type == 'farfield'`` then this
