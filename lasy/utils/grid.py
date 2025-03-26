@@ -55,8 +55,7 @@ class Grid:
         if dim == "rt":
             self.n_azimuthal_modes = n_azimuthal_modes
             self.azimuthal_modes = np.r_[
-                np.arange(
-                    n_azimuthal_modes), np.arange(-n_azimuthal_modes + 1, 0, 1)
+                np.arange(n_azimuthal_modes), np.arange(-n_azimuthal_modes + 1, 0, 1)
             ]
 
         # Data
@@ -176,7 +175,8 @@ class Grid:
         assert self.temporal_field_valid
 
         self.spectral_field = np.fft.ifft(
-            np.fft.fftshift(self.temporal_field, axes=-1), axis=-1)
+            np.fft.fftshift(self.temporal_field, axes=-1), axis=-1
+        )
 
         self.spectral_field_valid = True
 

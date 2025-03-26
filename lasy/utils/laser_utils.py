@@ -47,8 +47,7 @@ def compute_laser_energy(dim, grid):
         energy = ((dV * epsilon_0) * abs(envelope) ** 2).sum()
     else:  # dim == "rt":
         energy = (
-            dV[np.newaxis, :, np.newaxis] *
-            epsilon_0 * abs(envelope[:, :, :]) ** 2
+            dV[np.newaxis, :, np.newaxis] * epsilon_0 * abs(envelope[:, :, :]) ** 2
         ).sum()
 
     if grid.is_envelope:
@@ -326,8 +325,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
         Array with the angular frequencies of the spectrum.
     """
     # Get the frequencies of the fft output.
-    freq = np.fft.fftfreq(
-        grid.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
+    freq = np.fft.fftfreq(grid.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
     omega = 2 * np.pi * freq
 
     # Get on axis or full field.
@@ -452,8 +450,7 @@ def get_frequency(
     if grid.is_envelope:
         assert omega0 is not None
         phase = np.unwrap(np.angle(field))
-        omega = omega0 + \
-            np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
+        omega = omega0 + np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
         central_omega = np.average(omega, weights=np.abs(field))
     else:
         assert dim in ["xyt", "rt"]
@@ -742,8 +739,7 @@ def create_grid(array, axes, dim, is_envelope=True):
         lo = (axes["r"][0], axes["t"][0])
         hi = (axes["r"][-1], axes["t"][-1])
         npoints = (axes["r"].size, axes["t"].size)
-        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1,
-                    is_envelope=is_envelope)
+        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1, is_envelope=is_envelope)
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
         assert array.ndim == 3, (
@@ -822,8 +818,7 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
         for i_m in range(grid.azimuthal_modes.size):
             FieldAxprp.import_field(np.transpose(field[i_m]).copy())
 
-            field_z[i_m] = prop[i_m].t2z(
-                FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
+            field_z[i_m] = prop[i_m].t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
 
             field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
     else:
@@ -912,8 +907,7 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         field = np.zeros(grid.shape, dtype=np.complex128)
         for i_m in range(grid.azimuthal_modes.size):
             transform_data = np.transpose(field_fft[i_m]).copy()
-            transform_data *= np.exp(-1j *
-                                     z_axis[0] * (k_z[:, None] - omega0 / c))
+            transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None] - omega0 / c))
             field[i_m] = prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
             field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
         grid.set_temporal_field(field)
@@ -931,10 +925,8 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
         )
         # Convert the spectral image to the spatial field representation
         transform_data = np.moveaxis(field_fft, -1, 0).copy()
-        transform_data *= np.exp(-1j *
-                                 z_axis[0] * (k_z[:, None, None] - omega0 / c))
-        field = np.moveaxis(
-            prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
+        transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
+        field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
         field *= np.exp(1j * (z0 / c + t_axis) * omega0)
         grid.set_temporal_field(field)
 
@@ -1050,12 +1042,10 @@ def get_zeta(dim, grid, k0):
     weight_y_2d = np.sum(weight_y_3d, axis=2)
     # Calculate xda and yda, avoiding division by zero
     xda = np.where(
-        weight_x_2d != 0, np.sum(
-            grid.axes[0] * weight_x_3d, axis=2) / weight_x_2d, 0
+        weight_x_2d != 0, np.sum(grid.axes[0] * weight_x_3d, axis=2) / weight_x_2d, 0
     )
     yda = np.where(
-        weight_y_2d != 0, np.sum(
-            grid.axes[1] * weight_y_3d, axis=2) / weight_y_2d, 0
+        weight_y_2d != 0, np.sum(grid.axes[1] * weight_y_3d, axis=2) / weight_y_2d, 0
     )
     # Calculate spatial chirp zeta
     derivative_x_zeta = np.gradient(xda, omega, axis=0)
@@ -1138,8 +1128,7 @@ def get_pft(dim, grid):
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     weight_xy_2d = np.mean(env_abs2, axis=2)
-    z_centroids = np.sum(grid.axes[2] * env_abs2,
-                         axis=2) / np.sum(env_abs2, axis=2)
+    z_centroids = np.sum(grid.axes[2] * env_abs2, axis=2) / np.sum(env_abs2, axis=2)
     derivative_x_pft = np.gradient(z_centroids, axis=0) / grid.dx[0]
     derivative_y_pft = np.gradient(z_centroids, axis=1) / grid.dx[1]
     pft_x = np.average(derivative_x_pft, weights=weight_xy_2d)
@@ -1179,10 +1168,9 @@ def get_propation_angle(dim, grid, k0):
     return [angle_x, angle_y]
 
 
-def get_spectral_phase(grid, dim, omega0, mode='sum'):
+def get_spectral_phase(grid, dim, omega0, mode="sum"):
     """
-    Calculates the spectral phase of a pulse in a given grid. 
-
+    Calculates the spectral phase of a pulse in a given grid.
 
     Parameters
     ----------
@@ -1215,7 +1203,6 @@ def get_spectral_phase(grid, dim, omega0, mode='sum'):
         Angular freuqencies at which the phase is defined (in rad/s)
 
     """
-
     # Field must be envelope
     assert grid.is_envelope
 
@@ -1224,25 +1211,23 @@ def get_spectral_phase(grid, dim, omega0, mode='sum'):
     field_spectral = np.fft.fftshift(field_spectral, axes=-1)
 
     # if mode=='on-axis' get the on-axis field envelope, and calculate its phase
-    if mode == 'on-axis':
-        if dim == 'xyt':
+    if mode == "on-axis":
+        if dim == "xyt":
             Nx = grid.npoints[0]
             Ny = grid.npoints[1]
-            phase = np.angle(field_spectral[Nx//2, Ny//2, :])
+            phase = np.angle(field_spectral[Nx // 2, Ny // 2, :])
         else:  # dim=='rt'
             phase = np.angle(field_spectral[0, 0, :])
 
     # if mode=='sum' integrate the field spatially before getting the phase from it
     else:  # mode='sum'
-
         # grid cell volume required for integration
         dV = get_grid_cell_volume(grid, dim)
 
-        if dim == 'xyt':
-            summed_field = np.sum(field_spectral*dV, axis=(0, 1))
+        if dim == "xyt":
+            summed_field = np.sum(field_spectral * dV, axis=(0, 1))
         else:  # dim=='rt'
-            summed_field = np.sum(
-                field_spectral*dV[None, :, None], axis=(0, 1))
+            summed_field = np.sum(field_spectral * dV[None, :, None], axis=(0, 1))
 
         phase = np.angle(summed_field)
 
@@ -1251,7 +1236,8 @@ def get_spectral_phase(grid, dim, omega0, mode='sum'):
 
     # create omega array (angular frequencies)
     omega = np.fft.fftshift(
-        2*np.pi*np.fft.fftfreq(grid.npoints[-1], grid.dx[-1]), axes=-1)
+        2 * np.pi * np.fft.fftfreq(grid.npoints[-1], grid.dx[-1]), axes=-1
+    )
 
     if omega0:
         omega += omega0
@@ -1260,9 +1246,9 @@ def get_spectral_phase(grid, dim, omega0, mode='sum'):
     return phase, omega
 
 
-def get_gdd(grid, dim, omega0, mode='sum'):
+def get_gdd(grid, dim, omega0, mode="sum"):
     r"""
-    Calculates the group delay dispersion (GDD) of the laser. 
+    Calculates the group delay dispersion (GDD) of the laser.
 
     .. math::
         GD = \frac{\partial^2 \phi(\omega)}{\partial \omega^2}
@@ -1299,7 +1285,6 @@ def get_gdd(grid, dim, omega0, mode='sum'):
         Group delay dispersion at the center frequency (in s^2)
 
     """
-
     # calculate the spectral phase of the laser pulse
     phase, omega = get_spectral_phase(grid, dim, mode=mode, omega0=omega0)
 
