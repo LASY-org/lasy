@@ -66,13 +66,17 @@ class Grid:
 
         if is_cw:
             if npoints[-1] != 1:
-                print("CW profile: overwrite npoints to only 1 cell in the longitudinal direction.")
+                print(
+                    "CW profile: overwrite npoints to only 1 cell in the longitudinal direction."
+                )
             lo[-1] = -0.5
             hi[-1] = 0.5
             npoints[-1] = 1
         if is_plane_wave:
             if npoints[0] != 1:
-                print("Plane wave: overwrite npoints to only 1 cell in the transverse directions.")
+                print(
+                    "Plane wave: overwrite npoints to only 1 cell in the transverse directions."
+                )
             if dim == "rt":
                 lo[0] = 0.0
                 hi[0] = np.sqrt(1 / np.pi)
