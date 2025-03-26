@@ -22,12 +22,12 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
     The implementation of this class is based on that from `FBPIC`
     <https://github.com/fbpic/fbpic/blob/dev/fbpic/lpa_utils/laser/transverse_laser_profiles.py>.
 
-    **In the focal plane** (:math:`z=z_f`), or in the far field, the profile translates to a
+    **In the focal plane** (:math:`z=0`), or in the far field, the profile translates to a
     laser with a transverse electric field:
 
     .. math::
 
-        E(x,y,z=zf) \propto
+        E(x,y,z=0) \propto
         \exp\left(-\frac{r^2}{(N+1)w_0^2}\right)
         \sum_{n=0}^N c'_n L^0_n\left(\frac{2\,r^2}{(N+1)w_0^2}\right)
 
@@ -47,23 +47,23 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
 
     .. math::
 
-        E(x,y,z=\infty) \propto
-        \exp\left(-\frac{(N+1)r^2}{w(z)^2}\right)
-        \sum_{n=0}^N \frac{1}{n!}\left(\frac{(N+1)\,r^2}{w(z)^2}\right)^n
+        E(x,y) \propto
+        \exp\left(-\frac{(N+1)r^2}{w^2}\right)
+        \sum_{n=0}^N \frac{1}{n!}\left(\frac{(N+1)\,r^2}{w^2}\right)^n
 
     with
 
     .. math::
 
-        w(z) = \frac{\lambda_0}{\pi w_0}|z-z_{foc}|
+        w = \frac{\lambda_0}{\pi w_0}|z_{\mathrm{foc}}|
 
     - Note that a beam defined using the near field definition would be
-      equivalent to a beam defined with the corresponding parameters in
+      equivalent to a beam defined with the corresponding parameters far from focus in
       the far field, but without the parabolic phase arising from being
       defined far from the focus.
 
-    - For :math:`N=0`, this is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w(z)^2}\right)`.
-    - For :math:`N\rightarrow\infty`, this is a flat profile: :math:`E\propto\Theta(w(z)-r)`.
+    - For :math:`N=0`, the near field profile is a Gaussian profile: :math:`E\propto\exp\left(-\frac{r^2}{w^2}\right)`.
+    - For :math:`N\rightarrow\infty`, the near field profile is a flat profile: :math:`E\propto\Theta(w-r)`.
 
     Parameters
     ----------
