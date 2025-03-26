@@ -3,9 +3,9 @@ import openpmd_api as io
 from scipy.constants import c
 
 from lasy.utils.laser_utils import (
-    chunk_to_slice,
     create_grid,
     vector_potential_to_field,
+    field_to_envelope
 )
 
 from .from_array_profile import FromArrayProfile
@@ -26,11 +26,11 @@ class FromOpenPMDProfile(FromArrayProfile):
     field : string
         Name of the field containing the laser pulse.
 
+    coordinate : string
+        Name of the component of the field to be read.        
+
     omega0 : float
         Angular frequency at which laser envelope is defined.
-
-    compontent : string
-        Name of the component of the field to be read.
 
     is_envelope : bool
         Whether the field provided uses the (complex) envelope representation, as
@@ -43,37 +43,26 @@ class FromOpenPMDProfile(FromArrayProfile):
         path,
         iteration,
         field,
+        coordinate=None,
         omega0=None,
-        component=None,
         is_envelope=True,
     ):
         # Read the data
         series = io.Series(path, io.Access.read_only)
         i = series.iterations[iteration]
         m = i.meshes[field]
-        if component is not None:
-            component = m[component]
-            chunks = component.available_chunks()
-            for chunk in chunks:
-                chunk_slice = chunk_to_slice(chunk)
-                volume = 1
-                for csl in chunk_slice:
-                    volume *= csl.stop - csl.start
-                if volume == 0:
-                    continue
 
-            # read only valid region
-            array = component[chunk_slice]
-            series.flush()
-        else:
+        if coordinate is None:
             array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
-            series.flush()
-
+        else:
+            array = m[coordinate].load_chunk()
+        series.flush()
         # This is rqeuired for creating the grid
         if is_envelope:
             array = array.astype(np.complex128)
         else:
             array = array.astype(np.float64)
+        
         # Extract the required parameters to set the grid
         grid_offset = m.get_attribute("gridGlobalOffset")
         grid_spacing = m.get_attribute("gridSpacing")
@@ -82,8 +71,15 @@ class FromOpenPMDProfile(FromArrayProfile):
                 "position"
             )  # node (0.0) or cell (0.5) centered info for each axis
         except io.ErrorNoSuchAttribute:
-            grid_position = component.get_attribute("position")
+            grid_position = m[coordinate].get_attribute("position")
         axis_labels = m.get_attribute("axisLabels")
+
+        # Read/set polarization.
+        try:
+            pol = m.get_attribute("polarization")
+        except io.ErrorNoSuchAttribute:
+            print("Polarization not found. Defaulting to (1, 0)")
+            pol = (1, 0)
 
         if len(axis_labels) == 2:
             idx_offset = 1
@@ -126,10 +122,15 @@ class FromOpenPMDProfile(FromArrayProfile):
             array = np.swapaxes(array, idx_offset, 2)
 
         # Read angular frequency
-        try:
-            omg0 = m.get_attribute("angularFrequency")
-        except io.ErrorNoSuchAttribute:
+        if omega0 is not None:
             omg0 = omega0
+        else:
+            try:
+                omg0 = m.get_attribute("angularFrequency")
+            except io.ErrorNoSuchAttribute:
+                temp_grid = create_grid(array, axes, dim,is_envelope=False)
+                grid, omg0 = field_to_envelope(temp_grid, dim)
+
         wavelength = 2 * np.pi * c / omg0
 
         # If the field is stored as vector potential,
@@ -145,13 +146,6 @@ class FromOpenPMDProfile(FromArrayProfile):
         if vector_to_field:
             grid = create_grid(array, axes, dim)
             array = vector_potential_to_field(grid, omg0)
-
-        # Read/set polarization.
-        try:
-            pol = m.get_attribute("polarization")
-        except io.ErrorNoSuchAttribute:
-            print("Polarization not found. Defaulting to (1, 0)")
-            pol = (1, 0)
 
         super().__init__(
             wavelength=wavelength,
