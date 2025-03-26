@@ -1258,3 +1258,55 @@ def get_spectral_phase(grid, dim, omega0, mode='sum'):
 
     # return the phase and omega arrays
     return phase, omega
+
+
+def get_gdd(grid, dim, omega0, mode='sum'):
+    r"""
+    Calculates the group delay dispersion (GDD) of the laser. 
+
+    .. math::
+        GD = \frac{\partial^2 \phi(\omega)}{\partial \omega^2}
+
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the field to analyze.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    omega0 : float
+        Central angular frequency at which the GDD is calculated
+
+    mode : string, optional
+        Mode of retrieving the phase that is used for calculating the GDD. Options are:
+
+        - ``'sum'``: Calculates the spectral phase of the spatially summed field (default).
+        - ``'on-axis'``: Calculates the on-axis spectral phase.
+
+    Returns
+    -------
+    gdd: ndarray of floats (1D)
+        Group delay dispersion over the entire spectral range (in s^2)
+
+    gdd0: float
+        Group delay dispersion at the center frequency (in s^2)
+
+    """
+
+    # calculate the spectral phase of the laser pulse
+    phase, omega = get_spectral_phase(grid, dim, mode=mode, omega0=omega0)
+
+    # calculate the second derivative wrt. angular frequency
+    gd = np.gradient(phase, omega, axis=-1)
+    gdd = np.gradient(gd, omega, axis=-1)
+
+    # get the GDD at the center frequency
+    gdd0 = np.interp(omega0, omega, gdd)
+    return gdd, gdd0
