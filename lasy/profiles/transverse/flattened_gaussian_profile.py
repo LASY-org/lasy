@@ -42,7 +42,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
 
     - For :math:`N\rightarrow\infty`, this is a Jinc profile: :math:`E\propto\frac{J_1(r/w_0)}{r/w_0}`.
 
-    The equivalent expression for the collimated beam in the near field which produces this focus is
+    The equivalent expression for **the collimated beam** in the near field which produces this focus is
     given by:
 
     .. math::
