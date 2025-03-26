@@ -982,7 +982,7 @@ def get_w0(grid, dim):
 
 def get_phi2(dim, grid):
     r"""
-    Calculate the group-delay dispersion of the laser.
+    Calculate the second derivative of the temporal phase of the laser.
 
     Parameters
     ----------
@@ -999,10 +999,8 @@ def get_phi2(dim, grid):
 
     Returns
     -------
-    phi2 : Group-delay dispersion in :math:`\Phi^{(2)} = \frac{d\omega_0}{dt}` (second^-2)
-    varphi2 : Group-delay dispersion in :math:`\varphi^{(2)}=\frac{dt_0}{d\omega}` (second^2)
+    phi2 : Second derivative of temporal phase :math:`\Phi^{(2)} = \frac{d\omega_0}{dt} = \frac{d^2\Phi(t)}{dt^2}` in (second^-2)
     """
-    tau = 2 * get_duration(grid, dim)
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     # Calculate group-delayed dispersion
@@ -1010,8 +1008,8 @@ def get_phi2(dim, grid):
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
     phi2 = np.average(pphi_pt2, weights=env_abs2)
-    varphi2 = np.max(np.roots([4 * phi2, -4, tau**4 * phi2]))
-    return phi2, varphi2
+
+    return phi2
 
 
 def get_zeta(dim, grid, k0):
