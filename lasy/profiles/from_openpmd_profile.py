@@ -39,7 +39,7 @@ class FromOpenPMDProfile(FromArrayProfile):
     ):
         # Read the data
         series = io.Series(path, io.Access.read_only)
-        iterations = list(series.iterations)
+        iterations = np.array(series.iterations)
         if iteration is None:
             iteration = iterations[-1]
         elif iteration not in iterations:
