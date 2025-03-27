@@ -133,7 +133,7 @@ class FromOpenPMDProfile(FromArrayProfile):
                         "Angular frequency not found. Please provide the value.\
                             If you are using Wake-T, please store the field as a"
                     )
-        else: # If electric field is provided, convert it to envelope
+        else:  # If electric field is provided, convert it to envelope
             assert omega0 is None
             temp_grid = create_grid(array, axes, dim, is_envelope=False)
             grid, omg0 = field_to_envelope(temp_grid, dim)
