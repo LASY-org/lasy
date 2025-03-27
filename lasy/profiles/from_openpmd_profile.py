@@ -26,7 +26,7 @@ class FromOpenPMDProfile(FromArrayProfile):
     field : string
         Name of the field containing the laser pulse.
 
-    coordinate : string
+    component : string
         Name of the component of the field to be read.
     """
 
@@ -35,7 +35,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         path,
         field,
         iteration=None,
-        coordinate=None,
+        component=None,
     ):
         # Read the data
         series = io.Series(path, io.Access.read_only)
@@ -44,7 +44,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             iteration = iterations[-1]
         elif iteration not in iterations:
             print(
-                "Error: The iteration {} is not in the list of available iterations {}.".format(
+                "Error: The iteration {} is not in the array of available iterations {}.".format(
                     iteration, iterations
                 )
             )
@@ -53,14 +53,14 @@ class FromOpenPMDProfile(FromArrayProfile):
         i = series.iterations[iteration]
         m = i.meshes[field]
         # Get data `array` and `position`.
-        if coordinate is None:
+        if component is None:
             array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
             position = m.get_attribute(
                 "position"
             )  # node (0.0) or cell (0.5) centered info for each axis
         else:
-            array = m[coordinate].load_chunk()
-            position = m[coordinate].get_attribute("position")
+            array = m[component].load_chunk()
+            position = m[component].get_attribute("position")
         series.flush()
 
         # Extract the required parameters to set the grid
