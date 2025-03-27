@@ -122,14 +122,21 @@ class FromOpenPMDProfile(FromArrayProfile):
             array = np.swapaxes(array, idx_offset, 2)
 
         # Read angular frequency
-        if omega0 is not None:
-            omg0 = omega0
-        else:
-            try:
-                omg0 = m.get_attribute("angularFrequency")
-            except io.ErrorNoSuchAttribute:
-                temp_grid = create_grid(array, axes, dim, is_envelope=False)
-                grid, omg0 = field_to_envelope(temp_grid, dim)
+        if is_envelope:
+            if omega0 is not None:
+                omg0 = omega0
+            else:
+                try:
+                    omg0 = m.get_attribute("angularFrequency")
+                except io.ErrorNoSuchAttribute:
+                    raise ValueError(
+                        "Angular frequency not found. Please provide the value.\
+                            If you are using Wake-T, please store the field as a"
+                    )
+        else: # If electric field is provided, convert it to envelope
+            assert omega0 is None
+            temp_grid = create_grid(array, axes, dim, is_envelope=False)
+            grid, omg0 = field_to_envelope(temp_grid, dim)
 
         wavelength = 2 * np.pi * c / omg0
 
