@@ -41,31 +41,23 @@ class FromOpenPMDProfile(FromArrayProfile):
         series = io.Series(path, io.Access.read_only)
         i = series.iterations[iteration]
         m = i.meshes[field]
-
+        # Get data `array` and `position`.
         if coordinate is None:
             array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
+            position = m.get_attribute(
+                "position"
+            )  # node (0.0) or cell (0.5) centered info for each axis
         else:
             array = m[coordinate].load_chunk()
+            position = m[coordinate].get_attribute("position")
         series.flush()
 
         # Extract the required parameters to set the grid
         grid_offset = m.get_attribute("gridGlobalOffset")
         grid_spacing = m.get_attribute("gridSpacing")
-        try:
-            grid_position = m.get_attribute(
-                "position"
-            )  # node (0.0) or cell (0.5) centered info for each axis
-        except io.ErrorNoSuchAttribute:
-            grid_position = m[coordinate].get_attribute("position")
+ 
+        # Axis labels
         axis_labels = m.get_attribute("axisLabels")
-
-        # Read/set polarization.
-        try:
-            pol = m.get_attribute("polarization")
-        except io.ErrorNoSuchAttribute:
-            print("Polarization not found. Defaulting to (1, 0)")
-            pol = (1, 0)
-
         if len(axis_labels) == 2:
             idx_offset = 1
             dim = "rt"
@@ -85,8 +77,8 @@ class FromOpenPMDProfile(FromArrayProfile):
             # Define the axis array
             N = array.shape[idx + idx_offset]
             axis = np.linspace(
-                grid_offset[idx] + grid_position[idx] * grid_spacing[idx],
-                grid_offset[idx] + (N - 1 + grid_position[idx]) * grid_spacing[idx],
+                grid_offset[idx] + position[idx] * grid_spacing[idx],
+                grid_offset[idx] + (N - 1 + position[idx]) * grid_spacing[idx],
                 N,
             )
             # If label is `z`, change it to `t`
@@ -119,7 +111,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
         wavelength = 2 * np.pi * c / omg0
 
-        # If the field is stored as vector potential,
+        # If the envelope is stored as normalized vector potential,
         # convert it to electric field
         vector_to_field = False
         try:
@@ -132,6 +124,13 @@ class FromOpenPMDProfile(FromArrayProfile):
         if vector_to_field:
             grid = create_grid(array, axes, dim)
             array = vector_potential_to_field(grid, omg0)
+
+        # Read/set polarization.
+        try:
+            pol = m.get_attribute("polarization")
+        except io.ErrorNoSuchAttribute:
+            print("Polarization not found. Defaulting to (1, 0)")
+            pol = (1, 0)
 
         super().__init__(
             wavelength=wavelength,
