@@ -57,7 +57,8 @@ class FromOpenPMDProfile(FromArrayProfile):
         else:
             array = m[coordinate].load_chunk()
         series.flush()
-        # This is rqeuired for creating the grid
+
+        # This is required for creating the grid
         if is_envelope:
             array = array.astype(np.complex128)
         else:
