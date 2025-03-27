@@ -66,7 +66,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         # Extract the required parameters to set the grid
         grid_offset = m.get_attribute("gridGlobalOffset")
         grid_spacing = m.get_attribute("gridSpacing")
- 
+
         # Axis labels
         axis_labels = m.get_attribute("axisLabels")
         if len(axis_labels) == 2:
@@ -111,11 +111,11 @@ class FromOpenPMDProfile(FromArrayProfile):
 
         # This block determines is the field is stored as envelope or not.
         try:
-            # If field is stored as envelope, 
+            # If field is stored as envelope,
             # it must contain the angular frequency as attribute.
             omg0 = m.get_attribute("angularFrequency")
         except io.ErrorNoSuchAttribute:
-            # If no angular frequency present, 
+            # If no angular frequency present,
             # then it must be the full electric field.
             grid = create_grid(array, axes, dim, is_envelope=False)
             grid, omg0 = field_to_envelope(grid, dim)
