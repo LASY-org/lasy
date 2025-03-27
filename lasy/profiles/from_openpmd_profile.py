@@ -33,12 +33,23 @@ class FromOpenPMDProfile(FromArrayProfile):
     def __init__(
         self,
         path,
-        iteration,
         field,
+        iteration=None,
         coordinate=None,
     ):
         # Read the data
         series = io.Series(path, io.Access.read_only)
+        iterations = list(series.iterations)
+        if iteration is None:
+            iteration = iterations[-1]
+        elif iteration not in iterations:
+            print(
+                "Error: The iteration {} is not in the list of available iterations {}.".format(
+                    iteration, iterations
+                )
+            )
+            raise ValueError
+
         i = series.iterations[iteration]
         m = i.meshes[field]
         # Get data `array` and `position`.
