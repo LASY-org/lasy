@@ -585,12 +585,13 @@ def vector_potential_to_field(grid, omega0, direct=True):
 
 
 def field_to_envelope(grid, dim, phase_unwrap_nd=False):
-    """Get the complex envelope of a field by applying a Hilbert transform.
+    """Convert a field to its complex envelope representation by applying a Hilbert transform.
 
     Parameters
     ----------
     grid : Grid
-        The field from which to extract the envelope.
+        The Grid object on which the field is replaced with an envelope.
+        This object is modified by the function.
 
     dim : string
         Dimensionality of the array. Options are:
@@ -608,8 +609,8 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
 
     Returns
     -------
-    tuple
-        The central wavelength.
+    scalar
+        The central angular frequency.
     """
     assert not grid.is_envelope
 
