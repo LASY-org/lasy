@@ -457,8 +457,8 @@ def get_frequency(
         if dim == "xyt" and phase_unwrap_nd:
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
-        h = field if is_hilbert else hilbert_transform(grid)
-        h = np.squeeze(field)
+        h = field if is_hilbert else hilbert_transform(field)
+
         if phase_unwrap_nd:
             try:
                 from skimage.restoration import unwrap_phase
@@ -585,12 +585,13 @@ def vector_potential_to_field(grid, omega0, direct=True):
 
 
 def field_to_envelope(grid, dim, phase_unwrap_nd=False):
-    """Get the complex envelope of a field by applying a Hilbert transform.
+    """Convert a field to its complex envelope representation by applying a Hilbert transform.
 
     Parameters
     ----------
     grid : Grid
-        The field from which to extract the envelope.
+        The Grid object on which the field is replaced with an envelope.
+        This object is modified by the function.
 
     dim : string
         Dimensionality of the array. Options are:
@@ -608,32 +609,31 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
 
     Returns
     -------
-    tuple
-        A tuple with the envelope array and the central wavelength.
+    scalar
+        The central angular frequency.
     """
     assert not grid.is_envelope
 
-    field = grid.get_temporal_field()
-
-    # hilbert transform needs inverted time axis.
-    field = hilbert_transform(field)
-
     # Get central wavelength from array
-    omg_h, omg0_h = get_frequency(
+    _, omg0_h = get_frequency(
         grid,
         dim=dim,
-        is_hilbert=True,
+        is_hilbert=False,
         phase_unwrap_nd=phase_unwrap_nd,
     )
+    # Hilbert transform
+    field = hilbert_transform(grid.get_temporal_field())
+    # Remove carrier frequency
     field *= np.exp(1j * omg0_h * grid.axes[-1])
+    # Store envelope
     grid.set_is_envelope(True)
     grid.set_temporal_field(field)
 
-    return grid, omg0_h
+    return omg0_h
 
 
 def hilbert_transform(field):
-    """Make a hilbert transform of the grid field.
+    """Make a hilbert transform of the field.
 
     Currently the arrays need to be flipped along t (both the input field and
     its transform) to get the imaginary part (and thus the phase) with the
@@ -641,8 +641,8 @@ def hilbert_transform(field):
 
     Parameters
     ----------
-    grid : Grid
-        The lasy grid whose field should be transformed.
+    field : 3d numpy array
+        The field whose field should be transformed.
     """
     return hilbert(field[:, :, ::-1])[:, :, ::-1]
 
