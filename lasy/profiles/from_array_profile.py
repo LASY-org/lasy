@@ -62,7 +62,7 @@ class FromArrayProfile(Profile):
 
             self.combined_field_interp = RegularGridInterpolator(
                 (axes["x"], axes["y"], axes["t"]),
-                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
+                np.abs(self.array) + 1.0j * np.unwrap(np.angle(self.array), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )
@@ -78,9 +78,9 @@ class FromArrayProfile(Profile):
             # to make correct interpolation within the first cell
             if axes["r"][0] != 0.0:
                 r = np.concatenate(([-axes["r"][0]], axes["r"]))
-                subarray = array[:, 0, :]  # takes first element in second dimension
+                subarray = self.array[:, 0, :]  # takes first element in second dimension
                 self.array = np.concatenate(
-                    (subarray[:, np.newaxis, :], array), axis=1
+                    (subarray[:, np.newaxis, :], self.array), axis=1
                 )  # add it at the beginning
             else:
                 r = axes["r"]
