@@ -739,12 +739,13 @@ def create_grid(array, axes, dim, is_envelope=True):
         lo = (axes["r"][0], axes["t"][0])
         hi = (axes["r"][-1], axes["t"][-1])
         npoints = (axes["r"].size, axes["t"].size)
+        nm = int((array.shape[0] + 1) / 2)
         grid = Grid(
             dim,
             lo,
             hi,
             npoints,
-            n_azimuthal_modes=array.shape[0],
+            n_azimuthal_modes=nm,
             is_envelope=is_envelope,
         )
         assert np.all(grid.axes[0] == axes["r"])
