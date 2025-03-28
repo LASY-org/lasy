@@ -78,7 +78,9 @@ class FromArrayProfile(Profile):
             # to make correct interpolation within the first cell
             if axes["r"][0] != 0.0:
                 r = np.concatenate(([-axes["r"][0]], axes["r"]))
-                subarray = self.array[:, 0, :]  # takes first element in second dimension
+                subarray = self.array[
+                    :, 0, :
+                ]  # takes first element in second dimension
                 self.array = np.concatenate(
                     (subarray[:, np.newaxis, :], self.array), axis=1
                 )  # add it at the beginning
