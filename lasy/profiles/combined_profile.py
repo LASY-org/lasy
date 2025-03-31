@@ -32,11 +32,6 @@ class CombinedLongitudinalTransverseProfile(Profile):
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
 
-    laser_energy : float (in Joule)
-        The total energy of the laser pulse. The amplitude of the laser
-        field (:math:`E_0` in the above formula) is automatically
-        calculated so that the pulse has the prescribed energy.
-
     long_profile : :class:`.LongitudinalProfile`
         Defines the longitudinal envelope of the laser, i.e. the
         function :math:`\mathcal{L}(t)` in the above formula.
@@ -44,11 +39,53 @@ class CombinedLongitudinalTransverseProfile(Profile):
     transverse_profile : :class:`.TransverseProfile`
         Defines the transverse envelope of the laser, i.e. the
         function :math:`\mathcal{T}(x, y)` in the above formula.
+
+    laser_energy : float (in Joule)
+        The total energy of the laser pulse. The amplitude of the laser
+        field (:math:`E_0` in the above formula) is automatically
+        calculated so that the pulse has the prescribed energy.
+
+    peak_fluence : float (in J/m^2)
+        The peak fluence of the laser pulse. The amplitude of the laser
+        field (:math:`E_0` in the above formula) is automatically
+        calculated so that the pulse has the prescribed peak fluence.
+        Required for a CW (monochromatic) profile.
+
+    peak_power : float (in W)
+        The peak power of the laser pulse. The amplitude of the laser
+        field (:math:`E_0` in the above formula) is automatically
+        calculated so that the pulse has the prescribed peak power.
+        Required for a plane wave profile.
     """
 
-    def __init__(self, wavelength, pol, laser_energy, long_profile, trans_profile):
+    def __init__(
+        self,
+        wavelength,
+        pol,
+        long_profile,
+        trans_profile,
+        laser_energy=None,
+        peak_fluence=None,
+        peak_power=None,
+    ):
         super().__init__(wavelength, pol)
-        self.laser_energy = laser_energy
+        assert (
+            (laser_energy is not None)
+            ^ (peak_fluence is not None)
+            ^ (peak_power is not None)
+        ), "Exactly one of laser_energy, peak_fluence, or peak_power must be specified"
+        if long_profile.is_cw:
+            assert peak_fluence is not None
+            self.peak_fluence = peak_fluence
+            self.__update_is_cw__(long_profile.is_cw)
+
+        elif trans_profile.is_plane_wave:
+            assert peak_power is not None
+            self.peak_power = peak_power
+            self.__update_is_plane_wave__(trans_profile.is_plane_wave)
+        else:
+            assert laser_energy is not None
+            self.laser_energy = laser_energy
         self.long_profile = long_profile
         self.trans_profile = trans_profile
 

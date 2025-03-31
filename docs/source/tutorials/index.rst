@@ -16,3 +16,5 @@ Additionally, a set of static (automatically tested) examples can be found below
    gaussian_laser.ipynb
    axiparabola.ipynb
    denoised_laser.ipynb
+   1d_temporal_laser.ipynb
+   2d_spatial_laser.ipynb

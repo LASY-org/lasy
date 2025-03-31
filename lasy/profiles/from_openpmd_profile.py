@@ -109,7 +109,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         # extract the envelope with a Hilbert transform
         if not is_envelope:
             grid = create_grid(F, axes, dim, is_envelope=is_envelope)
-            grid, omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
+            omg0 = field_to_envelope(grid, dim, phase_unwrap_nd)
             array = grid.get_temporal_field()[0]
         else:
             s = io.Series(path + "/" + prefix + "_%T.h5", io.Access.read_only)
