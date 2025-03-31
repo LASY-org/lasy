@@ -51,7 +51,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         \exp\left(-\frac{(N+1)r^2}{w^2}\right)
         \sum_{n=0}^N \frac{1}{n!}\left(\frac{(N+1)\,r^2}{w^2}\right)^n
 
-    with the relationship between the spot sizes of the beams in the far field and in the near field given by;
+    with the relationship between the spot sizes of the beams in the far field and in the near field given by:
 
     .. math::
 
