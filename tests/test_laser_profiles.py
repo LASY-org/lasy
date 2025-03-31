@@ -566,8 +566,8 @@ def test_flattened_gaussian_profile():
 
     long = GaussianLongitudinalProfile(wl, tau, 0)
 
-    nf_prof = CombinedLongitudinalTransverseProfile(wl, pol, energy, long, nf)
-    ff_prof = CombinedLongitudinalTransverseProfile(wl, pol, energy, long, ff)
+    nf_prof = CombinedLongitudinalTransverseProfile(wl, pol, long, nf, laser_energy=energy)
+    ff_prof = CombinedLongitudinalTransverseProfile(wl, pol, long, ff, laser_energy=energy)
 
     dim = "rt"
     lo = (0, -100e-15)
