@@ -15,3 +15,4 @@ Transverse Laser Profiles
    jinc_profile
    transverse_profile_from_data
    plane_wave
+   flattened_gaussian
