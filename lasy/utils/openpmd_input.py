@@ -132,7 +132,11 @@ def convert_field_fbpic_to_lasy(grid, dim):
     array_new[0, :, :] = array[0, :, :]
     nm = int((array.shape[0] + 1) / 2)
     for mode in range(1, nm):
-        array_new[-mode, :, :] = (1.0j * array[2 * mode - 1, :, :] + array[2 * mode, :, :]) / 2.0j
-        array_new[mode, :, :] = -(1.0j * array[2 * mode - 1, :, :] - array[2 * mode, :, :]) / 2.0j
+        array_new[-mode, :, :] = (
+            1.0j * array[2 * mode - 1, :, :] + array[2 * mode, :, :]
+        ) / 2.0j
+        array_new[mode, :, :] = (
+            -(1.0j * array[2 * mode - 1, :, :] - array[2 * mode, :, :]) / 2.0j
+        )
 
     grid.set_temporal_field(array_new)

@@ -91,7 +91,9 @@ class FromArrayProfile(Profile):
             # However, lasy envelope array is 3D.
             # First dimension corresponds to the azimuthal mode decomposition.
             # For now, we just select mode 1 when many modes are present.
-            self.array = self.array[1, :, :] if self.array.shape[0] > 1 else self.array[0, :, :]
+            self.array = (
+                self.array[1, :, :] if self.array.shape[0] > 1 else self.array[0, :, :]
+            )
 
             self.combined_field_interp = RegularGridInterpolator(
                 (r, axes["t"]),
