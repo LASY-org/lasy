@@ -105,3 +105,34 @@ def reorder_array_rt(array, md):
         + np.flip(array[: array.shape[0] // 2, :], axis=0)
     )
     return array, axes
+
+
+def convert_field_fbpic_to_lasy(grid, dim):
+    """Convert an openPMD array to the lasy representation in `rt` geometry.
+
+    Parameters
+    ----------
+    grid : Grid
+        The Grid object on which the field is replaced with an envelope.
+        This object is modified by the function.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    """
+    assert dim == "rt", "Only rt geometry is supported."
+
+    array = grid.get_temporal_field()
+    array_new = np.zeros(array.shape, dtype=array.dtype)
+    array_new[0, :, :] = array[0, :, :]
+    nm = int((array.shape[0] + 1) / 2)
+    for mode in range(1, nm):
+        array_new[-mode, :, :] = (1.0j * array[2 * mode - 1, :, :] + array[2 * mode, :, :]) / 2.0j
+        array_new[mode, :, :] = -(1.0j * array[2 * mode - 1, :, :] - array[2 * mode, :, :]) / 2.0j
+
+    grid.set_temporal_field(array_new)
