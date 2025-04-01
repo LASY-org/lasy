@@ -60,6 +60,8 @@ def normalize_energy(dim, energy, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching laser energy to an energy given as an input.
+
     Parameters
     ----------
     dim : string
@@ -93,6 +95,8 @@ def normalize_peak_field_amplitude(amplitude, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching laser field amplitude to a peak field amplitude given as an input.
+
     Parameters
     ----------
     amplitude : scalar (V/m)
@@ -115,6 +119,8 @@ def normalize_peak_intensity(peak_intensity, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching laser intensity to a peak intensity given as an input.
+
     Parameters
     ----------
     peak_intensity : scalar (W/m^2)
@@ -134,9 +140,36 @@ def normalize_peak_intensity(peak_intensity, grid):
             grid.set_temporal_field(field)
 
 
+def normalize_peak_fluence(peak_fluence, grid):
+    """
+    Normalize energy of the laser pulse contained in grid.
+
+    Normalizes by matching laser fluence to a peak fluence given as an input.
+
+    Parameters
+    ----------
+    peak_fluence : scalar (J/m^2)
+        Peak fluence of the laser pulse after normalization.
+
+    grid : a Grid object
+        Contains value of the laser envelope and metadata.
+    """
+    if peak_fluence is not None:
+        field = grid.get_temporal_field()
+        fluence = get_laser_fluence(grid)
+        input_peak_fluence = fluence.max()
+        if input_peak_fluence == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            field *= np.sqrt(peak_fluence / input_peak_fluence)
+            grid.set_temporal_field(field)
+
+
 def normalize_average_intensity(average_intensity, grid):
     """
     Normalize energy of the laser pulse contained in grid.
+
+    Normalizes by matching average laser intensity to an average intensity given as an input.
 
     Parameters
     ----------
@@ -155,6 +188,90 @@ def normalize_average_intensity(average_intensity, grid):
         else:
             field *= np.sqrt(average_intensity / input_average_intensity)
             grid.set_temporal_field(field)
+
+
+def normalize_peak_power(dim, peak_power, grid):
+    """
+    Normalize energy of the laser pulse contained in grid.
+
+    Normalizes by matching laser power to a peak power given as an input.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    peak_power : scalar (W)
+        Peak power of the laser pulse after normalization.
+
+    grid : a Grid object
+        Contains value of the laser envelope and metadata.
+    """
+    if peak_power is not None:
+        power = get_laser_power(dim, grid)
+        input_peak_power = power.max()
+        if input_peak_power == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            field = grid.get_temporal_field()
+            grid.set_temporal_field(field * np.sqrt(peak_power / input_peak_power))
+
+
+def get_laser_power(dim, grid):
+    r"""
+    Calculate the instantaneous power of the laser along the time axis.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    Returns
+    -------
+    power : ndarray (W)
+        The instantaneous laser power along the temporal axis.
+    """
+    field = grid.get_temporal_field()
+    intensity = np.abs(epsilon_0 * field**2 / 2 * c)
+    dz = grid.dx[-1] * c
+    unit_area = get_grid_cell_volume(grid, dim) / dz
+    power = intensity.sum(axis=tuple(range(intensity.ndim - 1))) * unit_area
+
+    return power
+
+
+def get_laser_fluence(grid):
+    r"""
+    Calculate the fluence of the laser in space.
+
+    Parameters
+    ----------
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    Returns
+    -------
+    fluence : ndarray (J/m^2)
+        The fluence of the laser pulse in space.
+    """
+    field = grid.get_temporal_field()
+    intensity = np.abs(epsilon_0 * field**2 / 2 * c)
+    fluence = np.squeeze(np.sum(intensity, axis=-1) * grid.dx[-1])
+
+    return fluence
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):

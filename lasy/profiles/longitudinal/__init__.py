@@ -1,3 +1,4 @@
+from .continuous_wave_profile import ContinuousWaveProfile
 from .cosine_profile import CosineLongitudinalProfile
 from .gaussian_profile import GaussianLongitudinalProfile
 from .longitudinal_profile import LongitudinalProfile
@@ -10,4 +11,5 @@ __all__ = [
     "SuperGaussianLongitudinalProfile",
     "LongitudinalProfileFromData",
     "LongitudinalProfile",
+    "ContinuousWaveProfile",
 ]

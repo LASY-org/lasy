@@ -7,7 +7,9 @@ from lasy.utils.laser_utils import (
     normalize_average_intensity,
     normalize_energy,
     normalize_peak_field_amplitude,
+    normalize_peak_fluence,
     normalize_peak_intensity,
+    normalize_peak_power,
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
@@ -106,7 +108,15 @@ class Laser:
     def __init__(
         self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1, n_theta_evals=None
     ):
-        self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
+        self.grid = Grid(
+            dim,
+            lo,
+            hi,
+            npoints,
+            n_azimuthal_modes,
+            is_cw=profile.is_cw,
+            is_plane_wave=profile.is_plane_wave,
+        )
         self.dim = dim
         self.profile = profile
         self.output_iteration = 0  # Incremented each time write_to_file is called
@@ -142,13 +152,17 @@ class Laser:
                 )
             self.grid.set_temporal_field(field)
 
-        # For profiles that define the energy, normalize the amplitude
+        # For profiles that define the energy, peak fluence or peak power, normalize the amplitude
         if hasattr(profile, "laser_energy"):
             self.normalize(profile.laser_energy, kind="energy")
+        elif hasattr(profile, "peak_fluence"):
+            self.normalize(profile.peak_fluence, kind="peak_fluence")
+        elif hasattr(profile, "peak_power"):
+            self.normalize(profile.peak_power, kind="peak_power")
 
     def normalize(self, value, kind="energy"):
         """
-        Normalize the pulse either to the energy, peak field amplitude, peak intensity, or average intensity. The average intensity option operates on the envelope.
+        Normalize the pulse either to the energy, peak field amplitude, peak fluence, peak power, peak intensity, or average intensity. The average intensity option operates on the envelope.
 
         Parameters
         ----------
@@ -156,7 +170,7 @@ class Laser:
             Value to which to normalize the field property that is defined in ``kind``
         kind : string (optional)
             Distance by which the laser pulse should be propagated
-            Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'`` (default is ``'energy'``)
+            Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'``, ``'peak_fluence'``, ``'peak_power'``, (default is ``'energy'``)
         """
         if kind == "energy":
             normalize_energy(self.dim, value, self.grid)
@@ -166,6 +180,10 @@ class Laser:
             normalize_peak_intensity(value, self.grid)
         elif kind == "average_intensity":
             normalize_average_intensity(value, self.grid)
+        elif kind == "peak_power":
+            normalize_peak_power(self.dim, value, self.grid)
+        elif kind == "peak_fluence":
+            normalize_peak_fluence(value, self.grid)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
