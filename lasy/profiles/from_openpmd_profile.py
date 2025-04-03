@@ -103,19 +103,22 @@ class FromOpenPMDProfile(FromArrayProfile):
             axes_order.append(label)
 
         # Set the LASY order here.
-        # (If not, `create_grid` will fail below when converting
-        # from vector potential to electric field.)
+        # (If not, `create_grid` will fail below.)
         if axes_order[0] == "t":
             axes_order = axes_order[::-1]
             array = np.swapaxes(array, idx_offset, 2)
 
-        # This block determines is the field is stored as envelope or not.
+        # Get electric field envelope.
         try:
             # If field is stored as envelope,
             # it must contain the angular frequency as attribute.
             omg0 = m.get_attribute("angularFrequency")
+            envelopeField = m.get_attribute("envelopeField")
+            if envelopeField == "normalized_vector_potential":
+                grid = create_grid(array, axes, dim)
+                array = vector_potential_to_field(grid, omg0)
         except io.ErrorNoSuchAttribute:
-            # If no angular frequency present,
+            # If envelope attributes are not present,
             # then it must be the full electric field.
             grid = create_grid(array, axes, dim, is_envelope=False)
             omg0 = field_to_envelope(grid, dim)
@@ -123,20 +126,6 @@ class FromOpenPMDProfile(FromArrayProfile):
             array = grid.get_temporal_field()
 
         wavelength = 2 * np.pi * c / omg0
-
-        # If the envelope is stored as normalized vector potential,
-        # convert it to electric field
-        vector_to_field = False
-        try:
-            if m.get_attribute("envelopeField") == "normalized_vector_potential":
-                vector_to_field = True
-        except io.ErrorNoSuchAttribute:
-            if field == "a":
-                vector_to_field = True
-
-        if vector_to_field:
-            grid = create_grid(array, axes, dim)
-            array = vector_potential_to_field(grid, omg0)
 
         # Read/set polarization.
         try:
