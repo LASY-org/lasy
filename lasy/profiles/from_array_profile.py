@@ -77,13 +77,14 @@ class FromArrayProfile(Profile):
             # If the first point of radial axis is not 0, we "mirror" it,
             # to make correct interpolation within the first cell
             if axes["r"][0] != 0.0:
+                # add mirrored point to the axis
                 r = np.concatenate(([-axes["r"][0]], axes["r"]))
-                subarray = self.array[
-                    :, 0, :
-                ]  # takes first element in second dimension
+                # takes first element of the array in the radial dimension
+                subarray = self.array[:, 0, :]
+                # add it at the beginning to be the value at the mirrored point 
                 self.array = np.concatenate(
                     (subarray[:, np.newaxis, :], self.array), axis=1
-                )  # add it at the beginning
+                )
             else:
                 r = axes["r"]
 
