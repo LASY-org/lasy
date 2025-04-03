@@ -8,6 +8,8 @@ from lasy.utils.laser_utils import (
     vector_potential_to_field,
 )
 
+from lasy.utils.openpmd_input import convert_field_fbpic_to_lasy
+
 from .from_array_profile import FromArrayProfile
 
 
@@ -121,8 +123,8 @@ class FromOpenPMDProfile(FromArrayProfile):
             # If envelope attributes are not present,
             # then it must be the full electric field.
             grid = create_grid(array, axes, dim, is_envelope=False)
-            omg0 = field_to_envelope(grid, dim)
             # convert_field_fbpic_to_lasy(grid, dim)  <- work in progress
+            omg0 = field_to_envelope(grid, dim)
             array = grid.get_temporal_field()
 
         wavelength = 2 * np.pi * c / omg0
