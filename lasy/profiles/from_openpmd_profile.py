@@ -8,7 +8,7 @@ from lasy.utils.laser_utils import (
     vector_potential_to_field,
 )
 
-from lasy.utils.openpmd_input import convert_field_fbpic_to_lasy
+# from lasy.utils.openpmd_input import convert_field_fbpic_to_lasy
 
 from .from_array_profile import FromArrayProfile
 
