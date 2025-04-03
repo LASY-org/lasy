@@ -125,7 +125,7 @@ def convert_field_fbpic_to_lasy(grid, dim):
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     """
-    assert dim == "rt", "Only rt geometry is supported."
+    assert dim == "rt"
 
     array = grid.get_temporal_field()
     array_new = np.zeros(array.shape, dtype=array.dtype)
