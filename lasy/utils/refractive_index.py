@@ -72,12 +72,12 @@ class RefractiveIndexDatabase:
 
         Parameters
         ----------
-        database_path: str or None
+        database_path : str or None
             Is None, defaults to user home directory. If passed,
             should be the directory containing the database
             structure.
 
-        auto_download: bool, default is True
+        auto_download : bool, default is True
             If True, database will be downloaded. If False and
             no database found, an error will be thrown.
         """
@@ -151,21 +151,21 @@ class RefractiveIndexDatabase:
 
         Parameters
         ----------
-        shelf_name: str or None
+        shelf_name : str or None
             refractiveindex.info shelf name.
 
-        book_name: str or None
+        book_name : str or None
             refractiveindex.info book name.
 
-        page_name: str or None
+        page_name : str or None
             refractiveindex.info page name.
 
-        name: str or None
+        name : str or None
             A known name, defined in the dict `known_materials_nk` above.
 
         Returns
         -------
-        mat_dict: dict
+        mat_dict : dict
             Dict with all data available in the database entry, as
             read from the yaml file.
         """
@@ -212,18 +212,18 @@ class RefractiveIndexDatabase:
 
         Parameters
         ----------
-        shelf_name: str or None
+        shelf_name : str or None
             refractiveindex.info shelf name.
 
-        book_name: str or None
+        book_name : str or None
             refractiveindex.info book name.
 
-        name: str or None
+        name : str or None
             A known name, defined in the dict `known_materials_n2` above.
 
         Returns
         -------
-        data_dict: dict
+        data_dict : dict
             Dict containing the yaml database entries with page names as keys.
         """
         # If data is in the lasy database, return it
