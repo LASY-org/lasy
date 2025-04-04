@@ -1285,3 +1285,45 @@ def get_propation_angle(dim, grid, k0):
     angle_x = np.average(pphi_px, weights=env_abs2) / k0
     angle_y = np.average(pphi_py, weights=env_abs2) / k0
     return [angle_x, angle_y]
+
+
+def make_periodic_on_grid(dim, kmax, grid, n_order=8):
+    r"""
+    Makes the laser periodic on the grid. This is done by applying a low-pass super-Gaussian filter to the spatially Fouier transformed field.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    kmax : scalar (1/m)
+        Maximum k value used for Fourier filtering
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    n_order : scalar (optional)
+        Super-Gaussian order of the filter, exp(-(k**2/kmax**2)**(n_order/2))
+        If :math:`n=2` the super-Gaussian becomes a standard Gaussian function.
+    """
+    assert dim == "xyt", "Only cartesian domains are currently supported."
+
+    field = grid.get_temporal_field()
+    Nx, Ny, Nt = field.shape
+
+    # Transform the field from spatial to wavenumber domain
+    field_fft = np.fft.fftn(field, axes=(0, 1))
+    # Create the axes for wavenumbers
+    kx = 2 * np.pi * np.fft.fftfreq(Nx, grid.dx[0])
+    ky = 2 * np.pi * np.fft.fftfreq(Ny, grid.dx[1])
+    [ky_g, kx_g] = np.meshgrid(ky, kx)
+    # filter
+    filt = np.exp(-np.power((kx_g**2 + ky_g**2) / (kmax**2), n_order / 2))
+    field_fft *= np.repeat(filt[:, :, np.newaxis], Nt, axis=2)
+    # inverse transform
+    field = np.fft.ifftn(field_fft, axes=(0, 1))
+    grid.set_temporal_field(field)
