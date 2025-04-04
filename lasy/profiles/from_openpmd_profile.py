@@ -9,7 +9,6 @@ from lasy.utils.laser_utils import (
 )
 
 # from lasy.utils.openpmd_input import convert_field_fbpic_to_lasy
-
 from .from_array_profile import FromArrayProfile
 
 
