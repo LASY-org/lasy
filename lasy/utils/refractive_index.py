@@ -266,12 +266,12 @@ class RefractiveIndexDatabase:
 
         Parameters
         ----------
-        db: str, default is 'nk'
+        db : str, default is 'nk'
             Either 'nk' or 'n2'
 
         Returns
         -------
-        shelves: list
+        shelves : list
             List of shelf nambes available
         """
         if db == "nk":
@@ -287,15 +287,15 @@ class RefractiveIndexDatabase:
 
         Parameters
         ----------
-        shelf_name: str
+        shelf_name : str
             A shelf, must be available in the database.
 
-        db: str, default is 'nk'
+        db : str, default is 'nk'
             Either 'nk' or 'n2'
 
         Returns
         -------
-        books: list
+        books : list
             List of books on the given shelf.
         """
         if db == "nk":
@@ -315,18 +315,18 @@ class RefractiveIndexDatabase:
 
         Parameters
         ----------
-        shelf_name: str
+        shelf_name : str
             A shelf, must be available in the database.
 
-        book_name: str
+        book_name : str
             Name of book to get pages for.
 
-        db: str, default is 'nk'
+        db : str, default is 'nk'
             Either 'nk' or 'n2'
 
         Returns
         -------
-        pages: list
+        pages : list
             List of pages in the requested book on a requested shelf.
         """
         if db == "nk":
@@ -364,19 +364,19 @@ class Material:
 
         Parameters
         ----------
-        shelf: str or None
+        shelf : str or None
             refractiveindex.info shelf name.
 
-        book: str or None
+        book : str or None
             refractiveindex.info book name.
 
-        page: str or None
+        page : str or None
             refractiveindex.info page name.
 
-        name: str or None
+        name : str or None
             A known name, defined in the dict above.
 
-        db: RefractiveIndexDatabase instance or None
+        db : RefractiveIndexDatabase instance or None
             An instance of RefractiveIndexDatabase can be
             given, which speeds up material initialisation.
         """
@@ -475,13 +475,13 @@ class Material:
 
         Parameters
         ----------
-        lambda_um: float or iterable
+        lambda_um : float or iterable
             Wavelength(s) at which to evaluate the refractive
             index. Must be in microns.
 
         Returns
         -------
-        n: float or np.array
+        n : float or np.array
             Refractive index value, same shape as `lambda_mu`. 0 is
             returned for wavelengths outside the applicable range
         """
@@ -513,13 +513,13 @@ class Material:
 
         Parameters
         ----------
-        lambda_um: float or iterable
+        lambda_um : float or iterable
             Wavelength(s) at which to evaluate the extinction
             coefficient. Must be in microns.
 
         Returns
         -------
-        k: float or np.array
+        k : float or np.array
             Extinction coefficient, same shape as `lambda_mu`. 0 is
             returned for wavelengths outside the applicable range
         """
@@ -565,19 +565,19 @@ class Material:
 
         Parameters
         ----------
-        omega0: float (in rad/s)
+        omega0 : float (in rad/s)
             Central frequency at which to evaluate the
             spectral phase expansion terms.
 
         Returns
         -------
-        dphi_dw: float
+        dphi_dw : float
             First term (group delay), in units s/m
 
-        d2phi_dw2: float
+        d2phi_dw2 : float
             Second term (GVD), in units s^2/m
 
-        d3phi_dw3: float
+        d3phi_dw3 : float
             Third term (TOD), in units s^3/m
         """
         lam = 2 * np.pi * ct.c / omega0  # Sellmeier and everything uses dn/dlambda!
@@ -606,29 +606,29 @@ class Material:
 
         Parameters
         ----------
-        lambda_mu: float
+        lambda_mu : float
             The wavelength at which n2 should be evaluated. Must
             be in microns.
 
-        page: str or None, default is None
+        page : str or None, default is None
             If given, will only return n2 data from the requested
             page, ignoring all other data for the material.
 
-        return_mean: bool, default is False
+        return_mean : bool, default is False
             If False, all data where n2 can be evaluated will be
             returned. If True, a mean value of all available data
             is returned.
 
         Returns
         -------
-        n2: float or array
+        n2 : float or array
             n2 value (in m^2/W) at the given lambda_mu.
             If `return_mean` is True, a mean of all available data.
             If `return_mean` is False, all available data in an array.
 
             0 is returned if no data exists or was found.
 
-        pages: list
+        pages : list
             List of page names which contain n2 data for the requested
             wavelength.
         """
