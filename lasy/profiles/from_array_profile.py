@@ -81,7 +81,7 @@ class FromArrayProfile(Profile):
                 r = np.concatenate(([-axes["r"][0]], axes["r"]))
                 # takes first element of the array in the radial dimension
                 subarray = self.array[:, 0, :]
-                # add it at the beginning to be the value at the mirrored point 
+                # add it at the beginning to be the value at the mirrored point
                 self.array = np.concatenate(
                     (subarray[:, np.newaxis, :], self.array), axis=1
                 )
