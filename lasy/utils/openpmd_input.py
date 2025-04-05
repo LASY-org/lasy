@@ -106,6 +106,7 @@ def OLD_reorder_array_rt(array, md):
     )
     return array, axes
 
+
 def reorder_array_xyt(array, md):
     """Reorder an openPMD array to the lasy representation in `xyt` geometry.
 

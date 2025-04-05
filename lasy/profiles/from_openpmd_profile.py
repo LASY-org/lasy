@@ -10,6 +10,7 @@ from lasy.utils.laser_utils import (
 
 from .from_array_profile import FromArrayProfile
 
+
 def _reorder_array(array, m, position):
     axis_labels = m.get_attribute("axisLabels")
     grid_offset = m.get_attribute("gridGlobalOffset")
@@ -17,19 +18,14 @@ def _reorder_array(array, m, position):
     print(axis_labels)
     if len(axis_labels) == 2:
         idx_offset = 1
-        assert axis_labels in [
-            ["r", "z"],
-            ["z", "r"],
-            ["r", "t"],
-            ["t", "r"]
-        ]
+        assert axis_labels in [["r", "z"], ["z", "r"], ["r", "t"], ["t", "r"]]
     elif len(axis_labels) == 3:
         idx_offset = 0
         assert axis_labels in [
             ["x", "y", "z"],
             ["z", "y", "x"],
             ["x", "y", "t"],
-            ["t", "y", "x"]
+            ["t", "y", "x"],
         ]
 
     # Define parameters to create a profile
@@ -60,15 +56,16 @@ def _reorder_array(array, m, position):
 
     return axes_order, axes, array
 
+
 def _convert_modes(arr_list, dim_in, is_env):
     if dim_in == "cartesian":
         assert len(arr_list) == 1
         return arr_list[0]
     # Convert to LASY mode decomposition exp(i*m*theta) m in [-N+1,N-1]:
-        # - Electromagnetic + cylindrical: we assume Er and Etheta
-        #   https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record
-        # - Envelope + cylindrical: we assume Ex (actually Epol)
-        #   Modes in file are still assumes cos(theta) and sin(theta)
+    # - Electromagnetic + cylindrical: we assume Er and Etheta
+    #   https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record
+    # - Envelope + cylindrical: we assume Ex (actually Epol)
+    #   Modes in file are still assumes cos(theta) and sin(theta)
     array_out = np.zeros_like(arr_list[0], dtype="complex128")
     nmodes_in = (arr_list[0].shape[0] + 1) // 2
     print("nmodes_in", nmodes_in)
@@ -78,9 +75,11 @@ def _convert_modes(arr_list, dim_in, is_env):
         nmodes_out = nmodes_in
         array_in = arr_list[0]
         array_out = np.zeros_like(arr_list[0], dtype="complex128")
-        array_out[0,:,:] = array_in[0,:,:]
+        array_out[0, :, :] = array_in[0, :, :]
         for imode in range(nmodes_in):
-            array_out[imode,:,:] = 0.5 * ( array_in[ 2*imode - 1 ] - 1j * array_in[ 2*imode ] )
+            array_out[imode, :, :] = 0.5 * (
+                array_in[2 * imode - 1] - 1j * array_in[2 * imode]
+            )
     else:
         # arr_list contains 2 elements, Er and Etheta, that need to be
         # combined into Ex. At this point, still operating on full field.
@@ -91,29 +90,32 @@ def _convert_modes(arr_list, dim_in, is_env):
 
         nmodes_out = nmodes_in - 1
         # array_out = np.zeros(shape=(2*nmodes_out-1, Er_in.shape[1], Er_in.shape[2]), dtype="float64")
-        array_out = np.zeros(shape=(2*nmodes_out-1, Er_in.shape[1], Er_in.shape[2]))
+        array_out = np.zeros(shape=(2 * nmodes_out - 1, Er_in.shape[1], Er_in.shape[2]))
         # The _in arrays have real and imag parts separated, so we add them
         # together by hand
         for imode in range(nmodes_out):
             # 2*m - 1 and 2*m are real and imag part of mode m, respectively
             # The +1 is conversion from Er & Etheta representation to Ex
-            print(np.amax(Er_in[1,:,:]))
-            print(np.amax(Et_in[2,:,:]))
+            print(np.amax(Er_in[1, :, :]))
+            print(np.amax(Et_in[2, :, :]))
             # array_out[imode,:,:] = \
             #     0.5 * ( Er_in[2*(imode+1)-1,:,:] + 1j * Er_in[2*(imode+1),:,:] + 1j *
             #             Et_in[2*(imode+1)-1,:,:] + 1j * Et_in[2*(imode+1),:,:])
-            array_out[imode,:,:] = \
-                0.5 * ( Er_in[2*(imode+1)-1,:,:] - Et_in[2*(imode+1),:,:] )
+            array_out[imode, :, :] = 0.5 * (
+                Er_in[2 * (imode + 1) - 1, :, :] - Et_in[2 * (imode + 1), :, :]
+            )
             print(np.amax(array_out))
             # Here we assume that mode 0 is only plasma, so we never use it
             if imode >= 2:
                 # array_out[imode,:,:] += \
                 #     0.5 * ( Er_in[2*(imode-1)-1,:,:] + 1j * Er_in[2*(imode-1),:,:] - 1j *
                 #             Et_in[2*(imode-1)-1,:,:] + 1j * Et_in[2*(imode-1),:,:])
-                array_out[imode,:,:] += \
-                    0.5 * ( Er_in[2*(imode-1)-1,:,:] + Et_in[2*(imode-1),:,:] )
+                array_out[imode, :, :] += 0.5 * (
+                    Er_in[2 * (imode - 1) - 1, :, :] + Et_in[2 * (imode - 1), :, :]
+                )
 
     return array_out
+
 
 class FromOpenPMDProfile(FromArrayProfile):
     r"""
@@ -149,14 +151,14 @@ class FromOpenPMDProfile(FromArrayProfile):
             try:
                 m = i.meshes["laserEnvelope"]
             except:
-                m = i.meshes["a"]                
+                m = i.meshes["a"]
             omg0 = m.get_attribute("angularFrequency")
             try:
                 envelopeField = m.get_attribute("envelopeField")
                 pol = m.get_attribute("polarization")
             except:
                 envelopeField = "normalized_vector_potential"
-                pol = (1,0)
+                pol = (1, 0)
             array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
             print(array.shape)
             # node (0.0) or cell (0.5) centered info for each axis
