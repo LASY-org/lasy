@@ -84,13 +84,6 @@ class FromArrayProfile(Profile):
             # Loop over the 2*m-1 elements of the array and createe a separate
             # interpolator object for each of them
             for imode in range(array.shape[0]):
-                print("wesh")
-#                 field_interp = RegularGridInterpolator(
-#                     (r, axes["t"]),
-#                     np.abs(self.array[imode,:,:]) + 1.0j * np.unwrap(np.angle(self.array[imode,:,:]), axis=-1),
-#                     bounds_error=False,
-#                     fill_value=0.0,
-#                 )
                 self.field_interp_modes.append( RegularGridInterpolator(
                     (r, axes["t"]),
                     np.abs(self.array[imode,:,:]) + 1.0j * np.unwrap(np.angle(self.array[imode,:,:]), axis=-1),
@@ -105,10 +98,11 @@ class FromArrayProfile(Profile):
             combined_field = self.combined_field_interp((x, y, t))
         else:
             r = np.sqrt(x**2 + y**2)
-            theta = np.angle(x,y)
+            theta = np.angle(x+1j*y)
             combined_field = np.zeros_like(x, dtype="complex128")
-            for imode in range(-self.nmodes+1,self.nmodes):
-                combined_field += self.field_interp_modes[imode](r, t) * np.exp(-1j * imode * theta)
+            nmodes = (len(self.field_interp_modes) + 1)//2
+            for imode in range(-nmodes+1, nmodes):
+                combined_field += self.field_interp_modes[imode]((r, t)) * np.exp(-1j * imode * theta)
 
         envelope = np.abs(np.real(combined_field)) * np.exp(
             1.0j * np.imag(combined_field)
@@ -118,11 +112,5 @@ class FromArrayProfile(Profile):
 
     def evaluate_mrt(self, mode, r, t):
         """Return the envelope field of the scaled profile."""
-        if hasattr(self, "field_interp_modes"):
-            print(mode)
-            print(r.shape)
-            print(t.shape)
-            print(len(self.field_interp_modes))
-            return self.field_interp_modes[mode]((r, t))
-        else:
-            print("evaluate_mrt not properly set")
+        assert self.dim == "rt"
+        return self.field_interp_modes[mode]((r, t))
