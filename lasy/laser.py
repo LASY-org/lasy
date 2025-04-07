@@ -133,10 +133,12 @@ class Laser:
         elif self.dim == "rt":
             if hasattr(profile, "evaluate_mrt"):
                 r, t = np.meshgrid(*self.grid.axes, indexing="ij")
-                field = np.zeros((2*self.grid.n_azimuthal_modes-1, *r.shape), dtype="complex128")
+                field = np.zeros(
+                    (2 * self.grid.n_azimuthal_modes - 1, *r.shape), dtype="complex128"
+                )
                 print(field.shape)
                 for mode in range(2 * self.grid.n_azimuthal_modes - 1):
-                    field[mode,:,:] = profile.evaluate_mrt(mode, r, t)
+                    field[mode, :, :] = profile.evaluate_mrt(mode, r, t)
             else:
                 if n_theta_evals is None:
                     # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of

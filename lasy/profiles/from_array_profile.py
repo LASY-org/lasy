@@ -85,18 +85,20 @@ class FromArrayProfile(Profile):
             # interpolator object for each of them
             for imode in range(array.shape[0]):
                 print("wesh")
-#                 field_interp = RegularGridInterpolator(
-#                     (r, axes["t"]),
-#                     np.abs(self.array[imode,:,:]) + 1.0j * np.unwrap(np.angle(self.array[imode,:,:]), axis=-1),
-#                     bounds_error=False,
-#                     fill_value=0.0,
-#                 )
-                self.field_interp_modes.append( RegularGridInterpolator(
-                    (r, axes["t"]),
-                    np.abs(self.array[imode,:,:]) + 1.0j * np.unwrap(np.angle(self.array[imode,:,:]), axis=-1),
-                    bounds_error=False,
-                    fill_value=0.0,
-                )
+                #                 field_interp = RegularGridInterpolator(
+                #                     (r, axes["t"]),
+                #                     np.abs(self.array[imode,:,:]) + 1.0j * np.unwrap(np.angle(self.array[imode,:,:]), axis=-1),
+                #                     bounds_error=False,
+                #                     fill_value=0.0,
+                #                 )
+                self.field_interp_modes.append(
+                    RegularGridInterpolator(
+                        (r, axes["t"]),
+                        np.abs(self.array[imode, :, :])
+                        + 1.0j * np.unwrap(np.angle(self.array[imode, :, :]), axis=-1),
+                        bounds_error=False,
+                        fill_value=0.0,
+                    )
                 )
 
     def evaluate(self, x, y, t):
@@ -105,10 +107,12 @@ class FromArrayProfile(Profile):
             combined_field = self.combined_field_interp((x, y, t))
         else:
             r = np.sqrt(x**2 + y**2)
-            theta = np.angle(x,y)
+            theta = np.angle(x, y)
             combined_field = np.zeros_like(x, dtype="complex128")
-            for imode in range(-self.nmodes+1,self.nmodes):
-                combined_field += self.field_interp_modes[imode](r, t) * np.exp(-1j * imode * theta)
+            for imode in range(-self.nmodes + 1, self.nmodes):
+                combined_field += self.field_interp_modes[imode](r, t) * np.exp(
+                    -1j * imode * theta
+                )
 
         envelope = np.abs(np.real(combined_field)) * np.exp(
             1.0j * np.imag(combined_field)
