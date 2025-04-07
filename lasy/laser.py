@@ -131,25 +131,32 @@ class Laser:
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
             self.grid.set_temporal_field(profile.evaluate(x, y, t))
         elif self.dim == "rt":
-            if n_theta_evals is None:
-                # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
-                # theta, to evaluate the laser
-                n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
-            # Make sure that there are enough points to resolve the azimuthal modes
-            assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
-            theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
-            theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
-            x = r * np.cos(theta)
-            y = r * np.sin(theta)
-            # Evaluate the profile on the generated grid
-            envelope = profile.evaluate(x, y, t)
-            # Perform the azimuthal decomposition
-            azimuthal_modes = np.fft.ifft(envelope, axis=0)
-            field = azimuthal_modes[:n_azimuthal_modes]
-            if n_azimuthal_modes > 1:
-                field = np.concatenate(
-                    (field, azimuthal_modes[-n_azimuthal_modes + 1 :])
-                )
+            if hasattr(profile, "evaluate_mrt"):
+                r, t = np.meshgrid(*self.grid.axes, indexing="ij")
+                field = np.zeros((2*self.grid.n_azimuthal_modes-1, *r.shape), dtype="complex128")
+                print(field.shape)
+                for mode in range(2 * self.grid.n_azimuthal_modes - 1):
+                    field[mode,:,:] = profile.evaluate_mrt(mode, r, t)
+            else:
+                if n_theta_evals is None:
+                    # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
+                    # theta, to evaluate the laser
+                    n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
+                # Make sure that there are enough points to resolve the azimuthal modes
+                assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
+                theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
+                theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
+                x = r * np.cos(theta)
+                y = r * np.sin(theta)
+                # Evaluate the profile on the generated grid
+                envelope = profile.evaluate(x, y, t)
+                # Perform the azimuthal decomposition
+                azimuthal_modes = np.fft.ifft(envelope, axis=0)
+                field = azimuthal_modes[:n_azimuthal_modes]
+                if n_azimuthal_modes > 1:
+                    field = np.concatenate(
+                        (field, azimuthal_modes[-n_azimuthal_modes + 1 :])
+                    )
             self.grid.set_temporal_field(field)
 
         # For profiles that define the energy, peak fluence or peak power, normalize the amplitude
