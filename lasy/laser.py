@@ -11,7 +11,7 @@ from lasy.utils.laser_utils import (
     normalize_peak_intensity,
     normalize_peak_power,
 )
-from lasy.utils.openpmd_output import write_to_openpmd_file
+from lasy.utils.openpmd_helper import write_to_openpmd_file
 
 
 class Laser:
