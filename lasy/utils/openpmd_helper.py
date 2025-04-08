@@ -109,7 +109,7 @@ def write_to_openpmd_file(
         # Switch from x,y,t (internal to lasy) to t,y,x (in openPMD file)
         # This is because many PIC codes expect x to be the fastest index
         data = np.transpose(array).copy()
-    else: # dim == "rt"
+    else:  # dim == "rt"
         # The representation of modes in openPMD
         # (see https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record)
         # is different than the representation of modes internal to lasy.
