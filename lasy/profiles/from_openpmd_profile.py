@@ -51,10 +51,11 @@ def _extract_array(m, series, component=None):
     axis_labels = m.get_attribute("axisLabels")
     grid_offset = m.get_attribute("gridGlobalOffset")
     grid_spacing = m.get_attribute("gridSpacing")
+    assert len(axis_labels) in [2, 3]
     if len(axis_labels) == 2:
         idx_offset = 1
         assert axis_labels in [["r", "z"], ["z", "r"], ["r", "t"], ["t", "r"]]
-    elif len(axis_labels) == 3:
+    else: # len(axis_labels) == 3
         idx_offset = 0
         assert axis_labels in [
             ["x", "y", "z"],
@@ -217,7 +218,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             try:
                 envelopeField = m.get_attribute("envelopeField")
                 pol = m.get_attribute("polarization")
-            except:
+            except Exception:
                 envelopeField = "normalized_vector_potential"
                 pol = (1, 0)
                 print(
