@@ -35,9 +35,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         If true, print some more intermediate steps.
     """
 
-    def __init__(
-        self, filename, is_envelope, field_name=None, verbose=False
-    ):
+    def __init__(self, filename, is_envelope, field_name=None, verbose=False):
         series = io.Series(filename, io.Access.read_only)
         iterations = np.array(series.iterations)
         i = series.iterations[iterations[-1]]
@@ -74,7 +72,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             if geometry == "cartesian":
                 field_list = ["E"]
                 coord_list = ["x"]
-            else: # thetaMode
+            else:  # thetaMode
                 field_list = ["E", "E"]
                 coord_list = ["r", "t"]
             array_list = []
