@@ -103,11 +103,13 @@ class FromArrayProfile(Profile):
             combined_field = self.combined_field_interp((x, y, t))
         else:
             r = np.sqrt(x**2 + y**2)
-            theta = np.angle(x+1j*y)
+            theta = np.angle(x + 1j * y)
             combined_field = np.zeros_like(x, dtype="complex128")
-            nmodes = (len(self.field_interp_modes) + 1)//2
-            for imode in range(-nmodes+1, nmodes):
-                combined_field += self.field_interp_modes[imode]((r, t)) * np.exp(-1j * imode * theta)
+            nmodes = (len(self.field_interp_modes) + 1) // 2
+            for imode in range(-nmodes + 1, nmodes):
+                combined_field += self.field_interp_modes[imode]((r, t)) * np.exp(
+                    -1j * imode * theta
+                )
 
         envelope = np.abs(np.real(combined_field)) * np.exp(
             1.0j * np.imag(combined_field)

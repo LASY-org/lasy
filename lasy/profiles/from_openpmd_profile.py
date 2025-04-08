@@ -53,13 +53,14 @@ def _extract_array(m, series, component=None):
     grid_spacing = m.get_attribute("gridSpacing")
     if len(axis_labels) == 2:
         idx_offset = 1
-        assert axis_labels in [["r", "z"], ["z", "r"],
-                               ["r", "t"], ["t", "r"]]
+        assert axis_labels in [["r", "z"], ["z", "r"], ["r", "t"], ["t", "r"]]
     elif len(axis_labels) == 3:
         idx_offset = 0
         assert axis_labels in [
-            ["x", "y", "z"], ["z", "y", "x"],
-            ["x", "y", "t"], ["t", "y", "x"]
+            ["x", "y", "z"],
+            ["z", "y", "x"],
+            ["x", "y", "t"],
+            ["t", "y", "x"],
         ]
 
     # Define parameters to create a profile
@@ -103,7 +104,7 @@ def _convert_modes(arr_list, dim_in, is_env, verbose=False):
     ----------
     arr_list : list of Numpy arrays
         List of 3D arrays to be converted. They are processed independently.
-    
+
     dim_in : string
         "cartesian" or "cylindrical". Dimensionality of input data.
 
@@ -219,10 +220,20 @@ class FromOpenPMDProfile(FromArrayProfile):
             except:
                 envelopeField = "normalized_vector_potential"
                 pol = (1, 0)
-                print("WARNING: 'envelopeField' and/or 'polarization' attributes must be specified according to the standard but are currently missing for mesh record " + field_name + ", see https://github.com/openPMD/openPMD-standard/blob/upcoming-2.0.0/EXT_LaserEnvelope.md. Assumed 'normalized_vector_potential' and (1,0), respectively.")
+                print(
+                    "WARNING: 'envelopeField' and/or 'polarization' attributes must be specified according to the standard but are currently missing for mesh record "
+                    + field_name
+                    + ", see https://github.com/openPMD/openPMD-standard/blob/upcoming-2.0.0/EXT_LaserEnvelope.md. Assumed 'normalized_vector_potential' and (1,0), respectively."
+                )
             axes_order, axes, array = _extract_array(m, series)
-            assert dimension == 'cylindrical' and axes_order == ['r', 't'] or \
-                   dimension == 'cartesian' and axes_order == ['x', 'y', 't'], "'dimension' not consistent with properties of array read from openPMD file"
+            assert (
+                dimension == "cylindrical"
+                and axes_order == ["r", "t"]
+                or dimension == "cartesian"
+                and axes_order == ["x", "y", "t"]
+            ), (
+                "'dimension' not consistent with properties of array read from openPMD file"
+            )
             array = _convert_modes([array], dimension, is_envelope, verbose)
             if envelopeField == "normalized_vector_potential":
                 if verbose:
