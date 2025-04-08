@@ -113,7 +113,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             t_amplitude = (
                 np.fft.ifftshift(
                     np.fft.fft(
-                        np.fft.fftshift(freq_amplitude * np.exp(-1j * freq_phase))
+                        np.fft.fftshift(freq_amplitude * np.exp(1j * freq_phase))
                     )
                 )
                 / dt
