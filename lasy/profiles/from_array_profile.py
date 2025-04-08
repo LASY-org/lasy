@@ -87,12 +87,14 @@ class FromArrayProfile(Profile):
             # Loop over the 2*m-1 elements of the array and createe a separate
             # interpolator object for each of them
             for imode in range(array.shape[0]):
-                self.field_interp_modes.append( RegularGridInterpolator(
-                    (r, axes["t"]),
-                    np.abs(self.array[imode,:,:]) + 1.0j * np.unwrap(np.angle(self.array[imode,:,:]), axis=-1),
-                    bounds_error=False,
-                    fill_value=0.0,
-                )
+                self.field_interp_modes.append(
+                    RegularGridInterpolator(
+                        (r, axes["t"]),
+                        np.abs(self.array[imode, :, :])
+                        + 1.0j * np.unwrap(np.angle(self.array[imode, :, :]), axis=-1),
+                        bounds_error=False,
+                        fill_value=0.0,
+                    )
                 )
 
     def evaluate(self, x, y, t):

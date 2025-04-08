@@ -198,12 +198,7 @@ class FromOpenPMDProfile(FromArrayProfile):
     """
 
     def __init__(
-        self,
-        filename,
-        dimension,
-        is_envelope,
-        field_name=None,
-        verbose=False
+        self, filename, dimension, is_envelope, field_name=None, verbose=False
     ):
         assert dimension in ["cartesian", "cylindrical"]
         dim = "rt" if dimension == "cylindrical" else "xyt"
@@ -213,7 +208,9 @@ class FromOpenPMDProfile(FromArrayProfile):
         if is_envelope:
             if verbose:
                 print("Read envelope")
-            assert field_name is not None, "field_name must be specified for an envelope"
+            assert field_name is not None, (
+                "field_name must be specified for an envelope"
+            )
             m = i.meshes[field_name]
             omg0 = m.get_attribute("angularFrequency")
             try:
