@@ -16,7 +16,7 @@ class FromOpenPMDProfile(FromArrayProfile):
     r"""
     Profile defined from an openPMD file.
 
-    Upon initialization, read from an openPMD profile, builds interpolation objects on the array data and use them to create function evaluate.
+    Upon initialization, read from an openPMD profile, build interpolation objects on the array data and use them to create function evaluate.
 
     Parameters
     ----------

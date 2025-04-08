@@ -52,7 +52,7 @@ class FromArrayProfile(Profile):
         super().__init__(wavelength, pol)
 
         assert dim in ["xyt", "rt"]
-        assert array.ndim == 3, "array myst be 3D, [x,y,t] or [modes,r,t]."
+        assert array.ndim == 3, "array must be 3D, [x,y,t] or [modes,r,t]."
         self.axes = axes
         self.dim = dim
         self.array = array
@@ -84,7 +84,7 @@ class FromArrayProfile(Profile):
                 r = axes["r"]
 
             self.field_interp_modes = []
-            # Loop over the 2*m-1 elements of the array and createe a separate
+            # Loop over the 2*m-1 elements of the array and create a separate
             # interpolator object for each of them
             for imode in range(array.shape[0]):
                 self.field_interp_modes.append(
