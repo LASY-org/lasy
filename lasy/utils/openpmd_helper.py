@@ -135,6 +135,7 @@ def write_to_openpmd_file(
     series.flush()
     series.close()
 
+
 def extract_array(m, series, component=None):
     """
     Extract and reorder openPMD-formatted array to LASY ordering.

@@ -1,12 +1,13 @@
 import numpy as np
 import openpmd_api as io
 from scipy.constants import c
-from lasy.utils.openpmd_helper import extract_array, convert_modes
+
 from lasy.utils.laser_utils import (
     create_grid,
     field_to_envelope,
     vector_potential_to_field,
 )
+from lasy.utils.openpmd_helper import convert_modes, extract_array
 
 from .from_array_profile import FromArrayProfile
 
