@@ -55,7 +55,7 @@ def _extract_array(m, series, component=None):
     if len(axis_labels) == 2:
         idx_offset = 1
         assert axis_labels in [["r", "z"], ["z", "r"], ["r", "t"], ["t", "r"]]
-    else: # len(axis_labels) == 3
+    else:  # len(axis_labels) == 3
         idx_offset = 0
         assert axis_labels in [
             ["x", "y", "z"],
