@@ -131,7 +131,7 @@ class Laser:
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
             self.grid.set_temporal_field(profile.evaluate(x, y, t))
         elif self.dim == "rt":
-            profile_rt = profile.dim == 'rt' if hasattr(profile, "dim") else False
+            profile_rt = profile.dim == "rt" if hasattr(profile, "dim") else False
             if profile_rt:
                 r, t = np.meshgrid(*self.grid.axes, indexing="ij")
                 field = np.zeros(
