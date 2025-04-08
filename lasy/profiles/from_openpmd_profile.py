@@ -11,20 +11,55 @@ from lasy.utils.laser_utils import (
 from .from_array_profile import FromArrayProfile
 
 
-def _reorder_array(array, m, position, verbose=False):
+def _extract_array(m, series, component=None):
+    """
+    Extract and eorder an array at the openPMD format to LASY ordering,
+    namely ensure that:
+     - The longitudinal dimension is t, not z
+     - The last axis is t
+
+    Parameters
+    ----------
+    m : openPMD-api mesh record object
+        The array and metadata are read from this.
+
+    series : openPMD Series
+        The series containing data m. Only passed for the flush.
+
+    Returns
+    -------
+    axes_order : List of strings
+        Name and ordering of the axes array.
+        Input argument for FromArrayProfile, see there for more details.
+
+    axes : Python dictionary containing the axes vectors
+        e.g. keys: 'x', 'y', 't' and values: the 1D arrays of each axis.
+        Input argument for FromArrayProfile, see there for more details.
+
+    array : 3D array of complex numbers
+        Reordered array, with axes in the right order and t last.
+
+    """
+    if component is not None:
+        array = m[component].load_chunk()
+        position = m[component].get_attribute("position")
+    else:
+        array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
+        position = m.get_attribute("position")
+    series.flush()
+    # node (0.0) or cell (0.5) centered info for each axis
     axis_labels = m.get_attribute("axisLabels")
     grid_offset = m.get_attribute("gridGlobalOffset")
     grid_spacing = m.get_attribute("gridSpacing")
     if len(axis_labels) == 2:
         idx_offset = 1
-        assert axis_labels in [["r", "z"], ["z", "r"], ["r", "t"], ["t", "r"]]
+        assert axis_labels in [["r", "z"], ["z", "r"],
+                               ["r", "t"], ["t", "r"]]
     elif len(axis_labels) == 3:
         idx_offset = 0
         assert axis_labels in [
-            ["x", "y", "z"],
-            ["z", "y", "x"],
-            ["x", "y", "t"],
-            ["t", "y", "x"],
+            ["x", "y", "z"], ["z", "y", "x"],
+            ["x", "y", "t"], ["t", "y", "x"]
         ]
 
     # Define parameters to create a profile
@@ -57,14 +92,37 @@ def _reorder_array(array, m, position, verbose=False):
 
 
 def _convert_modes(arr_list, dim_in, is_env, verbose=False):
+    """
+    Convert from openPMD mode decomposition in cos(m*theta) and sin(m*theta), stored, m in [0, Nmodes] to LASY mode decomposition exp(i*m*theta) m in [-Nmodes+1,Nmodes-1] (array of complex numbers, see https://github.com/LASY-org/lasy/blob/development/README.md):
+     - Electromagnetic + cylindrical: we assume Er and Etheta
+        https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record. Complex modes, the real and imag part are stored in 2 real arrays.
+     - Envelope + cylindrical: we assume the array is Ex (in principle, we should measure the polarization). Complex modes, stored as arrays of complex numbers. See openPMD link above aas well as https://github.com/openPMD/openPMD-standard/blob/upcoming-2.0.0/EXT_LaserEnvelope.md.
+     - Cartesian: do not do anything.
+
+    Parameters
+    ----------
+    arr_list : list of Numpy arrays
+        List of 3D arrays to be converted. They are processed independently.
+    
+    dim_in : string
+        "cartesian" or "cylindrical". Dimensionality of input data.
+
+    is_env : bool
+        Whether the input data represents a laser envelope.
+        Otherwise electric field is assumed, specifically x-polarized at the moment.
+
+    verbose : bool (optional)
+        If true, print some more intermediate steps.
+
+    Returns
+    -------
+    array_out : 3D array
+        The array converted to LASY mode decomposition.
+        This is still the full field, not yet the envelope.
+    """
     if dim_in == "cartesian":
         assert len(arr_list) == 1
         return arr_list[0]
-    # Convert to LASY mode decomposition exp(i*m*theta) m in [-N+1,N-1]:
-    # - Electromagnetic + cylindrical: we assume Er and Etheta
-    #   https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record
-    # - Envelope + cylindrical: we assume Ex (actually Epol)
-    #   Modes in file are still assumes cos(theta) and sin(theta)
     nmodes_in = (arr_list[0].shape[0] + 1) // 2
     if verbose:
         print("nmodes_in:", nmodes_in)
@@ -74,6 +132,8 @@ def _convert_modes(arr_list, dim_in, is_env, verbose=False):
         array_in = arr_list[0]
         array_out = np.zeros_like(arr_list[0], dtype="complex128")
         array_out[0, :, :] = array_in[0, :, :]
+        # The data is already Ex, we simply to convert from
+        # cos(m*theta) and sin(m*theta) to exp(i*m*theta).
         for imode in range(1, nmodes_in):
             array_out[imode, :, :] = 0.5 * (
                 array_in[2 * imode - 1] + 1j * array_in[2 * imode]
@@ -96,8 +156,10 @@ def _convert_modes(arr_list, dim_in, is_env, verbose=False):
         # The _in arrays have real and imag parts separated, so we add them
         # together by hand
         for imode in range(nmodes_out):
-            # 2*m - 1 and 2*m are real and imag part of mode m, respectively
+            # input 2*m - 1 and 2*m are real and imag part of mode m, respectively
             # The +1 is conversion from Er & Etheta representation to Ex
+            # output exp(i*m*theta) modes: for some reasons, all data goes in
+            # m >= 0 modes
             array_out[imode, :, :] = 0.5 * (
                 Er_in[2 * (imode + 1) - 1, :, :] - Et_in[2 * (imode + 1), :, :]
             )
@@ -116,17 +178,23 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     Parameters
     ----------
-    path : string
-        Path to the openPMD file containing the laser field or envelope.
+    filename : string
+        Name of openPMD file to read the envelope from, including path.
 
-    iteration : int
-        Iteration at which the argument is read.
+    dimension : string
+        "cartesian" or "cylindrical".
+        Dimensionality of the data from the openPMD file.
 
-    field : string
-        Name of the field containing the laser pulse.
+    is_envelope : bool
+        Whether the openPMD file represents a laser envelope.
+        Otherwise, electric field is assumed, and its envelope is extracted.
 
-    component : string
-        Name of the component of the field to be read.
+    field_name : string (optional)
+        Required if is_envelope is True.
+        The name of the envelope field (this is not prescribed by the openPMD standard for the envelope).
+
+    verbose : bool (optional)
+        If true, print some more intermediate steps.
     """
 
     def __init__(
@@ -155,14 +223,10 @@ class FromOpenPMDProfile(FromArrayProfile):
                 envelopeField = "normalized_vector_potential"
                 pol = (1, 0)
                 print("WARNING: 'envelopeField' and/or 'polarization' attributes must be specified according to the standard but are currently missing for mesh record " + field_name + ", see https://github.com/openPMD/openPMD-standard/blob/upcoming-2.0.0/EXT_LaserEnvelope.md. Assumed 'normalized_vector_potential' and (1,0), respectively.")
-            array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
-            # node (0.0) or cell (0.5) centered info for each axis
-            position = m.get_attribute("position")
-            series.flush()
-            axes_order, axes, array = _reorder_array(array, m, position)
+            axes_order, axes, array = _extract_array(m, series)
             assert dimension == 'cylindrical' and axes_order == ['r', 't'] or \
                    dimension == 'cartesian' and axes_order == ['x', 'y', 't'], "'dimension' not consistent with properties of array read from openPMD file"
-            array = _convert_modes([array], dimension, is_envelope)
+            array = _convert_modes([array], dimension, is_envelope, verbose)
             if envelopeField == "normalized_vector_potential":
                 if verbose:
                     print("Convert from vector potential to electric field")
@@ -180,13 +244,9 @@ class FromOpenPMDProfile(FromArrayProfile):
                 # Read the data
                 m = i.meshes[field]
                 component = coord_list[count]
-                # Get data `array` and `position`.
-                array = m[component].load_chunk()
-                position = m[component].get_attribute("position")
-                series.flush()
-                axes_order, axes, array = _reorder_array(array, m, position)
+                axes_order, axes, array = _extract_array(m, series, component)
                 array_list.append(array)
-            array = _convert_modes(array_list, dimension, is_envelope)
+            array = _convert_modes(array_list, dimension, is_envelope, verbose)
             grid = create_grid(array, axes, dim, is_envelope=False)
             omg0 = field_to_envelope(grid, dim)
             array = grid.get_temporal_field()

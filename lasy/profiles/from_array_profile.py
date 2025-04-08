@@ -33,6 +33,9 @@ class FromArrayProfile(Profile):
     array : 3darray of complex numbers
         Contains the values of the envelope, defined as :math:`\mathcal{E}` in the above formula.
 
+    dim : string
+        "xyt" or "rt"
+
     axes : Python dictionary containing the axes vectors.
         Keys are 'x', 'y', 't'.
         Values are the 1D arrays of each axis.
