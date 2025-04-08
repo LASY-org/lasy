@@ -131,12 +131,12 @@ class Laser:
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
             self.grid.set_temporal_field(profile.evaluate(x, y, t))
         elif self.dim == "rt":
-            if profile.dim == "rt":
+            profile_rt = hasattr(profile, "dim") ? profile.dim == 'rt' : False
+            if profile_rt:
                 r, t = np.meshgrid(*self.grid.axes, indexing="ij")
                 field = np.zeros(
                     (2 * self.grid.n_azimuthal_modes - 1, *r.shape), dtype="complex128"
                 )
-                print(field.shape)
                 for mode in range(2 * self.grid.n_azimuthal_modes - 1):
                     field[mode, :, :] = profile.evaluate_mrt(mode, r, t)
             else:

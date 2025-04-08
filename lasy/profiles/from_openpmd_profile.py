@@ -13,8 +13,9 @@ from .from_array_profile import FromArrayProfile
 
 def _extract_array(m, series, component=None):
     """
-    Extract and eorder an array at the openPMD format to LASY ordering,
-    namely ensure that:
+    Extract and reorder openPMD-formatted array to LASY ordering.
+
+    Namely, ensure that:
      - The longitudinal dimension is t, not z
      - The last axis is t
 
@@ -95,6 +96,8 @@ def _extract_array(m, series, component=None):
 
 def _convert_modes(arr_list, dim_in, is_env, verbose=False):
     """
+    Convert from openPMD mode decomposition to LASY mode decomposition.
+
     Convert from openPMD mode decomposition in cos(m*theta) and sin(m*theta), stored, m in [0, Nmodes] to LASY mode decomposition exp(i*m*theta) m in [-Nmodes+1,Nmodes-1] (array of complex numbers, see https://github.com/LASY-org/lasy/blob/development/README.md):
      - Electromagnetic + cylindrical: we assume Er and Etheta
         https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record. Complex modes, the real and imag part are stored in 2 real arrays.
@@ -177,6 +180,8 @@ def _convert_modes(arr_list, dim_in, is_env, verbose=False):
 class FromOpenPMDProfile(FromArrayProfile):
     r"""
     Profile defined from an openPMD file.
+
+    Upon initialization, read from an openPMD profile, builds interpolation objects on the array data and use them to create function evaluate.
 
     Parameters
     ----------
