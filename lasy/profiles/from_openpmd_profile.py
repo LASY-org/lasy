@@ -23,10 +23,6 @@ class FromOpenPMDProfile(FromArrayProfile):
     filename : string
         Name of openPMD file to read the envelope from, including path.
 
-    dimension : string
-        "cartesian" or "cylindrical".
-        Dimensionality of the data from the openPMD file.
-
     is_envelope : bool
         Whether the openPMD file represents a laser envelope.
         Otherwise, electric field is assumed, and its envelope is extracted.
@@ -40,10 +36,8 @@ class FromOpenPMDProfile(FromArrayProfile):
     """
 
     def __init__(
-        self, filename, dimension, is_envelope, field_name=None, verbose=False
+        self, filename, is_envelope, field_name=None, verbose=False
     ):
-        assert dimension in ["cartesian", "cylindrical"]
-        dim = "rt" if dimension == "cylindrical" else "xyt"
         series = io.Series(filename, io.Access.read_only)
         iterations = np.array(series.iterations)
         i = series.iterations[iterations[-1]]
@@ -54,6 +48,8 @@ class FromOpenPMDProfile(FromArrayProfile):
                 "field_name must be specified for an envelope"
             )
             m = i.meshes[field_name]
+            geometry = m.get_attribute("geometry")
+            dim = "xyt" if geometry == "cartesian" else "rt"
             omg0 = m.get_attribute("angularFrequency")
             try:
                 envelopeField = m.get_attribute("envelopeField")
@@ -67,25 +63,18 @@ class FromOpenPMDProfile(FromArrayProfile):
                     + ", see https://github.com/openPMD/openPMD-standard/blob/upcoming-2.0.0/EXT_LaserEnvelope.md. Assumed 'normalized_vector_potential' and (1,0), respectively."
                 )
             axes_order, axes, array = extract_array(m, series)
-            assert (
-                dimension == "cylindrical"
-                and axes_order == ["r", "t"]
-                or dimension == "cartesian"
-                and axes_order == ["x", "y", "t"]
-            ), (
-                "'dimension' not consistent with properties of array read from openPMD file"
-            )
-            array = convert_modes([array], dimension, is_envelope, verbose)
+            array = convert_modes([array], geometry, is_envelope, verbose)
             if envelopeField == "normalized_vector_potential":
                 if verbose:
                     print("Convert from vector potential to electric field")
                 grid = create_grid(array, axes, dim)
                 array = vector_potential_to_field(grid, omg0)
         else:
-            if dimension == "cartesian":
+            geometry = i.meshes["E"].get_attribute("geometry")
+            if geometry == "cartesian":
                 field_list = ["E"]
                 coord_list = ["x"]
-            else:
+            else: # thetaMode
                 field_list = ["E", "E"]
                 coord_list = ["r", "t"]
             array_list = []
@@ -95,7 +84,8 @@ class FromOpenPMDProfile(FromArrayProfile):
                 component = coord_list[count]
                 axes_order, axes, array = extract_array(m, series, component)
                 array_list.append(array)
-            array = convert_modes(array_list, dimension, is_envelope, verbose)
+            array = convert_modes(array_list, geometry, is_envelope, verbose)
+            dim = "xyt" if geometry == "cartesian" else "rt"
             grid = create_grid(array, axes, dim, is_envelope=False)
             omg0 = field_to_envelope(grid, dim)
             array = grid.get_temporal_field()

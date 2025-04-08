@@ -220,7 +220,7 @@ def extract_array(m, series, component=None):
     return axes_order, axes, array
 
 
-def convert_modes(arr_list, dim_in, is_env, verbose=False):
+def convert_modes(arr_list, geometry, is_env, verbose=False):
     """
     Convert from openPMD mode decomposition to LASY mode decomposition.
 
@@ -235,8 +235,8 @@ def convert_modes(arr_list, dim_in, is_env, verbose=False):
     arr_list : list of Numpy arrays
         List of 3D arrays to be converted. They are processed independently.
 
-    dim_in : string
-        "cartesian" or "cylindrical". Dimensionality of input data.
+    geometry : string
+        Geometry of input data from openPMD standard, "cartesian" or "thetaMode" supported.
 
     is_env : bool
         Whether the input data represents a laser envelope.
@@ -251,7 +251,7 @@ def convert_modes(arr_list, dim_in, is_env, verbose=False):
         The array converted to LASY mode decomposition.
         This is still the full field, not yet the envelope.
     """
-    if dim_in == "cartesian":
+    if geometry == "cartesian":
         assert len(arr_list) == 1
         return arr_list[0]
     nmodes_in = (arr_list[0].shape[0] + 1) // 2
