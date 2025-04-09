@@ -56,6 +56,7 @@ def check_parabolic_mirror(laser):
     w0_num = get_w0(laser)
     w0_theor = wavelength * f0 / (np.pi * w0)
     err = 2 * np.abs(w0_theor - w0_num) / (w0_theor + w0_num)
+    print(err)
     assert err < 1e-3
 
 
