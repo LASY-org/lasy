@@ -122,7 +122,7 @@ class Grid:
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
-        self.spectral_axis = 2 * np.pi * np.fft.fftfreq(npoints[-1], dx[-1])
+        self.spectral_axis = 2 * np.pi * np.fft.fftfreq(npoints[-1], self.dx[-1])
 
     def set_is_envelope(self, is_envelope):
         """
