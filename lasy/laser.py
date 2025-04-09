@@ -124,7 +124,6 @@ class Laser:
         # Get the spectral axis
         dt = self.grid.dx[time_axis_indx]
         Nt = self.grid.shape[time_axis_indx]
-        self.omega_1d = 2 * np.pi * np.fft.fftfreq(Nt, dt) + profile.omega0
 
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
@@ -198,9 +197,9 @@ class Laser:
             propagates.
         """
         # Apply optical element
-        spectral_field = self.grid.get_spectral_field()
+        spectral_field, spectral_axis = self.grid.get_spectral_field()
         if self.dim == "rt":
-            r, omega = np.meshgrid(self.grid.axes[0], self.omega_1d, indexing="ij")
+            r, omega = np.meshgrid(self.grid.axes[0], spectral_axis + self.profile.omega0, indexing="ij")
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and an array of 0s as `y`
@@ -216,7 +215,7 @@ class Laser:
                 spectral_field[i_m, :, :] *= multiplier
         else:
             x, y, omega = np.meshgrid(
-                self.grid.axes[0], self.grid.axes[1], self.omega_1d, indexing="ij"
+                self.grid.axes[0], self.grid.axes[1], spectral_axis + self.profile.omega0, indexing="ij"
             )
             spectral_field *= optical_element.amplitude_multiplier(x, y, omega)
         self.grid.set_spectral_field(spectral_field)
@@ -265,7 +264,7 @@ class Laser:
             self.grid.set_temporal_field(field)
 
         # Retrieve the spectral field from the current grid
-        spectral_field = self.grid.get_spectral_field()
+        spectral_field, spectral_axis = self.grid.get_spectral_field()
 
         if self.dim == "rt":
             # Resampling onto new grid
@@ -291,7 +290,7 @@ class Laser:
                     self.prop.append(
                         PropagatorResampling(
                             *spatial_axes,
-                            self.omega_1d / c,
+                            (spectral_axis + self.profile.omega0) / c,
                             *spatial_axes_n,
                             mode=m,
                             backend=backend,
@@ -308,7 +307,7 @@ class Laser:
                         self.prop.append(
                             PropagatorResampling(
                                 *spatial_axes,
-                                self.omega_1d / c,
+                                (spectral_axis + self.profile.omega0) / c,
                                 mode=m,
                                 backend=backend,
                                 verbose=False,
@@ -347,7 +346,7 @@ class Laser:
                 spatial_axes = ((Lx, Nx), (Ly, Ny))
                 self.prop = PropagatorFFT2(
                     *spatial_axes,
-                    self.omega_1d / c,
+                    (spectral_axis + self.profile.omega0) / c,
                     backend=backend,
                     verbose=False,
                 )
@@ -366,9 +365,7 @@ class Laser:
         # propagators, so it needs to be added by hand.
         # Note: subtracting by omega0 is only a global phase convention,
         # that derives from the definition of the envelope in lasy.
-        spectral_field *= np.exp(
-            -1j * (self.omega_1d[None, None, :] - self.profile.omega0) * translate_time
-        )
+        spectral_field *= np.exp(-1j * spectral_axis * translate_time)
         self.grid.set_spectral_field(spectral_field)
 
         # Translate the domain

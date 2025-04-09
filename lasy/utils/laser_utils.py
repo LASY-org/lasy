@@ -441,18 +441,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     omega : ndarray
         Array with the angular frequencies of the spectrum.
     """
-    # Get the frequencies of the fft output.
-    freq = np.fft.fftfreq(grid.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
-    omega = 2 * np.pi * freq
-
-    # Get on axis or full field.
-    field = grid.get_temporal_field()
-    if method == "on_axis":
-        if dim == "xyt":
-            nx, ny, _ = field.shape
-            field = field[nx // 2, ny // 2]
-        else:
-            field = field[0, 0]
+    spectral_field, spectral_axis = self.grid.get_spectral_field()
 
     # Get spectrum.
     if grid.is_envelope:
@@ -460,8 +449,11 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
         # conjugate of the envelope do not overlap. Then we only need
         # one of them.
         assert omega0 is not None
-        spectrum = 0.5 * np.fft.fft(field) * grid.dx[-1]
-        omega = omega0 - omega
+        spectrum = 0.5 * spectral_field * grid.dx[-1]
+        if method == "on_axis":
+            nx, ny, _ = spectrum.shape
+            spectrum = spectrum[nx // 2, ny // 2] if dim == "xyt" else spectrum[0, 0]
+        omega = spectral_axis + omega0
         # Sort frequency array (and the spectrum accordingly).
         i_sort = np.argsort(omega)
         omega = omega[i_sort]
@@ -471,10 +463,13 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
         omega = omega[i_keep]
         spectrum = spectrum[..., i_keep]
     else:
-        spectrum = np.fft.fft(field) * grid.dx[-1]
+        spectrum = spectral_field * grid.dx[-1]
+        if method == "on_axis":
+            nx, ny, _ = spectrum.shape
+            spectrum = spectrum[nx // 2, ny // 2] if dim == "xyt" else spectrum[0, 0]
         # Keep only positive frequencies.
         i_keep = spectrum.shape[-1] // 2
-        omega = omega[:i_keep]
+        omega = spectral_axis[:i_keep]
         spectrum = spectrum[..., :i_keep]
 
     # Convert to spectral energy density (J/(m^2 rad Hz)).
@@ -1148,12 +1143,12 @@ def get_zeta(dim, grid, k0):
     assert dim == "xyt", "No spatial chirp for axis-symmetric dimension."
     w0 = get_w0(grid, dim)
     tau = 2 * get_duration(grid, dim)
-    env_spec = grid.get_spectral_field()
+    env_spec, spectral_axis = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
     # Get the spectral axis
     dt = grid.dx[-1]
     Nt = grid.shape[-1]
-    omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
+    omega = spectral_axis + k0 * c
     # Calculate dx0 and dy0 in (x,y,omega) space
     weight_x_3d = np.transpose(env_spec_abs2, (2, 1, 0))
     weight_y_3d = np.transpose(env_spec_abs2, (2, 0, 1))
@@ -1201,12 +1196,12 @@ def get_beta(dim, grid, k0):
     beta_x, beta_y : Angular dispersion in :math:` \beta = \frac{d\theta_0}{d\omega}` (second)
     """
     assert dim == "xyt", "No angular chirp for axis-symmetric dimension."
-    env_spec = grid.get_spectral_field()
+    env_spec, spectral_axis = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
     # Get the spectral axis
     dt = grid.dx[-1]
     Nt = grid.shape[-1]
-    omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
+    omega = spectral_axis + k0 * c
     # Calculate angular dispersion beta
     phi_envelop_abs = np.unwrap(
         np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
