@@ -121,10 +121,6 @@ class Laser:
         self.profile = profile
         self.output_iteration = 0  # Incremented each time write_to_file is called
 
-        # Get the spectral axis
-        dt = self.grid.dx[time_axis_indx]
-        Nt = self.grid.shape[time_axis_indx]
-
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")

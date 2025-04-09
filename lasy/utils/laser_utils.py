@@ -441,7 +441,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     omega : ndarray
         Array with the angular frequencies of the spectrum.
     """
-    spectral_field, spectral_axis = self.grid.get_spectral_field()
+    spectral_field, spectral_axis = grid.get_spectral_field()
 
     # Get spectrum.
     if grid.is_envelope:
@@ -1146,8 +1146,6 @@ def get_zeta(dim, grid, k0):
     env_spec, spectral_axis = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
     # Get the spectral axis
-    dt = grid.dx[-1]
-    Nt = grid.shape[-1]
     omega = spectral_axis + k0 * c
     # Calculate dx0 and dy0 in (x,y,omega) space
     weight_x_3d = np.transpose(env_spec_abs2, (2, 1, 0))
@@ -1199,8 +1197,6 @@ def get_beta(dim, grid, k0):
     env_spec, spectral_axis = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
     # Get the spectral axis
-    dt = grid.dx[-1]
-    Nt = grid.shape[-1]
     omega = spectral_axis + k0 * c
     # Calculate angular dispersion beta
     phi_envelop_abs = np.unwrap(
