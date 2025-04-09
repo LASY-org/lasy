@@ -199,7 +199,9 @@ class Laser:
         # Apply optical element
         spectral_field, spectral_axis = self.grid.get_spectral_field()
         if self.dim == "rt":
-            r, omega = np.meshgrid(self.grid.axes[0], spectral_axis + self.profile.omega0, indexing="ij")
+            r, omega = np.meshgrid(
+                self.grid.axes[0], spectral_axis + self.profile.omega0, indexing="ij"
+            )
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and an array of 0s as `y`
@@ -215,7 +217,10 @@ class Laser:
                 spectral_field[i_m, :, :] *= multiplier
         else:
             x, y, omega = np.meshgrid(
-                self.grid.axes[0], self.grid.axes[1], spectral_axis + self.profile.omega0, indexing="ij"
+                self.grid.axes[0],
+                self.grid.axes[1],
+                spectral_axis + self.profile.omega0,
+                indexing="ij",
             )
             spectral_field *= optical_element.amplitude_multiplier(x, y, omega)
         self.grid.set_spectral_field(spectral_field)
