@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
 from scipy.constants import c, epsilon_0
-from .grid import Grid
-from .laser_utils import get_w0, get_duration
+
+from .laser_utils import get_duration, get_w0
+
 
 def show_laser(grid, dim, show_intensity, **kw):
     """
