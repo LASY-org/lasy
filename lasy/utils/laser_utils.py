@@ -441,8 +441,9 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     omega : ndarray
         Array with the angular frequencies of the spectrum.
     """
+    spectral_field, spectral_axis = grid.get_spectral_field()
     # multiply by the number of points due to np.fft.fft normalization
-    spectral_field, spectral_axis = grid.get_spectral_field() * grid.npoints[-1]
+    spectral_field *= grid.npoints[-1]
 
     # Get spectrum.
     if grid.is_envelope:
