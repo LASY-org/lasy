@@ -86,7 +86,7 @@ class FromArrayProfile(Profile):
             self.field_interp_modes = []
             # Loop over the 2*m-1 elements of the array and create a separate
             # interpolator object for each of them
-            for imode in range(array.shape[0]):
+            for imode in range(self.array.shape[0]):
                 self.field_interp_modes.append(
                     RegularGridInterpolator(
                         (r, axes["t"]),
