@@ -4,8 +4,6 @@ from scipy.constants import c
 
 from lasy.utils.grid import Grid, time_axis_indx
 from lasy.utils.laser_utils import (
-    get_duration,
-    get_w0,
     normalize_average_intensity,
     normalize_energy,
     normalize_peak_field_amplitude,
