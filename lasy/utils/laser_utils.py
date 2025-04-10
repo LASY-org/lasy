@@ -1342,7 +1342,7 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
     field_spectral = np.fft.fftshift(field_spectral, axes=-1)
 
     # if method=='on-axis' get the on-axis field envelope, and calculate its phase
-    assert method in ['on-axis', 'sum']
+    assert method in ["on-axis", "sum"]
     if method == "on-axis":
         if dim == "xyt":
             Nx = grid.npoints[0]
