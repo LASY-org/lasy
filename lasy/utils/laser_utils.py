@@ -1426,10 +1426,7 @@ def get_gdd(grid, dim, omega0, omega_gdd=None, method="sum"):
     gd = np.gradient(phase, omega, axis=-1)
     gdd = np.gradient(gd, omega, axis=-1)
 
-    # get the GDD at the specified frequency...
-    if omega_gdd:
-        gdd0 = np.interp(omega_gdd, omega, gdd)
-    # ... or at the central frequency
-    else:
-        gdd0 = np.interp(omega0, omega, gdd)
+    # get the GDD at the specified frequency or the envelope's frequency
+    omega_eval = omega_gdd if omega_gdd is not None else omega0
+    gdd0 = np.interp(omega_eval, omega, gdd)
     return gdd, gdd0
