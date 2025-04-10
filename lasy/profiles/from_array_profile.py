@@ -85,7 +85,11 @@ class FromArrayProfile(Profile):
 
             self.field_interp_modes = []
             # Loop over the 2*m-1 elements of the array and create a separate
-            # interpolator object for each of them
+            # interpolator object for each of them.
+            # Note that the field_interp_modes is not directly the complex
+            # envelope because interpolating separately real and imag is not
+            # accurate enough. Instead, the real part of field_interp_modes
+            # represents the mode's modulus and its imag the mode's phase.
             for imode in range(self.array.shape[0]):
                 self.field_interp_modes.append(
                     RegularGridInterpolator(
@@ -111,13 +115,14 @@ class FromArrayProfile(Profile):
                     -1j * imode * theta
                 )
 
-        envelope = np.abs(np.real(combined_field)) * np.exp(
+        return np.abs(np.real(combined_field)) * np.exp(
             1.0j * np.imag(combined_field)
         )
-
-        return envelope
 
     def evaluate_mrt(self, mode, r, t):
         """Return the envelope field of the scaled profile."""
         assert self.dim == "rt"
-        return self.field_interp_modes[mode]((r, t))
+        combined_field = self.field_interp_modes[mode]((r, t))
+        return np.abs(np.real(combined_field)) * np.exp(
+            1.0j * np.imag(combined_field)
+        )
