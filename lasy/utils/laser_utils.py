@@ -1331,7 +1331,7 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
         Spectral phase of the pulse in the specified units and calculation method (in rad/s)
 
     omega: ndarray of floats (1D)
-        Angular freuqencies at which the phase is defined (in rad/s)
+        Angular frequencies at which the phase is defined (in rad/s)
 
     """
     # Field must be envelope
@@ -1342,6 +1342,7 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
     field_spectral = np.fft.fftshift(field_spectral, axes=-1)
 
     # if method=='on-axis' get the on-axis field envelope, and calculate its phase
+    assert method in ['on-axis', 'sum']
     if method == "on-axis":
         if dim == "xyt":
             Nx = grid.npoints[0]
@@ -1370,8 +1371,7 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
         2 * np.pi * np.fft.fftfreq(grid.npoints[-1], grid.dx[-1]), axes=-1
     )
 
-    if omega0:
-        omega += omega0
+    omega += omega0
 
     # return the phase and omega arrays
     return phase, omega
