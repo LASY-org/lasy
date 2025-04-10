@@ -1399,10 +1399,10 @@ def get_gdd(grid, dim, omega0, omega_gdd=None, method="sum"):
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     omega0 : float
-        Central angular frequency of the field
+        Angular frequency at which the laser envelope is defined.
 
     omega_gdd : float, optional
-        Central angular frequency at which the GDD is calculated, if `None` the central frequency `omega0` is used.
+        Central angular frequency at which the GDD is calculated, if `None`, `omega0` is used.
 
     method : string, optional
         Method of retrieving the phase that is used for calculating the GDD. Options are:
