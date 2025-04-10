@@ -20,32 +20,26 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     Parameters
     ----------
-    filename : string
-        Name of openPMD file to read the envelope from, including path.
+    file_name : string
+        Name of openPMD file, including path, to read the laser field or envelope from.
 
-    is_envelope : bool
-        Whether the openPMD file represents a laser envelope.
-        Otherwise, electric field is assumed, and its envelope is extracted.
-
-    field_name : string (optional)
-        Required if is_envelope is True.
+    envelope_name : string (optional)
         The name of the envelope field (this is not prescribed by the openPMD standard for the envelope).
+        If specified, an envelope field is expected from the openPMD file. Otherwise, a full electric field is assumed.
 
     verbose : bool (optional)
-        If true, print some more intermediate steps.
+        If true, print some intermediate steps.
     """
 
-    def __init__(self, filename, is_envelope, field_name=None, verbose=False):
-        series = io.Series(filename, io.Access.read_only)
+    def __init__(self, file_name, envelope_name=None, verbose=False):
+        series = io.Series(file_name, io.Access.read_only)
         iterations = np.array(series.iterations)
         i = series.iterations[iterations[-1]]
+        is_envelope = envelope_name is not None
         if is_envelope:
             if verbose:
                 print("Read envelope")
-            assert field_name is not None, (
-                "field_name must be specified for an envelope"
-            )
-            m = i.meshes[field_name]
+            m = i.meshes[envelope_name]
             geometry = m.get_attribute("geometry")
             dim = "xyt" if geometry == "cartesian" else "rt"
             omg0 = m.get_attribute("angularFrequency")
@@ -57,7 +51,7 @@ class FromOpenPMDProfile(FromArrayProfile):
                 pol = (1, 0)
                 print(
                     "WARNING: 'envelopeField' and/or 'polarization' attributes must be specified according to the standard but are currently missing for mesh record "
-                    + field_name
+                    + envelope_name
                     + ", see https://github.com/openPMD/openPMD-standard/blob/upcoming-2.0.0/EXT_LaserEnvelope.md. Assumed 'normalized_vector_potential' and (1,0), respectively."
                 )
             axes_order, axes, array = extract_array(m, series)
