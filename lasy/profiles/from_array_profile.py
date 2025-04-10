@@ -115,14 +115,10 @@ class FromArrayProfile(Profile):
                     -1j * imode * theta
                 )
 
-        return np.abs(np.real(combined_field)) * np.exp(
-            1.0j * np.imag(combined_field)
-        )
+        return np.abs(np.real(combined_field)) * np.exp(1.0j * np.imag(combined_field))
 
     def evaluate_mrt(self, mode, r, t):
         """Return the envelope field of the scaled profile."""
         assert self.dim == "rt"
         combined_field = self.field_interp_modes[mode]((r, t))
-        return np.abs(np.real(combined_field)) * np.exp(
-            1.0j * np.imag(combined_field)
-        )
+        return np.abs(np.real(combined_field)) * np.exp(1.0j * np.imag(combined_field))
