@@ -247,13 +247,12 @@ def convert_modes(arr_list, geometry, is_env, verbose=False):
 
     Returns
     -------
-    array_out : 3D array
-        The array converted to LASY mode decomposition.
+    arrays_out : list of 3D array
+        The arrays converted to LASY mode decomposition.
         This is still the full field, not yet the envelope.
     """
     if geometry == "cartesian":
-        assert len(arr_list) == 1
-        return arr_list[0]
+        return arr_list
     nmodes_in = (arr_list[0].shape[0] + 1) // 2
     if verbose:
         print("nmodes_in:", nmodes_in)
@@ -272,6 +271,7 @@ def convert_modes(arr_list, geometry, is_env, verbose=False):
             array_out[-imode, :, :] = 0.5 * (
                 array_in[2 * imode - 1] - 1j * array_in[2 * imode]
             )
+        return [array_out]
     else:
         # arr_list contains 2 elements, Er and Etheta, that need to be
         # combined into Ex. At this point, still operating on full field.
@@ -283,7 +283,8 @@ def convert_modes(arr_list, geometry, is_env, verbose=False):
         nmodes_out = nmodes_in - 1
         if verbose:
             print("nmodes_out:", nmodes_in)
-        array_out = np.zeros(shape=(2 * nmodes_out - 1, *Er_in.shape[1:]))
+        Ex_out = np.zeros(shape=(2 * nmodes_out - 1, *Er_in.shape[1:]))
+        Ey_out = np.zeros(shape=(2 * nmodes_out - 1, *Er_in.shape[1:]))
         # The _in arrays have real and imag parts separated, so we add them
         # together by hand
         for imode in range(nmodes_out):
@@ -291,13 +292,63 @@ def convert_modes(arr_list, geometry, is_env, verbose=False):
             # The +1 is conversion from Er & Etheta representation to Ex
             # output exp(i*m*theta) modes: for some reasons, all data goes in
             # m >= 0 modes
-            array_out[imode, :, :] = 0.5 * (
+            Ex_out[imode, :, :] = 0.5 * (
                 Er_in[2 * (imode + 1) - 1, :, :] - Et_in[2 * (imode + 1), :, :]
+            )
+            Ey_out[imode, :, :] = 0.5 * (
+                Er_in[2 * (imode + 1), :, :] + Et_in[2 * (imode + 1) - 1, :, :]
             )
             # Here we assume that mode 0 is only plasma, so we never use it
             if imode >= 2:
-                array_out[imode, :, :] += 0.5 * (
+                Ex_out[imode, :, :] += 0.5 * (
                     Er_in[2 * (imode - 1) - 1, :, :] + Et_in[2 * (imode - 1), :, :]
                 )
+                Ey_out[imode, :, :] += 0.5 * (
+                    - Er_in[2 * (imode - 1), :, :] + Et_in[2 * (imode - 1) - 1, :, :]
+                )
+        return [Ex_out, Ey_out]
 
-    return array_out
+def isolate_polarization(arrays, dim):
+    """
+    Extract single array and polarization vector from Ex and Ey.
+
+    Parameters
+    ----------
+    arrays : list of 2 3D numpy arrays
+        Envelopes of Ex and Ey.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - 'xyt': The laser pulse is represented on a 3D grid:
+                 Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - 'rt' : The laser pulse is represented on a 2D grid:
+                 Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    Returns
+    -------
+    array : 3D numpy array
+        Laser envelope at LASY convention
+
+    pol : tuple of 2 elements
+        Polarization vector (px, py), both px and py are complex numbers.
+    """
+    Ex, Ey = arrays # Ex and Ey envelopes
+    if dim == "rt":
+        print("Cylindrical input with full field: polarization is extract from mode 0 only")
+        Ex = Ex[0]
+        Ey = Ey[0]
+    rho2 = np.abs(Ex)**2 + np.abs(Ey**2)
+    # Amplitude of polarization vectors
+    rho_x = np.sqrt(np.sum(np.abs(Ex)**2) / np.sum(rho2))
+    rho_y = np.sqrt(np.sum(np.abs(Ey)**2) / np.sum(rho2))
+    # Phase in x is assumed 0. This is a convention.
+    phi_x = 0
+    phi_y = np.average( np.angle(Ey) - np.angle(Ex), weights=rho2 )
+    px = rho_x * np.exp(1j * phi_x)
+    py = rho_y * np.exp(1j * phi_y)
+    pol = (px, py)
+    print("polarization state detected: (px, py) =", pol)
+    array = arrays[0]/px if rho_x >= rho_y else arrays[1]/py
+
+    return array, pol

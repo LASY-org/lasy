@@ -7,7 +7,7 @@ from lasy.utils.laser_utils import (
     field_to_envelope,
     vector_potential_to_field,
 )
-from lasy.utils.openpmd_helper import convert_modes, extract_array
+from lasy.utils.openpmd_helper import convert_modes, extract_array, isolate_polarization
 
 from .from_array_profile import FromArrayProfile
 
@@ -65,8 +65,8 @@ class FromOpenPMDProfile(FromArrayProfile):
         else:
             geometry = i.meshes["E"].get_attribute("geometry")
             if geometry == "cartesian":
-                field_list = ["E"]
-                coord_list = ["x"]
+                field_list = ["E", "E"]
+                coord_list = ["x", "y"]
             else:  # thetaMode
                 field_list = ["E", "E"]
                 coord_list = ["r", "t"]
@@ -77,12 +77,17 @@ class FromOpenPMDProfile(FromArrayProfile):
                 component = coord_list[count]
                 axes_order, axes, array = extract_array(m, series, component)
                 array_list.append(array)
-            array = convert_modes(array_list, geometry, is_envelope, verbose)
+            # Convert from Er & Etheta at openPMD mode decomposition
+            #           to Ex & Ey at LASY mode decomposition.
+            array_list = convert_modes(array_list, geometry, is_envelope, verbose)
             dim = "xyt" if geometry == "cartesian" else "rt"
-            grid = create_grid(array, axes, dim, is_envelope=False)
-            omg0 = field_to_envelope(grid, dim)
-            array = grid.get_temporal_field()
-            pol = (1, 0)
+            env_array_list = []
+            for array in array_list:
+                grid = create_grid(array, axes, dim, is_envelope=False)
+                omg0 = field_to_envelope(grid, dim)
+                array = grid.get_temporal_field()
+                env_array_list.append(array)
+            array, pol = isolate_polarization(env_array_list, dim)
         wavelength = 2 * np.pi * c / omg0
 
         super().__init__(
