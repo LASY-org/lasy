@@ -1,7 +1,9 @@
+from .flattened_gaussian_profile import FlattenedGaussianTransverseProfile
 from .gaussian_profile import GaussianTransverseProfile
 from .hermite_gaussian_profile import HermiteGaussianTransverseProfile
 from .jinc_profile import JincTransverseProfile
 from .laguerre_gaussian_profile import LaguerreGaussianTransverseProfile
+from .plane_wave_profile import PlaneWaveProfile
 from .super_gaussian_profile import SuperGaussianTransverseProfile
 from .transverse_profile import (
     ScaledTransverseProfile,
@@ -20,4 +22,6 @@ __all__ = [
     "TransverseProfile",
     "SummedTransverseProfile",
     "ScaledTransverseProfile",
+    "PlaneWaveProfile",
+    "FlattenedGaussianTransverseProfile",
 ]

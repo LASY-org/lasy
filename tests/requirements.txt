@@ -1,2 +1,1 @@
-openpmd-viewer
 pytest

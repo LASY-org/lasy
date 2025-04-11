@@ -7,9 +7,11 @@ from lasy.utils.laser_utils import (
     normalize_average_intensity,
     normalize_energy,
     normalize_peak_field_amplitude,
+    normalize_peak_fluence,
     normalize_peak_intensity,
+    normalize_peak_power,
 )
-from lasy.utils.openpmd_output import write_to_openpmd_file
+from lasy.utils.openpmd_helper import write_to_openpmd_file
 from lasy.utils.plotting import show_laser
 
 
@@ -107,7 +109,15 @@ class Laser:
     def __init__(
         self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1, n_theta_evals=None
     ):
-        self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
+        self.grid = Grid(
+            dim,
+            lo,
+            hi,
+            npoints,
+            n_azimuthal_modes,
+            is_cw=profile.is_cw,
+            is_plane_wave=profile.is_plane_wave,
+        )
         self.dim = dim
         self.profile = profile
         self.output_iteration = 0  # Incremented each time write_to_file is called
@@ -122,34 +132,47 @@ class Laser:
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
             self.grid.set_temporal_field(profile.evaluate(x, y, t))
         elif self.dim == "rt":
-            if n_theta_evals is None:
-                # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
-                # theta, to evaluate the laser
-                n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
-            # Make sure that there are enough points to resolve the azimuthal modes
-            assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
-            theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
-            theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
-            x = r * np.cos(theta)
-            y = r * np.sin(theta)
-            # Evaluate the profile on the generated grid
-            envelope = profile.evaluate(x, y, t)
-            # Perform the azimuthal decomposition
-            azimuthal_modes = np.fft.ifft(envelope, axis=0)
-            field = azimuthal_modes[:n_azimuthal_modes]
-            if n_azimuthal_modes > 1:
-                field = np.concatenate(
-                    (field, azimuthal_modes[-n_azimuthal_modes + 1 :])
+            profile_rt = profile.dim == "rt" if hasattr(profile, "dim") else False
+            if profile_rt:
+                r, t = np.meshgrid(*self.grid.axes, indexing="ij")
+                field = np.zeros(
+                    (2 * self.grid.n_azimuthal_modes - 1, *r.shape), dtype="complex128"
                 )
+                for mode in range(2 * self.grid.n_azimuthal_modes - 1):
+                    field[mode, :, :] = profile.evaluate_mrt(mode, r, t)
+            else:
+                if n_theta_evals is None:
+                    # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
+                    # theta, to evaluate the laser
+                    n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
+                # Make sure that there are enough points to resolve the azimuthal modes
+                assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
+                theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
+                theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
+                x = r * np.cos(theta)
+                y = r * np.sin(theta)
+                # Evaluate the profile on the generated grid
+                envelope = profile.evaluate(x, y, t)
+                # Perform the azimuthal decomposition
+                azimuthal_modes = np.fft.ifft(envelope, axis=0)
+                field = azimuthal_modes[:n_azimuthal_modes]
+                if n_azimuthal_modes > 1:
+                    field = np.concatenate(
+                        (field, azimuthal_modes[-n_azimuthal_modes + 1 :])
+                    )
             self.grid.set_temporal_field(field)
 
-        # For profiles that define the energy, normalize the amplitude
+        # For profiles that define the energy, peak fluence or peak power, normalize the amplitude
         if hasattr(profile, "laser_energy"):
             self.normalize(profile.laser_energy, kind="energy")
+        elif hasattr(profile, "peak_fluence"):
+            self.normalize(profile.peak_fluence, kind="peak_fluence")
+        elif hasattr(profile, "peak_power"):
+            self.normalize(profile.peak_power, kind="peak_power")
 
     def normalize(self, value, kind="energy"):
         """
-        Normalize the pulse either to the energy, peak field amplitude, peak intensity, or average intensity. The average intensity option operates on the envelope.
+        Normalize the pulse either to the energy, peak field amplitude, peak fluence, peak power, peak intensity, or average intensity. The average intensity option operates on the envelope.
 
         Parameters
         ----------
@@ -157,7 +180,7 @@ class Laser:
             Value to which to normalize the field property that is defined in ``kind``
         kind : string (optional)
             Distance by which the laser pulse should be propagated
-            Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'`` (default is ``'energy'``)
+            Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'``, ``'peak_fluence'``, ``'peak_power'``, (default is ``'energy'``)
         """
         if kind == "energy":
             normalize_energy(self.dim, value, self.grid)
@@ -167,6 +190,10 @@ class Laser:
             normalize_peak_intensity(value, self.grid)
         elif kind == "average_intensity":
             normalize_average_intensity(value, self.grid)
+        elif kind == "peak_power":
+            normalize_peak_power(self.dim, value, self.grid)
+        elif kind == "peak_fluence":
+            normalize_peak_fluence(value, self.grid)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 

@@ -4,7 +4,7 @@
 Test checks the implementation of the polynomial spectral phase
 by initializing a Gaussian pulse (with flat spectral phase),
 adding spectral phase to it, and checking the corresponding
-temporal shape of the laser pulse again analytical formulas.
+temporal shape of the laser pulse against analytical formulas.
 """
 
 import numpy as np
@@ -29,6 +29,42 @@ dim = "xyt"
 lo = (-12e-6, -12e-6, -100e-15)
 hi = (+12e-6, +12e-6, +100e-15)
 npoints = (100, 100, 200)
+
+
+def test_delay():
+    """Add and compare group delay for laser.
+
+    Add group delay to the laser and compare the on-axis field with the
+    analytical formula for a Gaussian pulse with group delay.
+    """
+    delay = 50e-15
+    dazzler = PolynomialSpectralPhase(omega0, delay=delay)
+
+    # Initialize the laser
+    dim = "xyt"
+    lo = (-12e-6, -12e-6, -100e-15)
+    hi = (+12e-6, +12e-6, +100e-15)
+    npoints = (100, 100, 400)
+    laser = Laser(dim, lo, hi, npoints, gaussian_profile)
+
+    # Get field before and after dazzler
+    E_before = laser.grid.get_temporal_field()
+    laser.apply_optics(dazzler)
+    E_after = laser.grid.get_temporal_field()
+
+    # Extract peak field before dazzler
+    E0 = abs(E_before[50, 50]).max()
+
+    # Compute the analtical expression in real space for a Gaussian
+    t = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
+
+    E_analytical = E0 * np.exp(-1.0 * ((t - delay) / tau) ** 2)
+
+    # Compare the on-axis field with the analytical formula
+    tol = 1.2e-3
+    assert np.all(
+        abs(E_after[50, 50, :] - E_analytical) / abs(E_analytical).max() < tol
+    )
 
 
 def test_gdd():

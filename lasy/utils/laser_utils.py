@@ -60,6 +60,8 @@ def normalize_energy(dim, energy, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching laser energy to an energy given as an input.
+
     Parameters
     ----------
     dim : string
@@ -93,6 +95,8 @@ def normalize_peak_field_amplitude(amplitude, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching laser field amplitude to a peak field amplitude given as an input.
+
     Parameters
     ----------
     amplitude : scalar (V/m)
@@ -115,6 +119,8 @@ def normalize_peak_intensity(peak_intensity, grid):
     """
     Normalize energy of the laser pulse contained in grid.
 
+    Normalizes by matching laser intensity to a peak intensity given as an input.
+
     Parameters
     ----------
     peak_intensity : scalar (W/m^2)
@@ -134,9 +140,36 @@ def normalize_peak_intensity(peak_intensity, grid):
             grid.set_temporal_field(field)
 
 
+def normalize_peak_fluence(peak_fluence, grid):
+    """
+    Normalize energy of the laser pulse contained in grid.
+
+    Normalizes by matching laser fluence to a peak fluence given as an input.
+
+    Parameters
+    ----------
+    peak_fluence : scalar (J/m^2)
+        Peak fluence of the laser pulse after normalization.
+
+    grid : a Grid object
+        Contains value of the laser envelope and metadata.
+    """
+    if peak_fluence is not None:
+        field = grid.get_temporal_field()
+        fluence = get_laser_fluence(grid)
+        input_peak_fluence = fluence.max()
+        if input_peak_fluence == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            field *= np.sqrt(peak_fluence / input_peak_fluence)
+            grid.set_temporal_field(field)
+
+
 def normalize_average_intensity(average_intensity, grid):
     """
     Normalize energy of the laser pulse contained in grid.
+
+    Normalizes by matching average laser intensity to an average intensity given as an input.
 
     Parameters
     ----------
@@ -155,6 +188,90 @@ def normalize_average_intensity(average_intensity, grid):
         else:
             field *= np.sqrt(average_intensity / input_average_intensity)
             grid.set_temporal_field(field)
+
+
+def normalize_peak_power(dim, peak_power, grid):
+    """
+    Normalize energy of the laser pulse contained in grid.
+
+    Normalizes by matching laser power to a peak power given as an input.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    peak_power : scalar (W)
+        Peak power of the laser pulse after normalization.
+
+    grid : a Grid object
+        Contains value of the laser envelope and metadata.
+    """
+    if peak_power is not None:
+        power = get_laser_power(dim, grid)
+        input_peak_power = power.max()
+        if input_peak_power == 0.0:
+            print("Field is zero everywhere, normalization will be skipped")
+        else:
+            field = grid.get_temporal_field()
+            grid.set_temporal_field(field * np.sqrt(peak_power / input_peak_power))
+
+
+def get_laser_power(dim, grid):
+    r"""
+    Calculate the instantaneous power of the laser along the time axis.
+
+    Parameters
+    ----------
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    Returns
+    -------
+    power : ndarray (W)
+        The instantaneous laser power along the temporal axis.
+    """
+    field = grid.get_temporal_field()
+    intensity = np.abs(epsilon_0 * field**2 / 2 * c)
+    dz = grid.dx[-1] * c
+    unit_area = get_grid_cell_volume(grid, dim) / dz
+    power = intensity.sum(axis=tuple(range(intensity.ndim - 1))) * unit_area
+
+    return power
+
+
+def get_laser_fluence(grid):
+    r"""
+    Calculate the fluence of the laser in space.
+
+    Parameters
+    ----------
+    grid : a Grid object.
+        It contains an ndarray (V/m) with the value of the envelope field and the associated metadata that defines the points at which the laser is defined.
+
+    Returns
+    -------
+    fluence : ndarray (J/m^2)
+        The fluence of the laser pulse in space.
+    """
+    field = grid.get_temporal_field()
+    intensity = np.abs(epsilon_0 * field**2 / 2 * c)
+    fluence = np.squeeze(np.sum(intensity, axis=-1) * grid.dx[-1])
+
+    return fluence
 
 
 def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
@@ -457,8 +574,8 @@ def get_frequency(
         if dim == "xyt" and phase_unwrap_nd:
             print("WARNING: using 3D phase unwrapping, this can be expensive")
 
-        h = field if is_hilbert else hilbert_transform(grid)
-        h = np.squeeze(field)
+        h = field if is_hilbert else hilbert_transform(field)
+
         if phase_unwrap_nd:
             try:
                 from skimage.restoration import unwrap_phase
@@ -585,12 +702,13 @@ def vector_potential_to_field(grid, omega0, direct=True):
 
 
 def field_to_envelope(grid, dim, phase_unwrap_nd=False):
-    """Get the complex envelope of a field by applying a Hilbert transform.
+    """Convert a field to its complex envelope representation by applying a Hilbert transform.
 
     Parameters
     ----------
     grid : Grid
-        The field from which to extract the envelope.
+        The Grid object on which the field is replaced with an envelope.
+        This object is modified by the function.
 
     dim : string
         Dimensionality of the array. Options are:
@@ -608,32 +726,31 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
 
     Returns
     -------
-    tuple
-        A tuple with the envelope array and the central wavelength.
+    scalar
+        The central angular frequency.
     """
     assert not grid.is_envelope
 
-    field = grid.get_temporal_field()
-
-    # hilbert transform needs inverted time axis.
-    field = hilbert_transform(field)
-
     # Get central wavelength from array
-    omg_h, omg0_h = get_frequency(
+    _, omg0_h = get_frequency(
         grid,
         dim=dim,
-        is_hilbert=True,
+        is_hilbert=False,
         phase_unwrap_nd=phase_unwrap_nd,
     )
+    # Hilbert transform
+    field = hilbert_transform(grid.get_temporal_field())
+    # Remove carrier frequency
     field *= np.exp(1j * omg0_h * grid.axes[-1])
+    # Store envelope
     grid.set_is_envelope(True)
     grid.set_temporal_field(field)
 
-    return grid, omg0_h
+    return omg0_h
 
 
 def hilbert_transform(field):
-    """Make a hilbert transform of the grid field.
+    """Make a hilbert transform of the field.
 
     Currently the arrays need to be flipped along t (both the input field and
     its transform) to get the imaginary part (and thus the phase) with the
@@ -641,8 +758,8 @@ def hilbert_transform(field):
 
     Parameters
     ----------
-    grid : Grid
-        The lasy grid whose field should be transformed.
+    field : 3d numpy array
+        The field whose field should be transformed.
     """
     return hilbert(field[:, :, ::-1])[:, :, ::-1]
 
@@ -730,8 +847,8 @@ def create_grid(array, axes, dim, is_envelope=True):
         hi = (axes["x"][-1], axes["y"][-1], axes["t"][-1])
         npoints = (axes["x"].size, axes["y"].size, axes["t"].size)
         grid = Grid(dim, lo, hi, npoints, is_envelope=is_envelope)
-        assert np.all(grid.axes[0] == axes["x"])
-        assert np.all(grid.axes[1] == axes["y"])
+        assert np.allclose(grid.axes[0], axes["x"])
+        assert np.allclose(grid.axes[1], axes["y"])
         assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
         assert array.ndim == 3, "Input array should be of dimension 3 [x, y, time]"
         grid.set_temporal_field(array)
@@ -739,7 +856,15 @@ def create_grid(array, axes, dim, is_envelope=True):
         lo = (axes["r"][0], axes["t"][0])
         hi = (axes["r"][-1], axes["t"][-1])
         npoints = (axes["r"].size, axes["t"].size)
-        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1, is_envelope=is_envelope)
+        nm = int((array.shape[0] + 1) / 2)
+        grid = Grid(
+            dim,
+            lo,
+            hi,
+            npoints,
+            n_azimuthal_modes=nm,
+            is_envelope=is_envelope,
+        )
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
         assert array.ndim == 3, (
@@ -974,7 +1099,7 @@ def get_w0(grid, dim):
 
 def get_phi2(dim, grid):
     r"""
-    Calculate the group-delay dispersion of the laser.
+    Calculate the second derivative of the temporal phase of the laser.
 
     Parameters
     ----------
@@ -991,10 +1116,8 @@ def get_phi2(dim, grid):
 
     Returns
     -------
-    phi2 : Group-delay dispersion in :math:`\Phi^{(2)} = \frac{d\omega_0}{dt}` (second^-2)
-    varphi2 : Group-delay dispersion in :math:`\varphi^{(2)}=\frac{dt_0}{d\omega}` (second^2)
+    phi2 : Second derivative of temporal phase :math:`\Phi^{(2)} = \frac{d\omega_0}{dt} = \frac{d^2\Phi(t)}{dt^2}` in (second^-2)
     """
-    tau = 2 * get_duration(grid, dim)
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     # Calculate group-delayed dispersion
@@ -1002,8 +1125,8 @@ def get_phi2(dim, grid):
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
     phi2 = np.average(pphi_pt2, weights=env_abs2)
-    varphi2 = np.max(np.roots([4 * phi2, -4, tau**4 * phi2]))
-    return phi2, varphi2
+
+    return phi2
 
 
 def get_zeta(dim, grid, k0):
@@ -1168,3 +1291,150 @@ def get_propation_angle(dim, grid, k0):
     angle_x = np.average(pphi_px, weights=env_abs2) / k0
     angle_y = np.average(pphi_py, weights=env_abs2) / k0
     return [angle_x, angle_y]
+
+
+def get_spectral_phase(grid, dim, omega0, method="sum"):
+    r"""
+    Calculate the spectral phase of a pulse in a given grid.
+
+    Depending on the chosen calculation method, the spectral phase can be calculated in two different ways.
+
+    If `method==sum` (default), the spectral field of the laser is spatially integrated before extracting the phase, i.e.
+
+    .. math::
+
+        \varphi(\omega) = \arg\left( \int E(x,y,\omega) dx dy \right)
+
+    If `method==on-axis`, the on-axis spectral phase is calculated:
+
+    .. math::
+
+        \varphi(\omega) = \arg\left( E(x=0,y=0,\omega) \right)
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the field to analyze.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    omega0 : float
+        Central angular frequency of the field
+
+    method : string, optional
+        Method of calculating the spectral phase. Options are:
+
+        - ``'sum'``: Calculates the spectral phase of the spatially summed field (default).
+        - ``'on-axis'``: Calculates the on-axis spectral phase.
+
+    Returns
+    -------
+    phase: ndarray of floats (1D)
+        Spectral phase of the pulse in the specified units and calculation method (in rad/s)
+
+    omega: ndarray of floats (1D)
+        Angular frequencies at which the phase is defined (in rad/s)
+
+    """
+    # Field must be envelope
+    assert grid.is_envelope
+
+    # get the spectral field
+    field_spectral = grid.get_spectral_field()
+    field_spectral = np.fft.fftshift(field_spectral, axes=-1)
+
+    # if method=='on-axis' get the on-axis field envelope, and calculate its phase
+    assert method in ["on-axis", "sum"]
+    if method == "on-axis":
+        if dim == "xyt":
+            Nx = grid.npoints[0]
+            Ny = grid.npoints[1]
+            phase = np.angle(field_spectral[Nx // 2, Ny // 2, :])
+        else:  # dim=='rt'
+            phase = np.angle(field_spectral[0, 0, :])
+
+    # if method=='sum' integrate the field spatially before getting the phase from it
+    else:  # method='sum'
+        # grid cell volume required for integration
+        dV = get_grid_cell_volume(grid, dim)
+
+        if dim == "xyt":
+            summed_field = np.sum(field_spectral * dV, axis=(0, 1))
+        else:  # dim=='rt'
+            summed_field = np.sum(field_spectral * dV[None, :, None], axis=(0, 1))
+
+        phase = np.angle(summed_field)
+
+    # unwrap the phase
+    phase = np.unwrap(phase)
+
+    # create omega array (angular frequencies)
+    omega = np.fft.fftshift(
+        2 * np.pi * np.fft.fftfreq(grid.npoints[-1], grid.dx[-1]), axes=-1
+    )
+
+    omega += omega0
+
+    # return the phase and omega arrays
+    return phase, omega
+
+
+def get_gdd(grid, dim, omega0, omega_gdd=None, method="sum"):
+    r"""
+    Calculate the group delay dispersion (GDD) of the laser.
+
+    .. math::
+        GDD = \frac{\partial^2 \phi(\omega)}{\partial \omega^2}
+
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the field to analyze.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    omega0 : float
+        Angular frequency at which the laser envelope is defined.
+
+    omega_gdd : float, optional
+        Central angular frequency at which the GDD is calculated, if `None`, `omega0` is used.
+
+    method : string, optional
+        Method of retrieving the phase that is used for calculating the GDD. Options are:
+
+        - ``'sum'``: Calculates the spectral phase of the spatially summed field (default).
+        - ``'on-axis'``: Calculates the on-axis spectral phase.
+
+    Returns
+    -------
+    gdd: ndarray of floats (1D)
+        Group delay dispersion over the entire spectral range (in s^2)
+
+    gdd0: float
+        Group delay dispersion at the center frequency (in s^2)
+
+    """
+    # calculate the spectral phase of the laser pulse
+    phase, omega = get_spectral_phase(grid, dim, method=method, omega0=omega0)
+
+    # calculate the second derivative wrt. angular frequency
+    gd = np.gradient(phase, omega, axis=-1)
+    gdd = np.gradient(gd, omega, axis=-1)
+
+    # get the GDD at the specified frequency or the envelope's frequency
+    omega_eval = omega_gdd if omega_gdd is not None else omega0
+    gdd0 = np.interp(omega_eval, omega, gdd)
+    return gdd, gdd0

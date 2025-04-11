@@ -33,6 +33,9 @@ class FromArrayProfile(Profile):
     array : 3darray of complex numbers
         Contains the values of the envelope, defined as :math:`\mathcal{E}` in the above formula.
 
+    dim : string
+        "xyt" or "rt"
+
     axes : Python dictionary containing the axes vectors.
         Keys are 'x', 'y', 't'.
         Values are the 1D arrays of each axis.
@@ -49,65 +52,73 @@ class FromArrayProfile(Profile):
         super().__init__(wavelength, pol)
 
         assert dim in ["xyt", "rt"]
+        assert array.ndim == 3, "array must be 3D, [x,y,t] or [modes,r,t]."
         self.axes = axes
         self.dim = dim
+        self.array = array
 
         if dim == "xyt":
-            assert axes_order in [["x", "y", "t"], ["t", "y", "x"]]
-
-            if axes_order == ["t", "y", "x"]:
-                self.array = np.swapaxes(array, 0, 2)
-            else:
-                self.array = array
+            assert axes_order == ["x", "y", "t"]
 
             self.combined_field_interp = RegularGridInterpolator(
                 (axes["x"], axes["y"], axes["t"]),
-                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
+                np.abs(self.array) + 1.0j * np.unwrap(np.angle(self.array), axis=-1),
                 bounds_error=False,
                 fill_value=0.0,
             )
         else:  # dim = "rt"
-            assert axes_order in [["r", "t"], ["t", "r"]]
-
-            if axes_order == ["t", "r"]:
-                self.array = np.swapaxes(array, 0, 2)
-            else:
-                self.array = array
+            assert axes_order == ["r", "t"]
 
             # If the first point of radial axis is not 0, we "mirror" it,
             # to make correct interpolation within the first cell
             if axes["r"][0] != 0.0:
+                # add mirrored point to the axis
                 r = np.concatenate(([-axes["r"][0]], axes["r"]))
-                array = np.concatenate(([array[0]], array))
+                # takes first element of the array in the radial dimension
+                subarray = self.array[:, 0, :]
+                # add it at the beginning to be the value at the mirrored point
+                self.array = np.concatenate(
+                    (subarray[:, np.newaxis, :], self.array), axis=1
+                )
             else:
                 r = axes["r"]
 
-            # The `RegularGridInterpolator` below expects a 2D array.
-            # However, when reading lasy envelope files, the array is 3D.
-            # First dimension corresponds to the azimuthal mode decomposition.
-            # For now, this only fix profiles with one mode.
-            if len(array.shape) == 3:
-                assert array.shape[0] == 1, (
-                    "Handling `rt` profiles with more than one azimuthal mode still needs to be implemented."
+            self.field_interp_modes = []
+            # Loop over the 2*m-1 elements of the array and create a separate
+            # interpolator object for each of them.
+            # Note that the field_interp_modes is not directly the complex
+            # envelope because interpolating separately real and imag is not
+            # accurate enough. Instead, the real part of field_interp_modes
+            # represents the mode's modulus and its imag the mode's phase.
+            for imode in range(self.array.shape[0]):
+                self.field_interp_modes.append(
+                    RegularGridInterpolator(
+                        (r, axes["t"]),
+                        np.abs(self.array[imode, :, :])
+                        + 1.0j * np.unwrap(np.angle(self.array[imode, :, :]), axis=-1),
+                        bounds_error=False,
+                        fill_value=0.0,
+                    )
                 )
-                array = array[0]
-
-            self.combined_field_interp = RegularGridInterpolator(
-                (r, axes["t"]),
-                np.abs(array) + 1.0j * np.unwrap(np.angle(array), axis=-1),
-                bounds_error=False,
-                fill_value=0.0,
-            )
 
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
         if self.dim == "xyt":
             combined_field = self.combined_field_interp((x, y, t))
         else:
-            combined_field = self.combined_field_interp((np.sqrt(x**2 + y**2), t))
+            r = np.sqrt(x**2 + y**2)
+            theta = np.angle(x + 1j * y)
+            combined_field = np.zeros_like(x, dtype="complex128")
+            nmodes = (len(self.field_interp_modes) + 1) // 2
+            for imode in range(-nmodes + 1, nmodes):
+                combined_field += self.field_interp_modes[imode]((r, t)) * np.exp(
+                    -1j * imode * theta
+                )
 
-        envelope = np.abs(np.real(combined_field)) * np.exp(
-            1.0j * np.imag(combined_field)
-        )
+        return np.abs(np.real(combined_field)) * np.exp(1.0j * np.imag(combined_field))
 
-        return envelope
+    def evaluate_mrt(self, mode, r, t):
+        """Return the envelope field of the scaled profile."""
+        assert self.dim == "rt"
+        combined_field = self.field_interp_modes[mode]((r, t))
+        return np.abs(np.real(combined_field)) * np.exp(1.0j * np.imag(combined_field))
