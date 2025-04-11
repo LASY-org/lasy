@@ -364,7 +364,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     return env, ext
 
 
-def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
+def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum", ordering="zero_center"):
     r"""
     Get the frequency spectrum of an envelope or electric field.
 
@@ -433,6 +433,12 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
         Determines the type of spectrum that is returned as described above.
         By default 'sum'.
 
+    ordering : string (optional)
+        Order of the frequency array and corresponding spectrum.
+        Options are:
+        - ``"zero_center"``: np.fft.fftshift is applied so the frequency array is monotonous with 0 at the center.
+        - ``"zero_first"``: The frequency array starts with positive frequencies, and negative frequencies are at the end. The array is not monotonous. This is the default with np.fft.ifft.
+
     Returns
     -------
     spectrum : ndarray
@@ -456,23 +462,11 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
             nx, ny, _ = spectrum.shape
             spectrum = spectrum[nx // 2, ny // 2] if dim == "xyt" else spectrum[0, 0]
         omega = spectral_axis + omega0
-        # Sort frequency array (and the spectrum accordingly).
-        i_sort = np.argsort(omega)
-        omega = omega[i_sort]
-        spectrum = spectrum[..., i_sort]
-        # Keep only positive frequencies.
-        i_keep = omega >= 0
-        omega = omega[i_keep]
-        spectrum = spectrum[..., i_keep]
     else:
         spectrum = spectral_field * grid.dx[-1]
         if method == "on_axis":
             nx, ny, _ = spectrum.shape
             spectrum = spectrum[nx // 2, ny // 2] if dim == "xyt" else spectrum[0, 0]
-        # Keep only positive frequencies.
-        i_keep = spectrum.shape[-1] // 2
-        omega = spectral_axis[:i_keep]
-        spectrum = spectrum[..., :i_keep]
 
     # Convert to spectral energy density (J/(m^2 rad Hz)).
     if method != "raw":
@@ -486,6 +480,11 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
             spectrum = np.sum(spectrum * dV / dz, axis=(0, 1))
         else:
             spectrum = np.sum(spectrum[0] * dV[:, np.newaxis] / dz, axis=0)
+
+    assert ordering in ['zero_first', 'zero_center']
+    if ordering == 'zero_center':
+        omega = np.fft.fftshift(omega, axes=-1)
+        spectrum = np.fft.fftshift(spectrum, axes=-1)
 
     # If the user specified a frequency range, interpolate into it.
     if method in ["sum", "on_axis"] and range is not None:
@@ -1286,7 +1285,7 @@ def get_propation_angle(dim, grid, k0):
     return [angle_x, angle_y]
 
 
-def get_spectral_phase(grid, dim, omega0, method="sum"):
+def get_spectral_phase(grid, dim, omega0, method="sum", ordering="zero_center"):
     r"""
     Calculate the spectral phase of a pulse in a given grid.
 
@@ -1326,6 +1325,13 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
         - ``'sum'``: Calculates the spectral phase of the spatially summed field (default).
         - ``'on-axis'``: Calculates the on-axis spectral phase.
 
+    ordering : string (optional)
+        Order of the frequency array and corresponding spectral phase.
+        Options are:
+        - ``"zero_center"``: np.fft.fftshift is applied so the frequency array is monotonous with 0 at the center.
+        - ``"zero_first"``: The frequency array starts with positive frequencies, and negative frequencies are at the end. The array is not monotonous. This is the default with np.fft.ifft.
+    
+
     Returns
     -------
     phase: ndarray of floats (1D)
@@ -1340,7 +1346,6 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
 
     # get the spectral field
     field_spectral, omega = grid.get_spectral_field()
-    field_spectral = np.fft.fftshift(field_spectral, axes=-1)
 
     # if method=='on-axis' get the on-axis field envelope, and calculate its phase
     assert method in ["on-axis", "sum"]
@@ -1364,11 +1369,15 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
 
         phase = np.angle(summed_field)
 
+    # create omega array (angular frequencies)
+    assert ordering in ['zero_first', 'zero_center']
+    if ordering == 'zero_center':
+        omega = np.fft.fftshift(omega, axes=-1)
+        phase = np.fft.fftshift(phase, axes=-1)
+    omega += omega0
+
     # unwrap the phase
     phase = np.unwrap(phase)
-
-    # create omega array (angular frequencies)
-    omega = np.fft.fftshift(omega) + omega0
 
     # return the phase and omega arrays
     return phase, omega
