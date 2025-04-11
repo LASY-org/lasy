@@ -1331,7 +1331,7 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
     assert grid.is_envelope
 
     # get the spectral field
-    field_spectral = grid.get_spectral_field()
+    field_spectral, omega = grid.get_spectral_field()
     field_spectral = np.fft.fftshift(field_spectral, axes=-1)
 
     # if method=='on-axis' get the on-axis field envelope, and calculate its phase
@@ -1360,11 +1360,7 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
     phase = np.unwrap(phase)
 
     # create omega array (angular frequencies)
-    omega = np.fft.fftshift(
-        2 * np.pi * np.fft.fftfreq(grid.npoints[-1], grid.dx[-1]), axes=-1
-    )
-
-    omega += omega0
+    omega = np.fft.fftshift( omega ) + omega0
 
     # return the phase and omega arrays
     return phase, omega
