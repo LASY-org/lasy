@@ -304,9 +304,10 @@ def convert_modes(arr_list, geometry, is_env, verbose=False):
                     Er_in[2 * (imode - 1) - 1, :, :] + Et_in[2 * (imode - 1), :, :]
                 )
                 Ey_out[imode, :, :] += 0.5 * (
-                    - Er_in[2 * (imode - 1), :, :] + Et_in[2 * (imode - 1) - 1, :, :]
+                    -Er_in[2 * (imode - 1), :, :] + Et_in[2 * (imode - 1) - 1, :, :]
                 )
         return [Ex_out, Ey_out]
+
 
 def isolate_polarization(arrays, dim):
     """
@@ -333,22 +334,24 @@ def isolate_polarization(arrays, dim):
     pol : tuple of 2 elements
         Polarization vector (px, py), both px and py are complex numbers.
     """
-    Ex, Ey = arrays # Ex and Ey envelopes
+    Ex, Ey = arrays  # Ex and Ey envelopes
     if dim == "rt":
-        print("Cylindrical input with full field: polarization is extract from mode 0 only")
+        print(
+            "Cylindrical input with full field: polarization is extract from mode 0 only"
+        )
         Ex = Ex[0]
         Ey = Ey[0]
-    rho2 = np.abs(Ex)**2 + np.abs(Ey**2)
+    rho2 = np.abs(Ex) ** 2 + np.abs(Ey**2)
     # Amplitude of polarization vectors
-    rho_x = np.sqrt(np.sum(np.abs(Ex)**2) / np.sum(rho2))
-    rho_y = np.sqrt(np.sum(np.abs(Ey)**2) / np.sum(rho2))
+    rho_x = np.sqrt(np.sum(np.abs(Ex) ** 2) / np.sum(rho2))
+    rho_y = np.sqrt(np.sum(np.abs(Ey) ** 2) / np.sum(rho2))
     # Phase in x is assumed 0. This is a convention.
     phi_x = 0
-    phi_y = np.average( np.angle(Ey) - np.angle(Ex), weights=rho2 )
+    phi_y = np.average(np.angle(Ey) - np.angle(Ex), weights=rho2)
     px = rho_x * np.exp(1j * phi_x)
     py = rho_y * np.exp(1j * phi_y)
     pol = (px, py)
     print("polarization state detected: (px, py) =", pol)
-    array = arrays[0]/px if rho_x >= rho_y else arrays[1]/py
+    array = arrays[0] / px if rho_x >= rho_y else arrays[1] / py
 
     return array, pol
