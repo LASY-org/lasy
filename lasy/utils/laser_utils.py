@@ -364,7 +364,9 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     return env, ext
 
 
-def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum", ordering="zero_center"):
+def get_spectrum(
+    grid, dim, range=None, bins=20, omega0=None, method="sum", ordering="zero_center"
+):
     r"""
     Get the frequency spectrum of an envelope or electric field.
 
@@ -481,8 +483,8 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum", orde
         else:
             spectrum = np.sum(spectrum[0] * dV[:, np.newaxis] / dz, axis=0)
 
-    assert ordering in ['zero_first', 'zero_center']
-    if ordering == 'zero_center':
+    assert ordering in ["zero_first", "zero_center"]
+    if ordering == "zero_center":
         omega = np.fft.fftshift(omega, axes=-1)
         spectrum = np.fft.fftshift(spectrum, axes=-1)
 
@@ -1330,7 +1332,7 @@ def get_spectral_phase(grid, dim, omega0, method="sum", ordering="zero_center"):
         Options are:
         - ``"zero_center"``: np.fft.fftshift is applied so the frequency array is monotonous with 0 at the center.
         - ``"zero_first"``: The frequency array starts with positive frequencies, and negative frequencies are at the end. The array is not monotonous. This is the default with np.fft.ifft.
-    
+
 
     Returns
     -------
@@ -1370,8 +1372,8 @@ def get_spectral_phase(grid, dim, omega0, method="sum", ordering="zero_center"):
         phase = np.angle(summed_field)
 
     # create omega array (angular frequencies)
-    assert ordering in ['zero_first', 'zero_center']
-    if ordering == 'zero_center':
+    assert ordering in ["zero_first", "zero_center"]
+    if ordering == "zero_center":
         omega = np.fft.fftshift(omega, axes=-1)
         phase = np.fft.fftshift(phase, axes=-1)
     omega += omega0
