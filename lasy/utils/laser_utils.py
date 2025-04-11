@@ -447,7 +447,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum", orde
     omega : ndarray
         Array with the angular frequencies of the spectrum.
     """
-    spectral_field, spectral_axis = grid.get_spectral_field()
+    spectral_field, omega = grid.get_spectral_field()
     # multiply by the number of points due to np.fft.fft normalization
     spectral_field *= grid.npoints[-1]
 
@@ -461,7 +461,7 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum", orde
         if method == "on_axis":
             nx, ny, _ = spectrum.shape
             spectrum = spectrum[nx // 2, ny // 2] if dim == "xyt" else spectrum[0, 0]
-        omega = spectral_axis + omega0
+        omega += omega0
     else:
         spectrum = spectral_field * grid.dx[-1]
         if method == "on_axis":
