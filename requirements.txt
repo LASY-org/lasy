@@ -1,5 +1,4 @@
 axiprop>=0.5.3
 numpy
-openpmd-api
-openpmd-viewer
+openpmd-api>=0.16.1
 scipy
