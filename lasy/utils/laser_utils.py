@@ -1360,7 +1360,7 @@ def get_spectral_phase(grid, dim, omega0, method="sum"):
     phase = np.unwrap(phase)
 
     # create omega array (angular frequencies)
-    omega = np.fft.fftshift( omega ) + omega0
+    omega = np.fft.fftshift(omega) + omega0
 
     # return the phase and omega arrays
     return phase, omega
