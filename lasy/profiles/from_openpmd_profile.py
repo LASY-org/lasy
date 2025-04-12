@@ -56,7 +56,8 @@ class FromOpenPMDProfile(FromArrayProfile):
                     + ", see https://github.com/openPMD/openPMD-standard/blob/upcoming-2.0.0/EXT_LaserEnvelope.md. Assumed 'normalized_vector_potential' and (1,0), respectively."
                 )
             axes_order, axes, array = extract_array(m, series)
-            array = convert_modes([array], geometry, is_envelope, verbose)
+            arrays = convert_modes([array], geometry, is_envelope, verbose)
+            array = arrays[0]
             if envelopeField == "normalized_vector_potential":
                 if verbose:
                     print("Convert from vector potential to electric field")
