@@ -1385,7 +1385,64 @@ def get_spectral_phase(grid, dim, omega0, method="sum", ordering="zero_center"):
     return phase, omega
 
 
-def get_gdd(grid, dim, omega0, omega_gdd=None, method="sum"):
+def get_gd(grid, dim, omega0, omega_eval=None, method="sum"):
+    r"""
+    Calculate the group delay (GD) of the laser.
+
+    .. math::
+        GD = \frac{\partial \phi(\omega)}{\partial \omega}
+
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the field to analyze.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    omega0 : float
+        Angular frequency at which the laser envelope is defined.
+
+    omega_eval : float, optional
+        Central angular frequency at which the GDD is calculated, if `None`, `omega0` is used.
+
+    method : string, optional
+        Method of retrieving the phase that is used for calculating the GD. Options are:
+
+        - ``'sum'``: Calculates the spectral phase of the spatially summed field (default).
+        - ``'on-axis'``: Calculates the on-axis spectral phase.
+
+    Returns
+    -------
+    gdd: ndarray of floats (1D)
+        Group delay over the entire spectral range (in s^2)
+
+    gdd0: float
+        Group delay at the center frequency (in s^2)
+
+    """
+    # calculate the spectral phase of the laser pulse
+    phase, omega = get_spectral_phase(grid, dim, omega0=omega0, method=method)
+
+    # calculate the second derivative wrt. angular frequency
+    gd = np.gradient(phase, omega, axis=-1, edge_order=1)
+
+    # get the GDD at the specified frequency or the envelope's frequency
+    omega_eval = omega_eval if omega_eval is not None else omega0
+
+    assert (omega_eval < omega[-1]) and (omega_eval > omega.min())
+
+    gd0 = np.interp(omega_eval, omega, gd)
+    return gd, gd0
+
+
+def get_gdd(grid, dim, omega0, omega_eval=None, method="sum"):
     r"""
     Calculate the group delay dispersion (GDD) of the laser.
 
@@ -1409,7 +1466,7 @@ def get_gdd(grid, dim, omega0, omega_gdd=None, method="sum"):
     omega0 : float
         Angular frequency at which the laser envelope is defined.
 
-    omega_gdd : float, optional
+    omega_eval : float, optional
         Central angular frequency at which the GDD is calculated, if `None`, `omega0` is used.
 
     method : string, optional
@@ -1435,6 +1492,69 @@ def get_gdd(grid, dim, omega0, omega_gdd=None, method="sum"):
     gdd = np.gradient(gd, omega, axis=-1)
 
     # get the GDD at the specified frequency or the envelope's frequency
-    omega_eval = omega_gdd if omega_gdd is not None else omega0
+    omega_eval = omega_eval if omega_eval is not None else omega0
+    
+    assert (omega_eval < omega[-1]) and (omega_eval > omega.min())
+    
     gdd0 = np.interp(omega_eval, omega, gdd)
     return gdd, gdd0
+
+
+def get_tod(grid, dim, omega0, omega_eval=None, method="sum"):
+    r"""
+    Calculate the third order dispersion (TOD) of the laser.
+
+    .. math::
+        TOD = \frac{\partial^3 \phi(\omega)}{\partial \omega^3}
+
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the field to analyze.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    omega0 : float
+        Angular frequency at which the laser envelope is defined.
+
+    omega_gdd : float, optional
+        Central angular frequency at which the GDD is calculated, if `None`, `omega0` is used.
+
+    method : string, optional
+        Method of retrieving the phase that is used for calculating the TOD. Options are:
+
+        - ``'sum'``: Calculates the spectral phase of the spatially summed field (default).
+        - ``'on-axis'``: Calculates the on-axis spectral phase.
+
+    Returns
+    -------
+    tod: ndarray of floats (1D)
+        Third order dispersion over the entire spectral range (in s^3)
+
+    tod0: float
+        Third order dispersion at the center frequency (in s^3)
+
+    """
+    # calculate the spectral phase of the laser pulse
+    phase, omega = get_spectral_phase(grid, dim, method=method, omega0=omega0)
+
+    # calculate the second derivative wrt. angular frequency
+    gd = np.gradient(phase, omega, axis=-1)
+    gdd = np.gradient(gd, omega, axis=-1)
+    tod = np.gradient(gdd, omega, axis=-1)
+
+    # get the GDD at the specified frequency or the envelope's frequency
+    omega_eval = omega_eval if omega_eval is not None else omega0
+    
+    assert (omega_eval < omega[-1]) and (omega_eval > omega.min())
+    
+    tod0 = np.interp(omega_eval, omega, tod)
+    
+    return gdd, tod0
