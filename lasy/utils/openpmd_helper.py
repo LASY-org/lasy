@@ -342,7 +342,7 @@ def isolate_polarization(arrays, dim):
         )
         Ex = Ex[0]
         Ey = Ey[0]
-    rho2 = np.abs(Ex)**2 + np.abs(Ey)**2
+    rho2 = np.abs(Ex) ** 2 + np.abs(Ey) ** 2
     # Amplitude of polarization vectors
     rho_x = np.sqrt(np.sum(np.abs(Ex) ** 2) / np.sum(rho2))
     rho_y = np.sqrt(np.sum(np.abs(Ey) ** 2) / np.sum(rho2))
