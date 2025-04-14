@@ -26,7 +26,7 @@ class FromOpenPMDProfile(FromArrayProfile):
     envelope_name : string (optional)
         The name of the envelope field (this is not prescribed by the openPMD standard for the envelope).
         If specified, an envelope field is expected from the openPMD file. Otherwise, a full electric field is assumed.
-        In the case of a full field, linear polarization in x is assumed for the moment, this can be generalized on demand.
+        In the case of a full field, The transverse electric field (Ex & Ey or Er and Etheta) is read, and the polarization is measured from this.
 
     verbose : bool (optional)
         If true, print some intermediate steps.

@@ -224,16 +224,16 @@ def convert_modes(arr_list, geometry, is_env, verbose=False):
     """
     Convert from openPMD mode decomposition to LASY mode decomposition.
 
-    Convert from openPMD mode decomposition in cos(m*theta) and sin(m*theta), stored, m in [0, Nmodes] to LASY mode decomposition exp(i*m*theta) m in [-Nmodes+1,Nmodes-1] (array of complex numbers, see https://github.com/LASY-org/lasy/blob/development/README.md):
-     - Electromagnetic + cylindrical: we assume Er and Etheta
+    Convert from openPMD mode decomposition of the electric field in cos(m*theta) and sin(m*theta), stored, m in [0, Nmodes] to LASY mode decomposition exp(i*m*theta) m in [-Nmodes+1,Nmodes-1] (array of complex numbers, see https://github.com/LASY-org/lasy/blob/development/README.md):
+     - Electromagnetic + cylindrical: we assume Er and Etheta, and construct Ex and Ey.
         https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record. Complex modes, the real and imag part are stored in 2 real arrays.
-     - Envelope + cylindrical: we assume the array is Ex (in principle, we should measure the polarization). Complex modes, stored as arrays of complex numbers. See openPMD link above aas well as https://github.com/openPMD/openPMD-standard/blob/upcoming-2.0.0/EXT_LaserEnvelope.md.
+     - Envelope + cylindrical: we assume the array is E + polarization. Complex modes, stored as arrays of complex numbers. See openPMD link above aas well as https://github.com/openPMD/openPMD-standard/blob/upcoming-2.0.0/EXT_LaserEnvelope.md.
      - Cartesian: do not do anything.
 
     Parameters
     ----------
     arr_list : list of Numpy arrays
-        List of 3D arrays to be converted. They are processed independently.
+        List of 3D arrays to be converted.
 
     geometry : string
         Geometry of input data from openPMD standard, "cartesian" or "thetaMode" supported.
@@ -253,6 +253,7 @@ def convert_modes(arr_list, geometry, is_env, verbose=False):
     """
     if geometry == "cartesian":
         return arr_list
+
     nmodes_in = (arr_list[0].shape[0] + 1) // 2
     if verbose:
         print("nmodes_in:", nmodes_in)
@@ -341,7 +342,7 @@ def isolate_polarization(arrays, dim):
         )
         Ex = Ex[0]
         Ey = Ey[0]
-    rho2 = np.abs(Ex) ** 2 + np.abs(Ey**2)
+    rho2 = np.abs(Ex)**2 + np.abs(Ey)**2
     # Amplitude of polarization vectors
     rho_x = np.sqrt(np.sum(np.abs(Ex) ** 2) / np.sum(rho2))
     rho_y = np.sqrt(np.sum(np.abs(Ey) ** 2) / np.sum(rho2))
