@@ -1493,9 +1493,9 @@ def get_gdd(grid, dim, omega0, omega_eval=None, method="sum"):
 
     # get the GDD at the specified frequency or the envelope's frequency
     omega_eval = omega_eval if omega_eval is not None else omega0
-    
+
     assert (omega_eval < omega[-1]) and (omega_eval > omega.min())
-    
+
     gdd0 = np.interp(omega_eval, omega, gdd)
     return gdd, gdd0
 
@@ -1552,9 +1552,9 @@ def get_tod(grid, dim, omega0, omega_eval=None, method="sum"):
 
     # get the GDD at the specified frequency or the envelope's frequency
     omega_eval = omega_eval if omega_eval is not None else omega0
-    
+
     assert (omega_eval < omega[-1]) and (omega_eval > omega.min())
-    
+
     tod0 = np.interp(omega_eval, omega, tod)
-    
+
     return gdd, tod0

@@ -2,9 +2,17 @@ import numpy as np
 from scipy.constants import c, epsilon_0
 
 from lasy.laser import Laser
-from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.laser_utils import compute_laser_energy, get_duration, get_spectrum, get_gd, get_gdd, get_tod
 from lasy.optical_elements.polynomial_spectral_phase import PolynomialSpectralPhase
+from lasy.profiles.gaussian_profile import GaussianProfile
+from lasy.utils.laser_utils import (
+    compute_laser_energy,
+    get_duration,
+    get_gd,
+    get_gdd,
+    get_spectrum,
+    get_tod,
+)
+
 
 def get_gaussian_profile():
     # Cases with Gaussian laser
@@ -38,8 +46,7 @@ def test_laser_analysis_utils():
         laser = get_gaussian_laser(dim)
 
         # Check that energy computed from spectrum agrees with `compute_laser_energy`.
-        spectrum, omega = get_spectrum(
-            laser.grid, dim, omega0=laser.profile.omega0)
+        spectrum, omega = get_spectrum(laser.grid, dim, omega0=laser.profile.omega0)
         d_omega = omega[1] - omega[0]
         spectrum_energy = np.sum(spectrum) * d_omega
         energy = compute_laser_energy(dim, laser.grid)
@@ -47,20 +54,26 @@ def test_laser_analysis_utils():
 
         # Check that laser duration agrees with the given one.
         tau_rms = get_duration(laser.grid, dim)
-        np.testing.assert_approx_equal(
-            2 * tau_rms, laser.profile.tau, significant=3)
+        np.testing.assert_approx_equal(2 * tau_rms, laser.profile.tau, significant=3)
 
         # Check that the spectral phase terms are calculated correctly.
         gd = 10e-15
         gdd = 50e-30
         tod = 100e-45
         laser_chirped = get_gaussian_laser(dim)
-        dazzler = PolynomialSpectralPhase(omega0=laser_chirped.profile.omega0,
-                                          delay=gd, gdd=gdd, tod=tod)
+        dazzler = PolynomialSpectralPhase(
+            omega0=laser_chirped.profile.omega0, delay=gd, gdd=gdd, tod=tod
+        )
         laser_chirped.apply_optics(dazzler)
-        _, gd_evaluated = get_gd(laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0)
-        _, gdd_evaluated = get_gdd(laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0)
-        _, tod_evaluated = get_tod(laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0)
+        _, gd_evaluated = get_gd(
+            laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0
+        )
+        _, gdd_evaluated = get_gdd(
+            laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0
+        )
+        _, tod_evaluated = get_tod(
+            laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0
+        )
 
         assert np.isclose(gd, gd_evaluated, atol=laser_chirped.grid.dx[-1])
         assert np.isclose(gdd, gdd_evaluated, atol=0)
