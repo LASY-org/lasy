@@ -3,8 +3,8 @@ from scipy.constants import c, epsilon_0
 
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.laser_utils import compute_laser_energy, get_duration, get_spectrum
-
+from lasy.utils.laser_utils import compute_laser_energy, get_duration, get_spectrum, get_gd, get_gdd, get_tod
+from lasy.optical_elements.polynomial_spectral_phase import PolynomialSpectralPhase
 
 def get_gaussian_profile():
     # Cases with Gaussian laser
