@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.x'
+        python-version: '3.10'
         
     - name: Install dependencies
       run: |
@@ -26,22 +26,33 @@ jobs:
         
     - name: Run tests with coverage
       run: |
-        pytest --cov=./ --cov-report=xml
+        pytest --cov=./
         
     - name: Extract coverage percentage
       id: get_coverage
       run: |
         COVERAGE_PERCENTAGE=$(pytest --cov=./ | grep TOTAL | awk '{print $NF}' | sed 's/%//')
+        # Make sure we got a number
+        if [[ ! $COVERAGE_PERCENTAGE =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+          echo "Error extracting coverage percentage"
+          exit 1
+        fi
         echo "coverage=$COVERAGE_PERCENTAGE" >> $GITHUB_OUTPUT
         echo "Total coverage: $COVERAGE_PERCENTAGE%"
         
     - name: Create Coverage Badge
       uses: schneegans/dynamic-badges-action@v1.6.0
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' && success()
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: be1461a986a559890c82ce71fda35f42
         filename: coverage.json
         label: coverage
         message: ${{ steps.get_coverage.outputs.coverage }}%
-        color: ${{ steps.get_coverage.outputs.coverage >= 90 && 'brightgreen' || steps.get_coverage.outputs.coverage >= 80 && 'green' || steps.get_coverage.outputs.coverage >= 70 && 'yellowgreen' || steps.get_coverage.outputs.coverage >= 60 && 'yellow' || 'red' }}
+        color: >-
+          ${{ 
+            steps.get_coverage.outputs.coverage >= 90 && 'brightgreen' || 
+            steps.get_coverage.outputs.coverage >= 80 && 'green' || 
+            steps.get_coverage.outputs.coverage >= 70 && 'yellowgreen' || 
+            steps.get_coverage.outputs.coverage >= 60 && 'yellow' || 'red' 
+          }}
