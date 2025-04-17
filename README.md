@@ -1,9 +1,9 @@
 # lasy
-[![tests badge](https://github.com/AngelFP/Wake-T/actions/workflows/test-package.yml/badge.svg)](https://github.com/AngelFP/Wake-T/actions)
+[![tests badge](https://github.com/AngelFP/Wake-T/actions/workflows/test-package.yml/badge.svg)](https://github.com/LASY-org/lasy/actions)
 [![Documentation Status](https://readthedocs.org/projects/wake-t/badge/?version=latest)](https://wake-t.readthedocs.io/en/latest/?badge=latest)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/980eb84cf4984df49d3f036cf9b742db)](https://app.codacy.com/gh/AngelFP/Wake-T/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/980eb84cf4984df49d3f036cf9b742db)](https://app.codacy.com/gh/AngelFP/Wake-T/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
-[![PyPI](https://img.shields.io/pypi/v/Wake-T)](https://pypi.org/project/Wake-T/)
+[![PyPI](https://img.shields.io/pypi/v/LASY)](https://pypi.org/project/lasy/)
 [![License](https://img.shields.io/github/license/AngelFP/Wake-T)](https://github.com/AngelFP/Wake-T/blob/master/LICENSE)
 ## Overview
 
