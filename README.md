@@ -6,8 +6,6 @@
 ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Paaaaarth/be1461a986a559890c82ce71fda35f42/raw/coverage.json)
 ![Coverage](https://img.shields.io/badge/coverage-XX%25-color)
 [![PyPI](https://img.shields.io/pypi/v/LASY)](https://pypi.org/project/lasy/)
-[![License](https://img.shields.io/github/license.txt/LASY-org/lasy)](https://github.com/LASY-org/lasy/blob/development/license.txt)
-![License](https://img.shields.io/badge/https%3A%2F%2Fgithub.com%2FLASY-org%2Flasy%2Fblob%2Fdevelopment%2Flicense.txt)
 
 ## Overview
 
