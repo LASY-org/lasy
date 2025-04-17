@@ -111,9 +111,9 @@ class LongitudinalProfileFromData(LongitudinalProfile):
 
             # Inverse Fourier Transform to the time domain
             t_amplitude = (
-                np.fft.fftshift(
-                    np.fft.ifft(
-                        np.fft.ifftshift(freq_amplitude * np.exp(-1j * freq_phase))
+                np.fft.ifftshift(
+                    np.fft.fft(
+                        np.fft.fftshift(freq_amplitude * np.exp(1j * freq_phase))
                     )
                 )
                 / dt

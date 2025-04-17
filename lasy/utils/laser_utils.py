@@ -364,7 +364,9 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     return env, ext
 
 
-def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
+def get_spectrum(
+    grid, dim, range=None, bins=20, omega0=None, method="sum", ordering="zero_center"
+):
     r"""
     Get the frequency spectrum of an envelope or electric field.
 
@@ -433,6 +435,12 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
         Determines the type of spectrum that is returned as described above.
         By default 'sum'.
 
+    ordering : string (optional)
+        Order of the frequency array and corresponding spectrum.
+        Options are:
+        - ``"zero_center"``: np.fft.fftshift is applied so the frequency array is monotonous with 0 at the center.
+        - ``"zero_first"``: The frequency array starts with positive frequencies, and negative frequencies are at the end. The array is not monotonous. This is the default with np.fft.ifft.
+
     Returns
     -------
     spectrum : ndarray
@@ -441,18 +449,9 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
     omega : ndarray
         Array with the angular frequencies of the spectrum.
     """
-    # Get the frequencies of the fft output.
-    freq = np.fft.fftfreq(grid.shape[-1], d=(grid.axes[-1][1] - grid.axes[-1][0]))
-    omega = 2 * np.pi * freq
-
-    # Get on axis or full field.
-    field = grid.get_temporal_field()
-    if method == "on_axis":
-        if dim == "xyt":
-            nx, ny, _ = field.shape
-            field = field[nx // 2, ny // 2]
-        else:
-            field = field[0, 0]
+    spectral_field, omega = grid.get_spectral_field()
+    # multiply by the number of points due to np.fft.fft normalization
+    spectral_field *= grid.npoints[-1]
 
     # Get spectrum.
     if grid.is_envelope:
@@ -460,22 +459,16 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
         # conjugate of the envelope do not overlap. Then we only need
         # one of them.
         assert omega0 is not None
-        spectrum = 0.5 * np.fft.fft(field) * grid.dx[-1]
-        omega = omega0 - omega
-        # Sort frequency array (and the spectrum accordingly).
-        i_sort = np.argsort(omega)
-        omega = omega[i_sort]
-        spectrum = spectrum[..., i_sort]
-        # Keep only positive frequencies.
-        i_keep = omega >= 0
-        omega = omega[i_keep]
-        spectrum = spectrum[..., i_keep]
+        spectrum = 0.5 * spectral_field * grid.dx[-1]
+        if method == "on_axis":
+            nx, ny, _ = spectrum.shape
+            spectrum = spectrum[nx // 2, ny // 2] if dim == "xyt" else spectrum[0, 0]
+        omega += omega0
     else:
-        spectrum = np.fft.fft(field) * grid.dx[-1]
-        # Keep only positive frequencies.
-        i_keep = spectrum.shape[-1] // 2
-        omega = omega[:i_keep]
-        spectrum = spectrum[..., :i_keep]
+        spectrum = spectral_field * grid.dx[-1]
+        if method == "on_axis":
+            nx, ny, _ = spectrum.shape
+            spectrum = spectrum[nx // 2, ny // 2] if dim == "xyt" else spectrum[0, 0]
 
     # Convert to spectral energy density (J/(m^2 rad Hz)).
     if method != "raw":
@@ -489,6 +482,11 @@ def get_spectrum(grid, dim, range=None, bins=20, omega0=None, method="sum"):
             spectrum = np.sum(spectrum * dV / dz, axis=(0, 1))
         else:
             spectrum = np.sum(spectrum[0] * dV[:, np.newaxis] / dz, axis=0)
+
+    assert ordering in ["zero_first", "zero_center"]
+    if ordering == "zero_center":
+        omega = np.fft.fftshift(omega, axes=-1)
+        spectrum = np.fft.fftshift(spectrum, axes=-1)
 
     # If the user specified a frequency range, interpolate into it.
     if method in ["sum", "on_axis"] and range is not None:
@@ -847,8 +845,8 @@ def create_grid(array, axes, dim, is_envelope=True):
         hi = (axes["x"][-1], axes["y"][-1], axes["t"][-1])
         npoints = (axes["x"].size, axes["y"].size, axes["t"].size)
         grid = Grid(dim, lo, hi, npoints, is_envelope=is_envelope)
-        assert np.all(grid.axes[0] == axes["x"])
-        assert np.all(grid.axes[1] == axes["y"])
+        assert np.allclose(grid.axes[0], axes["x"])
+        assert np.allclose(grid.axes[1], axes["y"])
         assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
         assert array.ndim == 3, "Input array should be of dimension 3 [x, y, time]"
         grid.set_temporal_field(array)
@@ -856,7 +854,15 @@ def create_grid(array, axes, dim, is_envelope=True):
         lo = (axes["r"][0], axes["t"][0])
         hi = (axes["r"][-1], axes["t"][-1])
         npoints = (axes["r"].size, axes["t"].size)
-        grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes=1, is_envelope=is_envelope)
+        nm = int((array.shape[0] + 1) / 2)
+        grid = Grid(
+            dim,
+            lo,
+            hi,
+            npoints,
+            n_azimuthal_modes=nm,
+            is_envelope=is_envelope,
+        )
         assert np.all(grid.axes[0] == axes["r"])
         assert np.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
         assert array.ndim == 3, (
@@ -1091,7 +1097,7 @@ def get_w0(grid, dim):
 
 def get_phi2(dim, grid):
     r"""
-    Calculate the group-delay dispersion of the laser.
+    Calculate the second derivative of the temporal phase of the laser.
 
     Parameters
     ----------
@@ -1108,10 +1114,8 @@ def get_phi2(dim, grid):
 
     Returns
     -------
-    phi2 : Group-delay dispersion in :math:`\Phi^{(2)} = \frac{d\omega_0}{dt}` (second^-2)
-    varphi2 : Group-delay dispersion in :math:`\varphi^{(2)}=\frac{dt_0}{d\omega}` (second^2)
+    phi2 : Second derivative of temporal phase :math:`\Phi^{(2)} = \frac{d\omega_0}{dt} = \frac{d^2\Phi(t)}{dt^2}` in (second^-2)
     """
-    tau = 2 * get_duration(grid, dim)
     env = grid.get_temporal_field()
     env_abs2 = np.abs(env**2)
     # Calculate group-delayed dispersion
@@ -1119,8 +1123,8 @@ def get_phi2(dim, grid):
     pphi_pt = np.gradient(phi_envelop, grid.dx[-1], axis=2)
     pphi_pt2 = np.gradient(pphi_pt, grid.dx[-1], axis=2)
     phi2 = np.average(pphi_pt2, weights=env_abs2)
-    varphi2 = np.max(np.roots([4 * phi2, -4, tau**4 * phi2]))
-    return phi2, varphi2
+
+    return phi2
 
 
 def get_zeta(dim, grid, k0):
@@ -1148,12 +1152,10 @@ def get_zeta(dim, grid, k0):
     assert dim == "xyt", "No spatial chirp for axis-symmetric dimension."
     w0 = get_w0(grid, dim)
     tau = 2 * get_duration(grid, dim)
-    env_spec = grid.get_spectral_field()
+    env_spec, spectral_axis = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
     # Get the spectral axis
-    dt = grid.dx[-1]
-    Nt = grid.shape[-1]
-    omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
+    omega = spectral_axis + k0 * c
     # Calculate dx0 and dy0 in (x,y,omega) space
     weight_x_3d = np.transpose(env_spec_abs2, (2, 1, 0))
     weight_y_3d = np.transpose(env_spec_abs2, (2, 0, 1))
@@ -1201,12 +1203,10 @@ def get_beta(dim, grid, k0):
     beta_x, beta_y : Angular dispersion in :math:` \beta = \frac{d\theta_0}{d\omega}` (second)
     """
     assert dim == "xyt", "No angular chirp for axis-symmetric dimension."
-    env_spec = grid.get_spectral_field()
+    env_spec, spectral_axis = grid.get_spectral_field()
     env_spec_abs2 = np.abs(env_spec**2)
     # Get the spectral axis
-    dt = grid.dx[-1]
-    Nt = grid.shape[-1]
-    omega = 2 * np.pi * np.fft.fftfreq(Nt, dt) + k0 * c
+    omega = spectral_axis + k0 * c
     # Calculate angular dispersion beta
     phi_envelop_abs = np.unwrap(
         np.array(np.arctan2(env_spec.imag, env_spec.real)), axis=2
@@ -1285,3 +1285,156 @@ def get_propation_angle(dim, grid, k0):
     angle_x = np.average(pphi_px, weights=env_abs2) / k0
     angle_y = np.average(pphi_py, weights=env_abs2) / k0
     return [angle_x, angle_y]
+
+
+def get_spectral_phase(grid, dim, omega0, method="sum", ordering="zero_center"):
+    r"""
+    Calculate the spectral phase of a pulse in a given grid.
+
+    Depending on the chosen calculation method, the spectral phase can be calculated in two different ways.
+
+    If `method==sum` (default), the spectral field of the laser is spatially integrated before extracting the phase, i.e.
+
+    .. math::
+
+        \varphi(\omega) = \arg\left( \int E(x,y,\omega) dx dy \right)
+
+    If `method==on-axis`, the on-axis spectral phase is calculated:
+
+    .. math::
+
+        \varphi(\omega) = \arg\left( E(x=0,y=0,\omega) \right)
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the field to analyze.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    omega0 : float
+        Central angular frequency of the field
+
+    method : string, optional
+        Method of calculating the spectral phase. Options are:
+
+        - ``'sum'``: Calculates the spectral phase of the spatially summed field (default).
+        - ``'on-axis'``: Calculates the on-axis spectral phase.
+
+    ordering : string (optional)
+        Order of the frequency array and corresponding spectral phase.
+        Options are:
+        - ``"zero_center"``: np.fft.fftshift is applied so the frequency array is monotonous with 0 at the center.
+        - ``"zero_first"``: The frequency array starts with positive frequencies, and negative frequencies are at the end. The array is not monotonous. This is the default with np.fft.ifft.
+
+
+    Returns
+    -------
+    phase: ndarray of floats (1D)
+        Spectral phase of the pulse in the specified units and calculation method (in rad/s)
+
+    omega: ndarray of floats (1D)
+        Angular frequencies at which the phase is defined (in rad/s)
+
+    """
+    # Field must be envelope
+    assert grid.is_envelope
+
+    # get the spectral field
+    field_spectral, omega = grid.get_spectral_field()
+
+    # if method=='on-axis' get the on-axis field envelope, and calculate its phase
+    assert method in ["on-axis", "sum"]
+    if method == "on-axis":
+        if dim == "xyt":
+            Nx = grid.npoints[0]
+            Ny = grid.npoints[1]
+            phase = np.angle(field_spectral[Nx // 2, Ny // 2, :])
+        else:  # dim=='rt'
+            phase = np.angle(field_spectral[0, 0, :])
+
+    # if method=='sum' integrate the field spatially before getting the phase from it
+    else:  # method='sum'
+        # grid cell volume required for integration
+        dV = get_grid_cell_volume(grid, dim)
+
+        if dim == "xyt":
+            summed_field = np.sum(field_spectral * dV, axis=(0, 1))
+        else:  # dim=='rt'
+            summed_field = np.sum(field_spectral * dV[None, :, None], axis=(0, 1))
+
+        phase = np.angle(summed_field)
+
+    # create omega array (angular frequencies)
+    assert ordering in ["zero_first", "zero_center"]
+    if ordering == "zero_center":
+        omega = np.fft.fftshift(omega, axes=-1)
+        phase = np.fft.fftshift(phase, axes=-1)
+    omega += omega0
+
+    # unwrap the phase
+    phase = np.unwrap(phase)
+
+    # return the phase and omega arrays
+    return phase, omega
+
+
+def get_gdd(grid, dim, omega0, omega_gdd=None, method="sum"):
+    r"""
+    Calculate the group delay dispersion (GDD) of the laser.
+
+    .. math::
+        GDD = \frac{\partial^2 \phi(\omega)}{\partial \omega^2}
+
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the field to analyze.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    omega0 : float
+        Angular frequency at which the laser envelope is defined.
+
+    omega_gdd : float, optional
+        Central angular frequency at which the GDD is calculated, if `None`, `omega0` is used.
+
+    method : string, optional
+        Method of retrieving the phase that is used for calculating the GDD. Options are:
+
+        - ``'sum'``: Calculates the spectral phase of the spatially summed field (default).
+        - ``'on-axis'``: Calculates the on-axis spectral phase.
+
+    Returns
+    -------
+    gdd: ndarray of floats (1D)
+        Group delay dispersion over the entire spectral range (in s^2)
+
+    gdd0: float
+        Group delay dispersion at the center frequency (in s^2)
+
+    """
+    # calculate the spectral phase of the laser pulse
+    phase, omega = get_spectral_phase(grid, dim, method=method, omega0=omega0)
+
+    # calculate the second derivative wrt. angular frequency
+    gd = np.gradient(phase, omega, axis=-1)
+    gdd = np.gradient(gd, omega, axis=-1)
+
+    # get the GDD at the specified frequency or the envelope's frequency
+    omega_eval = omega_gdd if omega_gdd is not None else omega0
+    gdd0 = np.interp(omega_eval, omega, gdd)
+    return gdd, gdd0

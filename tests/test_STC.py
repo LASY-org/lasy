@@ -14,7 +14,7 @@ from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
 from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import GaussianTransverseProfile
-from lasy.utils.laser_utils import get_beta, get_phi2, get_zeta
+from lasy.utils.laser_utils import get_beta, get_gdd, get_zeta
 
 wavelength = 0.6e-6  # m
 pol = (1, 0)
@@ -24,7 +24,7 @@ tau = 5e-14  # s
 t_peak = 0.0  # s
 beta = 3e-18  # s
 zeta = 2.4e-22  # m * s
-phi2 = 2.4e-24  # s ^ 2
+phi2 = 2.4e-27  # s ^ 2
 stc_theta = scc.pi / 2  # rad
 z_r = (np.pi * w0**2) / wavelength
 z_foc = 3 * z_r
@@ -46,8 +46,8 @@ STCprofile = GaussianProfile(
 # Create laser with given profile in `xyt` geometry.
 laser_3d = Laser(
     dim="xyt",
-    lo=(-10e-6, -10e-6, -10e-14),
-    hi=(10e-6, 10e-6, +10e-14),
+    lo=(-10e-6, -10e-6, -30e-14),
+    hi=(10e-6, 10e-6, +30e-14),
     npoints=(100, 100, 200),
     profile=STCprofile,
 )
@@ -99,13 +99,16 @@ err_imag = np.average(
     / np.array(env_combined.imag)
 )
 
-Phi2_3d, phi2_3d = get_phi2(laser_3d.dim, laser_3d.grid)
+gdd_3d, gdd0_3d = get_gdd(
+    grid=laser_3d.grid, dim=laser_3d.dim, omega0=laser_3d.profile.omega0
+)
 [zeta_x, zeta_y], [nu_x, nu_y] = get_zeta(
     laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6
 )
 [beta_x, beta_y] = get_beta(laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6)
 
 assert (err_real + err_imag) < 1e-6
-np.testing.assert_approx_equal(phi2_3d, phi2, significant=2)
+
+np.testing.assert_approx_equal(gdd0_3d, phi2, significant=2)
 np.testing.assert_approx_equal(zeta_y, zeta, significant=2)
 np.testing.assert_approx_equal(beta_y, beta, significant=2)

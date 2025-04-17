@@ -204,15 +204,20 @@ class Grid:
         -------
         field : ndarray of complexs
             The spectral field.
+
+        omega : 1d array of real numbers
+            The frequency axis consistent with the spectral field.
+            This is centered around 0, the central frequency of the envelope
+            must be added separately to construct the physical frequency array.
         """
         # We return a copy, so that the user cannot modify
         # the original field, unless set_spectral_field is called
         assert self.is_envelope
         if self.spectral_field_valid:
-            return self.spectral_field.copy()
+            return self.spectral_field.copy(), self.spectral_axis.copy()
         elif self.temporal_field_valid:
             self.temporal2spectral_fft()
-            return self.spectral_field.copy()
+            return self.spectral_field.copy(), self.spectral_axis.copy()
         else:
             raise ValueError("Both temporal and spectral fields are invalid")
 
@@ -223,9 +228,10 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
-        self.spectral_field = np.fft.ifft(
-            self.temporal_field, axis=time_axis_indx, norm="backward"
-        )
+
+        shifted_temporal = np.fft.fftshift(self.temporal_field, axes=time_axis_indx)
+        self.spectral_field = np.fft.ifft(shifted_temporal, axis=time_axis_indx)
+        self.spectral_axis = 2 * np.pi * np.fft.fftfreq(self.npoints[-1], self.dx[-1])
         self.spectral_field_valid = True
 
     def spectral2temporal_fft(self):
@@ -235,7 +241,8 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.spectral_field_valid
-        self.temporal_field = np.fft.fft(
-            self.spectral_field, axis=time_axis_indx, norm="backward"
-        )
+
+        shifted_temporal = np.fft.fft(self.spectral_field, axis=time_axis_indx)
+        self.temporal_field = np.fft.fftshift(shifted_temporal, axes=time_axis_indx)
+
         self.temporal_field_valid = True
