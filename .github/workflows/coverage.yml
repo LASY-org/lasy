@@ -1,10 +1,6 @@
 name: Python Code Coverage
 
-on:
-  push:
-    branches: [ "development" ]
-  pull_request:
-    branches: [ "development" ]
+on: [push, pull_request] 
 
 jobs:
   test:
@@ -16,22 +12,22 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.x'
         
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pytest-cov
+        pip install pytest coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         
     - name: Run tests with coverage
       run: |
-        pytest --cov=./
+        coverage run -m pytest tests/
         
     - name: Extract coverage percentage
       id: get_coverage
       run: |
-        COVERAGE_PERCENTAGE=$(pytest --cov=./ | grep TOTAL | awk '{print $NF}' | sed 's/%//')
+        COVERAGE_PERCENTAGE=$(coverage report | grep TOTAL | awk '{print $NF}' | sed 's/%//')
         # Make sure we got a number
         if [[ ! $COVERAGE_PERCENTAGE =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
           echo "Error extracting coverage percentage"
