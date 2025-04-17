@@ -1,0 +1,47 @@
+name: Python Code Coverage
+
+on:
+  push:
+    branches: [ "development" ]
+  pull_request:
+    branches: [ "development" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        
+    - name: Run tests with coverage
+      run: |
+        pytest --cov=./ --cov-report=xml
+        
+    - name: Extract coverage percentage
+      id: get_coverage
+      run: |
+        COVERAGE_PERCENTAGE=$(pytest --cov=./ | grep TOTAL | awk '{print $NF}' | sed 's/%//')
+        echo "coverage=$COVERAGE_PERCENTAGE" >> $GITHUB_OUTPUT
+        echo "Total coverage: $COVERAGE_PERCENTAGE%"
+        
+    - name: Create Coverage Badge
+      uses: schneegans/dynamic-badges-action@v1.6.0
+      if: github.ref == 'refs/heads/main'
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: be1461a986a559890c82ce71fda35f42
+        filename: coverage.json
+        label: coverage
+        message: ${{ steps.get_coverage.outputs.coverage }}%
+        color: ${{ steps.get_coverage.outputs.coverage >= 90 && 'brightgreen' || steps.get_coverage.outputs.coverage >= 80 && 'green' || steps.get_coverage.outputs.coverage >= 70 && 'yellowgreen' || steps.get_coverage.outputs.coverage >= 60 && 'yellow' || 'red' }}
