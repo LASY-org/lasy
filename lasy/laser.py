@@ -497,8 +497,9 @@ class Laser:
         spectral_field = self.grid.get_spectral_field() # used for normalising each wavelength
         spec_amp = np.sum(np.abs(spectral_field),axis=(0,1),keepdims=True)*(o/self.profile.omega0)
         
-        E_xyomega = self.profile.trans_profile.evaluate(x,y) # transverse profile in warped coordinates
-    
+        # transverse profile in warped coordinates
+        E_xyomega = np.abs(self.profile.evaluate(x, y, np.ones_like(o)*np.median(self.grid.axes[-1])))
+        
         amp_mod = np.divide(spec_amp,np.sum(E_xyomega,axis=(0,1),keepdims=True), 
                             out=np.zeros_like(spec_amp), where=np.sum(E_xyomega,axis=(0,1),keepdims=True)!=0)
         E_xyomega = E_xyomega*amp_mod # add spectral dependence
