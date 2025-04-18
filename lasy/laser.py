@@ -11,7 +11,7 @@ from lasy.utils.laser_utils import (
 )
 from lasy.utils.openpmd_output import write_to_openpmd_file
 
-from lasy.utils.fraunhofer import calc_focus_fraunhofer, calc_fraunhofer_axis
+from lasy.utils.fraunhofer import calc_farfield_fraunhofer, calc_fraunhofer_axis
 
 
 class Laser:
@@ -180,6 +180,11 @@ class Laser:
         optical_element: an :class:`.OpticalElement` object (optional)
             Represents a thin optical element, through which the laser
             propagates.
+
+        remember_optics: boolean (optional)
+            Whether to append the applied optic to a stored list
+            This is so that the optics can be used again in the go_to_farfield method
+            
         """
         if remember_optics:
             if hasattr(self, 'optical_element_list'):
@@ -446,9 +451,37 @@ class Laser:
         plt.ylabel("x (m)")
 
     def go_to_farfield(self,f,N_pad=None,unpad_result=True):
+        """
+        Transform a near field into a far field using Fraunhofer diffraction
+
+        Uses current spectral field, but recalculates transverse field from stored applied optics.
+        This is so that the spatial sampling can be adjusted in the near field plane so that the
+        output slices have the same spatial axis for all wavelengths.
+
+        The laser object is updated with the resulting spectral field and the new spatial grid.
+        
+        The focus term of the laser is implicit due to the far-field approximation.
+        So the field should not have the parabolic spatial phase term (the focus term)
+        This allows lower resolution to be use as you don't have to resolve the focus term
+        Deviations from perfect focusing can be added (i.e. focus shift and abberations)
+
+        Parameters
+        ----------
+        f : float
+            Focal length to use to calibration output spatial scale
+        
+        N_pad : int (optional)
+            size of padded array if padding is to be used in fourier transform
+            Increase to improve spatial resolution of result
+        
+        unpad_result : boolean (optional)
+            if True return array size to original after focus calculation
+    
+        """
         if self.dim == "rt":
             print('far field not implemented in rt coordinates')
             return
+        
         x, y, o = np.meshgrid(self.grid.axes[0],self.grid.axes[1],
                       self.omega_1d, # x, y, omega (omega in fft order)
                       indexing="ij")
@@ -478,19 +511,19 @@ class Laser:
 
 
         # angular frequency steps
-        df_x = self.grid.dx[0]/(f*self.profile.lambda0)
-        df_y = self.grid.dx[1]/(f*self.profile.lambda0)
+        d_fx = self.grid.dx[0]/(f*self.profile.lambda0)
+        d_fy = self.grid.dx[1]/(f*self.profile.lambda0)
         
         # sequentially compute fft's (allows for padding with minimum memory use)
-        E_xvomega = calc_focus_fraunhofer(E_xyomega, dx=df_x,axis=0,N_pad=N_pad,unpad_result=unpad_result)
-        E_uvomega = calc_focus_fraunhofer(E_xvomega, dx=df_y,axis=1,N_pad=N_pad,unpad_result=unpad_result)
+        E_xvomega = calc_farfield_fraunhofer(E_xyomega, d_fx=d_fx,axis=0,N_pad=N_pad,unpad_result=unpad_result)
+        E_uvomega = calc_farfield_fraunhofer(E_xvomega, d_fx=d_fy,axis=1,N_pad=N_pad,unpad_result=unpad_result)
         E_uvomega = E_uvomega*f*self.profile.lambda0 # amplitude correction
         
         # new grid
-        u = calc_fraunhofer_axis(self.grid.npoints[0],self.grid.dx[0]/(f*self.profile.lambda0),
+        u = calc_fraunhofer_axis(self.grid.npoints[0],d_fx,
                           N_pad=N_pad,unpad_result=unpad_result
                          )
-        v = calc_fraunhofer_axis(self.grid.npoints[1],self.grid.dx[1]/(f*self.profile.lambda0),
+        v = calc_fraunhofer_axis(self.grid.npoints[1],d_fy,
                           N_pad=N_pad,unpad_result=unpad_result
                          )
         new_grid = Grid(self.dim, 
