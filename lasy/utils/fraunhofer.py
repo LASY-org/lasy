@@ -1,6 +1,81 @@
 import numpy as np
 from numpy.fft import ifft,ifftshift,fft,fftshift
 
+
+def calc_farfield_fraunhofer(E_x,d_fx=1,axis=0,N_pad=None,unpad_result=True):
+    """
+    Calculate the focus of a laser field using Fraunhofer diffraction
+
+    Parameters
+    ----------
+    E_x : numpy array of complex
+        Field array at near field
+    
+    d_fx : float (optional)
+        step size in angular frequency of (original unpadded) near field (i.e. d_fx = d_x/(f*lambda0) )
+
+    N_pad : int (optional)
+         size of padded array if padding is to be used in fourier transform
+         Increase to improve spatial resolution of result
+    
+    unpad_result : boolean (optional)
+        if True return array size to original after focus calculation
+    
+    
+    Returns
+    -------
+    E_u: numpy array of complex
+        far field array
+
+    """
+    if N_pad is None:
+        N_x = np.shape(E_x)[axis]
+    else:
+        N_x = N_pad
+    E_u = calc_fft_pad(E_x,axis=axis,N_pad=N_pad,unpad_result=unpad_result,inverse=True)*d_fx*N_x
+    return E_u
+
+
+def calc_fraunhofer_axis(N,d_fx,N_pad=None,unpad_result=True):
+    """
+    Returns the spatial axis for a corresponding far field.
+
+    This should be used with calc_farfield_fraunhofer to give the corresponding spatial axis
+
+
+    Parameters
+    ----------
+    N : int
+        Original size of near field
+    
+    d_fx : float (optional)
+        step size in angular frequency of (original unpadded) near field (i.e. d_fx = d_x/(f*lambda0) )
+        (should value used in calc_farfield_fraunhofer)
+
+    N_pad : int (optional)
+        size of padded array if padding was used in fourier transform 
+        (should value used in calc_farfield_fraunhofer)
+    
+    unpad_result : boolean (optional)
+        if True return array size to original (should value used in calc_farfield_fraunhofer)
+    
+    
+    Returns
+    -------
+    E_u: numpy array of complex
+        far field array
+
+    """
+    if N_pad is None:
+        N_pad = N
+    du = 1/((N_pad)*d_fx)
+    u = (np.arange(N_pad)-N_pad/2)*du
+    if unpad_result:
+        u = unpad_array(u,N)
+    return u
+
+#----- Helper functions for farfield calculations -----
+
 def pad_array(input_array,N_pad,axis=0,pad_value=0):
     """
     Pad array along a given axis
@@ -111,75 +186,3 @@ def calc_fft_pad(E_x,axis=0,N_pad=None,unpad_result=True,inverse=False):
         E_u = unpad_array(E_u,N_input,axis=axis)
     return E_u
 
-
-def calc_farfield_fraunhofer(E_x,d_fx=1,axis=0,N_pad=None,unpad_result=True):
-    """
-    Calculate the focus of a laser field using Fraunhofer diffraction
-
-    Parameters
-    ----------
-    E_x : numpy array of complex
-        Field array at near field
-    
-    d_fx : float (optional)
-        step size in angular frequency of (original unpadded) near field (i.e. d_fx = d_x/(f*lambda0) )
-
-    N_pad : int (optional)
-         size of padded array if padding is to be used in fourier transform
-         Increase to improve spatial resolution of result
-    
-    unpad_result : boolean (optional)
-        if True return array size to original after focus calculation
-    
-    
-    Returns
-    -------
-    E_u: numpy array of complex
-        far field array
-
-    """
-    if N_pad is None:
-        N_x = np.shape(E_x)[axis]
-    else:
-        N_x = N_pad
-    E_u = calc_fft_pad(E_x,axis=axis,N_pad=N_pad,unpad_result=unpad_result,inverse=True)*d_fx*N_x
-    return E_u
-
-
-def calc_fraunhofer_axis(N,d_fx,N_pad=None,unpad_result=True):
-    """
-    Returns the spatial axis for a corresponding far field.
-
-    This should be used with calc_farfield_fraunhofer to give the corresponding spatial axis
-
-
-    Parameters
-    ----------
-    N : int
-        Original size of near field
-    
-    d_fx : float (optional)
-        step size in angular frequency of (original unpadded) near field (i.e. d_fx = d_x/(f*lambda0) )
-        (should value used in calc_farfield_fraunhofer)
-
-    N_pad : int (optional)
-        size of padded array if padding was used in fourier transform 
-        (should value used in calc_farfield_fraunhofer)
-    
-    unpad_result : boolean (optional)
-        if True return array size to original (should value used in calc_farfield_fraunhofer)
-    
-    
-    Returns
-    -------
-    E_u: numpy array of complex
-        far field array
-
-    """
-    if N_pad is None:
-        N_pad = N
-    du = 1/((N_pad)*d_fx)
-    u = (np.arange(N_pad)-N_pad/2)*du
-    if unpad_result:
-        u = unpad_array(u,N)
-    return u
