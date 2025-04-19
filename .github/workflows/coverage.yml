@@ -45,8 +45,8 @@ jobs:
     
     - name: Commit coverage badge
       run: |
-        git config --global Paaaaarth 'github-actions'
-        git config --global parth.patil@studium.uni-hamburg.de 'github-actions@github.com'
+        git config --global user.name 'Paaaaarth'
+        git config --global user.email 'parth.patil@studium.uni-hamburg.de'
         git add coverage-badge.json
         git commit -m "Update coverage badge" || echo "No changes"
         git push
