@@ -1,6 +1,10 @@
 name: Python Code Coverage
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "development" ]
+  pull_request:
+    branches: [ "development" ]
 
 jobs:
   test:
@@ -50,4 +54,3 @@ jobs:
         git add coverage-badge.json
         git commit -m "Update coverage badge" || echo "No changes"
         git push
-
