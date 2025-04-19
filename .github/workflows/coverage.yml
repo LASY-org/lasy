@@ -17,7 +17,6 @@ jobs:
         python-version: '3.x'
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
         pip install pytest coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Run tests with coverage
@@ -40,6 +39,10 @@ jobs:
           elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then echo yellow;
           else echo red; fi
         )\"}" > coverage-badge.json
+    - name: Show GitHub ref info
+      run: |
+        echo "GITHUB_REF = ${GITHUB_REF}"
+        echo "GITHUB_HEAD_REF = ${GITHUB_HEAD_REF}"
     - name: Commit coverage badge
       run: |
         git config --global user.name 'Paaaaarth'
