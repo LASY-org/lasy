@@ -1,8 +1,8 @@
 name: Python Code Coverage
 
 on:
-  schedule:
-    - cron: "27 3 * * 0"
+  push:
+    branches: [ "development" ]
 
 jobs:
   test:
