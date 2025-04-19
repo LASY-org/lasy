@@ -1,6 +1,10 @@
 name: Python Code Coverage
 
-on: [push, pull_request]
+on:
+  issues:
+    types:
+      - opened
+      - labeled
 
 jobs:
   test:
