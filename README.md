@@ -1,6 +1,6 @@
 # lasy
 [![tests badge](https://github.com/AngelFP/Wake-T/actions/workflows/test-package.yml/badge.svg)](https://github.com/LASY-org/lasy/actions)
-[![Documentation Status](https://readthedocs.org/projects/LASY/badge/?version=latest)](https://LASY.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/LASY/badge/?version=latest)](https://lasydoc.readthedocs.io/en/latest/)
 ![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Paaaaarth/LASY/Badges/coverage-badge.json)
 [![PyPI](https://img.shields.io/pypi/v/LASY)](https://pypi.org/project/lasy/)
 
