@@ -4,7 +4,6 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/980eb84cf4984df49d3f036cf9b742db)](https://app.codacy.com/gh/AngelFP/Wake-T/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/980eb84cf4984df49d3f036cf9b742db)](https://app.codacy.com/gh/AngelFP/Wake-T/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/Paaaaarth/be1461a986a559890c82ce71fda35f42/raw/coverage.json)
-![Coverage](https://img.shields.io/badge/coverage-XX%25-color)
 ![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Paaaaarth/LASY/tree/Badges/coverage-badge.json)
 [![PyPI](https://img.shields.io/pypi/v/LASY)](https://pypi.org/project/lasy/)
 
