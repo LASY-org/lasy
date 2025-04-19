@@ -53,4 +53,4 @@ jobs:
         git config --global user.email 'parth.patil@studium.uni-hamburg.de'
         git add coverage-badge.json
         git commit -m "Update coverage badge" || echo "No changes"
-        git push
+        git push origin HEAD:${GITHUB_HEAD_REF}
