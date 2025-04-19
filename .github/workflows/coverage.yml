@@ -1,10 +1,8 @@
 name: Python Code Coverage
 
 on:
-  issues:
-    types:
-      - opened
-      - labeled
+  label:
+    types: [created, edited]
 
 jobs:
   test:
