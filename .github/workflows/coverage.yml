@@ -9,33 +9,27 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v4
-    
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.x'
-        
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pytest coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        
     - name: Run tests with coverage
       run: |
         coverage run -m pytest tests/
         coverage report -m
-        
     - name: Extract coverage percentage
       id: get_coverage
       run: |
         COVERAGE_PERCENTAGE=$(coverage report | grep TOTAL | awk '{print $NF}' | sed 's/%//')
         echo "coverage=$COVERAGE_PERCENTAGE" >> $GITHUB_OUTPUT
         echo "Total coverage: $COVERAGE_PERCENTAGE%"
-        
     - name: Save coverage badge data
       run: |
         COVERAGE=${{ steps.get_coverage.outputs.coverage }}
@@ -46,7 +40,6 @@ jobs:
           elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then echo yellow;
           else echo red; fi
         )\"}" > coverage-badge.json
-    
     - name: Commit coverage badge
       run: |
         git config --global user.name 'Paaaaarth'
