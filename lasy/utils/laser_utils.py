@@ -1384,6 +1384,7 @@ def get_spectral_phase(grid, dim, omega0, method="sum", ordering="zero_center"):
     # return the phase and omega arrays
     return phase, omega
 
+
 def get_dispersion(grid, dim, omega0, order, omega_eval=None, method="sum"):
     r"""
     Calculate the n-th order dispersion polynomial of the laser.
@@ -1437,12 +1438,12 @@ def get_dispersion(grid, dim, omega0, order, omega_eval=None, method="sum"):
 
     # calculate the n-th order derivative wrt. angular frequency
     disp = np.gradient(phase, omega, axis=-1)
-    for _ in range(order-1):
+    for _ in range(order - 1):
         disp = np.gradient(disp, omega, axis=-1)
 
     # get the dispersion at the specified frequency of the envelope's frequency
     omega_eval = omega_eval if omega_eval is not None else omega0
 
-    disp0 = interp1d(omega, disp, bounds_error=True)(omega_eval) 
+    disp0 = interp1d(omega, disp, bounds_error=True)(omega_eval)
 
-    return disp, disp0 
+    return disp, disp0

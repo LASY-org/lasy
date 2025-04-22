@@ -6,9 +6,10 @@ from lasy.optical_elements.polynomial_spectral_phase import PolynomialSpectralPh
 from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.utils.laser_utils import (
     compute_laser_energy,
+    get_dispersion,
     get_duration,
     get_spectrum,
-    get_dispersion)
+)
 
 
 def get_gaussian_profile():
