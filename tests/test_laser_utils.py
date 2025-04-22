@@ -7,11 +7,8 @@ from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.utils.laser_utils import (
     compute_laser_energy,
     get_duration,
-    get_gd,
-    get_gdd,
     get_spectrum,
-    get_tod,
-)
+    get_dispersion)
 
 
 def get_gaussian_profile():
@@ -65,14 +62,14 @@ def test_laser_analysis_utils():
             omega0=laser_chirped.profile.omega0, delay=gd, gdd=gdd, tod=tod
         )
         laser_chirped.apply_optics(dazzler)
-        _, gd_evaluated = get_gd(
-            laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0
+        _, gd_evaluated = get_dispersion(
+            laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0, order=1
         )
-        _, gdd_evaluated = get_gdd(
-            laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0
+        _, gdd_evaluated = get_dispersion(
+            laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0, order=2
         )
-        _, tod_evaluated = get_tod(
-            laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0
+        _, tod_evaluated = get_dispersion(
+            laser_chirped.grid, dim, omega0=laser_chirped.profile.omega0, order=3
         )
 
         assert np.isclose(gd, gd_evaluated, atol=laser_chirped.grid.dx[-1])
