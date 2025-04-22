@@ -1392,7 +1392,7 @@ def get_dispersion(grid, dim, omega0, order, omega_eval=None, method="sum"):
     .. math::
         \Phi^{(n)} = \frac{\partial^{n} \phi(\omega)}{\partial \omega^{n}}
 
-    where n is the order to which the disperison is calculated (in s^{n}/rad).
+    where n is the order to which the disperison is calculated (in s^n/rad).
 
     E.g. `order`=1, calculates the group delay (GD), `order`=2 calculates group delay dispersion (GDD) and `order`=3 calculates the third order dispersion (TOD).
 
@@ -1427,10 +1427,10 @@ def get_dispersion(grid, dim, omega0, order, omega_eval=None, method="sum"):
     Returns
     -------
     disp: ndarray of floats (1D)
-        n-th order dispersion over the entire spectral range (in s^{n}/rad)
+        n-th order dispersion over the entire spectral range (in s^n/rad)
 
     disp0: float
-        n-th order dispersion at the center frequency (in s^{n}/rad)
+        n-th order dispersion at the center frequency (in s^n/rad)
 
     """
     # calculate the spectral phase of the laser pulse
