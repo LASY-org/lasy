@@ -89,17 +89,15 @@ class FromOpenPMDProfile(FromArrayProfile):
                 imajor = 1
             iminor = 1 - imajor
             # Convert major field to envelope, and measure frequency
-            grid = create_grid(array_list[imajor], axes, dim, is_envelope=False)
-            omg0 = field_to_envelope(grid, dim)
-            array_major = grid.get_temporal_field()
+            grid_major = create_grid(array_list[imajor], axes, dim, is_envelope=False)
+            omg0 = field_to_envelope(grid_major, dim)
             # Convert other field to envelope, for the same frequency
-            grid = create_grid(array_list[iminor], axes, dim, is_envelope=False)
-            field_to_envelope(grid, dim, omg0)
-            array_minor = grid.get_temporal_field()
+            grid_minor = create_grid(array_list[iminor], axes, dim, is_envelope=False)
+            field_to_envelope(grid_minor, dim, omg0)
             # Measure polarization state from Ex and Ey
             env_array_list = [None, None]
-            env_array_list[imajor] = array_major
-            env_array_list[iminor] = array_minor
+            env_array_list[imajor] = grid_major.get_temporal_field()
+            env_array_list[iminor] = grid_minor.get_temporal_field()
             array, pol = isolate_polarization(env_array_list, dim)
         wavelength = 2 * np.pi * c / omg0
 
