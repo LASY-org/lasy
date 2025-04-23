@@ -37,7 +37,7 @@ class FromOpenPMDProfile(FromArrayProfile):
         If true, print some intermediate steps.
     """
 
-    def __init__(self, file_name, envelope_name=None, iteration=None,verbose=False):
+    def __init__(self, file_name, envelope_name=None, iteration=None, verbose=False):
         series = io.Series(file_name, io.Access.read_only)
         iterations = np.array(series.iterations)
         if iteration is None:
