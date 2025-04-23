@@ -82,12 +82,21 @@ class FromOpenPMDProfile(FromArrayProfile):
             #           to Ex & Ey at LASY mode decomposition.
             array_list = convert_modes(array_list, geometry, is_envelope, verbose)
             dim = "xyt" if geometry == "cartesian" else "rt"
-            env_array_list = []
-            for array in array_list:
-                grid = create_grid(array, axes, dim, is_envelope=False)
-                omg0 = field_to_envelope(grid, dim)
-                array = grid.get_temporal_field()
-                env_array_list.append(array)
+            # Detect whether Ex (index 0) or Ey (index 1) is strongest (major)
+            imajor = 0 if np.max(np.abs(array_list[0])) >= np.max(np.abs(array_list[1])) else 1
+            iminor = 1 - imajor
+            # Convert major field to envelope, and measure frequency
+            grid = create_grid(array_list[imajor], axes, dim, is_envelope=False)
+            omg0 = field_to_envelope(grid, dim)
+            array_major = grid.get_temporal_field()
+            # Convert other field to envelope, for the same frequency
+            grid = create_grid(array_list[iminor], axes, dim, is_envelope=False)
+            field_to_envelope(grid, dim, omg0)
+            array_minor = grid.get_temporal_field()
+            # Measure polarization state from Ex and Ey
+            env_array_list = [None, None]
+            env_array_list[imajor] = array_major
+            env_array_list[iminor] = array_minor
             array, pol = isolate_polarization(env_array_list, dim)
         wavelength = 2 * np.pi * c / omg0
 
