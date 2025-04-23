@@ -754,6 +754,7 @@ def field_to_envelope(grid, dim, omega0=None, phase_unwrap_nd=False):
 
     return omg0 if omega0 is None else None
 
+
 def hilbert_transform(field):
     """Make a hilbert transform of the field.
 
