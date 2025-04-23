@@ -717,8 +717,8 @@ def field_to_envelope(grid, dim, omega0=None, phase_unwrap_nd=False):
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
     omega0 : scalar
-        Central frequency of the field.
-        If None, this is measured from the field.
+        Central frequency at which the envelope will be defined.
+        If None, the central frequency measured from the field is used.
 
     phase_unwrap_nd : boolean (optional)
         If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
