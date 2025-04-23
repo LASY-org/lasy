@@ -83,11 +83,10 @@ class FromOpenPMDProfile(FromArrayProfile):
             array_list = convert_modes(array_list, geometry, is_envelope, verbose)
             dim = "xyt" if geometry == "cartesian" else "rt"
             # Detect whether Ex (index 0) or Ey (index 1) is strongest (major)
-            imajor = (
-                0
-                if np.max(np.abs(array_list[0])) >= np.max(np.abs(array_list[1]))
-                else 1
-            )
+            if np.max(np.abs(array_list[0])) >= np.max(np.abs(array_list[1])):
+                imajor = 0
+            else:
+                imajor = 1
             iminor = 1 - imajor
             # Convert major field to envelope, and measure frequency
             grid = create_grid(array_list[imajor], axes, dim, is_envelope=False)
