@@ -1,5 +1,4 @@
 name: Weekly Coverage Update
-
 on:
   schedule:
     # Runs at 00:00 every Monday
@@ -13,25 +12,20 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    
     steps:
     - uses: actions/checkout@v3
-    
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.x'
-        
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pytest coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        
     - name: Run tests with coverage
       run: |
         coverage run -m pytest tests/
-        
     - name: Extract coverage percentage
       id: get_coverage
       run: |
@@ -45,10 +39,8 @@ jobs:
           LAST_LINE=$(tail -1 coverage_report.txt)
           COVERAGE_PERCENTAGE=$(echo "$LAST_LINE" | awk '{print $NF}' | sed 's/%//')
         fi
-        
         echo "Extracted coverage: $COVERAGE_PERCENTAGE%"
         echo "coverage=$COVERAGE_PERCENTAGE" >> $GITHUB_OUTPUT
-        
     - name: Determine badge color
       id: get_color
       run: |
@@ -65,7 +57,6 @@ jobs:
           COLOR="red"
         fi
         echo "color=$COLOR" >> $GITHUB_OUTPUT
-        
     - name: Create or update coverage.json
       run: |
         mkdir -p .github/badges
@@ -77,7 +68,6 @@ jobs:
           "color": "${{ steps.get_color.outputs.color }}"
         }
         EOF
-        
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v5
       with:
