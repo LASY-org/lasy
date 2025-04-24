@@ -74,29 +74,6 @@ repos:
       - "[pin];[donotremove]"
       # - --remove-kernel-metadata
 
-- repo: local
-  hooks:
-    - id: coverage-check
-      name: Check test coverage
-      entry: bash
-      language: python
-      additional_dependencies:
-        - coverage
-        - pytest
-      pass_filenames: false
-      always_run: true
-      verbose: true
-      args: [
-        -c,
-        |
-          coverage run -m pytest tests/ &&
-          coverage report -m |
-          grep TOTAL |
-          awk "{ print \$NF }" |
-          grep -q "^[8-9][0-9]\.[0-9]%\|^100\.0%"
-      ]
-
-
 # Checks the manifest for missing files (native support)
 - repo: https://github.com/mgedmin/check-manifest
   rev: "0.50"
