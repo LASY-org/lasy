@@ -2,8 +2,7 @@
 [![Documentation Status](https://readthedocs.org/projects/LASY/badge/?version=latest)](https://lasydoc.readthedocs.io/en/latest/)
 ![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/LASY-org/LASY/Badges/coverage-badge.json)
 [![PyPI](https://img.shields.io/pypi/v/LASY)](https://pypi.org/project/lasy/)
-[![License](https://img.shields.io/github/license/AngelFP/Wake-T)](https://github.com/AngelFP/Wake-T/blob/master/LICENSE)
-[![License](https://img.shields.io/github/license/LASY-org/lasy)](https://github.com/LASY-org/lasy/blob/development/license.txt)
+[![License](https://img.shields.io/badge/License-view-blue)](https://github.com/LASY-org/lasy/blob/development/license.txt)
 
 
 
