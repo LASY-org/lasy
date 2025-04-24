@@ -2,7 +2,7 @@ name: Python Code Coverage
 
 on:
   push:
-    branches: [ "development" ]
+    branches: [ "development", "Badges" ]
 
 jobs:
   test:
