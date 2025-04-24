@@ -11,10 +11,8 @@
 #     pre-commit autoupdate
 #
 # See https://pre-commit.com for more information
-
 # Do not check/format anything from third party directories
 #exclude: '^share/openPMD/thirdParty'
-
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
@@ -33,7 +31,6 @@ repos:
     - id: requirements-txt-fixer
 #  - id: fix-encoding-pragma
 #    exclude: ^noxfile.py$
-
 # documentation files: .rst
 -   repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
@@ -41,18 +38,15 @@ repos:
     - id: rst-backticks
     - id: rst-directive-colons
     - id: rst-inline-touching-normal
-
 #- repo: https://github.com/asottile/pyupgrade
 #  rev: v2.29.0
 #  hooks:
 #  - id: pyupgrade
-
 # Changes tabs to spaces
 - repo: https://github.com/Lucas-C/pre-commit-hooks
   rev: v1.5.5
   hooks:
   - id: remove-tabs
-
 # Python: Ruff linter & formatter
 #   https://docs.astral.sh/ruff/
 - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -63,7 +57,6 @@ repos:
       args: [--fix, --exit-non-zero-on-fix]
     # Run the formatter
     - id: ruff-format
-
 # Jupyter Notebooks: clean up all cell outputs
 - repo: https://github.com/roy-ht/pre-commit-jupyter
   rev: v1.2.1
@@ -73,7 +66,17 @@ repos:
       - --pin-patterns
       - "[pin];[donotremove]"
       # - --remove-kernel-metadata
-
+# Check code coverage when committing
+- repo: local
+  hooks:
+    - id: coverage-check
+      name: Check test coverage
+      entry: bash -c 'coverage run -m pytest tests/ && coverage report -m | grep TOTAL | awk "{print \$NF}" | grep -q "^[8-9][0-9]\.[0-9]\%\|^100\.\0\%"'
+      language: system
+      pass_filenames: false
+      always_run: true
+      verbose: true
+      stages: [commit]
 # Checks the manifest for missing files (native support)
 - repo: https://github.com/mgedmin/check-manifest
   rev: "0.50"
