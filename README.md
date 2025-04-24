@@ -3,7 +3,8 @@
 ![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/LASY-org/LASY/Badges/coverage-badge.json)
 [![PyPI](https://img.shields.io/pypi/v/LASY)](https://pypi.org/project/lasy/)
 [![License](https://img.shields.io/github/license/AngelFP/Wake-T)](https://github.com/AngelFP/Wake-T/blob/master/LICENSE)
-![License](https://img.shields.io/badge/https%3A%2F%2Fgithub.com%2FLASY-org%2Flasy%2Fblob%2Fdevelopment%2Flicense.txt?style=flat-square)
+![Static Badge](https://img.shields.io/badge/:badgeContent?link=https%3A%2F%2Fgithub.com%2FLASY-org%2Flasy%2Fblob%2Fdevelopment%2Flicense.txt)
+
 
 
 
