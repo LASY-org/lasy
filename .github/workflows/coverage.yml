@@ -30,7 +30,6 @@ jobs:
       id: get_coverage
       run: |
         # Save report and extract percentage
-        # coverage report > coverage_report.txt
         TOTAL_LINE=$(grep TOTAL coverage_report.txt || echo "No TOTAL line found")
         
         if [[ "$TOTAL_LINE" == *"TOTAL"* ]]; then
@@ -56,17 +55,19 @@ jobs:
           COLOR="red"
         fi
         echo "color=$COLOR" >> $GITHUB_OUTPUT
-    - name: Create or update coverage.json
+    - name: Append coverage with timestamp
       run: |
-        mkdir -p .github/badges
-        cat > .github/badges/coverage-badge.json << EOF
-        {
-          "schemaVersion": 1,
-          "label": "coverage",
-          "message": "${{ steps.get_coverage.outputs.coverage }}%",
-          "color": "${{ steps.get_color.outputs.color }}"
-        }
-        EOF
+        FILE=".github/badges/coverage-history.json"
+        TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        COVERAGE=${{ steps.get_coverage.outputs.coverage }}
+
+        # If file exists, append to it. Otherwise, start a new array.
+        if [ -f "$FILE" ]; then
+          jq --arg time "$TIMESTAMP" --arg cov "$COVERAGE" \
+            '. += [{"timestamp": $time, "coverage": ($cov | tonumber)}]' "$FILE" > tmp.json && mv tmp.json "$FILE"
+        else
+          echo '[{"timestamp": "'"$TIMESTAMP"'", "coverage": '"$COVERAGE"'}]' > "$FILE"
+        fi
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v7
       with:
