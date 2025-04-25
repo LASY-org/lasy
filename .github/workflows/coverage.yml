@@ -1,9 +1,7 @@
 name: Weekly Coverage Update
 on:
-  # schedule:
-    # Runs at 00:00 every Monday
-    # - cron: '0 0 * * 1'
-  # Optional: Allow manual triggering for testing
+  schedule:
+    - cron: '0 0 * * 1'
   workflow_dispatch:
 
 jobs:
