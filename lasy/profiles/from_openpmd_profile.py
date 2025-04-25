@@ -22,6 +22,8 @@ class FromOpenPMDProfile(FromArrayProfile):
     ----------
     file_name : string
         Name of openPMD file, including path, to read the laser field or envelope from.
+        When the openPMD series contains 1 file per iteration, either specify the exact file name (e.g. ``file_name="/path/data_00001.h5"``) or a file pattern + iteration (e.g. ``file_name="/path/data%T.h5", iteration=1``).
+        When the openPMD series contains 1 file with all iterations, specify file name + iteration (e.g. ``file_name="/path/data.h5", iteration=1``).
 
     envelope_name : string (optional)
         The name of the envelope field (this is not prescribed by the openPMD standard for the envelope).
@@ -30,8 +32,6 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     iteration : int (optional)
         The iteration to read from the openPMD file. If not specified, the last iteration is read.
-        The user can pass a `file_name` pattern such as `file_name="path/to/file%T.h5"`,
-        to loop over the iterations present in the set of files matching the pattern.
 
     verbose : bool (optional)
         If true, print some intermediate steps.
