@@ -57,7 +57,7 @@ jobs:
         echo "color=$COLOR" >> $GITHUB_OUTPUT
     - name: Append coverage with timestamp
       run: |
-        FILE=".github/badges/coverage-history.json"
+        FILE=".github/badges/coverage-badge.json"
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
         COVERAGE=${{ steps.get_coverage.outputs.coverage }}
 
