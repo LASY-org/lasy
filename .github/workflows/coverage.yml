@@ -1,7 +1,7 @@
 name: Weekly Coverage Update
 on:
   schedule:
-    - cron: "0 0 * * 1"
+    - cron: "*/4 * * * *"
   workflow_dispatch:
 
 jobs:
