@@ -30,14 +30,13 @@ jobs:
       id: get_coverage
       run: |
         # Save report and extract percentage
-        coverage report > coverage_report.txt
+        # coverage report > coverage_report.txt
         TOTAL_LINE=$(grep TOTAL coverage_report.txt || echo "No TOTAL line found")
         
         if [[ "$TOTAL_LINE" == *"TOTAL"* ]]; then
           COVERAGE_PERCENTAGE=$(echo "$TOTAL_LINE" | awk '{print $NF}' | sed 's/%//')
         else
-          LAST_LINE=$(tail -1 coverage_report.txt)
-          COVERAGE_PERCENTAGE=$(echo "$LAST_LINE" | awk '{print $NF}' | sed 's/%//')
+          COVERAGE_PERCENTAGE=0
         fi
         echo "Extracted coverage: $COVERAGE_PERCENTAGE%"
         echo "coverage=$COVERAGE_PERCENTAGE" >> $GITHUB_OUTPUT
