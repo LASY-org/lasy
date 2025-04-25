@@ -55,18 +55,38 @@ jobs:
           COLOR="red"
         fi
         echo "color=$COLOR" >> $GITHUB_OUTPUT
-    - name: Append coverage with timestamp
+    - name: Update coverage badge and history
       run: |
         FILE=".github/badges/coverage-badge.json"
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
         COVERAGE=${{ steps.get_coverage.outputs.coverage }}
-
-        # If file exists, append to it. Otherwise, start a new array.
+        COLOR=${{ steps.get_color.outputs.color }}
+        # If file exists, preserve history
         if [ -f "$FILE" ]; then
-          jq --arg time "$TIMESTAMP" --arg cov "$COVERAGE" \
-            '. += [{"timestamp": $time, "coverage": ($cov | tonumber)}]' "$FILE" > tmp.json && mv tmp.json "$FILE"
+          jq --arg coverage "$COVERAGE" \
+             --arg color "$COLOR" \
+             --arg time "$TIMESTAMP" '
+            .message = ($coverage + "%") |
+            .color = $color |
+            .history += [{
+              timestamp: $time,
+              coverage: ($coverage | tonumber)
+            }]
+          ' "$FILE" > tmp.json && mv tmp.json "$FILE"
         else
-          echo '[{"timestamp": "'"$TIMESTAMP"'", "coverage": '"$COVERAGE"'}]' > "$FILE"
+          mkdir -p .github/badges
+          echo '{
+            "schemaVersion": 1,
+            "label": "coverage",
+            "message": "'"$COVERAGE"'%",
+            "color": "'"$COLOR"'",
+            "history": [
+              {
+                "timestamp": "'"$TIMESTAMP"'",
+                "coverage": '"$COVERAGE"'
+              }
+            ]
+          }' > "$FILE"
         fi
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v7
