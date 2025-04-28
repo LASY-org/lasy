@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.fft import fft, fft2, fftshift, ifft, ifft2, ifftshift
 
 
 def fft(which, arr_in, axes_in, from_domain):
@@ -78,24 +77,24 @@ def fft(which, arr_in, axes_in, from_domain):
     # Perform fftshift of input data if required. Then transform.
     if shift_before:
         if inverse:
-            arr = ifftshift(arr_in, axes=ax)
+            arr = np.fft.ifftshift(arr_in, axes=ax)
         else:
-            arr = fftshift(arr_in, axes=ax)
-        arr_out = ifft2(arr, axes=ax) if transverse else ifft(arr, axes=ax)
+            arr = np.fft.fftshift(arr_in, axes=ax)
+        arr_out = np.fft.ifft2(arr, axes=ax) if transverse else np.fft.ifft(arr, axes=ax)
     else:
-        arr_out = fft2(arr, axes=ax) if transverse else fft(arr, axes=ax)
+        arr_out = np.fft.fft2(arr, axes=ax) if transverse else np.fft.fft(arr, axes=ax)
     if shift_after:
-        arr_out = ifftshift(arr, axes=ax) if inverse else fftshift(arr, axes=ax)
+        arr_out = np.fft.ifftshift(arr, axes=ax) if inverse else np.fft.fftshift(arr, axes=ax)
         if transverse:
             if inverse:
-                axes_out[0] = ifftshift(axes_out[0], axes)
-                axes_out[1] = ifftshift(axes_out[1], axes)
+                axes_out[0] = np.fft.ifftshift(axes_out[0], axes)
+                axes_out[1] = np.fft.ifftshift(axes_out[1], axes)
             else:
-                axes_out[0] = fftshift(axes_out[0], axes)
-                axes_out[1] = fftshift(axes_out[1], axes)
+                axes_out[0] = np.fft.fftshift(axes_out[0], axes)
+                axes_out[1] = np.fft.fftshift(axes_out[1], axes)
         else:
             if inverse:
-                axes_out[0] = ifftshift(axes_out[0], axes)
+                axes_out[0] = np.fft.ifftshift(axes_out[0], axes)
             else:
-                axes_out[0] = fftshift(axes_out[0], axes)
+                axes_out[0] = np.fft.fftshift(axes_out[0], axes)
     return arr_out, axes_out
