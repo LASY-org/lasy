@@ -1,5 +1,5 @@
 import numpy as np
-from fft import fft
+from .fft import fft
 
 time_axis_indx = -1
 
