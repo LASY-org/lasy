@@ -76,21 +76,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         y = fftshift(
             fftfreq(N_points, r0_step) * lambda0 * f0
         )
-        
-        # Simulation output meshgrid
-        X, Y = np.meshgrid(
-            x,
-            y,
-            indexing="ij",
-        )
-        R = np.sqrt(X**2 + Y**2)
-        
-        # Calculate unpadded output grids
-        region_idx = np.array([[np.shape(R)[0]//2-N_points//2,
-                      np.shape(R)[0]//2+N_points//2],
-                      [np.shape(R)[1]//2-N_points//2,
-                      np.shape(R)[1]//2+N_points//2]]) # Indexing of the focal region of interest
-        return [x,y], region_idx
+        return [x,y]
     
 
     def propagate(self, grid, grid_out=None, distance=None, abcd=None):
