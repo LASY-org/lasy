@@ -10,6 +10,7 @@ class Propagator(object):
     def update(self, dim=None, omega0=None):
         """
         Update the propagator parameters.
+
         Parameters
         ----------
         dim : str

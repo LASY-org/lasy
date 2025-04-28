@@ -44,7 +44,7 @@ def fft(arr_in, axes_in, which, inverse=False, shift_before=True, shift_after=Fa
     ax = (0, 1) if transverse else 2
     if shift_before:
         if inverse:
-            arr = ifftshift(arr_in, axes=ax) if inverse else 
+            arr = ifftshift(arr_in, axes=ax) if inverse else
         else:
             arr = fftshift(arr_in, axes=ax)
         arr_out = ifft2(arr, axes=ax) if transverse else ifft(arr, axes=ax)
