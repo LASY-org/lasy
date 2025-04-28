@@ -18,8 +18,8 @@ class ThickLens(OpticalElement):
         Thickness of the lens
     n_func : function
         Function that returns the refractive index given the wavelength in microns, taken from the website "https://refractiveindex.info".
-        e.g. for Fused Silica: 
-        nFS = lambda x: (1+0.6961663/(1-(0.0684043/x)**2)+0.4079426/(1-(0.1162414/x)**2)+0.8974794/(1-(9.896161/x)**2))**.5 
+        e.g. for Fused Silica:
+        nFS = lambda x: (1+0.6961663/(1-(0.0684043/x)**2)+0.4079426/(1-(0.1162414/x)**2)+0.8974794/(1-(9.896161/x)**2))**.5
     """
 
     def __init__(self, R1, R2, d, n_func):
@@ -45,6 +45,9 @@ class ThickLens(OpticalElement):
         lam = 2 * np.pi * c / omega * 1e6  # Wavelength in microns
         n = self.n_func(lam)
 
-        f = 1 / ((n - 1) * (1 / self.R1 - 1 / self.R2 + (n - 1) * self.d / (n * self.R1 * self.R2)))
+        f = 1 / (
+            (n - 1)
+            * (1 / self.R1 - 1 / self.R2 + (n - 1) * self.d / (n * self.R1 * self.R2))
+        )
 
         return np.exp(-1j * omega * (x**2 + y**2) / (2 * c * f))
