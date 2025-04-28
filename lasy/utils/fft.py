@@ -57,7 +57,6 @@ def fft(which, arr_in, axes_in, from_domain):
         inverse = False
 
     if which == "transverse":
-
         # Exit if only 1 element
         if min(axes_in[0].size, axes_in[1].size) < 2:
             print("fft of size 1: do nothing")
@@ -93,9 +92,8 @@ def fft(which, arr_in, axes_in, from_domain):
             axes_out[0] = xfftshift(axes_out[0])
             axes_out[1] = xfftshift(axes_out[1])
             arr_out = xfftshift(arr_out, axes=(0, 1))
-            
-    else: # "longitudinal"
 
+    else:  # "longitudinal"
         # Exit if only 1 element
         if axes_in.size <= 1:
             print("fft of size 1: do nothing")

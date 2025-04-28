@@ -238,8 +238,8 @@ class Grid:
         self.spectral_field = np.fft.ifft(shifted_temporal, axis=time_axis_indx)
         self.spectral_axis = 2 * np.pi * np.fft.fftfreq(self.npoints[-1], self.dx[-1])
         print("ASSERT STARTS")
-        assert(np.all(FIELD_NEW == self.spectral_field))
-        assert(np.all(AXIS_NEW == self.spectral_axis))
+        assert np.all(FIELD_NEW == self.spectral_field)
+        assert np.all(AXIS_NEW == self.spectral_axis)
         print("ASSERT DONE!!!")
         self.spectral_field_valid = True
 
