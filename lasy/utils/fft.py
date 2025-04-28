@@ -67,7 +67,7 @@ def fft(which, arr_in, axes_in, from_domain):
     npoints = [i.size for i in axes_in]
     if transverse:
         # List of 2 elements for 2 transverse directions, (x, y) or (kx, ky)
-        axes_out[
+        axes_out = [
             np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0]),
             np.fft.fftfreq(npoints[1], axes_in[1][1] - axes_in[1][0]),
         ]
