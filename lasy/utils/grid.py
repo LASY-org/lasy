@@ -1,6 +1,6 @@
 import numpy as np
 
-from .fft import fft
+from .fft_wrapper import fft
 
 time_axis_indx = -1
 
