@@ -2,7 +2,6 @@
 
 import copy
 
-import numpy as np
 import pytest
 
 from lasy.backend import xp
