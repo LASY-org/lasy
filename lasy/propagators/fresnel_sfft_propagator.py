@@ -28,11 +28,6 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             The input grid.
         distance : float
             The distance to propagate.
-
-        Returns
-        -------
-        Grid
-            The propagated grid.
         """
         axes = grid.axes
         omega0 = self.omega0
@@ -63,7 +58,7 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             fftInput = spectral_field * preFactor
 
             F, axes_out = fft(
-                which="transverse", arr_in=fftInput, axes_in=(x, y), from_domain="real"
+                which="transverse", arr_in=fftInput, axes_in=(x, y), from_domain="frequency"
             )
             k_x, k_y = axes_out
 
@@ -81,5 +76,5 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             grid.set_spectral_field(diffractedField)
             grid.axes[0] = np.unique(XF)
             grid.axes[1] = np.unique(YF)
-            grid.lo = [np.unique(XF)[0], np.unique(YF)[0], self.grid.lo[-1]]
-            grid.hi = [np.unique(XF)[-1], np.unique(YF)[-1], self.grid.hi[-1]]
+            grid.lo = [np.unique(XF)[0], np.unique(YF)[0], grid.lo[-1]]
+            grid.hi = [np.unique(XF)[-1], np.unique(YF)[-1], grid.hi[-1]]
