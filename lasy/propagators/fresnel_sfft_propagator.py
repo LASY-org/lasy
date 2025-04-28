@@ -58,7 +58,10 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             fftInput = spectral_field * preFactor
 
             F, axes_out = fft(
-                which="transverse", arr_in=fftInput, axes_in=(x, y), from_domain="frequency"
+                which="transverse",
+                arr_in=fftInput,
+                axes_in=(x, y),
+                from_domain="frequency",
             )
             k_x, k_y = axes_out
 
