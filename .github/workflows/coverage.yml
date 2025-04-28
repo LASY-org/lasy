@@ -29,9 +29,8 @@ jobs:
     - name: Extract coverage percentage
       id: get_coverage
       run: |
-        # Save report and extract percentage
-        TOTAL_LINE=$(grep TOTAL coverage_report.txt || echo "No TOTAL line found")
-        
+        # Run coverage report and extract percentage directly, without saving to a file
+        TOTAL_LINE=$(coverage report | grep TOTAL || echo "No TOTAL line found")
         if [[ "$TOTAL_LINE" == *"TOTAL"* ]]; then
           COVERAGE_PERCENTAGE=$(echo "$TOTAL_LINE" | awk '{print $NF}' | sed 's/%//')
         else
