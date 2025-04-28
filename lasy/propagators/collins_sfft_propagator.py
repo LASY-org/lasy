@@ -80,10 +80,10 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         R = np.sqrt(X**2 + Y**2)
         
         # Calculate unpadded output grids
-        region_idx = np.array([[np.shape(R)[0]//2-W//2,
-                      np.shape(R)[0]//2+W//2],
-                      [np.shape(R)[1]//2-W//2,
-                      np.shape(R)[1]//2+W//2]]) # Indexing of the focal region of interest
+        region_idx = np.array([[np.shape(R)[0]//2-N_points//2,
+                      np.shape(R)[0]//2+N_points//2],
+                      [np.shape(R)[1]//2-N_points//2,
+                      np.shape(R)[1]//2+N_points//2]]) # Indexing of the focal region of interest
         return [x,y], region_idx
     
 
@@ -187,9 +187,12 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             )
     
             profile_out = profile_out[region_idx[0,0]:region_idx[0,1],region_idx[1,0]:region_idx[1,1]]  # Select ROI
-            x_grid = x[region_idx[0,0]:region_idx[0,1]]
-            y_grid = y[region_idx[1,0]:region_idx[1,1]]
+            x = x[region_idx[0,0]:region_idx[0,1]]
+            y = y[region_idx[1,0]:region_idx[1,1]]
             
-            # Update grid here to be the new output grid and spectral field to be new spectral field
+        # Update grid here to be the new output grid and spectral field to be new spectral field
+        grid_new = Grid(self.dim, [np.min(x),np.min(y)], [np.max(x),np.max(y)], [len(x),len(y)])
+        laser.grid = grid_new
+        grid.set_spectral_field(profile_out)
         
         return profile_out
