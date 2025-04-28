@@ -2,8 +2,6 @@ name: Weekly Coverage Update
 on:
   schedule:
     - cron: "0 0 * * 1"
-  push:
-    branches: [ "Badges" ]
   workflow_dispatch:
 
 jobs:
