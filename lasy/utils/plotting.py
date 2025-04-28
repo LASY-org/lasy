@@ -1,19 +1,30 @@
+from copy import deepcopy
+
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.constants import c, epsilon_0
-from copy import deepcopy
 
-from .laser_utils import get_duration, get_w0, field_to_vector_potential
+from .laser_utils import field_to_vector_potential, get_duration, get_w0
 
 # default time and space units (value and label)
-units_def = {'t': {'value': 1e-15, 'label': 'fs'},
-             'x': {'value': 1e-6, 'label': r'\mu m'}}             
+units_def = {
+    "t": {"value": 1e-15, "label": "fs"},
+    "x": {"value": 1e-6, "label": r"\mu m"},
+}
 
 
-def show_laser(grid, dim, field_type="field", t_shift = 0,
-               show_lineout=True, show_max = False, omega0=None,
-               udict={}, **kw):
+def show_laser(
+    grid,
+    dim,
+    field_type="field",
+    t_shift=0,
+    show_lineout=True,
+    show_max=False,
+    omega0=None,
+    udict={},
+    **kw,
+):
     """
     Show a 2D image of the laser represented on the grid.
 
@@ -46,7 +57,7 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
 
     show_max : bool, default: False
         Show the maximum intensity of the laser field.
-        
+
     omega0 : scalar
         Angular frequency at which the envelope is defined.
         Needed if `field_type == "vector_potential"`.
@@ -82,12 +93,12 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
     # Calculate spatial scales for the axes
     if grid.hi[0] > 1:
         # scale is meters
-        units['x']['value'] = 1
-        units['x']['label'] = 'm'
+        units["x"]["value"] = 1
+        units["x"]["label"] = "m"
     elif grid.hi[0] > 1e-3:
         # scale is millimeters
-        units['x']['value'] = 1e-3
-        units['x']['label'] = 'mm'
+        units["x"]["value"] = 1e-3
+        units["x"]["label"] = "mm"
     else:
         # scale is microns (default)
         pass
@@ -95,12 +106,12 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
     # Calculate temporal scales for the axes
     if grid.hi[-1] - grid.lo[-1] > 1e-9:
         # scale is nanoseconds
-        units['t']['value'] = 1e-9
-        units['t']['label'] = 'ns'
+        units["t"]["value"] = 1e-9
+        units["t"]["label"] = "ns"
     elif grid.hi[-1] - grid.lo[-1] > 1e-12:
         # scale is picoseconds
-        units['t']['value'] = 1e-12
-        units['t']['label'] = 'ps'
+        units["t"]["value"] = 1e-12
+        units["t"]["label"] = "ps"
     else:
         # scale is femtoseconds (default)
         pass
@@ -110,16 +121,16 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
         units[k] = udict[k]
 
     # Allow the user to shift the temporal axis
-    if t_shift == 'left':
+    if t_shift == "left":
         t_shift = grid.lo[-1]
-    elif t_shift == 'right':
+    elif t_shift == "right":
         t_shift = grid.hi[-1]
-    elif t_shift == 'center':
+    elif t_shift == "center":
         t_shift = 0.5 * (grid.hi[-1] + grid.lo[-1])
     elif not isinstance(t_shift, float):
         raise ValueError(
-            f"Invalid value for t_shift.\n"
-            f"It should be one of 'left', 'right', 'center', or a float.\n"
+            "Invalid value for t_shift.\n"
+            "It should be one of 'left', 'right', 'center', or a float.\n"
         )
 
     if dim == "rt":
@@ -130,10 +141,10 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
         ]
         F_plot = sum(F_plot)  # Sum all the modes
         extent = [
-            (grid.lo[-1] - t_shift) / units['t']['value'],
-            (grid.hi[-1] - t_shift) / units['t']['value'],
-            -grid.hi[0] / units['x']['value'],
-            grid.hi[0] / units['x']['value'],
+            (grid.lo[-1] - t_shift) / units["t"]["value"],
+            (grid.hi[-1] - t_shift) / units["t"]["value"],
+            -grid.hi[0] / units["x"]["value"],
+            grid.hi[0] / units["x"]["value"],
         ]
 
     else:
@@ -141,10 +152,10 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
         i_slice = int(F.shape[1] // 2)
         F_plot = F[:, i_slice, :]
         extent = [
-            (grid.lo[-1] - t_shift) / units['t']['value'],
-            (grid.hi[-1] - t_shift) / units['t']['value'],
-            grid.lo[0] / units['x']['value'],
-            grid.hi[0] / units['x']['value'],
+            (grid.lo[-1] - t_shift) / units["t"]["value"],
+            (grid.hi[-1] - t_shift) / units["t"]["value"],
+            grid.lo[0] / units["x"]["value"],
+            grid.hi[0] / units["x"]["value"],
         ]
 
     fig, ax = plt.subplots()
@@ -153,8 +164,8 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
     im = ax.imshow(F_plot, extent=extent, aspect="auto", origin="lower", **kw)
     cb = fig.colorbar(im, cax=cax)
     cb.set_label(cbar_label)
-    ax.set_xlabel(r"t " + r"($%s$)" % units['t']['label'])
-    ax.set_ylabel(r"x " + r"($%s$)" % units['x']['label'])
+    ax.set_xlabel(r"t " + r"($%s$)" % units["t"]["label"])
+    ax.set_ylabel(r"x " + r"($%s$)" % units["x"]["label"])
 
     if t_shift != 0:
         ax.text(
@@ -162,16 +173,16 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
             1.01,
             r"Time shift = %.2e s" % t_shift,
             transform=ax.transAxes,
-            fontsize='x-small',
-            ha='left',
-            va='bottom',
+            fontsize="x-small",
+            ha="left",
+            va="bottom",
         )
 
     if show_lineout:
         # Create projected lineouts along time and space
         temporal_lineout = np.sum(F_plot, axis=0) / np.sum(F_plot, axis=0).max()
         ax.plot(
-            (grid.axes[-1] - t_shift) / units['t']['value'],
+            (grid.axes[-1] - t_shift) / units["t"]["value"],
             0.15 * temporal_lineout * (extent[3] - extent[2]) + extent[2],
             c=(0.3, 0.3, 0.3),
         )
@@ -189,27 +200,27 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
         field_max_label = r"$I_{max}$ = %.2e $W/cm^2$" % (field_max)
 
         # Get the pulse duration
-        tau = 2 * get_duration(grid, dim) / units['t']['value']
+        tau = 2 * get_duration(grid, dim) / units["t"]["value"]
         ax.text(
             0.95,
             0.95,
-            r"Pulse duration = %.2f " % (tau) + r"$%s$" % units['t']['label'],
+            r"Pulse duration = %.2f " % (tau) + r"$%s$" % units["t"]["label"],
             transform=ax.transAxes,
-            fontsize='small',
-            ha='right',
-            va='top',
+            fontsize="small",
+            ha="right",
+            va="top",
         )
 
         # Get the spot size
-        w0 = get_w0(grid, dim) / units['x']['value']
+        w0 = get_w0(grid, dim) / units["x"]["value"]
         ax.text(
             0.95,
             0.90,
-            r"Spot size = %.2f " % (w0) + r"$%s$" % units['x']['label'],
+            r"Spot size = %.2f " % (w0) + r"$%s$" % units["x"]["label"],
             transform=ax.transAxes,
-            fontsize='small',
-            ha='right',
-            va='top',
+            fontsize="small",
+            ha="right",
+            va="top",
         )
     elif field_type == "vector_potential":
         field_max_label = r"$a_0 = %.3f$" % (field_max)
@@ -222,7 +233,7 @@ def show_laser(grid, dim, field_type="field", t_shift = 0,
             0.95,
             field_max_label,
             transform=ax.transAxes,
-            fontsize='small',
-            ha='left',
-            va='top',
+            fontsize="small",
+            ha="left",
+            va="top",
         )

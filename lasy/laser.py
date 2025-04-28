@@ -422,9 +422,15 @@ class Laser:
         )
         self.output_iteration += 1
 
-    def show(self, field_type='field', t_shift = 0,
-             show_lineout=True, show_max = False, udict={},
-             **kw):
+    def show(
+        self,
+        field_type="field",
+        t_shift=0,
+        show_lineout=True,
+        show_max=False,
+        udict={},
+        **kw,
+    ):
         """
         Show a 2D image of the laser amplitude or intensity.
 
@@ -446,7 +452,7 @@ class Laser:
 
         show_max : bool, default: False
             Show the maximum intensity of the laser field.
-            
+
         udict : dict, default: {}
             Dictionary with the information of the unit scales of the axes,
             e.g. ``{'t': {'value': 1e-15, 'label': 'fs'}, 'x': {'value': 1e-6, 'label': r'\mu m'}}``
@@ -454,8 +460,14 @@ class Laser:
 
         **kw : additional arguments to be passed to matplotlib's imshow command
         """
-
-        show_laser(self.grid, self.dim, field_type=field_type,
-                   t_shift=t_shift, show_lineout=show_lineout, 
-                   show_max=show_max, udict=udict,
-                   omega0=self.profile.omega0, **kw)
+        show_laser(
+            self.grid,
+            self.dim,
+            field_type=field_type,
+            t_shift=t_shift,
+            show_lineout=show_lineout,
+            show_max=show_max,
+            udict=udict,
+            omega0=self.profile.omega0,
+            **kw,
+        )
