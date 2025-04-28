@@ -431,7 +431,7 @@ class Laser:
         udict={},
         **kw,
     ):
-        """
+        r"""
         Show a 2D image of the laser amplitude or intensity.
 
         Parameters

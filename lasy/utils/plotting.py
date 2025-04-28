@@ -25,7 +25,7 @@ def show_laser(
     udict={},
     **kw,
 ):
-    """
+    r"""
     Show a 2D image of the laser represented on the grid.
 
     Parameters
