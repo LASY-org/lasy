@@ -2,11 +2,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.constants import c, epsilon_0
+from copy import deepcopy
 
 from .laser_utils import get_duration, get_w0
 
+# default time and space units (value and label)
+units_def = {'t': {'value': 1e-15, 'label': 'fs'},
+             'x': {'value': 1e-6, 'label': r'\mu m'}}             
 
-def show_laser(grid, dim, show_intensity, **kw):
+
+def show_laser(grid, dim, show_intensity=False, udict={}, **kw):
     """
     Show a 2D image of the laser represented on the grid.
 
@@ -23,10 +28,15 @@ def show_laser(grid, dim, show_intensity, **kw):
         - ``'rt'`` : The laser pulse is represented on a 2D grid:
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    show_intensity : bool
+    show_intensity : bool, default: False
         if False the laser amplitude is plotted
         if True then the intensity of the laser is plotted along with lineouts
         and a measure of the pulse duration and spot size
+
+    udict : dict, default: {}
+        Dictionary with the information of the unit scales of the axes,
+        e.g. ``{'t': {'value': 1e-15, 'label': 'fs'}, 'x': {'value': 1e-6, 'label': r'\mu m'}}``
+        Allows the user to override the default unit scales.
 
     **kw : additional arguments to be passed to matplotlib's imshow command
     """
@@ -42,33 +52,38 @@ def show_laser(grid, dim, show_intensity, **kw):
         F = np.abs(grid.get_temporal_field())
         cbar_label = r"$|E_{envelope}|$ (V/m)"
 
+    # Set default unit scales for the axes
+    units = deepcopy(units_def)
+
     # Calculate spatial scales for the axes
     if grid.hi[0] > 1:
         # scale is meters
-        spatial_scale = 1
-        spatial_unit = r"(m)"
+        units['x']['value'] = 1
+        units['x']['label'] = 'm'
     elif grid.hi[0] > 1e-3:
         # scale is millimeters
-        spatial_scale = 1e-3
-        spatial_unit = r"(mm)"
+        units['x']['value'] = 1e-3
+        units['x']['label'] = 'mm'
     else:
-        # scale is microns
-        spatial_scale = 1e-6
-        spatial_unit = r"($\mu m$)"
+        # scale is microns (default)
+        pass
 
     # Calculate temporal scales for the axes
     if grid.hi[-1] - grid.lo[-1] > 1e-9:
         # scale is nanoseconds
-        temporal_scale = 1e-9
-        temporal_unit = r"(ns)"
+        units['t']['value'] = 1e-9
+        units['t']['label'] = 'ns'
     elif grid.hi[-1] - grid.lo[-1] > 1e-12:
         # scale is picoseconds
-        temporal_scale = 1e-12
-        temporal_unit = r"(ps)"
+        units['t']['value'] = 1e-12
+        units['t']['label'] = 'ps'
     else:
-        # scale is femtoseconds
-        temporal_scale = 1e-15
-        temporal_unit = r"(fs)"
+        # scale is femtoseconds (default)
+        pass
+
+    # Allows the user to override default units
+    for k in udict.keys():
+        units[k] = udict[k]
 
     if dim == "rt":
         # Show field in the plane y=0, above and below axis, with proper sign for each mode
@@ -78,10 +93,10 @@ def show_laser(grid, dim, show_intensity, **kw):
         ]
         F_plot = sum(F_plot)  # Sum all the modes
         extent = [
-            grid.lo[-1] / temporal_scale,
-            grid.hi[-1] / temporal_scale,
-            -grid.hi[0] / spatial_scale,
-            grid.hi[0] / spatial_scale,
+            grid.lo[-1] / units['t']['value'],
+            grid.hi[-1] / units['t']['value'],
+            -grid.hi[0] / units['x']['value'],
+            grid.hi[0] / units['x']['value'],
         ]
 
     else:
@@ -89,10 +104,10 @@ def show_laser(grid, dim, show_intensity, **kw):
         i_slice = int(F.shape[1] // 2)
         F_plot = F[:, i_slice, :]
         extent = [
-            grid.lo[-1] / temporal_scale,
-            grid.hi[-1] / temporal_scale,
-            grid.lo[0] / spatial_scale,
-            grid.hi[0] / spatial_scale,
+            grid.lo[-1] / units['t']['value'],
+            grid.hi[-1] / units['t']['value'],
+            grid.lo[0] / units['x']['value'],
+            grid.hi[0] / units['x']['value'],
         ]
 
     fig, ax = plt.subplots()
@@ -101,14 +116,14 @@ def show_laser(grid, dim, show_intensity, **kw):
     im = ax.imshow(F_plot, extent=extent, aspect="auto", origin="lower", **kw)
     cb = fig.colorbar(im, cax=cax)
     cb.set_label(cbar_label)
-    ax.set_xlabel(r"t " + temporal_unit)
-    ax.set_ylabel(r"x " + spatial_unit)
+    ax.set_xlabel(r"t " + r"($%s$)" % units['t']['label'])
+    ax.set_ylabel(r"x " + r"($%s$)" % units['x']['label'])
 
     if show_intensity:
         # Create projected lineouts along time and space
         temporal_lineout = np.sum(F_plot, axis=0) / np.sum(F_plot, axis=0).max()
         ax.plot(
-            grid.axes[-1] / temporal_scale,
+            grid.axes[-1] / units['t']['value'],
             0.15 * temporal_lineout * (extent[3] - extent[2]) + extent[2],
             c=(0.3, 0.3, 0.3),
         )
@@ -121,11 +136,11 @@ def show_laser(grid, dim, show_intensity, **kw):
         )
 
         # Get the pulse duration
-        tau = 2 * get_duration(grid, dim) / temporal_scale
+        tau = 2 * get_duration(grid, dim) / units['t']['value']
         ax.text(
             0.95,
             0.95,
-            r"Pulse Duration = %.1f " % (tau) + temporal_unit[1:-1],
+            r"Pulse duration = %.2f " % (tau) + r"$%s$" % units['t']['label'],
             transform=ax.transAxes,
             fontsize='small',
             ha='right',
@@ -133,11 +148,11 @@ def show_laser(grid, dim, show_intensity, **kw):
         )
 
         # Get the spot size
-        w0 = get_w0(grid, dim) / spatial_scale
+        w0 = get_w0(grid, dim) / units['x']['value']
         ax.text(
             0.95,
             0.9,
-            r"Spot Size = %.1f " % (w0) + spatial_unit[1:-1],
+            r"Spot size = %.2f " % (w0) + r"$%s$" % units['x']['label'],
             transform=ax.transAxes,
             fontsize='small',
             ha='right',
