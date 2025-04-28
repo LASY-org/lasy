@@ -82,8 +82,8 @@ def show_laser(
     # Set default unit scales for the axes
     units = {
         "t": {"value": 1e-15, "label": "fs"},
-        "x": {"value": 1e-6, "label": r"\mu m"}
-        }
+        "x": {"value": 1e-6, "label": r"\mu m"},
+    }
 
     # Calculate spatial scales for the axes
     if grid.hi[0] > 1:
