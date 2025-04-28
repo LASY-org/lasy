@@ -94,18 +94,23 @@ def fft(which, arr_in, axes_in, from_domain):
                 axes_out = np.fft.fftshift(axes_out, axes=ax)
 
     # Perform fftshift of input data if required. Then transform.
+    arr = np.copy(arr_in)
     if shift_before:
         if inverse:
             arr = np.fft.ifftshift(arr_in, axes=ax)
         else:
             arr = np.fft.fftshift(arr_in, axes=ax)
-        arr_out = (
-            np.fft.ifft2(arr, axes=ax) if transverse else np.fft.ifft(arr, axis=-1)
-        )
+
+    # Do the FFT
+    if inverse:
+        arr_out = np.fft.ifft2(arr, axes=ax) if transverse else np.fft.ifft(arr, axis=-1)
     else:
         arr_out = np.fft.fft2(arr, axes=ax) if transverse else np.fft.fft(arr, axis=-1)
+
+    # shift after?
     if shift_after:
-        arr_out = (
-            np.fft.ifftshift(arr, axes=ax) if inverse else np.fft.fftshift(arr, axes=-1)
-        )
+        if inverse:
+            arr_out = np.fft.ifftshift(arr, axes=ax)
+        else:
+            arr_out = np.fft.fftshift(arr, axes=-1)
     return arr_out, axes_out
