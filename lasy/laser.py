@@ -240,7 +240,7 @@ class Laser:
             Represents a propagation method.
         """
         propagator.update(self.dim, self.profile.omega0)
-        self.propagtor = propagator
+        self.propagator = propagator
 
 
     def propagate(self, distance=None, *kwargs):
@@ -257,7 +257,7 @@ class Laser:
         if self.propagator is None:
             raise Exception("No propagator defined. Use apply_propagator() first.")
         else:
-            self.propagtor.propagate(self.grid, distance=distance, *kwargs)
+            self.propagator.propagate(self.grid, distance=distance, *kwargs)
 
     def write_to_file(
         self,
