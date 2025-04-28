@@ -1,5 +1,5 @@
 from .single_fft_propagator import SingleFFTPropagator
-from lasy.utils.fft import fft
+#from lasy.utils.fft import fft
 import numpy as np
 from scipy.constants import c
 
