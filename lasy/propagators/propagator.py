@@ -8,13 +8,12 @@ class Propagator(object):
 
     def __init__(self):
         self.update()
-
         return
 
-    def update(self):
+    def update(self, dim=None, omega0=None):
+        self.dim = dim
+        self.omega0 = omega0
         return
 
-    def propagate(self, distance, grid_in, grid_out=None, abcd=None):
-        self.update()
-
-        return deepcopy(grid_in)
+    def propagate(self, grid, distance=None, abcd=None):
+        return
