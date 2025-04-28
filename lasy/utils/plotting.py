@@ -127,7 +127,7 @@ def show_laser(
         t_shift = grid.hi[-1]
     elif t_shift == "center":
         t_shift = 0.5 * (grid.hi[-1] + grid.lo[-1])
-    elif not isinstance(t_shift, float):
+    elif not isinstance(t_shift, (float, int)):
         raise ValueError(
             "Invalid value for t_shift.\n"
             "It should be one of 'left', 'right', 'center', or a float.\n"
