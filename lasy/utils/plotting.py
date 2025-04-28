@@ -11,7 +11,7 @@ units_def = {'t': {'value': 1e-15, 'label': 'fs'},
              'x': {'value': 1e-6, 'label': r'\mu m'}}             
 
 
-def show_laser(grid, dim, show_intensity=False, udict={}, **kw):
+def show_laser(grid, dim, show_intensity=False, t_shift = 0, udict={}, **kw):
     """
     Show a 2D image of the laser represented on the grid.
 
@@ -32,6 +32,11 @@ def show_laser(grid, dim, show_intensity=False, udict={}, **kw):
         if False the laser amplitude is plotted
         if True then the intensity of the laser is plotted along with lineouts
         and a measure of the pulse duration and spot size
+
+    t_shift : float, default: 0
+        Shift the temporal axis by `t_shift` seconds.
+        It also can be a string with `"left"`, `"right"` or `"center"`,
+        to shift the temporal axis to the left, right or center of the time axis.
 
     udict : dict, default: {}
         Dictionary with the information of the unit scales of the axes,
@@ -85,6 +90,19 @@ def show_laser(grid, dim, show_intensity=False, udict={}, **kw):
     for k in udict.keys():
         units[k] = udict[k]
 
+    # Allow the user to shift the temporal axis
+    if t_shift == 'left':
+        t_shift = grid.lo[-1]
+    elif t_shift == 'right':
+        t_shift = grid.hi[-1]
+    elif t_shift == 'center':
+        t_shift = 0.5 * (grid.hi[-1] + grid.lo[-1])
+    elif not isinstance(t_shift, float):
+        raise ValueError(
+            f"Invalid value for t_shift.\n"
+            f"It should be one of 'left', 'right', 'center', or a float.\n"
+        )
+
     if dim == "rt":
         # Show field in the plane y=0, above and below axis, with proper sign for each mode
         F_plot = [
@@ -93,8 +111,8 @@ def show_laser(grid, dim, show_intensity=False, udict={}, **kw):
         ]
         F_plot = sum(F_plot)  # Sum all the modes
         extent = [
-            grid.lo[-1] / units['t']['value'],
-            grid.hi[-1] / units['t']['value'],
+            (grid.lo[-1] - t_shift) / units['t']['value'],
+            (grid.hi[-1] - t_shift) / units['t']['value'],
             -grid.hi[0] / units['x']['value'],
             grid.hi[0] / units['x']['value'],
         ]
@@ -104,8 +122,8 @@ def show_laser(grid, dim, show_intensity=False, udict={}, **kw):
         i_slice = int(F.shape[1] // 2)
         F_plot = F[:, i_slice, :]
         extent = [
-            grid.lo[-1] / units['t']['value'],
-            grid.hi[-1] / units['t']['value'],
+            (grid.lo[-1] - t_shift) / units['t']['value'],
+            (grid.hi[-1] - t_shift) / units['t']['value'],
             grid.lo[0] / units['x']['value'],
             grid.hi[0] / units['x']['value'],
         ]
@@ -119,11 +137,22 @@ def show_laser(grid, dim, show_intensity=False, udict={}, **kw):
     ax.set_xlabel(r"t " + r"($%s$)" % units['t']['label'])
     ax.set_ylabel(r"x " + r"($%s$)" % units['x']['label'])
 
+    if t_shift != 0:
+        ax.text(
+            0.025,
+            1.05,
+            r"Time shift = %.2e s" % t_shift,
+            transform=ax.transAxes,
+            fontsize='x-small',
+            ha='left',
+            va='top',
+        )
+
     if show_intensity:
         # Create projected lineouts along time and space
         temporal_lineout = np.sum(F_plot, axis=0) / np.sum(F_plot, axis=0).max()
         ax.plot(
-            grid.axes[-1] / units['t']['value'],
+            (grid.axes[-1] - t_shift) / units['t']['value'],
             0.15 * temporal_lineout * (extent[3] - extent[2]) + extent[2],
             c=(0.3, 0.3, 0.3),
         )
