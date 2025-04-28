@@ -14,7 +14,7 @@ from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
 from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.profiles.longitudinal import GaussianLongitudinalProfile
 from lasy.profiles.transverse import GaussianTransverseProfile
-from lasy.utils.laser_utils import get_beta, get_gdd, get_zeta
+from lasy.utils.laser_utils import get_beta, get_dispersion, get_zeta
 
 wavelength = 0.6e-6  # m
 pol = (1, 0)
@@ -99,8 +99,8 @@ err_imag = np.average(
     / np.array(env_combined.imag)
 )
 
-gdd_3d, gdd0_3d = get_gdd(
-    grid=laser_3d.grid, dim=laser_3d.dim, omega0=laser_3d.profile.omega0
+gdd_3d, gdd0_3d = get_dispersion(
+    grid=laser_3d.grid, dim=laser_3d.dim, omega0=laser_3d.profile.omega0, order=2
 )
 [zeta_x, zeta_y], [nu_x, nu_y] = get_zeta(
     laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6
