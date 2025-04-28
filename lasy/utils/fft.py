@@ -76,11 +76,11 @@ def fft(which, arr_in, axes_in, from_domain):
     if shift_after:
         if transverse:
             if inverse:
-                axes_out[0] = np.fft.ifftshift(axes_out[0], axes=ax)
-                axes_out[1] = np.fft.ifftshift(axes_out[1], axes=ax)
+                axes_out[0] = np.fft.ifftshift(axes_out[0])
+                axes_out[1] = np.fft.ifftshift(axes_out[1])
             else:
-                axes_out[0] = np.fft.fftshift(axes_out[0], axes=ax)
-                axes_out[1] = np.fft.fftshift(axes_out[1], axes=ax)
+                axes_out[0] = np.fft.fftshift(axes_out[0])
+                axes_out[1] = np.fft.fftshift(axes_out[1])
         else:
             if inverse:
                 axes_out = np.fft.ifftshift(axes_out)
