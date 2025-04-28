@@ -4,14 +4,14 @@ from scipy.constants import c, epsilon_0
 from .propagator import Propagator
 
 
-class NonlinearKerrPropagator(Propagator):
+class NonlinearKerrStep():
     """
     Propagator for a nonlinear step with Kerr nonlinearity.
     """
 
     def __init__(self, n2, n0, k0):
         """
-        Initialize the NonlinearKerrPropagator.
+        Initialize the NonlinearKerrStep.
 
         Parameters
         ----------
@@ -22,7 +22,6 @@ class NonlinearKerrPropagator(Propagator):
         k0 : float
             Wave vector at the carrier frequency.
         """
-        super().__init__()
 
         self.n2 = n2  # nonlinear refractive index
         self.n0 = n0  # linear refractive index at the carrier frequency
