@@ -36,7 +36,7 @@ def fft(which, arr_in, axes_in, from_domain):
     assert which in ["transverse", "longitudinal"]
     assert from_domain in ["real", "frequency"]
     transverse = which == "transverse"
-    ax = (0, 1) if transverse else 2
+    ax = (0, 1) if transverse else -1
 
     # Here we set our conventions:
     # - From real space to frequency space, we use ifft and
