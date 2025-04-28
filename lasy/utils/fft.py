@@ -40,13 +40,10 @@ def fft(which, arr_in, axes_in, from_domain):
     # Checks, read parameters and set defaults
     assert which in ["transverse", "longitudinal"]
     assert from_domain in ["real", "frequency"]
-    # ax = (0, 1) if transverse else -1
 
-    # Here we set our conventions:
-    # - From real space to frequency space, we use ifft and
-    #   an fftshift is performed on the input data.
-    # - From frequency space to real space, we use fft and
-    #   an fftshift is performed on the output data.
+    # Set conventions:
+    # - From real to frequency, use ifft & fftshift on input data.
+    # - From frequency to real, use fft & fftshift on output data.
     if from_domain == "real":
         shift_before = True
         shift_after = False

@@ -231,16 +231,10 @@ class Grid:
         """
         assert self.temporal_field_valid
 
-        shifted_temporal = np.fft.ifftshift(self.temporal_field, axes=time_axis_indx)
-        self.spectral_field = np.fft.ifft(shifted_temporal, axis=time_axis_indx)
-        self.spectral_axis = 2 * np.pi * np.fft.fftfreq(self.npoints[-1], self.dx[-1])
-        FIELD_NEW, AXIS_NEW = fft(
+        self.spectral_field, self.spectral_axis = fft(
             "longitudinal", self.temporal_field, self.axes[-1], "real"
         )
-        print("ASSERT STARTS")
-        assert np.all(FIELD_NEW == self.spectral_field)
-        assert np.all(AXIS_NEW == self.spectral_axis)
-        print("ASSERT DONE!!!")
+
         self.spectral_field_valid = True
 
     def spectral2temporal_fft(self):
@@ -251,13 +245,8 @@ class Grid:
         """
         assert self.spectral_field_valid
 
-        shifted_temporal = np.fft.fft(self.spectral_field, axis=time_axis_indx)
-        self.temporal_field = np.fft.fftshift(shifted_temporal, axes=time_axis_indx)
-        FIELD_NEW, _ = fft(
+        self.temporal_field, _ = fft(
             "longitudinal", self.spectral_field, self.axes[-1], "frequency"
         )
-        print("ASSERT STARTS")
-        assert(np.all(FIELD_NEW == self.temporal_field))
-        print("ASSERT DONE!!!")
 
         self.temporal_field_valid = True
