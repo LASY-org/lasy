@@ -231,7 +231,7 @@ class Grid:
         """
         assert self.temporal_field_valid
 
-        self.spectral_field, self.spectral_axis = fft.fft(
+        self.spectral_field, self.spectral_axis = fft(
             "longitudinal", self.temporal_field, [self.axes[-1]], "real"
         )
         #        shifted_temporal = np.fft.ifftshift(self.temporal_field, axes=time_axis_indx)
@@ -247,7 +247,7 @@ class Grid:
         """
         assert self.spectral_field_valid
 
-        self.temporal_field, _ = fft.fft(
+        self.temporal_field, _ = fft(
             "longitudinal", self.temporal_field, [self.axes[-1]], "frequency"
         )
         #         shifted_temporal = np.fft.fft(self.spectral_field, axis=time_axis_indx)
