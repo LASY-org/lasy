@@ -57,21 +57,21 @@ def fft(which, arr_in, axes_in, from_domain):
     if transverse:
         # List of 2 elements for 2 transverse directions, (x, y) or (kx, ky)
         if axes_in[0].size == 1:
-            axes_out = [0, 0]
+            axes_out = [np.array(0), np.array(0)]
         else:
-            axes_out[np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0]),
-                     np.fft.fftfreq(npoints[1], axes_in[1][1] - axes_in[1][0])]
+            axes_out[
+                np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0]),
+                np.fft.fftfreq(npoints[1], axes_in[1][1] - axes_in[1][0]),
+            ]
         if from_domain == "real":
             axes_out[0] *= 2 * np.pi
             axes_out[1] *= 2 * np.pi
     else:
         # list of 1 element for longitudinal direction, t or omega
         if axes_in[0].size == 1:
-            axes_out = 0
+            axes_out = np.array(0)
         else:
-            axes_out = (
-                np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0])
-            )
+            axes_out = np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0])
         if from_domain == "real":
             axes_out *= 2 * np.pi
     if shift_after:
