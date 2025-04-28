@@ -123,17 +123,23 @@ def show_laser(grid, dim, show_intensity, **kw):
         # Get the pulse duration
         tau = 2 * get_duration(grid, dim) / temporal_scale
         ax.text(
-            0.55,
             0.95,
-            r"Pulse Duration   = %.1f " % (tau) + temporal_unit[1:-1],
+            0.95,
+            r"Pulse Duration = %.1f " % (tau) + temporal_unit[1:-1],
             transform=ax.transAxes,
+            fontsize='small',
+            ha='right',
+            va='top',
         )
 
         # Get the spot size
         w0 = get_w0(grid, dim) / spatial_scale
         ax.text(
-            0.55,
+            0.95,
             0.9,
-            r"Spot Size           = %.1f " % (w0) + spatial_unit[1:-1],
+            r"Spot Size = %.1f " % (w0) + spatial_unit[1:-1],
             transform=ax.transAxes,
+            fontsize='small',
+            ha='right',
+            va='top',
         )
