@@ -100,12 +100,12 @@ def fft(which, arr_in, axes_in, from_domain):
         else:
             arr = np.fft.fftshift(arr_in, axes=ax)
         arr_out = (
-            np.fft.ifft2(arr, axes=ax) if transverse else np.fft.ifft(arr, axes=ax)
+            np.fft.ifft2(arr, axes=ax) if transverse else np.fft.ifft(arr, axis=-1)
         )
     else:
-        arr_out = np.fft.fft2(arr, axes=ax) if transverse else np.fft.fft(arr, axes=ax)
+        arr_out = np.fft.fft2(arr, axes=ax) if transverse else np.fft.fft(arr, axes=-1)
     if shift_after:
         arr_out = (
-            np.fft.ifftshift(arr, axes=ax) if inverse else np.fft.fftshift(arr, axes=ax)
+            np.fft.ifftshift(arr, axes=ax) if inverse else np.fft.fftshift(arr, axes=-1)
         )
     return arr_out, axes_out
