@@ -1,8 +1,6 @@
 import numpy as np
-from axiprop.lib import PropagatorFFT2, PropagatorResampling
-from scipy.constants import c
 
-from lasy.utils.grid import Grid, time_axis_indx
+from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
     normalize_average_intensity,
     normalize_energy,
@@ -244,7 +242,6 @@ class Laser:
         self.propagtor = propagator
         self.propagator.update(self.dim, self.profile.omega0)
 
-
     def propagate(self, distance=None, *kwargs):
         """
         Propagate the laser pulse by the distance specified.
@@ -259,7 +256,7 @@ class Laser:
         if self.propagator is None:
             raise Exception("No propagator defined. Use apply_propagator() first.")
         else:
-            self.propagtor.propagate(self.grid,distance=distance,*kwargs)
+            self.propagtor.propagate(self.grid, distance=distance, *kwargs)
 
     def write_to_file(
         self,
