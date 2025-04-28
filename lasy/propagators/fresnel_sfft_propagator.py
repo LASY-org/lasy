@@ -1,4 +1,4 @@
-# from lasy.utils.fft import fft
+from lasy.utils.fft import fft
 import numpy as np
 from scipy.constants import c
 
@@ -60,37 +60,10 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             )
 
             fftInput = spectral_field * preFactor
-            dx = x[1] - x[0]
-            dy = y[1] - y[0]
-
-            F = (
-                np.fft.fftshift(
-                    np.fft.fft2(np.fft.ifftshift(fftInput, axes=(0, 1)), axes=(0, 1)),
-                    axes=(0, 1),
-                )
-                * dx
-                * dy
-            )
-
-            X = x[-1] - x[0]
-            sampleXFreq = len(x) / X
-            k_x = (
-                2
-                * np.pi
-                * np.linspace(
-                    -sampleXFreq / 2, (sampleXFreq / 2 - sampleXFreq / len(x)), len(x)
-                )
-            )
-            Y = y[-1] - y[0]
-            sampleYFreq = len(y) / Y
-            k_y = (
-                2
-                * np.pi
-                * np.linspace(
-                    -sampleYFreq / 2, (sampleYFreq / 2 - sampleYFreq / len(y)), len(y)
-                )
-            )
-
+            
+            F , axes_out = fft(fftInput, axes_in=(x,y),which="transverse",inverse=False,shift_before=True,shift_after=False)
+            k_x , k_y = axes_out
+            
             KY, KX, _ = np.meshgrid(k_y, k_x, spectral_axes)
 
             XF = KX * WAVELENGTH * distance / 2 / np.pi
