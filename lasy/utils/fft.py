@@ -3,7 +3,7 @@ import numpy as np
 
 def fft(which, arr_in, axes_in, from_domain):
     """
-    Perform FFT on a 3D array
+    Perform FFT on a 3D array.
 
     Parameters
     ----------
@@ -21,12 +21,6 @@ def fft(which, arr_in, axes_in, from_domain):
     from_domain : string
         "real" of the FFT is done from real domain (x,y) or (t) to frequency domain (kx, ky) or (omega)
         "frequency" for the opposite way
-
-    shift_before : boolean
-        Whether to perform fftshift on data before doing FFT.
-
-    shift_after : boolean
-        Whether to perform fftshift on data and output axis after FFT.
 
     Returns
     -------
