@@ -168,7 +168,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             
             profile_in = spectral_field
             
-            propagator = np.exp(1j * omega0 / (2 * c) * (A / B) * R0**2)
+            propagator = np.exp(1j * OM / (2 * c) * (A / B) * R0**2)
             
             profile_out = fftshift(
                 ifft2(
@@ -179,10 +179,10 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             ) * np.sqrt(np.shape(R)[0] * np.shape(R)[1])
             profile_out = (
                 profile_out
-                * np.exp(1j * omega0 / (2 * c) * (D / B) * R**2)
-                * omega0
+                * np.exp(1j * OM / (2 * c) * (D / B) * R**2)
+                * OM
                 / (2j * np.pi * c * B)
-                / np.abs(omega0 / (2j * np.pi * c * B))
+                / np.abs(OM / (2j * np.pi * c * B))
             )
         
         grid.lo[0] = x[0]
