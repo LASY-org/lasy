@@ -55,19 +55,38 @@ def fft(which, arr_in, axes_in, from_domain):
     # Build output axes data
     axes_out = axes_in.copy()
     npoints = [i.size for i in axes_in]
-    dx = [i[1] - i[0] for i in axes_in]
     if transverse:
         # List of 2 elements for 2 transverse directions, (x, y) or (kx, ky)
-        axes_out[0] = np.fft.fftfreq(npoints[0], dx[0])
-        axes_out[1] = np.fft.fftfreq(npoints[1], dx[1])
+        if axes_in[0].size == 1:
+            axes_out[0] = 0
+            axes_out[1] = 0
+        else:
+            axes_out[0] = np.fft.fftfreq(npoints[0], dx[0])
+            axes_out[1] = np.fft.fftfreq(npoints[1], dx[1])
         if from_domain == "real":
             axes_out[0] *= 2 * np.pi
             axes_out[1] *= 2 * np.pi
     else:
         # list of 1 element for longitudinal direction, t or omega
-        axes_out[0] = 2 * np.pi * np.fft.fftfreq(npoints[0], dx[0])
+        if axes_in[0].size == 1:
+            axes_out[0] = 0
+        else:
+            axes_out[0] = 2 * np.pi * np.fft.fftfreq(npoints[0], dx[0])
         if from_domain == "real":
             axes_out[0] *= 2 * np.pi
+    if shift_after:
+        if transverse:
+            if inverse:
+                axes_out[0] = np.fft.ifftshift(axes_out[0], axes=ax)
+                axes_out[1] = np.fft.ifftshift(axes_out[1], axes=ax)
+            else:
+                axes_out[0] = np.fft.fftshift(axes_out[0], axes=ax)
+                axes_out[1] = np.fft.fftshift(axes_out[1], axes=ax)
+        else:
+            if inverse:
+                axes_out[0] = np.fft.ifftshift(axes_out[0], axes=ax)
+            else:
+                axes_out[0] = np.fft.fftshift(axes_out[0], axes=ax)
 
     # Perform fftshift of input data if required. Then transform.
     if shift_before:
@@ -75,21 +94,11 @@ def fft(which, arr_in, axes_in, from_domain):
             arr = np.fft.ifftshift(arr_in, axes=ax)
         else:
             arr = np.fft.fftshift(arr_in, axes=ax)
-        arr_out = np.fft.ifft2(arr, axes=ax) if transverse else ifft(arr, axes=ax)
+        arr_out = (
+            np.fft.ifft2(arr, axes=ax) if transverse else np.fft.ifft(arr, axes=ax)
+        )
     else:
-        arr_out = np.fft.fft2(arr, axes=ax) if transverse else fft(arr, axes=ax)
+        arr_out = np.fft.fft2(arr, axes=ax) if transverse else np.fft.fft(arr, axes=ax)
     if shift_after:
-        arr_out = np.fft.ifftshift(arr, axes=ax) if inverse else fftshift(arr, axes=ax)
-        if transverse:
-            if inverse:
-                axes_out[0] = np.fft.ifftshift(axes_out[0], axes)
-                axes_out[1] = np.fft.ifftshift(axes_out[1], axes)
-            else:
-                axes_out[0] = np.fft.fftshift(axes_out[0], axes)
-                axes_out[1] = np.fft.fftshift(axes_out[1], axes)
-        else:
-            if inverse:
-                axes_out[0] = np.fft.ifftshift(axes_out[0], axes)
-            else:
-                axes_out[0] = np.fft.fftshift(axes_out[0], axes)
+        arr_out = np.fft.ifftshift(arr, axes=ax) if inverse else np.fft.fftshift(arr, axes=ax)
     return arr_out, axes_out

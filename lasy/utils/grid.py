@@ -1,4 +1,5 @@
 import numpy as np
+from fft import fft
 
 from lasy.utils.fft import fft
 
