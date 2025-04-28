@@ -106,9 +106,7 @@ def fft(which, arr_in, axes_in, from_domain):
     # shift after?
     if shift_after:
         if inverse:
-            arr_out = np.fft.ifftshift(arr, axes=ax)
+            arr_out = np.fft.ifftshift(arr_out, axes=ax)
         else:
-            arr_out = np.fft.fftshift(arr, axes=-1)
-    if from_domain == "real" and which == "longitudinal":
-        print(arr_out.shape, axes_out.shape)
+            arr_out = np.fft.fftshift(arr_out, axes=ax)
     return arr_out, axes_out
