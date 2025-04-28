@@ -1,6 +1,8 @@
 from .single_fft_propagator import SingleFFTPropagator
 
 from lasy.utils.laser_utils import get_w0
+import numpy as np
+from numpy.fft import fft, ifft, fft2, fftshift, ifft2, ifftshift, fftfreq
 c = 2.998e8
 
 
@@ -26,7 +28,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         return self.abcd
 
 
-    def add_output_grid(self, grid, N_points=100, magnification=1.0, f0=None):
+    def add_output_grid(self, grid, N_points=100, magnification=2.0):
         """
         Function to calculate the output grids 
         for a focusing / defocusing beam
@@ -55,20 +57,21 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         y = axes[1]
         dx = x[1] - x[0]
         dy = y[1] - y[0]
-        
+        L0_width = np.abs(x[-1] - x[0])
+
         w0 = get_w0(grid, self.dim)
         f0 = self.f0
-        lambda_0 = 2. * np.pi * c / self.omega_0
+        lambda0 = 2. * np.pi * c / self.omega0
         
-        padFactor = int(np.ceil(magnification * (2. * w0 / f0) * L0_width / lambda_0 / N_points)) // 2 * 2 + 1 # Must be odd
+        padFactor = int(np.ceil(magnification * (2. * w0 / f0) * L0_width / lambda0 / N_points)) // 2 * 2 + 1 # Must be odd
         print("Padding factor: ", padFactor)
         
         print("Number of spatial/transverse gridpoints: %0.0f" % (N_points))
         r0_step = np.abs(np.max(x)-np.min(x)) / (N_points*padFactor)  # Note: D gridpoints means D-1 intervals
         
-        x = fftshift(fftfreq(N_points*padFactor, r0_step) * lambda_0 * f0) / padFactor
+        x = fftshift(fftfreq(N_points*padFactor, r0_step) * lambda0 * f0) / padFactor
         y = fftshift(
-            fftfreq(N_points*padFactor, r0_step) * lambda_0 * f0
+            fftfreq(N_points*padFactor, r0_step) * lambda0 * f0
         ) / padFactor
         
         # Simulation output meshgrid
@@ -117,7 +120,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         spectral_field, spectral_axes = grid.get_spectral_field()
         
         if grid_out==None:
-            axes_out, region_idx = add_output_grid(grid) # Call routine to determine output grid
+            axes_out, region_idx = self.add_output_grid(grid) # Call routine to determine output grid
         else:
             axes_out = self.grid_out.axes # Use user-specified grid
             
@@ -162,18 +165,19 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             
             profile_in = spectral_field
     
-            padNumberx = int(np.shape(axes_out)[0]/np.shape(axes)[0])//2 * np.shape(axes)[0]
-            padNumbery = int(np.shape(axes_out)[1]/np.shape(axes)[1])//2 * np.shape(axes)[1]
+            padNumberx = int(len(axes_out[0])/len(axes[0]))//2 * len(axes[0])
+            padNumbery = int(len(axes_out[1])/len(axes[1]))//2 * len(axes[1])
+            print(padNumberx,padNumbery)
     
             propagator = np.exp(1j * OM / (2 * c) * (A / B) * R0**2)
             
-            profile = np.pad(profile, [(padNumberx, padNumbery), (padNumberx, padNumbery)], mode='constant')
-            propagator = np.pad(propagator, [(padNumberx, padNumbery), (padNumberx, padNumbery)], mode='constant')
-            print("Shape of padded profile: ",np.shape(profile))
+            # profile = np.pad(profile_in, [(padNumberx, padNumbery), (padNumberx, padNumbery)], mode='constant')
+            # propagator = np.pad(propagator, [(padNumberx, padNumbery), (padNumberx, padNumbery)], mode='constant')
+            print("Shape of padded profile: ",np.shape(profile_in))
             
             profile_out = fftshift(
                 ifft2(
-                    ifftshift(profile * propagator, axes=(0, 1)),
+                    ifftshift(profile_in * propagator, axes=(0, 1)),
                     axes=(0, 1),
                 ),
                 axes=(0, 1),
@@ -181,14 +185,14 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             profile_out = (
                 profile_out
                 * np.exp(1j * OM / (2 * c) * (D / B) * R**2)
-                * omega_0
+                * OM
                 / (2j * np.pi * c * B)
                 / np.abs(OM / (2j * np.pi * c * B))
             )
     
-            profile_out = profile_out[region_idx[0,0]:region_idx[0,1],region_idx[1,0]:region_idx[1,1]]  # Select ROI
-            x = x[region_idx[0,0]:region_idx[0,1]]
-            y = y[region_idx[1,0]:region_idx[1,1]]
+            # profile_out = profile_out[region_idx[0,0]:region_idx[0,1],region_idx[1,0]:region_idx[1,1]]  # Select ROI
+            # x = x[region_idx[0,0]:region_idx[0,1]]
+            # y = y[region_idx[1,0]:region_idx[1,1]]
             
         grid.set_spectral_field(profile_out)
         
@@ -198,5 +202,3 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         grid.hi[1] = y[-1]
         grid.axes[0] = x
         grid.axes[1] = y
-        
-        return profile_out
