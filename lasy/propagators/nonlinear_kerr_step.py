@@ -23,9 +23,9 @@ class NonlinearKerrStep():
             Wave vector at the carrier frequency.
         """
 
-        self.n2 = n2  # nonlinear refractive index
-        self.n0 = n0  # linear refractive index at the carrier frequency
-        self.k0 = k0  # wave vector at the carrier frequency
+        self.n2 = n2
+        self.n0 = n0
+        self.k0 = k0
 
     def propagate(self, grid, distance):
         """

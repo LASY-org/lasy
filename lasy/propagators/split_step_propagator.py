@@ -1,11 +1,10 @@
 from .propagator import Propagator
 
-
 class SplitStepPropagator(Propagator):
     def __init__(self, propagators):
         """
         Initialize the SplitStepPropagator.
-
+        
         Parameters
         ----------
         propagators : list
@@ -30,5 +29,5 @@ class SplitStepPropagator(Propagator):
         step_distance = distance / nsteps
 
         for _ in range(nsteps):
-            for step_propagator in self.propagators:
-                step_propagator.propagate(grid=grid, distance=step_distance)
+            for prop in self.propagators:
+                prop.propagate(grid=grid, distance=step_distance)
