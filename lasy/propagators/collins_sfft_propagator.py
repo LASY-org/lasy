@@ -190,9 +190,13 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             x = x[region_idx[0,0]:region_idx[0,1]]
             y = y[region_idx[1,0]:region_idx[1,1]]
             
-        # Update grid here to be the new output grid and spectral field to be new spectral field
-        grid_new = Grid(self.dim, [np.min(x),np.min(y)], [np.max(x),np.max(y)], [len(x),len(y)])
-        laser.grid = grid_new
         grid.set_spectral_field(profile_out)
+        
+        grid.lo[0] = x[0]
+        grid.lo[1] = y[0]
+        grid.hi[0] = x[-1]
+        grid.hi[1] = y[-1]
+        grid.axes[0] = x
+        grid.axes[1] = y
         
         return profile_out
