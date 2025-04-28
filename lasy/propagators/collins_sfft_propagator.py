@@ -109,7 +109,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         spectral_field, spectral_axes = grid.get_spectral_field()
         
         if grid_out==None:
-            axes_out, region_idx = self.add_output_grid(grid) # Call routine to determine output grid
+            axes_out = self.add_output_grid(grid) # Call routine to determine output grid
         else:
             axes_out = self.grid_out.axes # Use user-specified grid
             
