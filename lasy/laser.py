@@ -436,3 +436,9 @@ class Laser:
         **kw : additional arguments to be passed to matplotlib's imshow command
         """
         show_laser(self.grid, self.dim, show_intensity, **kw)
+
+    def add_propagator(self, propagator):
+        propagator.update(self)
+
+        self.TMP_propagate = propagator.propagate
+
