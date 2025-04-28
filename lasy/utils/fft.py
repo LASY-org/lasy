@@ -114,6 +114,6 @@ def fft(which, arr_in, axes_in, from_domain):
             arr_out = np.fft.ifftshift(arr, axes=ax)
         else:
             arr_out = np.fft.fftshift(arr, axes=-1)
-    if from_domain == "real" and which == 'longitudinal':
+    if from_domain == "real" and which == "longitudinal":
         print(arr_out.shape, axes_out.shape)
     return arr_out, axes_out
