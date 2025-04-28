@@ -4,14 +4,14 @@ import numpy as np
 from scipy.constants import c
 
 class FresnelSFFTPropagator(SingleFFTPropagator):
-    def __init__(self):
-        """
-        An implementation of the single FFT propagator using the Fresnel approximation.
+    """
+    An implementation of the single FFT propagator using the Fresnel approximation.
 
-        Following Goodman.
-        Goodman, J. W. (2005). Introduction to Fourier Optics. Roberts and Company Publishers.
-        
-        """
+    Following Goodman.
+    Goodman, J. W. (2005). Introduction to Fourier Optics. Roberts and Company Publishers.
+    
+    """
+    def __init__(self):
         super().__init__()
         
     def propagate(self, grid, distance):
