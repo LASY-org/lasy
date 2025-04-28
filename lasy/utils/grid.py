@@ -238,8 +238,8 @@ class Grid:
             "longitudinal", self.temporal_field, self.axes[-1], "real"
         )
         print("ASSERT STARTS")
-        assert(np.all(FIELD_NEW == self.spectral_field))
-        assert(np.all(AXIS_NEW == self.spectral_axis))
+        assert np.all(FIELD_NEW == self.spectral_field)
+        assert np.all(AXIS_NEW == self.spectral_axis)
         print("ASSERT DONE!!!")
         self.spectral_field_valid = True
 
