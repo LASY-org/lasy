@@ -15,8 +15,7 @@ channels:
 dependencies:
   - mamba
   - numpy
-  - openpmd-api~=0.14.5
-  - openpmd-viewer
+  - openpmd-api>=0.16.1
   - pytest
   - python>=3.7
   - scipy

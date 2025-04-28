@@ -39,6 +39,8 @@ class Profile(object):
         self.lambda0 = wavelength
         self.omega0 = 2 * np.pi * c / self.lambda0
         self.k0 = 2.0 * np.pi / wavelength
+        self.is_cw = False
+        self.is_plane_wave = False
 
     def evaluate(self, x, y, t):
         """
@@ -71,6 +73,14 @@ class Profile(object):
     def __rmul__(self, factor):
         """Return the scaled profile."""
         return ScaledProfile(self, factor)
+
+    def __update_is_cw__(self, value):
+        """Update state of is_cw variable."""
+        self.is_cw = value
+
+    def __update_is_plane_wave__(self, value):
+        """Update state of is_plane_wave variable."""
+        self.is_plane_wave = value
 
 
 class SummedProfile(Profile):

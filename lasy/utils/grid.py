@@ -34,23 +34,73 @@ class Grid:
         Whether the field provided uses the (complex) envelope representation, as
         used internally in lasy. If False, field is assumed to represent the
         the full (real) electric field (with fast oscillations).
+
+    is_cw : bool (optional)
+        Whether the laser pulse longitudinal profile is a continuous wave laer profile
+        or not.
+
+    is_plane_wave : bool (optional)
+        Whether the laser pulse transverse profile is a plane wave laer profile or not.
     """
 
-    def __init__(self, dim, lo, hi, npoints, n_azimuthal_modes=None, is_envelope=True):
+    def __init__(
+        self,
+        dim,
+        lo,
+        hi,
+        npoints,
+        n_azimuthal_modes=None,
+        is_envelope=True,
+        is_cw=False,
+        is_plane_wave=False,
+    ):
         # Metadata
         ndims = 2 if dim == "rt" else 3
         assert dim in ["rt", "xyt"]
         assert len(lo) == ndims
         assert len(hi) == ndims
 
-        self.lo = list(lo)
-        self.hi = list(hi)
+        lo = list(lo)
+        hi = list(hi)
+        npoints = list(npoints)
+
+        if is_cw:
+            if npoints[-1] != 1:
+                print(
+                    "CW profile: overwrite npoints to only 1 cell in the longitudinal direction."
+                )
+            lo[-1] = -0.5
+            hi[-1] = 0.5
+            npoints[-1] = 1
+        if is_plane_wave:
+            if npoints[0] != 1:
+                print(
+                    "Plane wave: overwrite npoints to only 1 cell in the transverse directions."
+                )
+            if dim == "rt":
+                lo[0] = 0.0
+                hi[0] = np.sqrt(1 / np.pi)
+                npoints[0] = 1
+            else:
+                lo[0] = -0.5
+                hi[0] = 0.5
+                npoints[0] = 1
+                lo[1] = -0.5
+                hi[1] = 0.5
+                npoints[1] = 1
+
         self.npoints = npoints
         self.axes = []
         self.dx = []
         for i in range(ndims):
             self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
-            self.dx.append(self.axes[i][1] - self.axes[i][0])
+            if len(self.axes[i]) > 1:
+                self.dx.append(self.axes[i][1] - self.axes[i][0])
+            else:
+                self.dx.append(hi[i] - lo[i])
+
+        self.lo = lo
+        self.hi = hi
 
         if dim == "rt":
             self.n_azimuthal_modes = n_azimuthal_modes
@@ -154,15 +204,20 @@ class Grid:
         -------
         field : ndarray of complexs
             The spectral field.
+
+        omega : 1d array of real numbers
+            The frequency axis consistent with the spectral field.
+            This is centered around 0, the central frequency of the envelope
+            must be added separately to construct the physical frequency array.
         """
         # We return a copy, so that the user cannot modify
         # the original field, unless set_spectral_field is called
         assert self.is_envelope
         if self.spectral_field_valid:
-            return self.spectral_field.copy()
+            return self.spectral_field.copy(), self.spectral_axis.copy()
         elif self.temporal_field_valid:
             self.temporal2spectral_fft()
-            return self.spectral_field.copy()
+            return self.spectral_field.copy(), self.spectral_axis.copy()
         else:
             raise ValueError("Both temporal and spectral fields are invalid")
 
@@ -173,9 +228,10 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.temporal_field_valid
-        self.spectral_field = np.fft.ifft(
-            self.temporal_field, axis=time_axis_indx, norm="backward"
-        )
+
+        shifted_temporal = np.fft.fftshift(self.temporal_field, axes=time_axis_indx)
+        self.spectral_field = np.fft.ifft(shifted_temporal, axis=time_axis_indx)
+        self.spectral_axis = 2 * np.pi * np.fft.fftfreq(self.npoints[-1], self.dx[-1])
         self.spectral_field_valid = True
 
     def spectral2temporal_fft(self):
@@ -185,7 +241,8 @@ class Grid:
         (Only along the time axis, not along the transverse spatial coordinates.)
         """
         assert self.spectral_field_valid
-        self.temporal_field = np.fft.fft(
-            self.spectral_field, axis=time_axis_indx, norm="backward"
-        )
+
+        shifted_temporal = np.fft.fft(self.spectral_field, axis=time_axis_indx)
+        self.temporal_field = np.fft.fftshift(shifted_temporal, axes=time_axis_indx)
+
         self.temporal_field_valid = True
