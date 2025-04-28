@@ -422,17 +422,20 @@ class Laser:
         )
         self.output_iteration += 1
 
-    def show(self, show_intensity=False, **kw):
+    def show(self, field_type='field', **kw):
         """
         Show a 2D image of the laser amplitude or intensity.
 
         Parameters
         ----------
-        show_intensity : bool
-            if False the laser amplitude is plotted
-            if True then the intensity of the laser is plotted along with lineouts
-            and a measure of the pulse duration and spot size
+        field_type : string, default: "field"
+            Options are:
+            - ``'field'``: Show the envelope of the laser field.
+            - ``'intensity'``: Show the intensity of the laser field.
+            - ``'vector_potential'``: Show the vector potential of the laser field.
 
         **kw : additional arguments to be passed to matplotlib's imshow command
         """
-        show_laser(self.grid, self.dim, show_intensity, **kw)
+
+        show_laser(self.grid, self.dim, field_type=field_type,
+                   omega0=self.profile.omega0, **kw)

@@ -4,14 +4,16 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.constants import c, epsilon_0
 from copy import deepcopy
 
-from .laser_utils import get_duration, get_w0
+from .laser_utils import get_duration, get_w0, field_to_vector_potential
 
 # default time and space units (value and label)
 units_def = {'t': {'value': 1e-15, 'label': 'fs'},
              'x': {'value': 1e-6, 'label': r'\mu m'}}             
 
 
-def show_laser(grid, dim, show_intensity=False, t_shift = 0, udict={}, **kw):
+def show_laser(grid, dim, field_type="field", t_shift = 0,
+               show_lineout=True, show_max = False, omega0=None,
+               udict={}, **kw):
     """
     Show a 2D image of the laser represented on the grid.
 
@@ -28,15 +30,26 @@ def show_laser(grid, dim, show_intensity=False, t_shift = 0, udict={}, **kw):
         - ``'rt'`` : The laser pulse is represented on a 2D grid:
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    show_intensity : bool, default: False
-        if False the laser amplitude is plotted
-        if True then the intensity of the laser is plotted along with lineouts
-        and a measure of the pulse duration and spot size
+    field_type : string, default: "field"
+        Options are:
+        - ``'field'``: Show the envelope of the laser field.
+        - ``'intensity'``: Show the intensity of the laser field.
+        - ``'vector_potential'``: Show the vector potential of the laser field.
 
     t_shift : float, default: 0
         Shift the temporal axis by `t_shift` seconds.
         It also can be a string with `"left"`, `"right"` or `"center"`,
         to shift the temporal axis to the left, right or center of the time axis.
+
+    show_lineout : bool, default: True
+        Show the lineout of the laser field.
+
+    show_max : bool, default: False
+        Show the maximum intensity of the laser field.
+        
+    omega0 : scalar
+        Angular frequency at which the envelope is defined.
+        Needed if `field_type == "vector_potential"`.
 
     udict : dict, default: {}
         Dictionary with the information of the unit scales of the axes,
@@ -50,9 +63,15 @@ def show_laser(grid, dim, show_intensity=False, t_shift = 0, udict={}, **kw):
     else:
         kw["cmap"] = "Reds"  # Set default colormap
 
-    if show_intensity:
+    if field_type == "intensity":
         F = epsilon_0 * c / 2 * np.abs(grid.get_temporal_field()) ** 2 / 1e4
         cbar_label = r"I (W/cm$^2$)"
+    elif field_type == "vector_potential":
+        assert omega0 is not None, (
+            "omega0 must be provided if field_type == 'vector_potential'"
+        )
+        F = np.abs(field_to_vector_potential(grid=grid, omega0=omega0))
+        cbar_label = r"$|a|$"
     else:
         F = np.abs(grid.get_temporal_field())
         cbar_label = r"$|E_{envelope}|$ (V/m)"
@@ -140,15 +159,15 @@ def show_laser(grid, dim, show_intensity=False, t_shift = 0, udict={}, **kw):
     if t_shift != 0:
         ax.text(
             0.025,
-            1.05,
+            1.01,
             r"Time shift = %.2e s" % t_shift,
             transform=ax.transAxes,
             fontsize='x-small',
             ha='left',
-            va='top',
+            va='bottom',
         )
 
-    if show_intensity:
+    if show_lineout:
         # Create projected lineouts along time and space
         temporal_lineout = np.sum(F_plot, axis=0) / np.sum(F_plot, axis=0).max()
         ax.plot(
@@ -163,6 +182,11 @@ def show_laser(grid, dim, show_intensity=False, t_shift = 0, udict={}, **kw):
             np.linspace(extent[2], extent[3], F_plot.shape[0]),
             c=(0.3, 0.3, 0.3),
         )
+
+    field_max = np.max(F_plot)
+
+    if field_type == "intensity":
+        field_max_label = r"$I_{max}$ = %.2e $W/cm^2$" % (field_max)
 
         # Get the pulse duration
         tau = 2 * get_duration(grid, dim) / units['t']['value']
@@ -180,10 +204,25 @@ def show_laser(grid, dim, show_intensity=False, t_shift = 0, udict={}, **kw):
         w0 = get_w0(grid, dim) / units['x']['value']
         ax.text(
             0.95,
-            0.9,
+            0.90,
             r"Spot size = %.2f " % (w0) + r"$%s$" % units['x']['label'],
             transform=ax.transAxes,
             fontsize='small',
             ha='right',
+            va='top',
+        )
+    elif field_type == "vector_potential":
+        field_max_label = r"$a_0 = %.3f$" % (field_max)
+    else:
+        field_max_label = r"$|E_{max}|$ = %.2e V/m" % (field_max)
+
+    if show_max:
+        ax.text(
+            0.025,
+            0.95,
+            field_max_label,
+            transform=ax.transAxes,
+            fontsize='small',
+            ha='left',
             va='top',
         )
