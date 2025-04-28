@@ -107,7 +107,7 @@ class GaussianProfile(Profile):
     >>> extent[2:] *= 1e6
     >>> extent[:2] *= 1e15
     >>> tmin, tmax, rmin, rmax = extent
-    >>> vmax = np.abs(E_rt).max()
+    >>> vmax = xp.abs(E_rt).max()
     >>> plt.imshow(
     ...     E_rt,
     ...     origin="lower",

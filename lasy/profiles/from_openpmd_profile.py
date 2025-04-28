@@ -1,7 +1,7 @@
-import numpy as np
 import openpmd_api as io
 from scipy.constants import c
 
+from lasy.backend import xp
 from lasy.utils.laser_utils import (
     create_grid,
     field_to_envelope,
@@ -34,7 +34,7 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     def __init__(self, file_name, envelope_name=None, verbose=False):
         series = io.Series(file_name, io.Access.read_only)
-        iterations = np.array(series.iterations)
+        iterations = xp.array(series.iterations)
         i = series.iterations[iterations[-1]]
         is_envelope = envelope_name is not None
         if is_envelope:
@@ -89,7 +89,7 @@ class FromOpenPMDProfile(FromArrayProfile):
                 array = grid.get_temporal_field()
                 env_array_list.append(array)
             array, pol = isolate_polarization(env_array_list, dim)
-        wavelength = 2 * np.pi * c / omg0
+        wavelength = 2 * xp.pi * c / omg0
 
         super().__init__(
             wavelength=wavelength,
