@@ -23,19 +23,23 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Run tests with coverage
-      run: |
-        coverage run -m pytest tests/
     - name: Extract coverage percentage
       id: get_coverage
+      shell: bash
       run: |
-        # Run coverage report and extract percentage directly, without saving to a file
-        TOTAL_LINE=$(coverage report | grep TOTAL || echo "No TOTAL line found")
-        if [[ "$TOTAL_LINE" == *"TOTAL"* ]]; then
+        # 1. Run coverage & tests
+        coverage run -m pytest tests/
+        # 2. Grab the TOTAL line
+        TOTAL_LINE=$(coverage report | grep TOTAL || true)
+        echo "::debug::TOTAL_LINE=<$TOTAL_LINE>"
+        # 3. Parse out the percentage (default to 0 if nothing found)
+        if [[ -n "$TOTAL_LINE" ]]; then
           COVERAGE_PERCENTAGE=$(echo "$TOTAL_LINE" | awk '{print $NF}' | sed 's/%//')
         else
+          echo "::warning::No TOTAL line found, defaulting to 0"
           COVERAGE_PERCENTAGE=0
         fi
+        # 4. Echo for logs and set as an output
         echo "Extracted coverage: $COVERAGE_PERCENTAGE%"
         echo "coverage=$COVERAGE_PERCENTAGE" >> $GITHUB_OUTPUT
     - name: Determine badge color
