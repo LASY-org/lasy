@@ -232,7 +232,7 @@ class Laser:
             spectral_field *= optical_element.amplitude_multiplier(x, y, omega)
         self.grid.set_spectral_field(spectral_field)
 
-    def apply_propagator(self, propagator):
+    def add_propagator(self, propagator):
         """
         Apply a propagator object to the laser pulse.
 
@@ -241,8 +241,9 @@ class Laser:
         propagator: a :class:`.Propagator` object (optional)
             Represents a propagation method.
         """
+        propagator.update(self.dim, self.profile.omega0)
         self.propagtor = propagator
-        self.propagator.update(self.dim, self.profile.omega0)
+
 
 
     def propagate(self, distance=None, *kwargs):
