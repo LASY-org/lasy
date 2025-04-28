@@ -242,7 +242,6 @@ class Laser:
         propagator.update(self.dim, self.profile.omega0)
         self.propagator = propagator
 
-
     def propagate(self, distance=None, *kwargs):
         """
         Propagate the laser pulse by the distance specified.
