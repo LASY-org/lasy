@@ -58,29 +58,27 @@ def fft(which, arr_in, axes_in, from_domain):
         inverse = False
 
     # Build output axes data
-    axes_out = axes_in.copy()
     npoints = [i.size for i in axes_in]
     if transverse:
         # List of 2 elements for 2 transverse directions, (x, y) or (kx, ky)
         if axes_in[0].size == 1:
-            axes_out[0] = 0
-            axes_out[1] = 0
+            axes_out = [0, 0]
         else:
-            axes_out[0] = np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0])
-            axes_out[1] = np.fft.fftfreq(npoints[1], axes_in[1][1] - axes_in[1][0])
+            axes_out[np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0]),
+                     np.fft.fftfreq(npoints[1], axes_in[1][1] - axes_in[1][0])]
         if from_domain == "real":
             axes_out[0] *= 2 * np.pi
             axes_out[1] *= 2 * np.pi
     else:
         # list of 1 element for longitudinal direction, t or omega
         if axes_in[0].size == 1:
-            axes_out[0] = 0
+            axes_out = 0
         else:
-            axes_out[0] = (
-                2 * np.pi * np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0])
+            axes_out = (
+                np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0])
             )
         if from_domain == "real":
-            axes_out[0] *= 2 * np.pi
+            axes_out *= 2 * np.pi
     if shift_after:
         if transverse:
             if inverse:
@@ -91,9 +89,9 @@ def fft(which, arr_in, axes_in, from_domain):
                 axes_out[1] = np.fft.fftshift(axes_out[1], axes=ax)
         else:
             if inverse:
-                axes_out[0] = np.fft.ifftshift(axes_out[0], axes=ax)
+                axes_out = np.fft.ifftshift(axes_out, axes=ax)
             else:
-                axes_out[0] = np.fft.fftshift(axes_out[0], axes=ax)
+                axes_out = np.fft.fftshift(axes_out, axes=ax)
 
     # Perform fftshift of input data if required. Then transform.
     if shift_before:
