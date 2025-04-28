@@ -60,7 +60,7 @@ def fft(which, arr_in, axes_in, from_domain):
     if transverse and min(axes_in[0].size, axes_in[1].size) <= 1:
         print("fft of size 1: do nothing")
         return arr_in, axes_in
-    if longitudinal and axes_in.size <= 1:
+    if not transverse and axes_in.size <= 1:
         print("fft of size 1: do nothing")
         return arr_in, axes_in
     # Build output axes data
