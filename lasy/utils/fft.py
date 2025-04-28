@@ -52,26 +52,26 @@ def fft(which, arr_in, axes_in, from_domain):
         shift_after = True
         inverse = False
 
+    if transverse and min(axes_in[0].size, axes_in[1].size) <= 1:
+        print("fft of size 1: do nothing")
+        return arr_in, axes_in
+    if longitudinal and axes_in.size <= 1:
+        print("fft of size 1: do nothing")
+        return arr_in, axes_in
     # Build output axes data
     npoints = [i.size for i in axes_in]
     if transverse:
         # List of 2 elements for 2 transverse directions, (x, y) or (kx, ky)
-        if axes_in[0].size == 1:
-            return arr_in, axes_in
-        else:
-            axes_out[
-                np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0]),
-                np.fft.fftfreq(npoints[1], axes_in[1][1] - axes_in[1][0]),
-            ]
+        axes_out[
+            np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0]),
+            np.fft.fftfreq(npoints[1], axes_in[1][1] - axes_in[1][0]),
+        ]
         if from_domain == "real":
             axes_out[0] *= 2 * np.pi
             axes_out[1] *= 2 * np.pi
     else:
-        # list of 1 element for longitudinal direction, t or omega
-        if axes_in[0].size == 1:
-            return arr_in, axes_in[0]
-        else:
-            axes_out = np.fft.fftfreq(npoints[0], axes_in[0][1] - axes_in[0][0])
+        # 1d array for longitudinal direction, t or omega
+        axes_out = np.fft.fftfreq(npoints[0], axes_in[1] - axes_in[0])
         if from_domain == "real":
             axes_out *= 2 * np.pi
     if shift_after:
