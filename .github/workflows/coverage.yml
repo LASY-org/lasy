@@ -59,9 +59,11 @@ jobs:
       run: |
         FILE=".github/badges/coverage-badge.json"
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-        COVERAGE=${{ steps.get_coverage.outputs.coverage }}
+
+        # Now you can use $COVERAGE directly because it's in environment
+        COVERAGE="$COVERAGE"
         COLOR=${{ steps.get_color.outputs.color }}
-        # If file exists, preserve history
+
         if [ -f "$FILE" ]; then
           jq --arg coverage "$COVERAGE" \
              --arg color "$COLOR" \
