@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.fft import fft, ifft, fft2, fftshift, ifft2, ifftshift, fftfreq
+from numpy.fft import fft, fft2, fftshift, ifft, ifft2, ifftshift
 
 
 def fft(which, arr_in, axes_in, from_domain):
@@ -38,7 +38,6 @@ def fft(which, arr_in, axes_in, from_domain):
         if which="transverse", 2 1d arrays for the transverse transformed axes
         if which="longitudinal", 1 1d array for the longitudinal transformed axis
     """
-
     # Checks, read parameters and set defaults
     assert which in ["transverse", "longitudinal"]
     assert from_domain in ["real", "frequency"]
