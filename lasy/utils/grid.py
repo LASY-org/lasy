@@ -1,6 +1,6 @@
 import numpy as np
 
-import lasy.utils.fft as fft
+from lasy.utils.fft import fft
 
 time_axis_indx = -1
 
