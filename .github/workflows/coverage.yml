@@ -62,20 +62,15 @@ jobs:
       run: |
         FILE=".github/badges/coverage-badge.json"
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-        # Now you can use $COVERAGE directly because it's in environment
-        COVERAGE="$COVERAGE"
-        COLOR=${{ steps.get_color.outputs.color }}
-
         if [ -f "$FILE" ]; then
           jq --arg coverage "$COVERAGE" \
              --arg color "$COLOR" \
              --arg time "$TIMESTAMP" '
-            .message = ($coverage + "%") |
-            .color = $color |
+            .message = "${{ steps.get_coverage.outputs.coverage }}%" |
+            .color = "${{ steps.get_color.outputs.color }}" |
             .history += [{
               timestamp: $time,
-              coverage: ($coverage | tonumber)
+              coverage: (${{ steps.get_coverage.outputs.coverage }}, | tonumber)
             }]
           ' "$FILE" > tmp.json && mv tmp.json "$FILE"
         else
@@ -83,12 +78,12 @@ jobs:
           echo '{
             "schemaVersion": 1,
             "label": "coverage",
-            "message": "'"$COVERAGE"'%",
-            "color": "'"$COLOR"'",
+            "message": "${{ steps.get_coverage.outputs.coverage }}%",,
+            "color": "${{ steps.get_color.outputs.color }}",
             "history": [
               {
                 "timestamp": "'"$TIMESTAMP"'",
-                "coverage": '"$COVERAGE"'
+                "coverage": "${{ steps.get_coverage.outputs.coverage }}%",
               }
             ]
           }' > "$FILE"
