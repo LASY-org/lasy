@@ -67,8 +67,8 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
 
             KY, KX, _ = np.meshgrid(k_y, k_x, spectral_axes)
 
-            XF = KX * WAVELENGTH * distance / 2 / np.pi
-            YF = KY * WAVELENGTH * distance / 2 / np.pi
+            XF = KX * WAVELENGTH * distance * 2 / np.pi
+            YF = KY * WAVELENGTH * distance * 2 / np.pi
 
             # old post factor seems to be incorrect by factor 2 from goodman pg 67
             # postFactor = np.exp( 1j*k/z * (XF**2 + YF**2) )
