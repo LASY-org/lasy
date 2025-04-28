@@ -83,9 +83,9 @@ def fft(which, arr_in, axes_in, from_domain):
                 axes_out[1] = np.fft.fftshift(axes_out[1], axes=ax)
         else:
             if inverse:
-                axes_out = np.fft.ifftshift(axes_out, axes=ax)
+                axes_out = np.fft.ifftshift(axes_out)
             else:
-                axes_out = np.fft.fftshift(axes_out, axes=ax)
+                axes_out = np.fft.fftshift(axes_out)
 
     # Perform fftshift of input data if required. Then transform.
     arr = np.copy(arr_in)
