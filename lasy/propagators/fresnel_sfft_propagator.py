@@ -61,9 +61,9 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
 
             fftInput = spectral_field * preFactor
             
-            F , axes_out = fft(fftInput, axes_in=(x,y),which="transverse",inverse=False,shift_before=True,shift_after=False)
+            F , axes_out = fft(which="transverse", arr_in=fftInput, axes_in=(x,y),from_domain="real")
             k_x , k_y = axes_out
-            
+
             KY, KX, _ = np.meshgrid(k_y, k_x, spectral_axes)
 
             XF = KX * WAVELENGTH * distance / 2 / np.pi
