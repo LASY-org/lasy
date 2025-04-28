@@ -700,7 +700,7 @@ def vector_potential_to_field(grid, omega0, direct=True):
         return 1j * m_e * omega * c * field / e
 
 
-def field_to_envelope(grid, dim, phase_unwrap_nd=False):
+def field_to_envelope(grid, dim, omega0=None, phase_unwrap_nd=False):
     """Convert a field to its complex envelope representation by applying a Hilbert transform.
 
     Parameters
@@ -717,6 +717,10 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
         - ``'rt'`` : The laser pulse is represented on a 2D grid:
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
+    omega0 : scalar
+        Central frequency at which the envelope will be defined.
+        If None, the central frequency measured from the field is used.
+
     phase_unwrap_nd : boolean (optional)
         If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
         If False, the phase unwrapping is done in t, treating each transverse cell
@@ -726,17 +730,21 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     Returns
     -------
     scalar
-        The central angular frequency.
+        If input parameter omega0 was None, return the central angular frequency.
+        Otherwise, return None.
     """
     assert not grid.is_envelope
 
     # Get central wavelength from array
-    _, omg0_h = get_frequency(
-        grid,
-        dim=dim,
-        is_hilbert=False,
-        phase_unwrap_nd=phase_unwrap_nd,
-    )
+    if omega0 is None:
+        _, omg0 = get_frequency(
+            grid,
+            dim=dim,
+            is_hilbert=False,
+            phase_unwrap_nd=phase_unwrap_nd,
+        )
+    else:
+        omg0 = omega0
     # Hilbert transform
     field = hilbert_transform(grid.get_temporal_field())
     # Remove carrier frequency
@@ -745,7 +753,7 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     grid.set_is_envelope(True)
     grid.set_temporal_field(field)
 
-    return omg0_h
+    return omg0 if omega0 is None else None
 
 
 def hilbert_transform(field):
