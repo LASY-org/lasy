@@ -119,7 +119,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         if grid_out = None:
             axes_out, region_idx = add_output_grid(grid) # Call routine to determine output grid
         else:
-            grid_out = self.grid_out # Use user-specified grid
+            axes_out = self.grid_out.axes # Use user-specified grid
             
         if abcd = None: # Update ABCD matrix if passed as variable
             abcd = self.abcd
