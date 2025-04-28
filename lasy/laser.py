@@ -451,12 +451,12 @@ class Laser:
             Show the lineout of the laser field.
 
         show_max : bool, default: False
-            Show the maximum intensity of the laser field.
+            Print the maximum intensity of the laser field.
 
         udict : dict, default: {}
             Dictionary with the information of the unit scales of the axes,
             e.g. ``{'t': {'value': 1e-15, 'label': 'fs'}, 'x': {'value': 1e-6, 'label': r'\mu m'}}``
-            Allows the user to override the default unit scales.
+            Override the default unit scales.
 
         **kw : additional arguments to be passed to matplotlib's imshow command
         """

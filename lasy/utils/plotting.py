@@ -1,17 +1,9 @@
-from copy import deepcopy
-
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from scipy.constants import c, epsilon_0
 
 from .laser_utils import field_to_vector_potential, get_duration, get_w0
-
-# default time and space units (value and label)
-units_def = {
-    "t": {"value": 1e-15, "label": "fs"},
-    "x": {"value": 1e-6, "label": r"\mu m"},
-}
 
 
 def show_laser(
@@ -56,7 +48,7 @@ def show_laser(
         Show the lineout of the laser field.
 
     show_max : bool, default: False
-        Show the maximum intensity of the laser field.
+        Print the maximum intensity of the laser field.
 
     omega0 : scalar
         Angular frequency at which the envelope is defined.
@@ -65,7 +57,7 @@ def show_laser(
     udict : dict, default: {}
         Dictionary with the information of the unit scales of the axes,
         e.g. ``{'t': {'value': 1e-15, 'label': 'fs'}, 'x': {'value': 1e-6, 'label': r'\mu m'}}``
-        Allows the user to override the default unit scales.
+        Override the default unit scales.
 
     **kw : additional arguments to be passed to matplotlib's imshow command
     """
@@ -88,7 +80,10 @@ def show_laser(
         cbar_label = r"$|E_{envelope}|$ (V/m)"
 
     # Set default unit scales for the axes
-    units = deepcopy(units_def)
+    units = {
+        "t": {"value": 1e-15, "label": "fs"},
+        "x": {"value": 1e-6, "label": r"\mu m"}
+        }
 
     # Calculate spatial scales for the axes
     if grid.hi[0] > 1:
@@ -99,9 +94,6 @@ def show_laser(
         # scale is millimeters
         units["x"]["value"] = 1e-3
         units["x"]["label"] = "mm"
-    else:
-        # scale is microns (default)
-        pass
 
     # Calculate temporal scales for the axes
     if grid.hi[-1] - grid.lo[-1] > 1e-9:
@@ -112,15 +104,12 @@ def show_laser(
         # scale is picoseconds
         units["t"]["value"] = 1e-12
         units["t"]["label"] = "ps"
-    else:
-        # scale is femtoseconds (default)
-        pass
 
-    # Allows the user to override default units
+    # Override default units
     for k in udict.keys():
         units[k] = udict[k]
 
-    # Allow the user to shift the temporal axis
+    # Shift the temporal axis
     if t_shift == "left":
         t_shift = grid.lo[-1]
     elif t_shift == "right":
@@ -130,7 +119,7 @@ def show_laser(
     elif not isinstance(t_shift, (float, int)):
         raise ValueError(
             "Invalid value for t_shift.\n"
-            "It should be one of 'left', 'right', 'center', or a float.\n"
+            "It should be one of 'left', 'right', 'center', or a number.\n"
         )
 
     if dim == "rt":
