@@ -1,6 +1,7 @@
-from lasy.utils.fft import fft
 import numpy as np
 from scipy.constants import c
+
+from lasy.utils.fft import fft
 
 from .single_fft_propagator import SingleFFTPropagator
 
@@ -60,9 +61,11 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             )
 
             fftInput = spectral_field * preFactor
-            
-            F , axes_out = fft(which="transverse", arr_in=fftInput, axes_in=(x,y),from_domain="real")
-            k_x , k_y = axes_out
+
+            F, axes_out = fft(
+                which="transverse", arr_in=fftInput, axes_in=(x, y), from_domain="real"
+            )
+            k_x, k_y = axes_out
 
             KY, KX, _ = np.meshgrid(k_y, k_x, spectral_axes)
 
