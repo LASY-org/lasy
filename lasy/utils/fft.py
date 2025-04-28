@@ -102,5 +102,7 @@ def fft(which, arr_in, axes_in, from_domain):
     else:
         arr_out = np.fft.fft2(arr, axes=ax) if transverse else np.fft.fft(arr, axis=-1)
     if shift_after:
-        arr_out = np.fft.ifftshift(arr, axes=ax) if inverse else np.fft.fftshift(arr, axis=-1)
+        arr_out = (
+            np.fft.ifftshift(arr, axes=ax) if inverse else np.fft.fftshift(arr, axis=-1)
+        )
     return arr_out, axes_out
