@@ -88,7 +88,6 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
                 YF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axes), axis=2
             )
 
-
             field_interp = interpolate_complex_field_XY(
                 diffractedField, XF, YF, OM, XF0, YF0
             )
