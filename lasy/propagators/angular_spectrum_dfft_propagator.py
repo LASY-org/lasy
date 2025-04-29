@@ -39,7 +39,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
             ky = 2 * np.pi * axes_freq[1]
 
             # Calculate the refractive index if it is a function of wavelength
-            n = self.n(2*np.pi*c/omega) if callable(self.n) else self.n
+            n = self.n(2 * np.pi * c / omega) if callable(self.n) else self.n
 
             # Calculate the phase shift in k-space
             phase = (
