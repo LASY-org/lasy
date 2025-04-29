@@ -33,7 +33,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
             # Get the spectral field in the spatial domain
             field, omega = grid.get_spectral_field()
 <<<<<<< HEAD
-            
+
             omega += self.omega0
             kz = omega/c
 
@@ -45,7 +45,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
 
             kx = 2*np.pi*axes_freq[0]
             ky = 2*np.pi*axes_freq[1]
-            
+
 =======
 
             kz = omega / c
@@ -80,7 +80,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
             phase_onaxis = phase[Nx//2, Ny//2, :]
 
             order = np.argsort(omega)
-            
+
             phase_onaxis = phase_onaxis[order]
             omega_sorted = omega[order]
 
@@ -117,5 +117,5 @@ class AngularSpectrumDFFTPropagator(Propagator):
             )
 >>>>>>> 6047ebc78956349d6fd87041bb3c4649f789fd8f
 
-                        
+
             grid.set_spectral_field(field)
