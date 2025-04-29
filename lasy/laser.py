@@ -441,4 +441,3 @@ class Laser:
         propagator.update(self)
 
         self.TMP_propagate = propagator.propagate
-

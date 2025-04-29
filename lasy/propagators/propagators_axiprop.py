@@ -1,19 +1,19 @@
 import numpy as np
+from axiprop.containers import ScalarFieldEnvelope
+from axiprop.lib import (
+    PropagatorFFT2,
+    PropagatorFFT2Fresnel,
+    PropagatorResampling,
+    PropagatorResamplingFresnel,
+)
+from axiprop.utils import import_from_lasy
 from scipy.constants import c
 
 from lasy.propagators import Propagator
 
-from axiprop.lib import PropagatorResampling
-from axiprop.lib import PropagatorResamplingFresnel
-from axiprop.lib import PropagatorFFT2
-from axiprop.lib import PropagatorFFT2Fresnel
-from axiprop.utils import import_from_lasy
-from axiprop.containers import ScalarFieldEnvelope
-
 
 class MRTPropagator(Propagator):
-    """
-    """
+    """ """
 
     def __init__(self, verbose=False):
         self.verbose = verbose
@@ -41,7 +41,8 @@ class MRTPropagator(Propagator):
                     r_axis=container_in.r,
                     kz_axis=container_in.k_freq,
                     r_axis_new=laser_out.grid.axes[0],
-                    mode=m, verbose=verbose
+                    mode=m,
+                    verbose=verbose,
                 )
             )
 
@@ -53,20 +54,15 @@ class MRTPropagator(Propagator):
             m = m_axis[im]
             container_in = containers_in[im]
             Field_ft_new = prop_rt.step(
-                container_in.Field_ft,
-                distance, overwrite=False,
-                show_progress=verbose
+                container_in.Field_ft, distance, overwrite=False, show_progress=verbose
             )
 
             laser_loc = ScalarFieldEnvelope(
-                container_in.k0,
-                t_axis=container_in.t + distance/c
+                container_in.k0, t_axis=container_in.t + distance / c
             )
 
             laser_loc.import_field_ft(
-                Field_ft_new,
-                r_axis=prop_rt.r_new,
-                transform=True, make_copy=False
+                Field_ft_new, r_axis=prop_rt.r_new, transform=True, make_copy=False
             )
 
             field_3d[im] = laser_loc.Field.T
@@ -78,9 +74,9 @@ class MRTPropagator(Propagator):
 
         return laser_out
 
+
 class MRTFresnelPropagator(Propagator):
-    """
-    """
+    """ """
 
     def __init__(self, verbose=False):
         self.verbose = verbose
@@ -109,7 +105,8 @@ class MRTFresnelPropagator(Propagator):
                     r_axis=container_in.r,
                     kz_axis=container_in.k_freq,
                     r_axis_new=laser_out.grid.axes[0],
-                    mode=m, verbose=verbose
+                    mode=m,
+                    verbose=verbose,
                 )
             )
 
@@ -121,20 +118,15 @@ class MRTFresnelPropagator(Propagator):
             m = m_axis[im]
             container_in = containers_in[im]
             Field_ft_new = prop_rt.step(
-                container_in.Field_ft,
-                distance, overwrite=False,
-                show_progress=verbose
+                container_in.Field_ft, distance, overwrite=False, show_progress=verbose
             )
 
             laser_loc = ScalarFieldEnvelope(
-                container_in.k0,
-                t_axis=container_in.t + distance/c
+                container_in.k0, t_axis=container_in.t + distance / c
             )
 
             laser_loc.import_field_ft(
-                Field_ft_new,
-                r_axis=prop_rt.r_new,
-                transform=True, make_copy=False
+                Field_ft_new, r_axis=prop_rt.r_new, transform=True, make_copy=False
             )
 
             field_3d[im] = laser_loc.Field.T
@@ -148,8 +140,7 @@ class MRTFresnelPropagator(Propagator):
 
 
 class XYTPropagator(Propagator):
-    """
-    """
+    """ """
 
     def __init__(self, verbose=False):
         self.verbose = verbose
@@ -172,23 +163,21 @@ class XYTPropagator(Propagator):
             x_axis=container_in.x,
             y_axis=container_in.y,
             kz_axis=container_in.k_freq,
-            verbose=verbose
+            verbose=verbose,
         )
 
         Field_ft_new = prop_xyt.step(
-            container_in.Field_ft,
-            distance, overwrite=False,
-            show_progress=verbose
+            container_in.Field_ft, distance, overwrite=False, show_progress=verbose
         )
 
-
         laser_loc = ScalarFieldEnvelope(
-            container_in.k0,
-            t_axis=container_in.t + distance/c
+            container_in.k0, t_axis=container_in.t + distance / c
         ).import_field_ft(
             Field_ft_new,
             r_axis=(prop_xyt.r, prop_xyt.x, prop_xyt.y),
-            transform=True, make_copy=False)
+            transform=True,
+            make_copy=False,
+        )
 
         laser_out.grid.set_temporal_field(np.moveaxis(laser_loc.Field, 0, -1))
         laser_out.grid.axes[-1] = laser_loc.t
@@ -198,10 +187,8 @@ class XYTPropagator(Propagator):
         return laser_out
 
 
-
 class XYTFresnelPropagator(Propagator):
-    """
-    """
+    """ """
 
     def __init__(self, verbose=False):
         self.verbose = verbose
@@ -230,23 +217,21 @@ class XYTFresnelPropagator(Propagator):
             x_axis_new=x_axis_new,
             y_axis_new=y_axis_new,
             kz_axis=container_in.k_freq,
-            verbose=verbose
+            verbose=verbose,
         )
 
         Field_ft_new = prop_xyt.step(
-            container_in.Field_ft,
-            distance, overwrite=False,
-            show_progress=verbose
+            container_in.Field_ft, distance, overwrite=False, show_progress=verbose
         )
 
-
         laser_loc = ScalarFieldEnvelope(
-            container_in.k0,
-            t_axis=container_in.t + distance/c
+            container_in.k0, t_axis=container_in.t + distance / c
         ).import_field_ft(
             Field_ft_new,
             r_axis=(prop_xyt.r, prop_xyt.x, prop_xyt.y),
-            transform=True, make_copy=False)
+            transform=True,
+            make_copy=False,
+        )
 
         laser_out.grid.set_temporal_field(np.moveaxis(laser_loc.Field, 0, -1))
         laser_out.grid.axes[-1] = laser_loc.t
