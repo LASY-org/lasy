@@ -5,7 +5,6 @@ from lasy.utils.fft import fft
 from lasy.utils.field_interpolator import interpolate_complex_field_XY
 
 from .single_fft_propagator import SingleFFTPropagator
-from scipy.interpolate import RegularGridInterpolator
 
 
 class FresnelSFFTPropagator(SingleFFTPropagator):
@@ -68,13 +67,11 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
 
             KY, KX, _ = np.meshgrid(k_y, k_x, spectral_axes)
 
-            XF = KX * WAVELENGTH * distance 
+            XF = KX * WAVELENGTH * distance
             YF = KY * WAVELENGTH * distance
 
-        
-            postFactor = (
-                np.exp(1j * K * (XF**2 + YF**2) / (2 * distance))
-                / (1j * WAVELENGTH * distance)
+            postFactor = np.exp(1j * K * (XF**2 + YF**2) / (2 * distance)) / (
+                1j * WAVELENGTH * distance
             )
 
             diffractedField = F * postFactor
@@ -82,18 +79,23 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             # Wach longitudinal frequency slice of the diffracted field has a different
             # Spatial scale. We need to interpolate them all onto a common grid.
             # for this we select the central frequency
-            
+
             centFreqIndx = np.argmin(np.abs(spectral_axes))
-            XF0 = np.repeat(XF[:,:, centFreqIndx][:,:,np.newaxis],len(spectral_axes),axis=2)
-            YF0 = np.repeat(YF[:,:, centFreqIndx][:,:,np.newaxis],len(spectral_axes),axis=2)
+            XF0 = np.repeat(
+                XF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axes), axis=2
+            )
+            YF0 = np.repeat(
+                YF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axes), axis=2
+            )
 
             NYK, NXK, _ = np.shape(diffractedField)
 
-            field_interp = interpolate_complex_field_XY(diffractedField, XF, YF, OM, XF0, YF0)
-
+            field_interp = interpolate_complex_field_XY(
+                diffractedField, XF, YF, OM, XF0, YF0
+            )
 
             grid.set_spectral_field(field_interp)
-            #grid.set_spectral_field(diffractedField)
+            # grid.set_spectral_field(diffractedField)
             grid.axes[0] = np.unique(XF0)
             grid.axes[1] = np.unique(YF0)
             grid.lo = [np.unique(XF0)[0], np.unique(YF0)[0], grid.lo[-1]]
