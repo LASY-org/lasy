@@ -11,12 +11,16 @@ class AngularSpectrumDFFTPropagator(Propagator):
     Angular spectrum dual FFT propagator.
     """
 
-    def __init__(self, omega0, n=1.0):
+    def __init__(self, omega0, dim, n=1.0):
         super().__init__()
         self.n = n  # refractive index
         self.omega0 = omega0
+        self.dim = dim
 
-    def propagate(self, distance, grid, dim):
+    def propagate(self, distance, grid, dim=None):
+        
+        dim = self.dim if not dim else dim
+
         if dim == "rt":
             print("'rt' geometry not yet supported by AngularSpectrumPropagator")
 
