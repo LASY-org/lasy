@@ -63,11 +63,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         z_Rf0 = (2. * f0**2 / (k0 * w0**2))  # Estimated Rayleigh range
         w_0f = 2. * f0 / (k0 * w0)  # Estimated focal spot-size
         print("Waist size [um]: ",w_0f/um,"\nRayleigh [um]: ",z_Rf0/um)
-
-        L_min = - w_0f
-        L_max = w_0f
-        L_width = abs(L_max - L_min)
-        print("Number of spatial/transverse gridpoints: %0.0f" % (N_points))
+        
         r0_step = L0_width / N_points  # Note: D gridpoints means D-1 intervals
         
         x = fftshift(fftfreq(N_points, r0_step) * lambda0 * f0)
