@@ -11,8 +11,8 @@ from scipy.constants import c
 
 
 class MRTPropagator:
-    """
-    """
+    """ """
+
     def __init__(self, verbose=False):
         self.verbose = verbose
         return
@@ -73,8 +73,8 @@ class MRTPropagator:
 
 
 class MRTFresnelPropagator:
-    """
-    """
+    """ """
+
     def __init__(self, verbose=False):
         self.verbose = verbose
         return
@@ -136,8 +136,7 @@ class MRTFresnelPropagator:
 
 
 class XYTPropagator:
-    """
-    """
+    """ """
 
     def __init__(self, verbose=False):
         self.verbose = verbose
@@ -185,8 +184,8 @@ class XYTPropagator:
 
 
 class XYTFresnelPropagator:
-    """
-    """
+    """ """
+
     def __init__(self, verbose=False):
         self.verbose = verbose
         return
