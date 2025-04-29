@@ -1,14 +1,8 @@
-<<<<<<< HEAD
 from .propagator import Propagator
 from lasy.utils.fft_wrapper import fft
-=======
-import numpy as np
+
 from scipy.constants import c
-
-from lasy.utils.fourier import fft
->>>>>>> 6047ebc78956349d6fd87041bb3c4649f789fd8f
-
-from .propagator import Propagator
+import numpy as np
 
 
 class AngularSpectrumDFFTPropagator(Propagator):
@@ -16,24 +10,25 @@ class AngularSpectrumDFFTPropagator(Propagator):
     Angular spectrum dual FFT propagator.
     """
 
-<<<<<<< HEAD
     def __init__(self, omega0, n=1.):
 
-=======
-    def __init__(self, n=1.0):
->>>>>>> 6047ebc78956349d6fd87041bb3c4649f789fd8f
         super().__init__()
         self.n = n  # refractive index
         self.omega0 = omega0
     def propagate(self, distance, grid, dim):
-        if dim == "rt":
+        
+        if dim == 'rt':
             print("'rt' geometry not yet supported by AngularSpectrumPropagator")
 
-        if dim == "xyt":
+        if dim == 'xyt':
             # Get the spectral field in the spatial domain
             field, omega = grid.get_spectral_field()
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 8294da3 ()
             omega += self.omega0
             kz = omega/c
 
@@ -45,6 +40,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
 
             kx = 2*np.pi*axes_freq[0]
             ky = 2*np.pi*axes_freq[1]
+<<<<<<< HEAD
 
 =======
 
@@ -62,9 +58,12 @@ class AngularSpectrumDFFTPropagator(Propagator):
             ky = 2 * np.pi * axes_freq[1]
 
 >>>>>>> 6047ebc78956349d6fd87041bb3c4649f789fd8f
+=======
+            
+>>>>>>> 8294da3 ()
             # Calculate the refractive index if it is a function of wavelength
             if type(self.n) not in [int, float, np.ndarray]:
-                wavelength = 2 * np.pi * c / omega
+                wavelength = 2*np.pi*c/omega
                 n = self.n(wavelength)
                 n0 = self.n(2*np.pi*c/self.omega0)
             else:
@@ -72,7 +71,6 @@ class AngularSpectrumDFFTPropagator(Propagator):
                 n0 = self.n
 
             # Calculate the phase shift in k-space
-<<<<<<< HEAD
             phase = (distance * n * (kz[None, None, :]**2 - kx[:, None, None]**2 - ky[None, :, None]**2) ** 0.5)
 
             # compensate group delay to keep pulse centered in grid
@@ -90,32 +88,15 @@ class AngularSpectrumDFFTPropagator(Propagator):
             gd = np.interp(self.omega0, omega_sorted, gd)
 
             phase = phase - gd*(omega-self.omega0)[None, None, :]
-=======
-            phase = (
-                distance
-                * n
-                * (kz[:, :, None] ** 2 - kx[None, :, :] ** 2 - ky[:, None, :] ** 2)
-                ** 0.5
-            )
->>>>>>> 6047ebc78956349d6fd87041bb3c4649f789fd8f
 
             # Apply the phase shift to the field in k-space
             field_kspace *= np.exp(1j * phase)
 
             # Transform back to the spatial domain
-<<<<<<< HEAD
             field, _ = fft(arr_in=field_kspace,
                                   which="transverse",
                                   axes_in=(kx/(2*np.pi), ky/(2*np.pi)),
                                   from_domain="real",)
-=======
-            field_kspace, _ = fft(
-                arr_in=field_kspace,
-                which="transverse",
-                axes_in=(kx / (2 * np.pi), ky / (2 * np.pi)),
-                from_domain="frequency",
-            )
->>>>>>> 6047ebc78956349d6fd87041bb3c4649f789fd8f
 
 
             grid.set_spectral_field(field)
