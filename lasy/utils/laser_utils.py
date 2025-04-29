@@ -699,7 +699,7 @@ def vector_potential_to_field(grid, omega0, direct=True):
         return 1j * m_e * omega * c * field / e
 
 
-def field_to_envelope(grid, dim, phase_unwrap_nd=False):
+def field_to_envelope(grid, dim, omega0=None, phase_unwrap_nd=False):
     """Convert a field to its complex envelope representation by applying a Hilbert transform.
 
     Parameters
@@ -716,6 +716,10 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
         - ``'rt'`` : The laser pulse is represented on a 2D grid:
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
+    omega0 : scalar
+        Central frequency at which the envelope will be defined.
+        If None, the central frequency measured from the field is used.
+
     phase_unwrap_nd : boolean (optional)
         If True, the phase unwrapping is n-dimensional (2- or 3-D depending on dim).
         If False, the phase unwrapping is done in t, treating each transverse cell
@@ -725,26 +729,30 @@ def field_to_envelope(grid, dim, phase_unwrap_nd=False):
     Returns
     -------
     scalar
-        The central angular frequency.
+        If input parameter omega0 was None, return the central angular frequency.
+        Otherwise, return None.
     """
     assert not grid.is_envelope
 
     # Get central wavelength from array
-    _, omg0_h = get_frequency(
-        grid,
-        dim=dim,
-        is_hilbert=False,
-        phase_unwrap_nd=phase_unwrap_nd,
-    )
+    if omega0 is None:
+        _, omg0 = get_frequency(
+            grid,
+            dim=dim,
+            is_hilbert=False,
+            phase_unwrap_nd=phase_unwrap_nd,
+        )
+    else:
+        omg0 = omega0
     # Hilbert transform
     field = hilbert_transform(grid.get_temporal_field())
     # Remove carrier frequency
-    field *= np.exp(1j * omg0_h * grid.axes[-1])
+    field *= np.exp(1j * omg0 * grid.axes[-1])
     # Store envelope
     grid.set_is_envelope(True)
     grid.set_temporal_field(field)
 
-    return omg0_h
+    return omg0 if omega0 is None else None
 
 
 def hilbert_transform(field):
@@ -1385,13 +1393,16 @@ def get_spectral_phase(grid, dim, omega0, method="sum", ordering="zero_center"):
     return phase, omega
 
 
-def get_gdd(grid, dim, omega0, omega_gdd=None, method="sum"):
+def get_dispersion(grid, dim, omega0, order, omega_eval=None, method="sum"):
     r"""
-    Calculate the group delay dispersion (GDD) of the laser.
+    Calculate the n-th order dispersion polynomial of the laser.
 
     .. math::
-        GDD = \frac{\partial^2 \phi(\omega)}{\partial \omega^2}
+        \Phi^{(n)} = \frac{\partial^n \phi(\omega)}{\partial \omega^n}
 
+    where n is the order to which the disperison is calculated (in s^n/rad).
+
+    E.g. order=1, calculates the group delay (GD), order=2 calculates group delay dispersion (GDD) and order=3 calculates the third-order dispersion (TOD).
 
     Parameters
     ----------
@@ -1409,32 +1420,38 @@ def get_gdd(grid, dim, omega0, omega_gdd=None, method="sum"):
     omega0 : float
         Angular frequency at which the laser envelope is defined.
 
-    omega_gdd : float, optional
-        Central angular frequency at which the GDD is calculated, if `None`, `omega0` is used.
+    order : integer
+        Dispersion polynomial order that should be calculated.
+
+    omega_eval : float, optional
+        Central angular frequency at which the dispersion polynomial is calculated, if `None`, `omega0` is used.
 
     method : string, optional
-        Method of retrieving the phase that is used for calculating the GDD. Options are:
+        Method of retrieving the phase that is used for calculating the dispersion. Options are:
 
         - ``'sum'``: Calculates the spectral phase of the spatially summed field (default).
         - ``'on-axis'``: Calculates the on-axis spectral phase.
 
     Returns
     -------
-    gdd: ndarray of floats (1D)
-        Group delay dispersion over the entire spectral range (in s^2)
+    disp: ndarray of floats (1D)
+        n-th order dispersion over the entire spectral range (in s^n/rad)
 
-    gdd0: float
-        Group delay dispersion at the center frequency (in s^2)
+    disp0: float
+        n-th order dispersion at the center frequency (in s^n/rad)
 
     """
     # calculate the spectral phase of the laser pulse
     phase, omega = get_spectral_phase(grid, dim, method=method, omega0=omega0)
 
-    # calculate the second derivative wrt. angular frequency
-    gd = np.gradient(phase, omega, axis=-1)
-    gdd = np.gradient(gd, omega, axis=-1)
+    # calculate the n-th order derivative wrt. angular frequency
+    disp = np.gradient(phase, omega, axis=-1)
+    for _ in range(order - 1):
+        disp = np.gradient(disp, omega, axis=-1)
 
-    # get the GDD at the specified frequency or the envelope's frequency
-    omega_eval = omega_gdd if omega_gdd is not None else omega0
-    gdd0 = np.interp(omega_eval, omega, gdd)
-    return gdd, gdd0
+    # get the dispersion at the specified frequency of the envelope's frequency
+    omega_eval = omega_eval if omega_eval is not None else omega0
+
+    disp0 = interp1d(omega, disp, bounds_error=True)(omega_eval)
+
+    return disp, disp0
