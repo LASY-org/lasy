@@ -10,8 +10,12 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
     """
     An implementation of the single FFT propagator using the Fresnel approximation.
 
-    Following Goodman.
-    Goodman, J. W. (2005). Introduction to Fourier Optics. Roberts and Company Publishers.
+    Following J. W. Goodman, Introduction to Fourier Optics (2005). The diffraction of a scalar field :math:`U` in the :math:`(x,y)` plane to the plane :math:`(x',y')`, under the Fresnel approximation is given by the Fresnel diffraction integral:
+    
+    .. math::
+        U'(x',y') = \frac{e^{i k z}}{i \lambda z} e^{i\frac{k(x'^2+y'^2)}{2z}} \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} \left ( U(x,y) e^{i\frac{k(x^2+y^2)}{2 z}} \right ) e^{-i \frac{2\pi(xx' + yy')}{\lambda z}}\,dx \,dy
+
+    with :math:`k` is the laser wavevector, :math:`\lambda` is the laser wavelength and :math:`z` is the distance between the input and diffraction planes.
 
     """
 
