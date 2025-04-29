@@ -16,7 +16,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
         self.n = n  # refractive index
         self.omega0 = omega0
     def propagate(self, distance, grid, dim):
-        
+
         if dim == 'rt':
             print("'rt' geometry not yet supported by AngularSpectrumPropagator")
 
@@ -27,7 +27,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
 <<<<<<< HEAD
 
 =======
-            
+
 >>>>>>> 8294da3 ()
             omega += self.omega0
             kz = omega/c
@@ -59,7 +59,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
 
 >>>>>>> 6047ebc78956349d6fd87041bb3c4649f789fd8f
 =======
-            
+
 >>>>>>> 8294da3 ()
             # Calculate the refractive index if it is a function of wavelength
             if type(self.n) not in [int, float, np.ndarray]:
