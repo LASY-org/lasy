@@ -11,7 +11,7 @@ from axiprop.utils import import_from_lasy
 from axiprop.containers import ScalarFieldEnvelope
 
 
-class MRTPropagator(Propagator):
+class MRTPropagator:
     """
     """
 
@@ -50,7 +50,6 @@ class MRTPropagator(Propagator):
         for im in range(m_axis.size):
             prop_rt = self.props_rt[im]
 
-            m = m_axis[im]
             container_in = containers_in[im]
             Field_ft_new = prop_rt.step(
                 container_in.Field_ft,
@@ -78,7 +77,7 @@ class MRTPropagator(Propagator):
 
         return laser_out
 
-class MRTFresnelPropagator(Propagator):
+class MRTFresnelPropagator:
     """
     """
 
@@ -118,7 +117,6 @@ class MRTFresnelPropagator(Propagator):
         for im in range(m_axis.size):
             prop_rt = self.props_rt[im]
 
-            m = m_axis[im]
             container_in = containers_in[im]
             Field_ft_new = prop_rt.step(
                 container_in.Field_ft,
@@ -147,7 +145,7 @@ class MRTFresnelPropagator(Propagator):
         return laser_out
 
 
-class XYTPropagator(Propagator):
+class XYTPropagator:
     """
     """
 
@@ -199,7 +197,7 @@ class XYTPropagator(Propagator):
 
 
 
-class XYTFresnelPropagator(Propagator):
+class XYTFresnelPropagator:
     """
     """
 
