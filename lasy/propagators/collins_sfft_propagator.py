@@ -146,19 +146,13 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
 
             X0, Y0, OM = np.meshgrid(y0, x0, spectral_axes + omega0)
             X, Y, OM = np.meshgrid(y,  x,  spectral_axes + omega0)
-            K = OM / c
-            WAVELENGTH = 2 * np.pi * c / OM
-            
             R0 = np.sqrt(X0**2 + Y0**2)
             R = np.sqrt(X**2 + Y**2)
             
-            profile_in = spectral_field
-            
             propagator = np.exp(1j * OM / (2 * c) * (A / B) * R0**2)
-            
             profile_out = fftshift(
                 ifft2(
-                    ifftshift(profile_in * propagator, axes=(0, 1)),
+                    ifftshift(spectral_field * propagator, axes=(0, 1)),
                     axes=(0, 1),
                 ),
                 axes=(0, 1),
