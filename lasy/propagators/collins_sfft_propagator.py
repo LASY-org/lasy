@@ -1,7 +1,7 @@
 from .single_fft_propagator import SingleFFTPropagator
 from lasy.utils.laser_utils import get_w0
 import numpy as np
-from numpy.fft import fft, ifft, fft2, fftshift, ifft2, ifftshift, fftfreq
+from numpy.fft import ifft2, fftshift, ifftshift, fftfreq
 
 "DEFINE CONSTANTS"
 cm = 1e-2
@@ -49,8 +49,6 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         axes = grid.axes
         x = axes[0]
         y = axes[1]
-        dx = x[1] - x[0]
-        dy = y[1] - y[0]
         L0_width = np.abs(x[-1] - x[0])
         N_points = len(x)
 
@@ -133,16 +131,12 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
 
         elif self.dim == "xyt":
             print("Collins SFFT propagator in xyt")
-            axes = grid.axes
+            axes = grid.axes # Input axes
             x0 = axes[0]
             y0 = axes[1]
-            dx0 = x0[1] - x0[0]
-            dy0 = y0[1] - y0[0]
 
-            x = axes_out[0]
+            x = axes_out[0] # Output axes
             y = axes_out[1]
-            dx = x[1] - x[0]
-            dy = y[1] - y[0]
 
             X0, Y0, OM = np.meshgrid(y0, x0, spectral_axes + omega0)
             X, Y, OM = np.meshgrid(y,  x,  spectral_axes + omega0)
