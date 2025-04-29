@@ -1,10 +1,8 @@
 import numpy as np
 from scipy.constants import c, epsilon_0
 
-from .propagator import Propagator
 
-
-class NonlinearKerrStep():
+class NonlinearKerrStep:
     """
     Propagator for a nonlinear step with Kerr nonlinearity.
     """
@@ -22,7 +20,6 @@ class NonlinearKerrStep():
         k0 : float
             Wave vector at the carrier frequency.
         """
-
         self.n2 = n2
         self.n0 = n0
         self.k0 = k0

@@ -1,19 +1,22 @@
+import numpy as np
+
 from lasy.laser import Laser
 from lasy.profiles import GaussianProfile
-from lasy.utils.laser_utils import get_w0, get_duration
 from lasy.propagators import AngularSpectrumDFFTPropagator
-import numpy as np
+from lasy.utils.laser_utils import get_duration, get_w0
 
 
 def make_laser():
-    profile = GaussianProfile(wavelength=800e-9,
-                              pol=(1, 0),
-                              laser_energy=1,
-                              tau=30e-15/np.sqrt(2*np.log(2)),
-                              w0=100e-6,
-                              t_peak=0)
+    profile = GaussianProfile(
+        wavelength=800e-9,
+        pol=(1, 0),
+        laser_energy=1,
+        tau=30e-15 / np.sqrt(2 * np.log(2)),
+        w0=100e-6,
+        t_peak=0,
+    )
 
-    dim = 'xyt'
+    dim = "xyt"
     hi = (5e-3, 5e-3, 300e-15)
     lo = (-5e-3, -5e-3, -300e-15)
     npoints = (100, 100, 201)
@@ -24,7 +27,7 @@ def make_laser():
 
 
 def test_spatial_propagation():
-    prop = AngularSpectrumDFFTPropagator(n=1.)
+    prop = AngularSpectrumDFFTPropagator(n=1.0)
 
     z_pos = np.linspace(-5e-3, 5e-3, 50)
     waists_propagated = []
@@ -36,9 +39,9 @@ def test_spatial_propagation():
         waist = get_w0(grid=laser.grid, dim=laser.dim)
         waists_propagated.append(waist)
 
-    zR = np.pi*laser.profile.w0**2/laser.profile.laser_wavelength
+    zR = np.pi * laser.profile.w0**2 / laser.profile.laser_wavelength
 
-    waists_analytical = laser.profile.w0 * np.sqrt(1 + (z_pos/zR)**2)
+    waists_analytical = laser.profile.w0 * np.sqrt(1 + (z_pos / zR) ** 2)
 
     assert np.allclose(waists_propagated, waists_analytical, rtol=1e-3)
 
@@ -47,13 +50,15 @@ def n_fusedsilica(wavelength):
     """
     Sellmeier equation for fused silica
     """
-    return ((1+0.6961663/(1-(0.0684043/(wavelength*1e-6))**2)
-             + 0.4079426/(1-(0.1162414/(wavelength*1e-6))**2)
-             + 0.8974794/(1-(9.896161/(wavelength*1e-6))**2))**.5)
+    return (
+        1
+        + 0.6961663 / (1 - (0.0684043 / (wavelength * 1e-6)) ** 2)
+        + 0.4079426 / (1 - (0.1162414 / (wavelength * 1e-6)) ** 2)
+        + 0.8974794 / (1 - (9.896161 / (wavelength * 1e-6)) ** 2)
+    ) ** 0.5
 
 
 def test_temporal_propagation():
-
     prop = AngularSpectrumDFFTPropagator(n=n_fusedsilica)
 
     z_pos = np.linspace(0, 20e-3, 10)
@@ -68,8 +73,10 @@ def test_temporal_propagation():
         durations_propagated.append(duration)
 
     gdd = z_pos * 36.163e-27
-    tau_initial = laser.profile.tau*np.sqrt(2*np.log(2))
-    duration_analytical = tau_initial * np.sqrt(1 + (4*np.log(2)*gdd/tau_initial**2)**2)
+    tau_initial = laser.profile.tau * np.sqrt(2 * np.log(2))
+    duration_analytical = tau_initial * np.sqrt(
+        1 + (4 * np.log(2) * gdd / tau_initial**2) ** 2
+    )
 
     print(durations_propagated, duration_analytical)
     assert np.allclose(durations_propagated, duration_analytical, rtol=1e-3)

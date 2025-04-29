@@ -1,10 +1,11 @@
 from .propagator import Propagator
 
+
 class SplitStepPropagator(Propagator):
     def __init__(self, propagators):
         """
         Initialize the SplitStepPropagator.
-        
+
         Parameters
         ----------
         propagators : list
