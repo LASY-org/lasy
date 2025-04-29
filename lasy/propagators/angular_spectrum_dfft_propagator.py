@@ -16,19 +16,14 @@ class AngularSpectrumDFFTPropagator(Propagator):
         self.n = n  # refractive index
         self.omega0 = omega0
     def propagate(self, distance, grid, dim):
-
+        
         if dim == 'rt':
             print("'rt' geometry not yet supported by AngularSpectrumPropagator")
 
         if dim == 'xyt':
             # Get the spectral field in the spatial domain
             field, omega = grid.get_spectral_field()
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-
->>>>>>> 8294da3 ()
+            
             omega += self.omega0
             kz = omega/c
 
@@ -40,27 +35,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
 
             kx = 2*np.pi*axes_freq[0]
             ky = 2*np.pi*axes_freq[1]
-<<<<<<< HEAD
-
-=======
-
-            kz = omega / c
-
-            # get field in k-space and spatial frequency axes
-            field_kspace, axes_freq = fft(
-                arr_in=field,
-                which="transverse",
-                axes_in=[grid.axes[0], grid.axes[1]],
-                from_domain="real",
-            )
-
-            kx = 2 * np.pi * axes_freq[0]
-            ky = 2 * np.pi * axes_freq[1]
-
->>>>>>> 6047ebc78956349d6fd87041bb3c4649f789fd8f
-=======
-
->>>>>>> 8294da3 ()
+            
             # Calculate the refractive index if it is a function of wavelength
             if type(self.n) not in [int, float, np.ndarray]:
                 wavelength = 2*np.pi*c/omega
@@ -78,7 +53,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
             phase_onaxis = phase[Nx//2, Ny//2, :]
 
             order = np.argsort(omega)
-
+            
             phase_onaxis = phase_onaxis[order]
             omega_sorted = omega[order]
 
@@ -98,5 +73,5 @@ class AngularSpectrumDFFTPropagator(Propagator):
                                   axes_in=(kx/(2*np.pi), ky/(2*np.pi)),
                                   from_domain="real",)
 
-
+                        
             grid.set_spectral_field(field)
