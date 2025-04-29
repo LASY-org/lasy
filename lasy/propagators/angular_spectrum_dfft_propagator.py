@@ -18,7 +18,6 @@ class AngularSpectrumDFFTPropagator(Propagator):
         self.dim = dim
 
     def propagate(self, distance, grid, dim=None):
-        
         dim = self.dim if not dim else dim
 
         if dim == "rt":

@@ -1457,8 +1457,8 @@ def get_dispersion(grid, dim, omega0, order, omega_eval=None, method="sum"):
     return disp, disp0
 
 
-def get_bandwidth(grid, dim, method='sum', level=None, unit='rad/s', omega0=None):
-    """Calculates the spectral width of a pulse in a given grid. 
+def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None):
+    """Calculates the spectral width of a pulse in a given grid.
 
     By default, the bandwidth is calculated as the rms width of the spatially summed spectrum, in rad/s.
     Optionally, the bandwidth can also be calculated on-axis, at a given intensity level or in meters.
@@ -1483,7 +1483,7 @@ def get_bandwidth(grid, dim, method='sum', level=None, unit='rad/s', omega0=None
         - ``'on-axis'``: Calculates the width of the on-axis spectrum.
 
     level : float, optional
-        Intensity level at which the bandwidth is calculated. If None, i.e. by default, 
+        Intensity level at which the bandwidth is calculated. If None, i.e. by default,
         the bandwidth is calculated as the rms width of the spectral intensity.
 
     unit : string, optional
@@ -1494,7 +1494,7 @@ def get_bandwidth(grid, dim, method='sum', level=None, unit='rad/s', omega0=None
         - ``'m'``: meters.
 
     omega0 : float, optional
-        Central angular frequency of the pulse. 
+        Central angular frequency of the pulse.
         Only required if ``unit='m'``, i.e. the bandwidth should be converted to meters.
 
     Returns
@@ -1502,18 +1502,17 @@ def get_bandwidth(grid, dim, method='sum', level=None, unit='rad/s', omega0=None
     float
         Spectral bandwidth of the pulse in the specified units and calculation method.
     """
-
     # Get the volume of each grid cell and spectral field
     dV = get_grid_cell_volume(grid, dim)
     field, omega = grid.get_spectral_field()
 
     # Calculate omega
- #   omega = np.fft.fftfreq(grid.npoints[-1], grid.dx[-1]) * 2 * np.pi
+    #   omega = np.fft.fftfreq(grid.npoints[-1], grid.dx[-1]) * 2 * np.pi
 
     # Choose axis along which to calculate the bandwidth
-    if unit == 'm':  # convert omega to wavelength
+    if unit == "m":  # convert omega to wavelength
         assert omega0, "'omega0' must be provided to calculate bandwidth in meters."
-        width_axis = 2*np.pi*c/(omega+omega0)
+        width_axis = 2 * np.pi * c / (omega + omega0)
 
     else:  # keep omega as that axis
         width_axis = omega
@@ -1526,12 +1525,13 @@ def get_bandwidth(grid, dim, method='sum', level=None, unit='rad/s', omega0=None
         spectral_intensity = np.abs(field) ** 2 * dV[np.newaxis, :, np.newaxis]
 
     # Selecte the method to calculate the bandwidth
-    if method == 'sum':
+    if method == "sum":
         spectral_intensity = np.sum(spectral_intensity, axis=(0, 1))
     else:
-        if dim == 'xyt':
-            spectral_intensity = spectral_intensity[grid.npoints[0] //
-                                                    2, grid.npoints[1]//2, :]
+        if dim == "xyt":
+            spectral_intensity = spectral_intensity[
+                grid.npoints[0] // 2, grid.npoints[1] // 2, :
+            ]
         else:  # dim=='rt'
             spectral_intensity = spectral_intensity[0, 0, :]
 
@@ -1542,7 +1542,7 @@ def get_bandwidth(grid, dim, method='sum', level=None, unit='rad/s', omega0=None
         spectral_intensity = spectral_intensity[order]
 
         # find intensity threshold
-        threshold = np.max(spectral_intensity)*level
+        threshold = np.max(spectral_intensity) * level
 
         # find indices that mark the range in which spectral intensity >= threshold
         idcs = np.where(spectral_intensity >= threshold)[0]
@@ -1550,9 +1550,15 @@ def get_bandwidth(grid, dim, method='sum', level=None, unit='rad/s', omega0=None
 
         # calculate positions of lower and upper bounds
         lower_bound = np.interp(
-            threshold, spectral_intensity[i_min-1:i_min+1], width_axis[i_min-1:i_min+1])
+            threshold,
+            spectral_intensity[i_min - 1 : i_min + 1],
+            width_axis[i_min - 1 : i_min + 1],
+        )
         upper_bound = np.interp(
-            threshold, spectral_intensity[i_max:i_max+2][::-1], width_axis[i_max:i_max+2][::-1])
+            threshold,
+            spectral_intensity[i_max : i_max + 2][::-1],
+            width_axis[i_max : i_max + 2][::-1],
+        )
 
         # calculate bandwidth
         bandwidth = upper_bound - lower_bound
