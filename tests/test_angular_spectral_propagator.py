@@ -28,14 +28,15 @@ def make_laser():
 
 
 def test_spatial_propagation():
-    prop = AngularSpectrumDFFTPropagator(omega0=2 * np.pi * c / 800e-9, n=1.0)
+    laser = make_laser()
+    prop = AngularSpectrumDFFTPropagator(omega0=2 * np.pi * c / 800e-9, n=1.0, dim=laser.dim)
 
     z_pos = np.linspace(-5e-3, 50e-3, 10)
     waists_propagated = []
 
     for z in z_pos:
         laser = make_laser()
-        prop.propagate(distance=z, grid=laser.grid, dim=laser.dim)
+        prop.propagate(distance=z, grid=laser.grid)
         waist = get_w0(grid=laser.grid, dim=laser.dim)
         waists_propagated.append(waist)
 
@@ -59,14 +60,15 @@ def n_fusedsilica(wavelength):
 
 
 def test_temporal_propagation():
-    prop = AngularSpectrumDFFTPropagator(omega0=2 * np.pi * c / 800e-9, n=n_fusedsilica)
+    laser = make_laser()
+    prop = AngularSpectrumDFFTPropagator(omega0=2 * np.pi * c / 800e-9, n=n_fusedsilica, dim=laser.dim)
 
     z_pos = np.linspace(0, 10e-3, 10)
     durations_propagated = []
 
     for z in z_pos:
         laser = make_laser()
-        prop.propagate(distance=z, grid=laser.grid, dim=laser.dim)
+        prop.propagate(distance=z, grid=laser.grid)
         duration = (
             get_duration(grid=laser.grid, dim=laser.dim) * 2 * np.sqrt(2 * np.log(2))
         )
