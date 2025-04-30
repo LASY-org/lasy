@@ -1,8 +1,4 @@
 import numpy as np
-from scipy.constants import c
-
-from lasy.propagators import Propagator
-
 from axiprop.containers import ScalarFieldEnvelope
 from axiprop.lib import (
     PropagatorFFT2,
@@ -10,8 +6,10 @@ from axiprop.lib import (
     PropagatorResampling,
     PropagatorResamplingFresnel,
 )
-
 from axiprop.utils import import_from_lasy_grid
+from scipy.constants import c
+
+from lasy.propagators import Propagator
 
 
 class MRTPropagator(Propagator):
@@ -20,7 +18,6 @@ class MRTPropagator(Propagator):
     """
 
     def propagate(self, grid, distance, grid_out=None, verbose=True):
-
         containers_in, m_axis = import_from_lasy_grid(grid, self.dim, self.omega0)
 
         if grid_out is None:
@@ -72,7 +69,6 @@ class MRTFresnelPropagator(Propagator):
     """
 
     def propagate(self, grid, distance, grid_out=None, verbose=True):
-
         containers_in, m_axis = import_from_lasy_grid(grid, self.dim, self.omega0)
 
         if grid_out is None:
@@ -138,8 +134,7 @@ class XYTPropagator(Propagator):
         )
 
         Field_ft_new = prop_xyt.step(
-            container_in.Field_ft, distance,
-            overwrite=False, show_progress=verbose
+            container_in.Field_ft, distance, overwrite=False, show_progress=verbose
         )
 
         laser_loc = ScalarFieldEnvelope(
@@ -163,7 +158,6 @@ class XYTFresnelPropagator(Propagator):
     """
 
     def propagate(self, grid, distance, grid_out=None, verbose=True):
-
         container_in = import_from_lasy_grid(grid, self.dim, self.omega0)
 
         if grid_out is None:
@@ -183,8 +177,7 @@ class XYTFresnelPropagator(Propagator):
         )
 
         Field_ft_new = prop_xyt.step(
-            container_in.Field_ft, distance,
-            overwrite=False, show_progress=verbose
+            container_in.Field_ft, distance, overwrite=False, show_progress=verbose
         )
 
         laser_loc = ScalarFieldEnvelope(
