@@ -3,23 +3,28 @@ from scipy.constants import c, epsilon_0
 
 
 class NonlinearKerrStep:
-    """
-    Propagator for a nonlinear step with Kerr nonlinearity.
+    r"""
+    Class that represents a propagation step with Kerr nonlinearity.
+    This allows to calculate spectral broadening or self-focusing due to self phase modulation.
+
+    .. math::
+
+        E (x,y,t) = E(x,y,t) \times \exp(i\,n_2\,n_0\,k_0\,I(x,y,t))
+
+    where :math:`I(x,y,t)` is the intensity profile of the pulse.
+    
+    Parameters
+    ----------
+    n2 : float
+        Nonlinear refractive index.
+    n0 : float
+        Linear refractive index at the carrier frequency.
+    k0 : float
+        Wave vector at the carrier frequency.
     """
 
     def __init__(self, n2, n0, k0):
-        """
-        Initialize the NonlinearKerrStep.
 
-        Parameters
-        ----------
-        n2 : float
-            Nonlinear refractive index.
-        n0 : float
-            Linear refractive index at the carrier frequency.
-        k0 : float
-            Wave vector at the carrier frequency.
-        """
         self.n2 = n2
         self.n0 = n0
         self.k0 = k0
