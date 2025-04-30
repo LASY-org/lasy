@@ -12,7 +12,7 @@ class NonlinearKerrStep:
         E (x,y,t) = E(x,y,t) \times \exp(i\,n_2\,n_0\,k_0\,I(x,y,t))
 
     where :math:`I(x,y,t)` is the intensity profile of the pulse.
-    
+
     Parameters
     ----------
     n2 : float
@@ -24,7 +24,6 @@ class NonlinearKerrStep:
     """
 
     def __init__(self, n2, n0, k0):
-
         self.n2 = n2
         self.n0 = n0
         self.k0 = k0
