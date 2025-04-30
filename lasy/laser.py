@@ -437,7 +437,15 @@ class Laser:
         """
         show_laser(self.grid, self.dim, show_intensity, **kw)
 
-    def add_propagator(self, propagator):
-        propagator.update(self)
 
-        self.TMP_propagate = propagator.propagate
+    def add_propagator(self, propagator):
+        """
+        Apply a propagator object to the laser pulse.
+        Parameters
+        ----------
+        propagator: a :class:`.Propagator` object (optional)
+            Represents a propagation method.
+        """
+        propagator.update(self.dim, self.profile.omega0)
+        self.propagate_new = propagator.propagate
+

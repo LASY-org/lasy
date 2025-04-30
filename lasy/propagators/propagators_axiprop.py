@@ -1,4 +1,8 @@
 import numpy as np
+from scipy.constants import c
+
+from lasy.propagators import Propagator
+
 from axiprop.containers import ScalarFieldEnvelope
 from axiprop.lib import (
     PropagatorFFT2,
@@ -6,29 +10,21 @@ from axiprop.lib import (
     PropagatorResampling,
     PropagatorResamplingFresnel,
 )
-from axiprop.utils import import_from_lasy
-from scipy.constants import c
+
+from axiprop.utils import import_from_lasy_grid
 
 
-class MRTPropagator:
-    """ """
+class MRTPropagator(Propagator):
+    """
+    Wrapper for PropagatorResampling
+    """
 
-    def __init__(self, verbose=False):
-        self.verbose = verbose
-        return
+    def propagate(self, grid, distance, grid_out=None, verbose=True):
 
-    def update(self, laser_in):
-        self.laser_in = laser_in
-        return
+        containers_in, m_axis = import_from_lasy_grid(grid, self.dim, self.omega0)
 
-    def propagate(self, distance, laser_out=None):
-        laser_in = self.laser_in
-        verbose = self.verbose
-
-        containers_in, m_axis = import_from_lasy(laser_in)
-
-        if laser_out is None:
-            laser_out = laser_in
+        if grid_out is None:
+            grid_out = grid
 
         self.props_rt = []
         for im in range(m_axis.size):
@@ -38,13 +34,13 @@ class MRTPropagator:
                 PropagatorResampling(
                     r_axis=container_in.r,
                     kz_axis=container_in.k_freq,
-                    r_axis_new=laser_out.grid.axes[0],
+                    r_axis_new=grid_out.axes[0],
                     mode=m,
                     verbose=verbose,
                 )
             )
 
-        field_3d = np.zeros_like(laser_out.grid.temporal_field)
+        field_3d = np.zeros_like(grid_out.temporal_field)
 
         for im in range(m_axis.size):
             prop_rt = self.props_rt[im]
@@ -64,33 +60,23 @@ class MRTPropagator:
 
             field_3d[im] = laser_loc.Field.T
 
-        laser_out.grid.set_temporal_field(field_3d)
-        laser_out.grid.axes[-1] = laser_loc.t
-        laser_out.grid.hi[-1] = laser_loc.t.max()
-        laser_out.grid.lo[-1] = laser_loc.t.min()
-
-        return laser_out
+        grid_out.set_temporal_field(field_3d)
+        grid_out.axes[-1] = laser_loc.t
+        grid_out.hi[-1] = laser_loc.t.max()
+        grid_out.lo[-1] = laser_loc.t.min()
 
 
-class MRTFresnelPropagator:
-    """ """
+class MRTFresnelPropagator(Propagator):
+    """
+    Wrapper for PropagatorResamplingFresnel
+    """
 
-    def __init__(self, verbose=False):
-        self.verbose = verbose
-        return
+    def propagate(self, grid, distance, grid_out=None, verbose=True):
 
-    def update(self, laser_in):
-        self.laser_in = laser_in
-        return
+        containers_in, m_axis = import_from_lasy_grid(grid, self.dim, self.omega0)
 
-    def propagate(self, distance, laser_out=None):
-        laser_in = self.laser_in
-        verbose = self.verbose
-
-        containers_in, m_axis = import_from_lasy(laser_in)
-
-        if laser_out is None:
-            laser_out = laser_in
+        if grid_out is None:
+            grid_out = grid
 
         self.props_rt = []
         for im in range(m_axis.size):
@@ -101,13 +87,13 @@ class MRTFresnelPropagator:
                     dz=distance,
                     r_axis=container_in.r,
                     kz_axis=container_in.k_freq,
-                    r_axis_new=laser_out.grid.axes[0],
+                    r_axis_new=grid_out.axes[0],
                     mode=m,
                     verbose=verbose,
                 )
             )
 
-        field_3d = np.zeros_like(laser_out.grid.temporal_field)
+        field_3d = np.zeros_like(grid_out.temporal_field)
 
         for im in range(m_axis.size):
             prop_rt = self.props_rt[im]
@@ -127,33 +113,22 @@ class MRTFresnelPropagator:
 
             field_3d[im] = laser_loc.Field.T
 
-        laser_out.grid.set_temporal_field(field_3d)
-        laser_out.grid.axes[-1] = laser_loc.t
-        laser_out.grid.hi[-1] = laser_loc.t.max()
-        laser_out.grid.lo[-1] = laser_loc.t.min()
-
-        return laser_out
+        grid_out.set_temporal_field(field_3d)
+        grid_out.axes[-1] = laser_loc.t
+        grid_out.hi[-1] = laser_loc.t.max()
+        grid_out.lo[-1] = laser_loc.t.min()
 
 
-class XYTPropagator:
-    """ """
+class XYTPropagator(Propagator):
+    """
+    Wrapper for PropagatorFFT2
+    """
 
-    def __init__(self, verbose=False):
-        self.verbose = verbose
-        return
+    def propagate(self, grid, distance, grid_out=None, verbose=True):
+        container_in = import_from_lasy_grid(grid, self.dim, self.omega0)
 
-    def update(self, laser_in):
-        self.laser_in = laser_in
-        return
-
-    def propagate(self, distance, laser_out=None):
-        laser_in = self.laser_in
-        verbose = self.verbose
-
-        container_in = import_from_lasy(laser_in)
-
-        if laser_out is None:
-            laser_out = laser_in
+        if grid_out is None:
+            grid_out = grid
 
         prop_xyt = PropagatorFFT2(
             x_axis=container_in.x,
@@ -163,7 +138,8 @@ class XYTPropagator:
         )
 
         Field_ft_new = prop_xyt.step(
-            container_in.Field_ft, distance, overwrite=False, show_progress=verbose
+            container_in.Field_ft, distance,
+            overwrite=False, show_progress=verbose
         )
 
         laser_loc = ScalarFieldEnvelope(
@@ -175,36 +151,26 @@ class XYTPropagator:
             make_copy=False,
         )
 
-        laser_out.grid.set_temporal_field(np.moveaxis(laser_loc.Field, 0, -1))
-        laser_out.grid.axes[-1] = laser_loc.t
-        laser_out.grid.hi[-1] = laser_loc.t.max()
-        laser_out.grid.lo[-1] = laser_loc.t.min()
-
-        return laser_out
+        grid_out.set_temporal_field(np.moveaxis(laser_loc.Field, 0, -1))
+        grid_out.axes[-1] = laser_loc.t
+        grid_out.hi[-1] = laser_loc.t.max()
+        grid_out.lo[-1] = laser_loc.t.min()
 
 
-class XYTFresnelPropagator:
-    """ """
+class XYTFresnelPropagator(Propagator):
+    """
+    Wrapper for PropagatorFFT2Fresnel
+    """
 
-    def __init__(self, verbose=False):
-        self.verbose = verbose
-        return
+    def propagate(self, grid, distance, grid_out=None, verbose=True):
 
-    def update(self, laser_in):
-        self.laser_in = laser_in
-        return
+        container_in = import_from_lasy_grid(grid, self.dim, self.omega0)
 
-    def propagate(self, distance, laser_out=None):
-        laser_in = self.laser_in
-        verbose = self.verbose
+        if grid_out is None:
+            grid_out = grid
 
-        container_in = import_from_lasy(laser_in)
-
-        if laser_out is None:
-            laser_out = laser_in
-
-        x_axis_new = laser_out.grid.axes[0]
-        y_axis_new = laser_out.grid.axes[1]
+        x_axis_new = grid_out.axes[0]
+        y_axis_new = grid_out.axes[1]
 
         prop_xyt = PropagatorFFT2Fresnel(
             dz=distance,
@@ -217,7 +183,8 @@ class XYTFresnelPropagator:
         )
 
         Field_ft_new = prop_xyt.step(
-            container_in.Field_ft, distance, overwrite=False, show_progress=verbose
+            container_in.Field_ft, distance,
+            overwrite=False, show_progress=verbose
         )
 
         laser_loc = ScalarFieldEnvelope(
@@ -229,9 +196,7 @@ class XYTFresnelPropagator:
             make_copy=False,
         )
 
-        laser_out.grid.set_temporal_field(np.moveaxis(laser_loc.Field, 0, -1))
-        laser_out.grid.axes[-1] = laser_loc.t
-        laser_out.grid.hi[-1] = laser_loc.t.max()
-        laser_out.grid.lo[-1] = laser_loc.t.min()
-
-        return laser_out
+        grid_out.set_temporal_field(np.moveaxis(laser_loc.Field, 0, -1))
+        grid_out.axes[-1] = laser_loc.t
+        grid_out.hi[-1] = laser_loc.t.max()
+        grid_out.lo[-1] = laser_loc.t.min()
