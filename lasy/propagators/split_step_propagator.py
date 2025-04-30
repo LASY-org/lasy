@@ -2,15 +2,17 @@ from .propagator import Propagator
 
 
 class SplitStepPropagator(Propagator):
-    def __init__(self, propagators):
-        """
-        Initialize the SplitStepPropagator.
+    """Class that represents a split step propagator.
 
-        Parameters
+    The propagator takes a list of propagator or nonlinear steppers as inputs 
+    and propagates an input grid by iterating through each of these sub-steps.
+
+    Parameters
         ----------
         propagators : list
-            List of propagators to be used in the split-step method.
-        """
+            List of propagators to be used as the sub-steps of the propagation.
+    """
+    def __init__(self, propagators):
         super().__init__()
         self.propagators = propagators
 
