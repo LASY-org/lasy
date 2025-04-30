@@ -38,20 +38,19 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
         omega0 = self.omega0
 
         # Get the spectral field and axes from the input grid
-        spectral_field, spectral_axes = grid.get_spectral_field()
+        spectral_field, spectral_axis = grid.get_spectral_field()
 
         if self.dim == "rt":
             print("Fresnel SFFT propagator in rt")
 
         elif self.dim == "xyt":
             print("Fresnel SFFT propagator in xyt")
-            axes = grid.axes
             x = axes[0]
             y = axes[1]
 
-            Y, X, OM = np.meshgrid(y, x, spectral_axes + omega0)
+            X, Y, OM = np.meshgrid(x, y, spectral_axis + omega0, indexing="ij")
             K = OM / c
-            WAVELENGTH = 2 * np.pi * c / OM
+            WAVELENGTH = 2 * np.pi / K
 
             preFactor = np.exp(1j * K * (X**2 + Y**2) / (2 * distance))
 
@@ -65,7 +64,7 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             )
             k_x, k_y = axes_out
 
-            KY, KX, _ = np.meshgrid(k_y, k_x, spectral_axes)
+            KX, KY, _ = np.meshgrid(k_x, k_y, spectral_axis, indexing="ij")
 
             XF = KX * WAVELENGTH * distance
             YF = KY * WAVELENGTH * distance
@@ -80,12 +79,12 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             # Spatial scale. We need to interpolate them all onto a common grid.
             # for this we select the central frequency
 
-            centFreqIndx = np.argmin(np.abs(spectral_axes))
+            centFreqIndx = np.argmin(np.abs(spectral_axis))
             XF0 = np.repeat(
-                XF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axes), axis=2
+                XF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axis), axis=2
             )
             YF0 = np.repeat(
-                YF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axes), axis=2
+                YF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axis), axis=2
             )
 
 
