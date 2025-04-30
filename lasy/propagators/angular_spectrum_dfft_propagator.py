@@ -7,8 +7,39 @@ from .propagator import Propagator
 
 
 class AngularSpectrumDFFTPropagator(Propagator):
-    """
-    Angular spectrum dual FFT propagator.
+    r"""
+    Class that represents a dual FFT propagator using the angular spectrum method spectrum dual FFT propagator.
+
+    The propagated field is calculated in the following method:
+
+    .. math::
+
+        E_\mathrm{propagated} (x,y,\omega) = 
+        \mathcal{F}_{x,y}\left[\mathcal{F}_{x,y}\left[ E_\mathrm{input}(x,y,\omega) \right] 
+        \times\exp(i\,n\,\Delta z\,\sqrt{k_z^2-k_x^2-k_y^2}) \right]
+
+    where :math:`E_{i} (x,y,\omega)` is the initial/propagated fields complex field envelope 
+    and :math:`\mathcal{F}_{x,y}` is the 2D fourier transform in the transverse (x,y) axes.
+
+    Parameters
+    ----------
+    omega0 : float (in rad/s)
+        The center frequency of the laser field.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    n : float, 1d array of floats or callable, Optional
+        Refractive index of the medium in which to propagate the laser. 
+        Can be either a single value if dispersive effects are ignored, a 1d array 
+        describing the refractive index along the frequency/wavelength axis of the 
+        laser pulse, or a function of the wavelength (in meters).
+        Default value is n=1. to describe propagation in vacuum.
     """
 
     def __init__(self, omega0, dim, n=1.0):
