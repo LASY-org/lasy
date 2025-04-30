@@ -28,6 +28,8 @@ def make_laser():
 
 
 def test_spatial_propagation():
+    """Verify that the waist of Gaussian beam evolves as expected
+    """
     laser = make_laser()
     prop = AngularSpectrumDFFTPropagator(omega0=2 * np.pi * c / 800e-9, n=1.0, dim=laser.dim)
 
@@ -60,6 +62,8 @@ def n_fusedsilica(wavelength):
 
 
 def test_temporal_propagation():
+    """Verify that pulse broadenes as expected during propagation in material
+    """
     laser = make_laser()
     prop = AngularSpectrumDFFTPropagator(omega0=2 * np.pi * c / 800e-9, n=n_fusedsilica, dim=laser.dim)
 
