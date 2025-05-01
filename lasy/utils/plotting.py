@@ -30,6 +30,11 @@ def show_laser(grid, dim, show_intensity, **kw):
 
     **kw : additional arguments to be passed to matplotlib's imshow command
     """
+    if "cmap" in kw.keys():
+        pass
+    else:
+        kw["cmap"] = "Reds"  # Set default colormap
+
     if show_intensity:
         F = epsilon_0 * c / 2 * np.abs(grid.get_temporal_field()) ** 2 / 1e4
         cbar_label = r"I (W/cm$^2$)"
@@ -93,9 +98,7 @@ def show_laser(grid, dim, show_intensity, **kw):
     fig, ax = plt.subplots()
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="5%", pad=0.05)
-    im = ax.imshow(
-        F_plot, extent=extent, cmap="Reds", aspect="auto", origin="lower", **kw
-    )
+    im = ax.imshow(F_plot, extent=extent, aspect="auto", origin="lower", **kw)
     cb = fig.colorbar(im, cax=cax)
     cb.set_label(cbar_label)
     ax.set_xlabel(r"t " + temporal_unit)
