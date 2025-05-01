@@ -64,6 +64,8 @@ class MRTPropagator(Propagator):
         grid_out.hi[-1] = laser_loc.t.max()
         grid_out.lo[-1] = laser_loc.t.min()
 
+        return grid_out
+
 
 class MRTFresnelPropagator(Propagator):
     """
@@ -118,6 +120,8 @@ class MRTFresnelPropagator(Propagator):
         grid_out.hi[-1] = laser_loc.t.max()
         grid_out.lo[-1] = laser_loc.t.min()
 
+        return grid_out
+
 
 class XYTPropagator(Propagator):
     """
@@ -156,6 +160,8 @@ class XYTPropagator(Propagator):
         grid_out.axes[-1] = laser_loc.t
         grid_out.hi[-1] = laser_loc.t.max()
         grid_out.lo[-1] = laser_loc.t.min()
+
+        return grid_out
 
 
 class XYTFresnelPropagator(Propagator):
@@ -201,3 +207,5 @@ class XYTFresnelPropagator(Propagator):
         grid_out.axes[-1] = laser_loc.t
         grid_out.hi[-1] = laser_loc.t.max()
         grid_out.lo[-1] = laser_loc.t.min()
+
+        return grid_out
