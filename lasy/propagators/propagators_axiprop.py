@@ -17,11 +17,14 @@ class MRTPropagator(Propagator):
     Wrapper for PropagatorResampling
     """
 
-    def propagate(self, grid, distance, grid_out=None, verbose=True):
-        containers_in, m_axis = import_from_lasy_grid(grid, self.dim, self.omega0)
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
+
+        self.update(dim, omega0)
+
+        containers_in, m_axis = import_from_lasy_grid(grid_in, self.dim, self.omega0)
 
         if grid_out is None:
-            grid_out = grid
+            grid_out = grid_in
 
         self.props_rt = []
         for im in range(m_axis.size):
@@ -68,8 +71,11 @@ class MRTFresnelPropagator(Propagator):
     Wrapper for PropagatorResamplingFresnel
     """
 
-    def propagate(self, grid, distance, grid_out=None, verbose=True):
-        containers_in, m_axis = import_from_lasy_grid(grid, self.dim, self.omega0)
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
+
+        self.update(dim, omega0)
+
+        containers_in, m_axis = import_from_lasy_grid(grid_in, self.dim, self.omega0)
 
         if grid_out is None:
             grid_out = grid
@@ -119,12 +125,14 @@ class XYTPropagator(Propagator):
     """
     Wrapper for PropagatorFFT2
     """
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
 
-    def propagate(self, grid, distance, grid_out=None, verbose=True):
-        container_in = import_from_lasy_grid(grid, self.dim, self.omega0)
+        self.update(dim, omega0)
+
+        container_in = import_from_lasy_grid(grid_in, self.dim, self.omega0)
 
         if grid_out is None:
-            grid_out = grid
+            grid_out = grid_in
 
         prop_xyt = PropagatorFFT2(
             x_axis=container_in.x,
@@ -157,11 +165,14 @@ class XYTFresnelPropagator(Propagator):
     Wrapper for PropagatorFFT2Fresnel
     """
 
-    def propagate(self, grid, distance, grid_out=None, verbose=True):
-        container_in = import_from_lasy_grid(grid, self.dim, self.omega0)
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
+
+        self.update(dim, omega0)
+
+        container_in = import_from_lasy_grid(grid_in, self.dim, self.omega0)
 
         if grid_out is None:
-            grid_out = grid
+            grid_out = grid_in
 
         x_axis_new = grid_out.axes[0]
         y_axis_new = grid_out.axes[1]

@@ -11,7 +11,7 @@ class Propagator(object):
         self.omega0 = omega0
         return
 
-    def propagate(self, distance, grid_in, dim, omega0):
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None):
         # Update is called only in this step, to reinitialize the propagator
         # if needed.
         self.update(dim, omega0)
