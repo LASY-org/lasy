@@ -34,8 +34,9 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
         distance : float
             The distance to propagate.
         """
+        self.update(dim, omega0)
+
         axes = grid.axes
-        omega0 = self.omega0
 
         # Get the spectral field and axes from the input grid
         spectral_field, spectral_axis = grid.get_spectral_field()
@@ -48,7 +49,7 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             x = axes[0]
             y = axes[1]
 
-            X, Y, OM = np.meshgrid(x, y, spectral_axis + omega0, indexing="ij")
+            X, Y, OM = np.meshgrid(x, y, spectral_axis+self.omega0, indexing="ij")
             K = OM / c
             WAVELENGTH = 2 * np.pi / K
 
@@ -87,12 +88,12 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
                 YF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axis), axis=2
             )
 
-            field_interp = interpolate_complex_field_XY(
-                diffractedField, XF, YF, OM, XF0, YF0
-            )
+            # field_interp = interpolate_complex_field_XY(
+            #     diffractedField, XF, YF, OM, XF0, YF0
+            # )
+            # grid.set_spectral_field(field_interp)
 
-            grid.set_spectral_field(field_interp)
-            # grid.set_spectral_field(diffractedField)
+            grid.set_spectral_field(diffractedField)
             grid.axes[0] = np.unique(XF0)
             grid.axes[1] = np.unique(YF0)
             grid.lo = [np.unique(XF0)[0], np.unique(YF0)[0], grid.lo[-1]]

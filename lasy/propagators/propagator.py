@@ -4,7 +4,6 @@ class Propagator(object):
     """
 
     def __init__(self):
-        self.update()
         return
 
     def update(self, dim=None, omega0=None):
@@ -26,4 +25,5 @@ class Propagator(object):
         """
         Propagate the input grid using the specified method.
         """
+        self.update()
         return
