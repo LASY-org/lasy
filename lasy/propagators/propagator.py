@@ -1,6 +1,3 @@
-from copy import deepcopy
-
-
 class Propagator(object):
     """
     Base class for all propagators.
