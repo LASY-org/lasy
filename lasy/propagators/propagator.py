@@ -6,7 +6,7 @@ class Propagator(object):
     def __init__(self):
         return
 
-    def update(self, dim=None, omega0=None):
+    def update(self, dim, omega0):
         """
         Update the propagator parameters.
 
@@ -21,9 +21,14 @@ class Propagator(object):
         self.omega0 = omega0
         return
 
-    def propagate(self, grid, distance=None, abcd=None):
-        """
-        Propagate the input grid using the specified method.
-        """
-        self.update()
-        return
+    def propagate(self, distance, grid_in, dim, omega0):
+        # Update is called only in this step, to reinitialize the propagator
+        # if needed.
+        self.update(dim, omega0)
+
+        # This function explicitly returns a grid. This would let
+        # laser.propagate have both grids, and potentially do some check there.
+        # Can be rediscussed.
+        grid_out = deepcopy(grid_in)
+
+        return grid_out
