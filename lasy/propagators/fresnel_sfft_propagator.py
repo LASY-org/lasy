@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.constants import c
+from copy import deepcopy
 
 from lasy.utils.fft import fft
 
@@ -22,23 +23,16 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
     def __init__(self):
         super().__init__()
 
-    def propagate(self, distance, grid, dim, omega0):
+    def propagate(self, distance, grid_in, dim, omega0):
         """
         Propagate the input grid using the Fresnel SFFT method.
-
-        Parameters
-        ----------
-        grid : Grid
-            The input grid.
-        distance : float
-            The distance to propagate.
         """
         self.update(dim, omega0)
 
-        axes = grid.axes
+        axes = grid_in.axes
 
         # Get the spectral field and axes from the input grid
-        spectral_field, spectral_axis = grid.get_spectral_field()
+        spectral_field, spectral_axis = grid_in.get_spectral_field()
 
         if self.dim == "rt":
             print("Fresnel SFFT propagator in rt")
@@ -92,8 +86,12 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             # )
             # grid.set_spectral_field(field_interp)
 
-            grid.set_spectral_field(diffractedField)
-            grid.axes[0] = np.unique(XF0)
-            grid.axes[1] = np.unique(YF0)
-            grid.lo = [np.unique(XF0)[0], np.unique(YF0)[0], grid.lo[-1]]
-            grid.hi = [np.unique(XF0)[-1], np.unique(YF0)[-1], grid.hi[-1]]
+            grid_out = deepcopy(grid_in)
+            grid_out.set_spectral_field(diffractedField)
+            grid_out.axes[0] = np.unique(XF0)
+            grid_out.axes[1] = np.unique(YF0)
+            grid_out.lo = [np.unique(XF0)[0], np.unique(YF0)[0], grid_in.lo[-1]]
+            grid_out.hi = [np.unique(XF0)[-1], np.unique(YF0)[-1], grid_in.hi[-1]]
+
+            return grid_out
+

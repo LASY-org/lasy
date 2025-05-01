@@ -256,9 +256,10 @@ class Laser:
         """
         if self.propagator is None:
             raise Exception("No propagator defined. Use apply_propagator() first.")
-        self.propagator.propagate(
+        grid_out = self.propagator.propagate(
             distance, self.grid, self.dim, self.profile.omega0, *kwargs
         )
+        self.grid = grid_out
 
     def write_to_file(
         self,
