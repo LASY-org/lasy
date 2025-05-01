@@ -1,6 +1,7 @@
+from copy import deepcopy
+
 import numpy as np
 from scipy.constants import c
-from copy import deepcopy
 
 from lasy.utils.fft import fft
 
@@ -94,4 +95,3 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             grid_out.hi = [np.unique(XF0)[-1], np.unique(YF0)[-1], grid_in.hi[-1]]
 
             return grid_out
-
