@@ -18,7 +18,6 @@ class MRTPropagator(Propagator):
     """
 
     def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
-
         self.update(dim, omega0)
 
         containers_in, m_axis = import_from_lasy_grid(grid_in, self.dim, self.omega0)
@@ -72,7 +71,6 @@ class MRTFresnelPropagator(Propagator):
     """
 
     def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
-
         self.update(dim, omega0)
 
         containers_in, m_axis = import_from_lasy_grid(grid_in, self.dim, self.omega0)
@@ -125,8 +123,8 @@ class XYTPropagator(Propagator):
     """
     Wrapper for PropagatorFFT2
     """
-    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
 
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
         self.update(dim, omega0)
 
         container_in = import_from_lasy_grid(grid_in, self.dim, self.omega0)
@@ -166,7 +164,6 @@ class XYTFresnelPropagator(Propagator):
     """
 
     def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
-
         self.update(dim, omega0)
 
         container_in = import_from_lasy_grid(grid_in, self.dim, self.omega0)
