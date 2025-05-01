@@ -3,7 +3,7 @@ from copy import deepcopy
 import numpy as np
 from scipy.constants import c
 
-from lasy.utils.fft import fft
+from lasy.utils.fft_wrapper import fft
 
 from .single_fft_propagator import SingleFFTPropagator
 
