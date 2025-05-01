@@ -7,11 +7,9 @@ class Propagator(object):
     """
 
     def __init__(self):
-
         return
 
     def update(self):
-
         return
 
     def propagate(self, distance, grid_in, grid_out=None, abcd=None):
