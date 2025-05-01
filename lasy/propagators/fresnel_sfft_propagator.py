@@ -2,7 +2,6 @@ import numpy as np
 from scipy.constants import c
 
 from lasy.utils.fft import fft
-from lasy.utils.field_interpolator import interpolate_complex_field_XY
 
 from .single_fft_propagator import SingleFFTPropagator
 
@@ -49,7 +48,7 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             x = axes[0]
             y = axes[1]
 
-            X, Y, OM = np.meshgrid(x, y, spectral_axis+self.omega0, indexing="ij")
+            X, Y, OM = np.meshgrid(x, y, spectral_axis + self.omega0, indexing="ij")
             K = OM / c
             WAVELENGTH = 2 * np.pi / K
 
