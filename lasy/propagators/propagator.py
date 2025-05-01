@@ -15,4 +15,4 @@ class Propagator(object):
     def propagate(self, distance, grid_in, grid_out=None, abcd=None):
         self.update()
 
-        return deepcopy(grid_in)
+        return
