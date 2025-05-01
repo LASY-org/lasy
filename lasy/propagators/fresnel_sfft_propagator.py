@@ -22,7 +22,7 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
     def __init__(self):
         super().__init__()
 
-    def propagate(self, grid, distance):
+    def propagate(self, distance, grid, dim, omega0):
         """
         Propagate the input grid using the Fresnel SFFT method.
 
