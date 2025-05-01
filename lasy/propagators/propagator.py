@@ -22,6 +22,6 @@ class Propagator(object):
         # This function explicitly returns a grid. This would let
         # laser.propagate have both grids, and potentially do some check there.
         # Can be rediscussed.
-        grid_out = copy.deepcopy(grid_in)
+        grid_out = deepcopy(grid_in)
 
         return grid_out
