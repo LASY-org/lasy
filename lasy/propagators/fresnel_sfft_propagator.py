@@ -1,8 +1,9 @@
+from copy import deepcopy
+
 import numpy as np
 from scipy.constants import c
 
-from lasy.utils.fft import fft
-from lasy.utils.field_interpolator import interpolate_complex_field_XY
+from lasy.utils.fft_wrapper import fft
 
 from .single_fft_propagator import SingleFFTPropagator
 
@@ -20,26 +21,19 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
 
     """
 
-    def __init__(self,method="nearest"):
+    def __init__(self):
         super().__init__()
-        self.method = method
 
-    def propagate(self, grid, distance):
+    def propagate(self, distance, grid_in, dim, omega0):
         """
         Propagate the input grid using the Fresnel SFFT method.
-
-        Parameters
-        ----------
-        grid : Grid
-            The input grid.
-        distance : float
-            The distance to propagate.
         """
-        axes = grid.axes
-        omega0 = self.omega0
+        self.update(dim, omega0)
+
+        axes = grid_in.axes
 
         # Get the spectral field and axes from the input grid
-        spectral_field, spectral_axis = grid.get_spectral_field()
+        spectral_field, spectral_axis = grid_in.get_spectral_field()
 
         if self.dim == "rt":
             print("Fresnel SFFT propagator in rt")
@@ -49,7 +43,7 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             x = axes[0]
             y = axes[1]
 
-            X, Y, OM = np.meshgrid(x, y, spectral_axis + omega0, indexing="ij")
+            X, Y, OM = np.meshgrid(x, y, spectral_axis + self.omega0, indexing="ij")
             K = OM / c
             WAVELENGTH = 2 * np.pi / K
 
@@ -88,13 +82,16 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
                 YF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axis), axis=2
             )
 
-            field_interp = interpolate_complex_field_XY(
-                diffractedField, XF, YF, OM, XF0, YF0, method=self.method
-            )
+            # field_interp = interpolate_complex_field_XY(
+            #     diffractedField, XF, YF, OM, XF0, YF0
+            # )
+            # grid.set_spectral_field(field_interp)
 
-            grid.set_spectral_field(field_interp)
-            # grid.set_spectral_field(diffractedField)
-            grid.axes[0] = np.unique(XF0)
-            grid.axes[1] = np.unique(YF0)
-            grid.lo = [np.unique(XF0)[0], np.unique(YF0)[0], grid.lo[-1]]
-            grid.hi = [np.unique(XF0)[-1], np.unique(YF0)[-1], grid.hi[-1]]
+            grid_out = deepcopy(grid_in)
+            grid_out.set_spectral_field(diffractedField)
+            grid_out.axes[0] = np.unique(XF0)
+            grid_out.axes[1] = np.unique(YF0)
+            grid_out.lo = [np.unique(XF0)[0], np.unique(YF0)[0], grid_in.lo[-1]]
+            grid_out.hi = [np.unique(XF0)[-1], np.unique(YF0)[-1], grid_in.hi[-1]]
+
+            return grid_out

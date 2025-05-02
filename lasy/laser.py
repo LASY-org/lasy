@@ -239,10 +239,12 @@ class Laser:
         propagator: a :class:`.Propagator` object (optional)
             Represents a propagation method.
         """
-        propagator.update(self.dim, self.profile.omega0)
         self.propagator = propagator
 
-    def propagate(self, distance=None, *kwargs):
+    # I really would like to avoid these kwargs, such that one can change the
+    # propagator without affecting the call to laser.propagate. We'll see if
+    # that's reasonable.
+    def propagate(self, distance, *kwargs):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -252,11 +254,12 @@ class Laser:
             Distance by which the laser pulse should be propagated
 
         """
-        assert self.grid.is_envelope  # The propagator assumes envelope
         if self.propagator is None:
             raise Exception("No propagator defined. Use apply_propagator() first.")
-        else:
-            self.propagator.propagate(self.grid, distance=distance, *kwargs)
+        grid_out = self.propagator.propagate(
+            distance, self.grid, self.dim, self.profile.omega0, *kwargs
+        )
+        self.grid = grid_out
 
     def write_to_file(
         self,
