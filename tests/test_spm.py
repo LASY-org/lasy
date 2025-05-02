@@ -50,7 +50,7 @@ def test_nonlinear_step():
     # iterate over z-steps and calculate the on-axis bandwidth
     for z in z_pos:
         laser = make_laser()
-        NLprop.propagate(distance=z, grid=laser.grid)
+        NLprop.propagate(distance=z, grid_in=laser.grid)
         bandwidth = (
             get_bandwidth(grid=laser.grid, dim=laser.dim, method="on-axis") * 2
         )  # times 2 to convert half-width to full width

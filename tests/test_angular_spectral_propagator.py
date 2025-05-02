@@ -39,7 +39,7 @@ def test_spatial_propagation():
 
     for z in z_pos:
         laser = make_laser()
-        prop.propagate(distance=z, grid=laser.grid)
+        prop.propagate(distance=z, grid_in=laser.grid)
         waist = get_w0(grid=laser.grid, dim=laser.dim)
         waists_propagated.append(waist)
 
@@ -74,7 +74,7 @@ def test_temporal_propagation():
 
     for z in z_pos:
         laser = make_laser()
-        prop.propagate(distance=z, grid=laser.grid)
+        prop.propagate(distance=z, grid_in=laser.grid)
         duration = (
             get_duration(grid=laser.grid, dim=laser.dim) * 2 * np.sqrt(2 * np.log(2))
         )

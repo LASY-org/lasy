@@ -52,13 +52,13 @@ class AngularSpectrumDFFTPropagator(Propagator):
         self.omega0 = omega0
         self.dim = dim
 
-    def propagate(self, distance, grid):
+    def propagate(self, distance, grid_in):
         if self.dim == "rt":
             print("'rt' geometry not yet supported by AngularSpectrumPropagator")
 
         elif self.dim == "xyt":
             # Get the spectral field in the spatial domain
-            field, omega = grid.get_spectral_field()
+            field, omega = grid_in.get_spectral_field()
 
             omega += self.omega0
             kz = omega / c
@@ -67,7 +67,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
             field_kspace, axes_freq = fft(
                 arr_in=field,
                 which="transverse",
-                axes_in=[grid.axes[0], grid.axes[1]],
+                axes_in=[grid_in.axes[0], grid_in.axes[1]],
                 from_domain="frequency",
             )
 
@@ -116,4 +116,4 @@ class AngularSpectrumDFFTPropagator(Propagator):
                 from_domain="real",
             )
 
-            grid.set_spectral_field(field)
+            grid_in.set_spectral_field(field)

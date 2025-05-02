@@ -28,7 +28,7 @@ class NonlinearKerrStep:
         self.n0 = n0
         self.k0 = k0
 
-    def propagate(self, grid, distance):
+    def propagate(self, grid_in, distance):
         """
         Propagate the input grid for nonlinear step.
 
@@ -39,9 +39,9 @@ class NonlinearKerrStep:
         distance : float
             Distance over withh to propagate the field.
         """
-        temporal_field = grid.get_temporal_field()
+        temporal_field = grid_in.get_temporal_field()
         intensity = 0.5 * c * epsilon_0 * abs(temporal_field) ** 2
 
         phase = self.n0 * self.n2 * self.k0 * intensity * distance
 
-        grid.set_temporal_field(temporal_field * np.exp(1j * phase))
+        grid_in.set_temporal_field(temporal_field * np.exp(1j * phase))

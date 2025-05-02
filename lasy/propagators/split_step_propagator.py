@@ -20,13 +20,13 @@ class SplitStepPropagator(Propagator):
         self.propagators = propagators
         self.nsteps = nsteps
 
-    def propagate(self, grid, distance, nsteps=None):
+    def propagate(self, grid_in, distance, nsteps=None):
         """
         Propagate the input grid using a split-step method.
 
         Parameters
         ----------
-        grid : Grid
+        grid_in : Grid
             Input grid to be propagated.
         distance : float
             Distance over withh to propagate the field.
@@ -39,4 +39,4 @@ class SplitStepPropagator(Propagator):
 
         for _ in range(nsteps):
             for prop in self.propagators:
-                prop.propagate(grid=grid, distance=step_distance)
+                prop.propagate(grid_in=grid_in, distance=step_distance)
