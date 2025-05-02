@@ -11,13 +11,16 @@ class SplitStepPropagator(Propagator):
     ----------
         propagators : list
             List of propagators to be used as the sub-steps of the propagation.
+        nsteps : int, optional
+            Number of steps to take during the propagation, by default 1
     """
 
-    def __init__(self, propagators):
+    def __init__(self, propagators, nsteps=1):
         super().__init__()
         self.propagators = propagators
+        self.nsteps = nsteps
 
-    def propagate(self, grid, distance, nsteps=1):
+    def propagate(self, grid, distance, nsteps=None):
         """
         Propagate the input grid using a split-step method.
 
@@ -30,6 +33,8 @@ class SplitStepPropagator(Propagator):
         nsteps : int, optional
             Number of steps to take during the propagation, by default 1
         """
+        nsteps = nsteps if nsteps else self.nsteps 
+
         step_distance = distance / nsteps
 
         for _ in range(nsteps):
