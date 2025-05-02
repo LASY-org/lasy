@@ -54,8 +54,8 @@ class MRTPropagator(Propagator):
                     )
                 )
 
-    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
-        containers_in, self.m_axis = import_from_lasy_grid(grid_in, dim, omega0)
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0):
+        containers_in, self.m_axis = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
 
         if grid_out is None:
             grid_out = deepcopy(grid_in)
@@ -73,7 +73,7 @@ class MRTPropagator(Propagator):
             )
 
             laser_loc = ScalarFieldEnvelope(
-                container_in.k0, t_axis=container_in.t + distance / c
+                container_in.k0, container_in.t + distance / c, nr_boundary
             )
 
             laser_loc.import_field_ft(
@@ -133,8 +133,8 @@ class MRTFresnelPropagator(Propagator):
                     )
                 )
 
-    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
-        containers_in, self.m_axis = import_from_lasy_grid(grid_in, dim, omega0)
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0):
+        containers_in, self.m_axis = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
 
         if grid_out is None:
             print("`grid_out` is required for this propagator")
@@ -153,7 +153,7 @@ class MRTFresnelPropagator(Propagator):
             )
 
             laser_loc = ScalarFieldEnvelope(
-                container_in.k0, t_axis=container_in.t + distance / c
+                container_in.k0, container_in.t + distance / c, nr_boundary
             )
 
             laser_loc.import_field_ft(
@@ -200,8 +200,8 @@ class XYTPropagator(Propagator):
                 verbose=verbose,
             )
 
-    def propagate(self, distance, grid_in, dim, omega0, verbose=True):
-        container_in = import_from_lasy_grid(grid_in, dim, omega0)
+    def propagate(self, distance, grid_in, dim, omega0, verbose=True, nr_boundary=0):
+        container_in = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
         grid_out = deepcopy(grid_in)
 
         self.update(dim, omega0, container_in, verbose)
@@ -211,7 +211,7 @@ class XYTPropagator(Propagator):
         )
 
         laser_loc = ScalarFieldEnvelope(
-            container_in.k0, t_axis=container_in.t + distance / c
+            container_in.k0, container_in.t + distance / c, nr_boundary
         ).import_field_ft(
             Field_ft_new,
             r_axis=(self.prop_xyt.r, self.prop_xyt.x, self.prop_xyt.y),
@@ -264,8 +264,8 @@ class XYTFresnelPropagator(Propagator):
                 verbose=verbose,
             )
 
-    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
-        container_in = import_from_lasy_grid(grid_in, dim, omega0)
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0):
+        container_in = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
 
         if grid_out is None:
             print("`grid_out` is required for this propagator")
@@ -278,7 +278,7 @@ class XYTFresnelPropagator(Propagator):
         )
 
         laser_loc = ScalarFieldEnvelope(
-            container_in.k0, t_axis=container_in.t + distance / c
+            container_in.k0, container_in.t + distance / c, nr_boundary
         ).import_field_ft(
             Field_ft_new,
             r_axis=(self.prop_xyt.r, self.prop_xyt.x, self.prop_xyt.y),

@@ -54,7 +54,7 @@ def check_resampling(laser, new_grid, m=0):
     # Focus down the laser and propagate
     f0 = 2.0  # focal distance in m
     laser.apply_optics(ParabolicMirror(f=f0))
-    laser.propagate(f0, nr_boundary=128, grid=new_grid)  # resample the radial grid
+    laser.propagate(f0, nr_boundary=128, grid_out=new_grid)  # resample the radial grid
 
     # Check that the value is the expected one in the near field
     w0_num = get_w0(laser, m)

@@ -587,7 +587,7 @@ def test_flattened_gaussian_profile():
     OAP = ParabolicMirror(f=focal_length)
     las_nf_cp.apply_optics(OAP)
     las_nf_cp.propagate(
-        focal_length, grid=Grid(dim, lo, hi_ff, npoints, n_azimuthal_modes=1)
+        focal_length, grid_out=Grid(dim, lo, hi_ff, npoints, n_azimuthal_modes=1)
     )
 
     radlineout_nf_cp = (
