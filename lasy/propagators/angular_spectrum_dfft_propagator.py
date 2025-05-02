@@ -34,7 +34,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
         - ``'rt'`` : The laser pulse is represented on a 2D grid:
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    n : float, 1d array of floats or callable, Optional
+    n : int, float, 1d array or callable, Optional
         Refractive index of the medium in which to propagate the laser.
         Can be either a single value if dispersive effects are ignored, a 1d array
         describing the refractive index along the frequency/wavelength axis of the
@@ -44,17 +44,20 @@ class AngularSpectrumDFFTPropagator(Propagator):
 
     def __init__(self, omega0, dim, n=1.0):
         super().__init__()
+
+        assert isinstance(n, (int, float, np.ndarray)) or callable(n)
+        assert dim in ['rt', 'xyt']
+
         self.n = n  # refractive index
         self.omega0 = omega0
         self.dim = dim
 
-    def propagate(self, distance, grid, dim=None):
-        dim = self.dim if not dim else dim
+    def propagate(self, distance, grid):
 
-        if dim == "rt":
+        if self.dim == "rt":
             print("'rt' geometry not yet supported by AngularSpectrumPropagator")
 
-        if dim == "xyt":
+        elif self.dim == "xyt":
             # Get the spectral field in the spatial domain
             field, omega = grid.get_spectral_field()
 
