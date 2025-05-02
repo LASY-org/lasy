@@ -1567,3 +1567,4 @@ def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None
         bandwidth = weighted_std(width_axis, spectral_intensity)
 
     return bandwidth
+ 
