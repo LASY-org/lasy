@@ -1,7 +1,6 @@
-import numpy as np
-from scipy.constants import c
 from copy import deepcopy
 
+import numpy as np
 from axiprop.containers import ScalarFieldEnvelope
 from axiprop.lib import (
     PropagatorFFT2,
@@ -10,6 +9,7 @@ from axiprop.lib import (
     PropagatorResamplingFresnel,
 )
 from axiprop.utils import import_from_lasy_grid
+from scipy.constants import c
 
 from .propagator import Propagator
 
@@ -25,14 +25,14 @@ class MRTPropagator(Propagator):
 
         make_propagator = True
 
-        if hasattr(self, 'props_rt'):
+        if hasattr(self, "props_rt"):
             grid_changed = False
             for im in range(self.m_axis.size):
                 container_in = containers_in[im]
                 prop_rt = self.props_rt[im]
                 try:
-                    assert ( np.allclose( container_in.r, prop_rt.r  ) )
-                    assert ( np.allclose( grid_out.axes[0], prop_rt.r_new  ) )
+                    assert np.allclose(container_in.r, prop_rt.r)
+                    assert np.allclose(grid_out.axes[0], prop_rt.r_new)
                 except:
                     grid_changed = True
 
@@ -101,15 +101,15 @@ class MRTFresnelPropagator(Propagator):
 
         make_propagator = True
 
-        if hasattr(self, 'props_rt'):
+        if hasattr(self, "props_rt"):
             grid_changed = False
             for im in range(self.m_axis.size):
                 container_in = containers_in[im]
                 prop_rt = self.props_rt[im]
                 try:
-                    assert ( distance == self.distance )
-                    assert ( np.allclose( container_in.r, prop_rt.r  ) )
-                    assert ( np.allclose( grid_out.axes[0], prop_rt.r_new  ) )
+                    assert distance == self.distance
+                    assert np.allclose(container_in.r, prop_rt.r)
+                    assert np.allclose(grid_out.axes[0], prop_rt.r_new)
                 except:
                     grid_changed = True
 
@@ -137,7 +137,7 @@ class MRTFresnelPropagator(Propagator):
         containers_in, self.m_axis = import_from_lasy_grid(grid_in, dim, omega0)
 
         if grid_out is None:
-            print ('`grid_out` is required for this propagator')
+            print("`grid_out` is required for this propagator")
             return grid_in
 
         field_3d = np.zeros_like(grid_out.temporal_field)
@@ -181,11 +181,11 @@ class XYTPropagator(Propagator):
 
         make_propagator = True
 
-        if hasattr(self, 'prop_xyt'):
+        if hasattr(self, "prop_xyt"):
             grid_changed = False
             try:
-                assert ( np.allclose( container_in.x, self.prop_xyt.x  ) )
-                assert ( np.allclose( container_in.y, self.prop_xyt.y  ) )
+                assert np.allclose(container_in.x, self.prop_xyt.x)
+                assert np.allclose(container_in.y, self.prop_xyt.y)
             except:
                 grid_changed = True
 
@@ -238,14 +238,14 @@ class XYTFresnelPropagator(Propagator):
 
         make_propagator = True
 
-        if hasattr(self, 'prop_xyt'):
+        if hasattr(self, "prop_xyt"):
             grid_changed = False
             try:
-                assert ( np.allclose( self.distance, distance  ) )
-                assert ( np.allclose( container_in.x, self.prop_xyt.x0  ) )
-                assert ( np.allclose( container_in.y, self.prop_xyt.y0  ) )
-                assert ( np.allclose( grid_out.axes[0], self.prop_xyt.x  ) )
-                assert ( np.allclose( grid_out.axes[1], self.prop_xyt.y  ) )
+                assert np.allclose(self.distance, distance)
+                assert np.allclose(container_in.x, self.prop_xyt.x0)
+                assert np.allclose(container_in.y, self.prop_xyt.y0)
+                assert np.allclose(grid_out.axes[0], self.prop_xyt.x)
+                assert np.allclose(grid_out.axes[1], self.prop_xyt.y)
             except:
                 grid_changed = True
 
@@ -267,9 +267,8 @@ class XYTFresnelPropagator(Propagator):
     def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True):
         container_in = import_from_lasy_grid(grid_in, dim, omega0)
 
-
         if grid_out is None:
-            print ('`grid_out` is required for this propagator')
+            print("`grid_out` is required for this propagator")
             return grid_in
 
         self.update(distance, dim, omega0, container_in, grid_out, verbose)
