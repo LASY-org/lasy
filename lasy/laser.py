@@ -243,7 +243,7 @@ class Laser:
     # I really would like to avoid these kwargs, such that one can change the
     # propagator without affecting the call to laser.propagate. We'll see if
     # that's reasonable.
-    def propagate(self, distance, *kwargs):
+    def propagate(self, distance, **kwargs):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -257,9 +257,9 @@ class Laser:
             of radial grid points. Only works for ``'rt'``.
         """
         if self.propagator is None:
-            raise Exception("No propagator defined. Use apply_propagator() first.")
+            raise Exception("No propagator defined. Use add_propagator() first.")
         grid_out = self.propagator.propagate(
-            distance, self.grid, self.dim, self.profile.omega0, *kwargs
+            distance, self.grid, self.dim, self.profile.omega0, **kwargs
         )
         self.grid = grid_out
 
