@@ -20,8 +20,9 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
 
     """
 
-    def __init__(self):
+    def __init__(self,method="nearest"):
         super().__init__()
+        self.method = method
 
     def propagate(self, grid, distance):
         """
@@ -88,7 +89,7 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
             )
 
             field_interp = interpolate_complex_field_XY(
-                diffractedField, XF, YF, OM, XF0, YF0
+                diffractedField, XF, YF, OM, XF0, YF0, method=self.method
             )
 
             grid.set_spectral_field(field_interp)

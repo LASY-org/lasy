@@ -2,7 +2,7 @@ import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
 
-def interpolate_complex_field_XY(spectral_field, X, Y, OM, X_new, Y_new):
+def interpolate_complex_field_XY(spectral_field, X, Y, OM, X_new, Y_new, method="nearest"):
     """
     Fast interpolation of complex 3D spectral field from varying regular XY grids to new regular XY grids.
 
@@ -25,6 +25,10 @@ def interpolate_complex_field_XY(spectral_field, X, Y, OM, X_new, Y_new):
 
     X_new, Y_new : 3darray of real numbers
         The regular output spatial grids per frequency
+    
+    method : str, optional
+        The interpolation method to use. Default is 'nearest'.
+        Other options include 'linear', 'cubic', etc. See scipy.interpolate.RegularGridInterpolator for details.
 
     Returns
     -------
@@ -46,10 +50,19 @@ def interpolate_complex_field_XY(spectral_field, X, Y, OM, X_new, Y_new):
             raise ValueError(f"X and Y slice {k} are not regular grids.")
 
         # Create fast interpolators
-        interp = RegularGridInterpolator(
+        interpReal = RegularGridInterpolator(
             (xk, yk),
-            spectral_field[:, :, k],
-            method="nearest",
+            np.real(spectral_field[:, :, k]),
+            method=method,
+            bounds_error=False,
+            fill_value=0,
+        )
+
+        # Create fast interpolators
+        interpImag = RegularGridInterpolator(
+            (xk, yk),
+            np.imag(spectral_field[:, :, k]),
+            method=method,
             bounds_error=False,
             fill_value=0,
         )
@@ -59,6 +72,9 @@ def interpolate_complex_field_XY(spectral_field, X, Y, OM, X_new, Y_new):
             [X_new[:, :, k].ravel(), Y_new[:, :, k].ravel()], axis=-1
         )
 
-        field_interp[:, :, k] = interp(target_points).reshape(Nx_new, Ny_new)
+        #field_interp[:, :, k] = interp(target_points).reshape(Nx_new, Ny_new)
+        field_interp[:, :, k] = (
+            interpReal(target_points) + 1j * interpImag(target_points)
+        ).reshape(Nx_new, Ny_new)
 
     return field_interp
