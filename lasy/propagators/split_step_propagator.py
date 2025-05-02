@@ -33,7 +33,7 @@ class SplitStepPropagator(Propagator):
         nsteps : int, optional
             Number of steps to take during the propagation, by default 1
         """
-        nsteps = nsteps if nsteps else self.nsteps 
+        nsteps = nsteps if nsteps else self.nsteps
 
         step_distance = distance / nsteps
 

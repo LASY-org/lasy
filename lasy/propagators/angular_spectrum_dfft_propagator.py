@@ -46,14 +46,13 @@ class AngularSpectrumDFFTPropagator(Propagator):
         super().__init__()
 
         assert isinstance(n, (int, float, np.ndarray)) or callable(n)
-        assert dim in ['rt', 'xyt']
+        assert dim in ["rt", "xyt"]
 
         self.n = n  # refractive index
         self.omega0 = omega0
         self.dim = dim
 
     def propagate(self, distance, grid):
-
         if self.dim == "rt":
             print("'rt' geometry not yet supported by AngularSpectrumPropagator")
 
