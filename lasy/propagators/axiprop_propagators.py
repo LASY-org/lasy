@@ -54,8 +54,12 @@ class MRTPropagator(Propagator):
                     )
                 )
 
-    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0):
-        containers_in, self.m_axis = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
+    def propagate(
+        self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
+    ):
+        containers_in, self.m_axis = import_from_lasy_grid(
+            grid_in, dim, omega0, nr_boundary
+        )
 
         if grid_out is None:
             grid_out = deepcopy(grid_in)
@@ -133,8 +137,12 @@ class MRTFresnelPropagator(Propagator):
                     )
                 )
 
-    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0):
-        containers_in, self.m_axis = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
+    def propagate(
+        self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
+    ):
+        containers_in, self.m_axis = import_from_lasy_grid(
+            grid_in, dim, omega0, nr_boundary
+        )
 
         if grid_out is None:
             print("`grid_out` is required for this propagator")
@@ -264,7 +272,9 @@ class XYTFresnelPropagator(Propagator):
                 verbose=verbose,
             )
 
-    def propagate(self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0):
+    def propagate(
+        self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
+    ):
         container_in = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
 
         if grid_out is None:

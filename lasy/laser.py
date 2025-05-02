@@ -256,14 +256,16 @@ class Laser:
             Resample the field onto a new grid of different radial size and/or different number
             of radial grid points. Only works for ``'rt'``.
         """
-        if not hasattr(self, 'propagator'):
-            #raise Exception("No propagator defined. Use add_propagator() first.")
-            if self.dim == 'rt':
+        if not hasattr(self, "propagator"):
+            # raise Exception("No propagator defined. Use add_propagator() first.")
+            if self.dim == "rt":
                 from lasy.propagators import MRTPropagator
+
                 prop_MRT = MRTPropagator()
                 self.add_propagator(prop_MRT)
-            elif self.dim == 'xyt':
+            elif self.dim == "xyt":
                 from lasy.propagators import XYTPropagator
+
                 prop_XYT = XYTPropagator()
                 self.add_propagator(prop_XYT)
 
