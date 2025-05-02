@@ -59,7 +59,6 @@ class Propagator(object):
         grid_out: :class:`lasy.utils.Grid` (optional)
             Grid lasy object where the output field will be written.
         """
-
         # Update is called only in this step, to reinitialize the propagator
         # if needed.
         self.update(dim, omega0)
