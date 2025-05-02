@@ -1401,7 +1401,7 @@ def get_dispersion(grid, dim, omega0, order, omega_eval=None, method="sum"):
         \Phi^{(n)} = \frac{\partial^n \phi(\omega)}{\partial \omega^n}
 
     where n is the order to which the disperison is calculated (in s^n/rad).
-        
+
     E.g. order=1, calculates the group delay (GD), order=2 calculates group delay dispersion (GDD) and order=3 calculates the third-order dispersion (TOD).
 
     Parameters
