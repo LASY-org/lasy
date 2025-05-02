@@ -33,7 +33,7 @@ class MRTPropagator(Propagator):
                 try:
                     assert np.allclose(container_in.r, prop_rt.r)
                     assert np.allclose(grid_out.axes[0], prop_rt.r_new)
-                except:
+                except AssertionError:
                     grid_changed = True
 
             if not grid_changed:
@@ -114,7 +114,7 @@ class MRTFresnelPropagator(Propagator):
                     assert distance == self.distance
                     assert np.allclose(container_in.r, prop_rt.r)
                     assert np.allclose(grid_out.axes[0], prop_rt.r_new)
-                except:
+                except AssertionError:
                     grid_changed = True
 
             if not grid_changed:
@@ -194,7 +194,7 @@ class XYTPropagator(Propagator):
             try:
                 assert np.allclose(container_in.x, self.prop_xyt.x)
                 assert np.allclose(container_in.y, self.prop_xyt.y)
-            except:
+            except AssertionError:
                 grid_changed = True
 
             if not grid_changed:
@@ -254,7 +254,7 @@ class XYTFresnelPropagator(Propagator):
                 assert np.allclose(container_in.y, self.prop_xyt.y0)
                 assert np.allclose(grid_out.axes[0], self.prop_xyt.x)
                 assert np.allclose(grid_out.axes[1], self.prop_xyt.y)
-            except:
+            except AssertionError:
                 grid_changed = True
 
             if not grid_changed:
