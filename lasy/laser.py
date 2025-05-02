@@ -256,7 +256,7 @@ class Laser:
             Resample the field onto a new grid of different radial size and/or different number
             of radial grid points. Only works for ``'rt'``.
         """
-        if not hasattr(self, 'propagator'):
+        if not hasattr(self, "propagator"):
             raise Exception("No propagator defined. Use add_propagator() first.")
 
         grid_out = self.propagator.propagate(
