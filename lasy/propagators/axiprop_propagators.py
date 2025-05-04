@@ -15,7 +15,6 @@ from .propagator import Propagator
 
 
 class AxipropPropagator(Propagator):
-
     def update(self, dim, omega0, containers_in, grid_out=None, verbose=False):
         """
         Initialize or update the propagator if needed.
@@ -266,9 +265,7 @@ class AxipropPropagator(Propagator):
 
         return field_3d, laser_loc.t
 
-    def _propagate_xyt(
-        self, distance, grid_in, omega0, verbose=True, nr_boundary=0
-    ):
+    def _propagate_xyt(self, distance, grid_in, omega0, verbose=True, nr_boundary=0):
         """
         Propagate laser pulse in z direction by a given distance.
 
@@ -319,10 +316,7 @@ class AxipropPropagator(Propagator):
 
 
 class AxipropFresnelPropagator(Propagator):
-
-    def update(
-        self, distance, dim, omega0, containers_in, grid_out, verbose=False
-    ):
+    def update(self, distance, dim, omega0, containers_in, grid_out, verbose=False):
         """
         Initialize or update the propagator if needed.
 
