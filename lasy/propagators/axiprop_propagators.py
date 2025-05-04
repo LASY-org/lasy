@@ -20,7 +20,6 @@ class AxipropPropagator(Propagator):
     """
 
     def update(self, dim, omega0, containers_in, grid_out=None, verbose=False):
-
         self.dim = dim
         self.omega0 = omega0
         self.make_propagator = True
@@ -31,7 +30,6 @@ class AxipropPropagator(Propagator):
             self._update_xyt(dim, omega0, containers_in, verbose)
 
     def _update_mrt(self, dim, omega0, containers_in, grid_out, verbose):
-
         if hasattr(self, "props_rt"):
             grid_changed = False
             for im in range(self.m_axis.size):
@@ -62,7 +60,6 @@ class AxipropPropagator(Propagator):
                 )
 
     def _update_xyt(self, dim, omega0, container_in, verbose):
-
         if hasattr(self, "prop_xyt"):
             grid_changed = False
             try:
@@ -86,14 +83,20 @@ class AxipropPropagator(Propagator):
         self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
     ):
         if dim == "xyt":
-            assert grid_out is None, "grid_out not yet supported for xyt, please use None"
+            assert grid_out is None, (
+                "grid_out not yet supported for xyt, please use None"
+            )
         if grid_out is None:
             grid_out = deepcopy(grid_in)
 
         if dim == "rt":
-            field, t_axis = self._propagate_mrt(distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary)
+            field, t_axis = self._propagate_mrt(
+                distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary
+            )
         else:
-            field, t_axis = self._propagate_xyt(distance, grid_in, dim, omega0, verbose, nr_boundary)
+            field, t_axis = self._propagate_xyt(
+                distance, grid_in, dim, omega0, verbose, nr_boundary
+            )
 
         grid_out.set_temporal_field(field)
         grid_out.axes[-1] = t_axis
@@ -103,7 +106,7 @@ class AxipropPropagator(Propagator):
         return grid_out
 
     def _propagate_mrt(
-            self, distance, grid_in, dim, omega0, grid_out, verbose=True, nr_boundary=0
+        self, distance, grid_in, dim, omega0, grid_out, verbose=True, nr_boundary=0
     ):
         containers_in, self.m_axis = import_from_lasy_grid(
             grid_in, dim, omega0, nr_boundary
@@ -133,7 +136,9 @@ class AxipropPropagator(Propagator):
 
         return field_3d, laser_loc.t
 
-    def _propagate_xyt(self, distance, grid_in, dim, omega0, verbose=True, nr_boundary=0):
+    def _propagate_xyt(
+        self, distance, grid_in, dim, omega0, verbose=True, nr_boundary=0
+    ):
         container_in = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
 
         self.update(dim, omega0, container_in, verbose)
@@ -155,9 +160,9 @@ class AxipropPropagator(Propagator):
 
 
 class AxipropFresnelPropagator(Propagator):
-
-    def update(self, distance, dim, omega0, containers_in, grid_out=None, verbose=False):
-
+    def update(
+        self, distance, dim, omega0, containers_in, grid_out=None, verbose=False
+    ):
         self.dim = dim
         self.omega0 = omega0
         self.make_propagator = True
@@ -168,7 +173,6 @@ class AxipropFresnelPropagator(Propagator):
             self._update_xyt(distance, dim, omega0, containers_in, verbose)
 
     def _update_mrt(self, distance, dim, omega0, containers_in, grid_out, verbose):
-
         if hasattr(self, "props_rt"):
             grid_changed = False
             for im in range(self.m_axis.size):
@@ -236,9 +240,13 @@ class AxipropFresnelPropagator(Propagator):
             return grid_in
 
         if dim == "rt":
-            self._propagate_mrt(distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary)
+            self._propagate_mrt(
+                distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary
+            )
         else:
-            self._propagate_xyt(distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary)
+            self._propagate_xyt(
+                distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary
+            )
 
         grid_out.set_temporal_field()
         grid_out.axes[-1] = laser_loc.t
