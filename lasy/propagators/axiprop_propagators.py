@@ -170,7 +170,7 @@ class AxipropFresnelPropagator(Propagator):
         if self.dim == "rt":
             self._update_mrt(distance, dim, omega0, containers_in, grid_out, verbose)
         else:
-            self._update_xyt(distance, dim, omega0, containers_in, verbose)
+            self._update_xyt(distance, dim, omega0, containers_in, grid_out, verbose)
 
     def _update_mrt(self, distance, dim, omega0, containers_in, grid_out, verbose):
         if hasattr(self, "props_rt"):
