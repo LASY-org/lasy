@@ -15,8 +15,14 @@ from .propagator import Propagator
 
 
 class AxipropPropagator(Propagator):
+    """
+    Axiprop's non-paraxial propagator.
+
+    This class wraps around Axiprop's PropagatorFFT2 and PropagatorResampling, for 3D cartesian and 2D cylindrical, respectively.
+    """
+
     def update(self, dim, omega0, containers_in, grid_out=None, verbose=False):
-        """
+        r"""
         Initialize or update the propagator if needed.
 
         Parameters
@@ -51,7 +57,7 @@ class AxipropPropagator(Propagator):
             self._update_xyt(omega0, containers_in, verbose)
 
     def _update_mrt(self, omega0, containers_in, grid_out, verbose):
-        """
+        r"""
         Initialize or update the propagator if needed.
 
         Parameters
@@ -99,7 +105,7 @@ class AxipropPropagator(Propagator):
                 )
 
     def _update_xyt(self, omega0, container_in, verbose):
-        """
+        r"""
         Initialize or update the propagator if needed.
 
         Parameters
@@ -140,7 +146,7 @@ class AxipropPropagator(Propagator):
     def propagate(
         self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
     ):
-        """
+        r"""
         Propagate laser pulse in z direction by a given distance.
 
         Currently, the propagation is assumed to take place in vacuum.
@@ -203,7 +209,7 @@ class AxipropPropagator(Propagator):
     def _propagate_mrt(
         self, distance, grid_in, omega0, grid_out, verbose=True, nr_boundary=0
     ):
-        """
+        r"""
         Propagate laser pulse in z direction by a given distance.
 
         Currently, the propagation is assumed to take place in vacuum.
@@ -266,7 +272,7 @@ class AxipropPropagator(Propagator):
         return field_3d, laser_loc.t
 
     def _propagate_xyt(self, distance, grid_in, omega0, verbose=True, nr_boundary=0):
-        """
+        r"""
         Propagate laser pulse in z direction by a given distance.
 
         Currently, the propagation is assumed to take place in vacuum.
@@ -316,8 +322,14 @@ class AxipropPropagator(Propagator):
 
 
 class AxipropFresnelPropagator(Propagator):
+    """
+    Axiprop's paraxial Fresnel propagator.
+
+    This class wraps around Axiprop's PropagatorFFT2Fresnel and PropagatorResamplingFresnel, for 3D cartesian and 2D cylindrical, respectively.
+    """
+
     def update(self, distance, dim, omega0, containers_in, grid_out, verbose=False):
-        """
+        r"""
         Initialize or update the propagator if needed.
 
         Parameters
@@ -353,7 +365,7 @@ class AxipropFresnelPropagator(Propagator):
             self._update_xyt(distance, omega0, containers_in, grid_out, verbose)
 
     def _update_mrt(self, distance, omega0, containers_in, grid_out, verbose):
-        """
+        r"""
         Initialize or update the propagator if needed.
 
         Parameters
@@ -407,7 +419,7 @@ class AxipropFresnelPropagator(Propagator):
                 )
 
     def _update_xyt(self, distance, omega0, container_in, grid_out, verbose):
-        """
+        r"""
         Initialize or update the propagator if needed.
 
         Parameters
@@ -457,7 +469,7 @@ class AxipropFresnelPropagator(Propagator):
     def propagate(
         self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
     ):
-        """
+        r"""
         Propagate laser pulse in z direction by a given distance.
 
         Currently, the propagation is assumed to take place in vacuum.
@@ -517,7 +529,7 @@ class AxipropFresnelPropagator(Propagator):
     def _propagate_mrt(
         self, distance, grid_in, omega0, grid_out, verbose=True, nr_boundary=0
     ):
-        """
+        r"""
         Propagate laser pulse in z direction by a given distance.
 
         Currently, the propagation is assumed to take place in vacuum.
@@ -582,7 +594,7 @@ class AxipropFresnelPropagator(Propagator):
     def _propagate_xyt(
         self, distance, grid_in, omega0, grid_out, verbose=True, nr_boundary=0
     ):
-        """
+        r"""
         Propagate laser pulse in z direction by a given distance.
 
         Currently, the propagation is assumed to take place in vacuum.
