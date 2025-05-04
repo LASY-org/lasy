@@ -240,18 +240,18 @@ class AxipropFresnelPropagator(Propagator):
             return grid_in
 
         if dim == "rt":
-            self._propagate_mrt(
+            field, t_axis = self._propagate_mrt(
                 distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary
             )
         else:
-            self._propagate_xyt(
+            field, t_axis = self._propagate_xyt(
                 distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary
             )
 
-        grid_out.set_temporal_field()
-        grid_out.axes[-1] = laser_loc.t
-        grid_out.hi[-1] = laser_loc.t.max()
-        grid_out.lo[-1] = laser_loc.t.min()
+        grid_out.set_temporal_field(field)
+        grid_out.axes[-1] = t_axis
+        grid_out.hi[-1] = t_axis.max()
+        grid_out.lo[-1] = t_axis.min()
 
         return grid_out
 
