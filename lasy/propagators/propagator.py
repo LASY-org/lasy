@@ -4,6 +4,8 @@ from copy import deepcopy
 class Propagator(object):
     """
     Base class for all propagators.
+
+    A propagator advances the laser pulse in the z direction by some distance.
     """
 
     def __init__(self):
@@ -11,22 +13,18 @@ class Propagator(object):
 
     def update(self, dim, omega0):
         """
-        Create the propagator or check consistancy if already exists
+        Initialize or update the propagator if needed.
 
         Parameters
         ----------
         dim : string
             Dimensionality of the array. Options are:
-
-            - ``'xyt'``: The laser pulse is represented on a 3D grid:
-                        Cartesian (x,y) transversely, and temporal (t) longitudinally.
-            - ``'rt'`` : The laser pulse is represented on a 2D grid:
-                        Cylindrical (r) transversely, and temporal (t) longitudinally.
+            - ``'xyt'``: The laser pulse is represented on a 3D Cartesian grid.
+            - ``'rt'`` : The laser pulse is represented on a 2D cylindrical grid.
 
         omega0 : float (in s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
-
         """
         self.dim = dim
         self.omega0 = omega0
@@ -34,7 +32,7 @@ class Propagator(object):
 
     def propagate(self, distance, grid_in, dim, omega0, grid_out=None):
         """
-        Method to propagate field from the grid.
+        Propagate field in the grid along axis z, for a certain distance.
 
         Parameters
         ----------
@@ -42,17 +40,15 @@ class Propagator(object):
             Distance over which the field will be propagated.
 
         grid_in: :class:`lasy.utils.Grid`
-            Grid lasy object that contanins the input field.
+            Grid lasy object that contains the input field.
 
         dim : string
             Dimensionality of the array. Options are:
 
-            - ``'xyt'``: The laser pulse is represented on a 3D grid:
-                        Cartesian (x,y) transversely, and temporal (t) longitudinally.
-            - ``'rt'`` : The laser pulse is represented on a 2D grid:
-                        Cylindrical (r) transversely, and temporal (t) longitudinally.
+            - ``'xyt'``: The laser pulse is represented on a 3D Cartesian grid.
+            - ``'rt'`` : The laser pulse is represented on a 2D cylindrical grid.
 
-        omega0 : float (in s^-1)
+        omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
