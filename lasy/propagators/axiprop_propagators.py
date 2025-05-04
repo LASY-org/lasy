@@ -14,16 +14,23 @@ from scipy.constants import c
 from .propagator import Propagator
 
 
-class MRTPropagator(Propagator):
+class AxipropPropagator(Propagator):
     """
     Wrapper for PropagatorResampling
     """
 
-    def update(self, dim, omega0, containers_in, grid_out, verbose):
+    def update(self, dim, omega0, containers_in, grid_out=None, verbose=False):
+
         self.dim = dim
         self.omega0 = omega0
+        self.make_propagator = True
 
-        make_propagator = True
+        if self.dim == "rt":
+            self._update_mrt(dim, omega0, containers_in, grid_out, verbose)
+        else:
+            self._update_xyt(dim, omega0, containers_in, verbose)
+
+    def _update_mrt(self, dim, omega0, containers_in, grid_out, verbose):
 
         if hasattr(self, "props_rt"):
             grid_changed = False
@@ -37,9 +44,9 @@ class MRTPropagator(Propagator):
                     grid_changed = True
 
             if not grid_changed:
-                make_propagator = False
+                self.make_propagator = False
 
-        if make_propagator:
+        if self.make_propagator:
             self.props_rt = []
             for im in range(self.m_axis.size):
                 m = self.m_axis[im]
@@ -54,15 +61,53 @@ class MRTPropagator(Propagator):
                     )
                 )
 
+    def _update_xyt(self, dim, omega0, container_in, verbose):
+
+        if hasattr(self, "prop_xyt"):
+            grid_changed = False
+            try:
+                assert np.allclose(container_in.x, self.prop_xyt.x)
+                assert np.allclose(container_in.y, self.prop_xyt.y)
+            except AssertionError:
+                grid_changed = True
+
+            if not grid_changed:
+                self.make_propagator = False
+
+        if self.make_propagator:
+            self.prop_xyt = PropagatorFFT2(
+                x_axis=container_in.x,
+                y_axis=container_in.y,
+                kz_axis=container_in.k_freq,
+                verbose=verbose,
+            )
+
     def propagate(
         self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
+    ):
+        if dim == "xyt":
+            assert grid_out is None, "grid_out not yet supported for xyt, please use None"
+        if grid_out is None:
+            grid_out = deepcopy(grid_in)
+
+        if dim == "rt":
+            field, t_axis = self._propagate_mrt(distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary)
+        else:
+            field, t_axis = self._propagate_xyt(distance, grid_in, dim, omega0, verbose, nr_boundary)
+
+        grid_out.set_temporal_field(field)
+        grid_out.axes[-1] = t_axis
+        grid_out.hi[-1] = t_axis.max()
+        grid_out.lo[-1] = t_axis.min()
+
+        return grid_out
+
+    def _propagate_mrt(
+            self, distance, grid_in, dim, omega0, grid_out, verbose=True, nr_boundary=0
     ):
         containers_in, self.m_axis = import_from_lasy_grid(
             grid_in, dim, omega0, nr_boundary
         )
-
-        if grid_out is None:
-            grid_out = deepcopy(grid_in)
 
         field_3d = np.zeros_like(grid_out.temporal_field)
 
@@ -86,24 +131,43 @@ class MRTPropagator(Propagator):
 
             field_3d[im] = laser_loc.Field.T
 
-        grid_out.set_temporal_field(field_3d)
-        grid_out.axes[-1] = laser_loc.t
-        grid_out.hi[-1] = laser_loc.t.max()
-        grid_out.lo[-1] = laser_loc.t.min()
+        return field_3d, laser_loc.t
 
-        return grid_out
+    def _propagate_xyt(self, distance, grid_in, dim, omega0, verbose=True, nr_boundary=0):
+        container_in = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
+
+        self.update(dim, omega0, container_in, verbose)
+
+        Field_ft_new = self.prop_xyt.step(
+            container_in.Field_ft, distance, overwrite=False, show_progress=verbose
+        )
+
+        laser_loc = ScalarFieldEnvelope(
+            container_in.k0, container_in.t + distance / c, nr_boundary
+        ).import_field_ft(
+            Field_ft_new,
+            r_axis=(self.prop_xyt.r, self.prop_xyt.x, self.prop_xyt.y),
+            transform=True,
+            make_copy=False,
+        )
+
+        return np.moveaxis(laser_loc.Field, 0, -1), laser_loc.t
 
 
-class MRTFresnelPropagator(Propagator):
-    """
-    Wrapper for PropagatorResamplingFresnel
-    """
+class AxipropFresnelPropagator(Propagator):
 
-    def update(self, distance, dim, omega0, containers_in, grid_out, verbose):
+    def update(self, distance, dim, omega0, containers_in, grid_out=None, verbose=False):
+
         self.dim = dim
         self.omega0 = omega0
+        self.make_propagator = True
 
-        make_propagator = True
+        if self.dim == "rt":
+            self._update_mrt(distance, dim, omega0, containers_in, grid_out, verbose)
+        else:
+            self._update_xyt(distance, dim, omega0, containers_in, verbose)
+
+    def _update_mrt(self, distance, dim, omega0, containers_in, grid_out, verbose):
 
         if hasattr(self, "props_rt"):
             grid_changed = False
@@ -118,9 +182,9 @@ class MRTFresnelPropagator(Propagator):
                     grid_changed = True
 
             if not grid_changed:
-                make_propagator = False
+                self.make_propagator = False
 
-        if make_propagator:
+        if self.make_propagator:
             self.props_rt = []
             self.distance = distance
             for im in range(self.m_axis.size):
@@ -137,16 +201,58 @@ class MRTFresnelPropagator(Propagator):
                     )
                 )
 
+    def _update_xyt(self, distance, dim, omega0, container_in, grid_out, verbose):
+        if hasattr(self, "prop_xyt"):
+            grid_changed = False
+            try:
+                assert np.allclose(self.distance, distance)
+                assert np.allclose(container_in.x, self.prop_xyt.x0)
+                assert np.allclose(container_in.y, self.prop_xyt.y0)
+                assert np.allclose(grid_out.axes[0], self.prop_xyt.x)
+                assert np.allclose(grid_out.axes[1], self.prop_xyt.y)
+            except AssertionError:
+                grid_changed = True
+
+            if not grid_changed:
+                self.make_propagator = False
+
+        if self.make_propagator:
+            self.distance = distance
+            self.prop_xyt = PropagatorFFT2Fresnel(
+                dz=distance,
+                x_axis=container_in.x,
+                y_axis=container_in.y,
+                x_axis_new=grid_out.axes[0],
+                y_axis_new=grid_out.axes[1],
+                kz_axis=container_in.k_freq,
+                verbose=verbose,
+            )
+
     def propagate(
+        self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
+    ):
+        if grid_out is None:
+            print("`grid_out` is required for this propagator")
+            return grid_in
+
+        if dim == "rt":
+            self._propagate_mrt(distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary)
+        else:
+            self._propagate_xyt(distance, grid_in, dim, omega0, grid_out, verbose, nr_boundary)
+
+        grid_out.set_temporal_field()
+        grid_out.axes[-1] = laser_loc.t
+        grid_out.hi[-1] = laser_loc.t.max()
+        grid_out.lo[-1] = laser_loc.t.min()
+
+        return grid_out
+
+    def _propagate_mrt(
         self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
     ):
         containers_in, self.m_axis = import_from_lasy_grid(
             grid_in, dim, omega0, nr_boundary
         )
-
-        if grid_out is None:
-            print("`grid_out` is required for this propagator")
-            return grid_in
 
         field_3d = np.zeros_like(grid_out.temporal_field)
 
@@ -170,116 +276,12 @@ class MRTFresnelPropagator(Propagator):
 
             field_3d[im] = laser_loc.Field.T
 
-        grid_out.set_temporal_field(field_3d)
-        grid_out.axes[-1] = laser_loc.t
-        grid_out.hi[-1] = laser_loc.t.max()
-        grid_out.lo[-1] = laser_loc.t.min()
+        return field_3d, laser_loc.t
 
-        return grid_out
-
-
-class XYTPropagator(Propagator):
-    """
-    Wrapper for PropagatorFFT2
-    """
-
-    def update(self, dim, omega0, container_in, verbose):
-        self.dim = dim
-        self.omega0 = omega0
-
-        make_propagator = True
-
-        if hasattr(self, "prop_xyt"):
-            grid_changed = False
-            try:
-                assert np.allclose(container_in.x, self.prop_xyt.x)
-                assert np.allclose(container_in.y, self.prop_xyt.y)
-            except AssertionError:
-                grid_changed = True
-
-            if not grid_changed:
-                make_propagator = False
-
-        if make_propagator:
-            self.prop_xyt = PropagatorFFT2(
-                x_axis=container_in.x,
-                y_axis=container_in.y,
-                kz_axis=container_in.k_freq,
-                verbose=verbose,
-            )
-
-    def propagate(self, distance, grid_in, dim, omega0, verbose=True, nr_boundary=0):
-        container_in = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
-        grid_out = deepcopy(grid_in)
-
-        self.update(dim, omega0, container_in, verbose)
-
-        Field_ft_new = self.prop_xyt.step(
-            container_in.Field_ft, distance, overwrite=False, show_progress=verbose
-        )
-
-        laser_loc = ScalarFieldEnvelope(
-            container_in.k0, container_in.t + distance / c, nr_boundary
-        ).import_field_ft(
-            Field_ft_new,
-            r_axis=(self.prop_xyt.r, self.prop_xyt.x, self.prop_xyt.y),
-            transform=True,
-            make_copy=False,
-        )
-
-        grid_out.set_temporal_field(np.moveaxis(laser_loc.Field, 0, -1))
-        grid_out.axes[-1] = laser_loc.t
-        grid_out.hi[-1] = laser_loc.t.max()
-        grid_out.lo[-1] = laser_loc.t.min()
-
-        return grid_out
-
-
-class XYTFresnelPropagator(Propagator):
-    """
-    Wrapper for PropagatorFFT2Fresnel
-    """
-
-    def update(self, distance, dim, omega0, container_in, grid_out, verbose):
-        self.dim = dim
-        self.omega0 = omega0
-
-        make_propagator = True
-
-        if hasattr(self, "prop_xyt"):
-            grid_changed = False
-            try:
-                assert np.allclose(self.distance, distance)
-                assert np.allclose(container_in.x, self.prop_xyt.x0)
-                assert np.allclose(container_in.y, self.prop_xyt.y0)
-                assert np.allclose(grid_out.axes[0], self.prop_xyt.x)
-                assert np.allclose(grid_out.axes[1], self.prop_xyt.y)
-            except AssertionError:
-                grid_changed = True
-
-            if not grid_changed:
-                make_propagator = False
-
-        if make_propagator:
-            self.distance = distance
-            self.prop_xyt = PropagatorFFT2Fresnel(
-                dz=distance,
-                x_axis=container_in.x,
-                y_axis=container_in.y,
-                x_axis_new=grid_out.axes[0],
-                y_axis_new=grid_out.axes[1],
-                kz_axis=container_in.k_freq,
-                verbose=verbose,
-            )
-
-    def propagate(
+    def _propagate_xyt(
         self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
     ):
         container_in = import_from_lasy_grid(grid_in, dim, omega0, nr_boundary)
-
-        if grid_out is None:
-            print("`grid_out` is required for this propagator")
-            return grid_in
 
         self.update(distance, dim, omega0, container_in, grid_out, verbose)
 
@@ -296,9 +298,4 @@ class XYTFresnelPropagator(Propagator):
             make_copy=False,
         )
 
-        grid_out.set_temporal_field(np.moveaxis(laser_loc.Field, 0, -1))
-        grid_out.axes[-1] = laser_loc.t
-        grid_out.hi[-1] = laser_loc.t.max()
-        grid_out.lo[-1] = laser_loc.t.min()
-
-        return grid_out
+        return np.moveaxis(laser_loc.Field, 0, -1), laser_loc.t

@@ -257,18 +257,12 @@ class Laser:
             of radial grid points. Only works for ``'rt'``.
         """
         if not hasattr(self, "propagator"):
-            # raise Exception("No propagator defined. Use add_propagator() first.")
-            if self.dim == "rt":
-                from lasy.propagators import MRTPropagator
 
-                prop_MRT = MRTPropagator()
-                self.add_propagator(prop_MRT)
-            elif self.dim == "xyt":
-                from lasy.propagators import XYTPropagator
+            from lasy.propagators import AxipropPropagator
 
-                prop_XYT = XYTPropagator()
-                self.add_propagator(prop_XYT)
-
+            propagator = AxipropPropagator()
+            self.add_propagator(propagator)
+            
         grid_out = self.propagator.propagate(
             distance, self.grid, self.dim, self.profile.omega0, **kwargs
         )
