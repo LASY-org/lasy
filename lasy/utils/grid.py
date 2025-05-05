@@ -56,7 +56,7 @@ class Grid:
         is_envelope=True,
         is_cw=False,
         is_plane_wave=False,
-        position=0.,
+        position=0.0,
     ):
         # Metadata
         ndims = 2 if dim == "rt" else 3
