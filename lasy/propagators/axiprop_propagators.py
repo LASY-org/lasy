@@ -191,18 +191,15 @@ class AxipropPropagator(Propagator):
             grid_out = deepcopy(grid_in)
 
         if dim == "rt":
-            field, t_axis = self._propagate_mrt(
+            field = self._propagate_mrt(
                 distance, grid_in, omega0, grid_out, verbose, nr_boundary
             )
         else:
-            field, t_axis = self._propagate_xyt(
+            field = self._propagate_xyt(
                 distance, grid_in, omega0, verbose, nr_boundary
             )
-
+        grid_out.position += distance
         grid_out.set_temporal_field(field)
-        grid_out.axes[-1] = t_axis
-        grid_out.hi[-1] = t_axis.max()
-        grid_out.lo[-1] = t_axis.min()
 
         return grid_out
 
@@ -240,8 +237,6 @@ class AxipropPropagator(Propagator):
         Returns
         -------
         field : ndarray with laser envelope in temporal representation.
-
-        t_axis : Time axis after propagation.
         """
         containers_in, self.m_axis = import_from_lasy_grid(
             grid_in, "rt", omega0, nr_boundary
@@ -269,7 +264,7 @@ class AxipropPropagator(Propagator):
 
             field_3d[im] = laser_loc.Field.T
 
-        return field_3d, laser_loc.t
+        return field_3d
 
     def _propagate_xyt(self, distance, grid_in, omega0, verbose=True, nr_boundary=0):
         r"""
@@ -298,8 +293,6 @@ class AxipropPropagator(Propagator):
         Returns
         -------
         field : ndarray with laser envelope in temporal representation.
-
-        t_axis : Time axis after propagation.
         """
         container_in = import_from_lasy_grid(grid_in, "xyt", omega0, nr_boundary)
 
@@ -318,7 +311,7 @@ class AxipropPropagator(Propagator):
             make_copy=False,
         )
 
-        return np.moveaxis(laser_loc.Field, 0, -1), laser_loc.t
+        return np.moveaxis(laser_loc.Field, 0, -1)
 
 
 class AxipropFresnelPropagator(Propagator):
@@ -511,18 +504,16 @@ class AxipropFresnelPropagator(Propagator):
             return grid_in
 
         if dim == "rt":
-            field, t_axis = self._propagate_mrt(
+            field = self._propagate_mrt(
                 distance, grid_in, omega0, grid_out, verbose, nr_boundary
             )
         else:
-            field, t_axis = self._propagate_xyt(
+            field = self._propagate_xyt(
                 distance, grid_in, omega0, grid_out, verbose, nr_boundary
             )
 
         grid_out.set_temporal_field(field)
-        grid_out.axes[-1] = t_axis
-        grid_out.hi[-1] = t_axis.max()
-        grid_out.lo[-1] = t_axis.min()
+        grid_out.position += distance
 
         return grid_out
 
@@ -560,8 +551,6 @@ class AxipropFresnelPropagator(Propagator):
         Returns
         -------
         field : ndarray with laser envelope in temporal representation.
-
-        t_axis : Time axis after propagation.
         """
         containers_in, self.m_axis = import_from_lasy_grid(
             grid_in, "rt", omega0, nr_boundary
@@ -589,7 +578,7 @@ class AxipropFresnelPropagator(Propagator):
 
             field_3d[im] = laser_loc.Field.T
 
-        return field_3d, laser_loc.t
+        return field_3d
 
     def _propagate_xyt(
         self, distance, grid_in, omega0, grid_out, verbose=True, nr_boundary=0
@@ -625,8 +614,6 @@ class AxipropFresnelPropagator(Propagator):
         Returns
         -------
         field : ndarray with laser envelope in temporal representation.
-
-        t_axis : Time axis after propagation.
         """
         container_in = import_from_lasy_grid(grid_in, "xyt", omega0, nr_boundary)
 
@@ -645,4 +632,4 @@ class AxipropFresnelPropagator(Propagator):
             make_copy=False,
         )
 
-        return np.moveaxis(laser_loc.Field, 0, -1), laser_loc.t
+        return np.moveaxis(laser_loc.Field, 0, -1)
