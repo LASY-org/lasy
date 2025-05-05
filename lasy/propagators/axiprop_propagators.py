@@ -303,7 +303,7 @@ class AxipropPropagator(Propagator):
         """
         container_in = import_from_lasy_grid(grid_in, "xyt", omega0, nr_boundary)
 
-        self.update("xyt", omega0, container_in, verbose)
+        self.update("xyt", omega0, container_in, verbose=verbose)
 
         Field_ft_new = self.prop_xyt.step(
             container_in.Field_ft, distance, overwrite=False, show_progress=verbose
