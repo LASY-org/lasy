@@ -58,6 +58,10 @@ class FromOpenPMDProfile(FromArrayProfile):
             dim = "xyt" if geometry == "cartesian" else "rt"
             omg0 = m.get_attribute("angularFrequency")
             try:
+                position = m.get_attribute("position")
+            except Exception:
+                position = 0.
+            try:
                 envelopeField = m.get_attribute("envelopeField")
                 pol = m.get_attribute("polarization")
             except Exception:
@@ -74,7 +78,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             if envelopeField == "normalized_vector_potential":
                 if verbose:
                     print("Convert from vector potential to electric field")
-                grid = create_grid(array, axes, dim)
+                grid = create_grid(array, axes, dim, position=position)
                 array = vector_potential_to_field(grid, omg0)
         else:
             geometry = it.meshes["E"].get_attribute("geometry")
