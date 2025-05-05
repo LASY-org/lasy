@@ -60,7 +60,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             try:
                 position = m.grid_global_offset[0] * c
             except Exception:
-                position = 0.
+                position = 0.0
             try:
                 envelopeField = m.get_attribute("envelopeField")
                 pol = m.get_attribute("polarization")
