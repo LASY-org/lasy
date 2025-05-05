@@ -6,6 +6,5 @@ Propagators
 
    axiprop_propagators
    collins_sfft_propagator
-   fresnel_sfft_propagator
    single_fft_propagator
    propagator
