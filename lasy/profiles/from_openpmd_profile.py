@@ -58,7 +58,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             dim = "xyt" if geometry == "cartesian" else "rt"
             omg0 = m.get_attribute("angularFrequency")
             try:
-                position = m.get_attribute("position")
+                position = m.grid_global_offset[0] * c
             except Exception:
                 position = 0.
             try:
