@@ -16,7 +16,7 @@ class NonlinearKerrStep:
     Parameters
     ----------
     n2 : float
-        Nonlinear refractive index.
+        Nonlinear (intensity dependent) refractive index.
     n0 : float
         Linear refractive index at the carrier frequency.
     k0 : float
@@ -28,16 +28,16 @@ class NonlinearKerrStep:
         self.n0 = n0
         self.k0 = k0
 
-    def propagate(self, grid_in, distance):
+    def apply(self, grid_in, distance):
         """
-        Propagate the input grid for nonlinear step.
+        Apply intensity dependent phase shift to the field.
 
         Parameters
         ----------
         grid : Grid
-            Input grid to be propagated.
+            Input grid to which the phase shift is applie.
         distance : float
-            Distance over withh to propagate the field.
+            Distance over which the pulse propagates the field.
         """
         temporal_field = grid_in.get_temporal_field()
         intensity = 0.5 * c * epsilon_0 * abs(temporal_field) ** 2

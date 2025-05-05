@@ -3,7 +3,7 @@ from scipy.constants import c, epsilon_0
 
 from lasy.laser import Laser
 from lasy.profiles import GaussianProfile
-from lasy.propagators import NonlinearKerrStep
+from lasy.propagators.nonlinear_phase_shift import NonlinearKerrStep
 from lasy.utils.laser_utils import get_bandwidth
 
 
