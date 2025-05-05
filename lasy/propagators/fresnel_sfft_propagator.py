@@ -7,6 +7,8 @@ from lasy.utils.fft_wrapper import fft
 
 from .single_fft_propagator import SingleFFTPropagator
 
+from lasy.utils.field_interpolator import interpolate_complex_field_XY
+
 
 class FresnelSFFTPropagator(SingleFFTPropagator):
     """
@@ -82,13 +84,14 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
                 YF[:, :, centFreqIndx][:, :, np.newaxis], len(spectral_axis), axis=2
             )
 
-            # field_interp = interpolate_complex_field_XY(
+            #field_interp = interpolate_complex_field_XY(
             #     diffractedField, XF, YF, OM, XF0, YF0
             # )
-            # grid.set_spectral_field(field_interp)
+            #grid.set_spectral_field(field_interp)
 
             grid_out = deepcopy(grid_in)
             grid_out.set_spectral_field(diffractedField)
+            #grid_out.set_spectral_field(field_interp)
             grid_out.axes[0] = np.unique(XF0)
             grid_out.axes[1] = np.unique(YF0)
             grid_out.lo = [np.unique(XF0)[0], np.unique(YF0)[0], grid_in.lo[-1]]
