@@ -20,15 +20,34 @@ class FresnelSFFTPropagator(SingleFFTPropagator):
         U'(x',y') = \frac{e^{i k z}}{i \lambda z} e^{i\frac{k(x'^2+y'^2)}{2z}} \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} \left ( U(x,y) e^{i\frac{k(x^2+y^2)}{2 z}} \right ) e^{-i \frac{2\pi(xx' + yy')}{\lambda z}}\,dx \,dy
 
     with :math:`k` is the laser wavevector, :math:`\lambda` is the laser wavelength and :math:`z` is the distance between the input and diffraction planes.
-
     """
 
     def __init__(self):
         super().__init__()
 
     def propagate(self, distance, grid_in, dim, omega0):
-        """
-        Propagate the input grid using the Fresnel SFFT method.
+        r"""
+        Propagate laser pulse in z direction by a given distance.
+
+        Currently, the propagation is assumed to take place in vacuum.
+        This propagator is non-paraxial.
+
+        Parameters
+        ----------
+        distance : scalar
+            Distance by which the laser is propagated.
+
+        grid_in : Grid
+            Grid object containing the laser to propagate.
+
+        dim : string
+            Dimensionality of the array. Options are:
+            - ``'xyt'``: Laser pulse represented on a 3D Cartesian grid.
+            - ``'rt'`` : Laser pulse represented on a 2D cylindrical grid.
+
+        omega0 : float (in rad.s^-1)
+            The main frequency :math:`\omega_0`, which is defined by the laser
+            wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
         """
         self.update(dim, omega0)
 
