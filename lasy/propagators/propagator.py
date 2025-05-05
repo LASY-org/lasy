@@ -1,7 +1,9 @@
+from abc import ABC, abstractmethod
+
 from copy import deepcopy
 
 
-class Propagator(object):
+class Propagator(ABC):
     """
     Base class for all propagators.
 
@@ -9,27 +11,9 @@ class Propagator(object):
     """
 
     def __init__(self):
-        return
+        pass
 
-    def update(self, dim, omega0):
-        """
-        Initialize or update the propagator if needed.
-
-        Parameters
-        ----------
-        dim : string
-            Dimensionality of the array. Options are:
-            - ``'xyt'``: The laser pulse is represented on a 3D Cartesian grid.
-            - ``'rt'`` : The laser pulse is represented on a 2D cylindrical grid.
-
-        omega0 : float (in s^-1)
-            The main frequency :math:`\omega_0`, which is defined by the laser
-            wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
-        """
-        self.dim = dim
-        self.omega0 = omega0
-        return
-
+    @abstractmethod
     def propagate(self, distance, grid_in, dim, omega0, grid_out=None):
         """
         Propagate field in the grid along axis z, for a certain distance.
