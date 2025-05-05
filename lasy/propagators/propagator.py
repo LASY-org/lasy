@@ -14,7 +14,7 @@ class Propagator(ABC):
 
     @abstractmethod
     def propagate(self, distance, grid_in, dim, omega0, grid_out=None):
-        """
+        r"""
         Propagate field in the grid along axis z, for a certain distance.
 
         Parameters
