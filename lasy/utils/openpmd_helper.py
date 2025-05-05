@@ -88,6 +88,7 @@ def write_to_openpmd_file(
     # Store metadata needed to reconstruct the field
     m.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
     m.set_attribute("polarization", pol)
+    m.set_attribute("position", grid.position)
     if save_as_vector_potential:
         m.set_attribute("envelopeField", "normalized_vector_potential")
         m.unit_dimension = {}
