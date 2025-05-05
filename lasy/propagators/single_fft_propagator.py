@@ -2,9 +2,7 @@ from .propagator import Propagator
 
 
 class SingleFFTPropagator(Propagator):
-    """
-    Single FFT propagators.
-    """
+    """Single FFT propagators."""
 
     def __init__(self):
         super().__init__()

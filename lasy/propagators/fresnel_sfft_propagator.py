@@ -2,9 +2,7 @@ from .single_fft_propagator import SingleFFTPropagator
 
 
 class FresnelSFFTPropagator(SingleFFTPropagator):
-    """
-    Fresnel's propagator.
-    """
+    """Fresnel's propagator."""
 
     def __init__(self):
         super().__init__()
