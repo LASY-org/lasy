@@ -195,9 +195,7 @@ class AxipropPropagator(Propagator):
                 distance, grid_in, omega0, grid_out, verbose, nr_boundary
             )
         else:
-            field = self._propagate_xyt(
-                distance, grid_in, omega0, verbose, nr_boundary
-            )
+            field = self._propagate_xyt(distance, grid_in, omega0, verbose, nr_boundary)
         grid_out.position += distance
         grid_out.set_temporal_field(field)
 
