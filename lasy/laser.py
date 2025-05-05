@@ -79,29 +79,24 @@ class Laser:
     ...     npoints=(50, 400),
     ...     profile=profile,
     ... )
-    >>> # Propagate and visualize.
-    >>> n_steps = 3
-    >>> propagate_step = 1e-3
-    >>> fig, axes = plt.subplots(1, n_steps, sharey=True)
-    >>> for step in range(n_steps):
-    >>>     laser.propagate(propagate_step)
-    >>>     E_rt, extent = get_full_field(laser)
-    >>>     extent[2:] *= 1e6
-    >>>     extent[:2] *= 1e12
-    >>>     tmin, tmax, rmin, rmax = extent
-    >>>     vmax = np.abs(E_rt).max()
-    >>>     axes[step].imshow(
-    ...         E_rt,
-    ...         origin="lower",
-    ...         aspect="auto",
-    ...         vmax=vmax,
-    ...         vmin=-vmax,
-    ...         extent=[tmin, tmax, rmin, rmax],
-    ...         cmap='bwr',
-    ...     )
-    >>>     axes[step].set(xlabel='t (ps)')
-    >>>     if step == 0:
-    >>>         axes[step].set(ylabel='r (µm)')
+    >>> # Visualize.
+    >>> fig, axes = plt.subplots(1, 1)
+    >>> E_rt, extent = get_full_field(laser)
+    >>> extent[2:] *= 1e6
+    >>> extent[:2] *= 1e12
+    >>> tmin, tmax, rmin, rmax = extent
+    >>> vmax = np.abs(E_rt).max()
+    >>> axes.imshow(
+    ...     E_rt,
+    ...     origin="lower",
+    ...     aspect="auto",
+    ...     vmax=vmax,
+    ...     vmin=-vmax,
+    ...     extent=[tmin, tmax, rmin, rmax],
+    ...     cmap='bwr',
+    ... )
+    >>> axes.set(xlabel='t (ps)')
+    >>> axes.set(ylabel='r (µm)')
     """
 
     def __init__(
