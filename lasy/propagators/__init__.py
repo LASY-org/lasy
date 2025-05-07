@@ -4,14 +4,12 @@ from .fresnel_sfft_propagator import FresnelSFFTPropagator
 from .nonlinear_phase_shift import NonlinearKerrStep
 from .propagator import Propagator
 from .single_fft_propagator import SingleFFTPropagator
-from .split_step_propagator import SplitStepPropagator
 
 __all__ = [
     "Propagator",
     "SingleFFTPropagator",
     "FresnelSFFTPropagator",
     "CollinsSFFTPropagator",
-    "SplitStepPropagator",
     "NonlinearKerrStep",
     "AngularSpectrumDFFTPropagator",
 ]
