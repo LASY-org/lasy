@@ -35,6 +35,7 @@ class AxipropPropagator(Propagator):
         omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
         containers_in : Axiprop container(s)
             An Axiprop container (dim='xyt'), or list of containers (dim='rt', 1 element per mode), with the data of laser to propagate.
 
@@ -65,6 +66,7 @@ class AxipropPropagator(Propagator):
         omega0 : float (in s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
         containers_in : Axiprop container(s)
             A list of Axiprop containers, with the data of laser to propagate.
 
@@ -113,6 +115,7 @@ class AxipropPropagator(Propagator):
         omega0 : float (in s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
         containers_in : Axiprop container(s)
             An Axiprop container, with the data of laser to propagate.
 
@@ -168,10 +171,11 @@ class AxipropPropagator(Propagator):
         omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
         grid_out : Grid object (optional)
             Grid object for on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
-            Only supported for rt geometry.
+            Only supported for 'rt' geometry.
 
         verbose : boolean (optional, default False)
             Whether to print intermediate steps.
@@ -278,6 +282,7 @@ class AxipropPropagator(Propagator):
 
         grid_in : Grid
             Grid object containing the laser to propagate.
+
         omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
@@ -336,6 +341,7 @@ class AxipropFresnelPropagator(Propagator):
         omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
         containers_in : Axiprop container(s)
             An Axiprop container (dim='xyt'), or list of containers (dim='rt', 1 element per mode), with the data of laser to propagate.
 
@@ -367,6 +373,7 @@ class AxipropFresnelPropagator(Propagator):
         omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
         containers_in : Axiprop container(s)
             A list of Axiprop containers (1 element per mode), with the data of laser to propagate.
 
@@ -421,6 +428,7 @@ class AxipropFresnelPropagator(Propagator):
         omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
         containers_in : Axiprop container(s)
             An Axiprop container with the data of laser to propagate.
 
@@ -482,10 +490,10 @@ class AxipropFresnelPropagator(Propagator):
         omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
         grid_out : Grid object (optional)
             Grid object for on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
-            Only supported for rt geometry.
 
         verbose : boolean (optional, default False)
             Whether to print intermediate steps.
