@@ -7,7 +7,7 @@ from scipy.constants import c, epsilon_0
 class NonlinearKerrStep:
     r"""
     Class that represents a propagation step with Kerr nonlinearity.
-    
+
     This allows to calculate spectral broadening or self-focusing due to self phase modulation.
 
     .. math::

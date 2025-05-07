@@ -30,7 +30,7 @@ def make_laser():
 def test_nonlinear_step():
     """
     Compare the numerically calculated spectral broadening to the analytical equation for broadening of Gaussian pulses.
-    
+
     The analytical description is taken from 'Nonlinear Fiber Optics, G. Agrawal, 3rd ed., p.104.'
     """
     # define refractive index and nonlinear refractive index
