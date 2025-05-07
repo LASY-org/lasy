@@ -823,7 +823,7 @@ def weighted_std(values, weights=None):
     return std
 
 
-def create_grid(array, axes, dim, is_envelope=True):
+def create_grid(array, axes, dim, is_envelope=True, position=0.0):
     """Create a lasy grid from a numpy array.
 
     Parameters
@@ -852,7 +852,7 @@ def create_grid(array, axes, dim, is_envelope=True):
         lo = (axes["x"][0], axes["y"][0], axes["t"][0])
         hi = (axes["x"][-1], axes["y"][-1], axes["t"][-1])
         npoints = (axes["x"].size, axes["y"].size, axes["t"].size)
-        grid = Grid(dim, lo, hi, npoints, is_envelope=is_envelope)
+        grid = Grid(dim, lo, hi, npoints, is_envelope=is_envelope, position=position)
         assert np.allclose(grid.axes[0], axes["x"])
         assert np.allclose(grid.axes[1], axes["y"])
         assert np.allclose(grid.axes[2], axes["t"], rtol=1.0e-14)
