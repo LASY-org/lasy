@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.constants import c
+from copy import deepcopy
 
 from lasy.utils.fft_wrapper import fft
 
@@ -44,6 +45,30 @@ class AngularSpectrumDFFTPropagator(Propagator):
 
     def __init__(self, omega0, dim, n=1.0):
         super().__init__()
+        self.update(dim=dim, omega0=omega0, n=n)
+
+    def update(self, dim, omega0, n):
+        r"""
+        Initialize or update the propagator if needed.
+
+        Parameters
+        ----------
+        dim : string
+            Dimensionality of the array. Options are:
+            - ``'xyt'``: Laser pulse represented on a 3D Cartesian grid.
+            - ``'rt'`` : Laser pulse represented on a 2D cylindrical grid.
+
+        omega0 : float (in rad.s^-1)
+            The main frequency :math:`\omega_0`, which is defined by the laser
+            wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
+        n : int, float, 1d array or callable
+            Refractive index of the medium in which to propagate the laser.
+            Can be either a single value if dispersive effects are ignored, a 1d array
+            describing the refractive index along the frequency/wavelength axis of the
+            laser pulse, or a function of the wavelength (in meters).
+            Default value is n=1. to describe propagation in vacuum.
+        """
 
         assert isinstance(n, (int, float, np.ndarray)) or callable(n)
         assert dim in ["rt", "xyt"]
@@ -52,58 +77,106 @@ class AngularSpectrumDFFTPropagator(Propagator):
         self.omega0 = omega0
         self.dim = dim
 
-    def propagate(self, distance, grid_in):
+    def propagate(self, distance, grid_in, dim, omega0, grid_out=None):
+        r"""
+        Propagates the laser field in z diration by a given distance 
+        using the angular spectrum method.
+        
+        Parameters
+        ----------
+        distance : scalar
+            Distance by which the laser is propagated.
+
+        grid_in : Grid
+            Grid object containing the laser to propagate.
+
+        dim : string
+            Dimensionality of the array. Options are:
+            - ``'xyt'``: Laser pulse represented on a 3D Cartesian grid.
+            - ``'rt'`` : Laser pulse represented on a 2D cylindrical grid.
+
+        omega0 : float (in rad.s^-1)
+            The main frequency :math:`\omega_0`, which is defined by the laser
+            wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
+        grid_out : Grid object (optional)
+            Grid object on which the propagated laser pulse is defined.
+            Can be different from laser grid before propagation.
+
+        Returns
+        -------
+        Grid object with laser data after propagation.
+        
+        """
+        self.update(omega0=omega0, dim=dim, n=self.n)
+        
+        if grid_out is None:
+            grid_out = deepcopy(grid_in)
+        
         if self.dim == "rt":
-            print("'rt' geometry not yet supported by AngularSpectrumPropagator")
-
+            field = self._propagate_mrt(distance, grid_in)
+            
         elif self.dim == "xyt":
-            # Get the spectral field in the spatial domain
-            field, omega = grid_in.get_spectral_field()
+            field = self._propagate_xyt(distance, grid_in)
 
-            omega += self.omega0
-            kz = omega / c
+ #       grid_out.position += distance
+        grid_out.set_spectral_field(field)
 
-            # get field in k-space and spatial frequency axes
-            field_kspace, axes_freq = fft(
-                arr_in=field,
-                which="transverse",
-                axes_in=[grid_in.axes[0], grid_in.axes[1]],
-                from_domain="frequency",
-            )
+        return grid_out
 
-            kx = 2 * np.pi * axes_freq[0]
-            ky = 2 * np.pi * axes_freq[1]
+    def _propagate_xyt(self, distance, grid_in):
 
-            # Calculate the refractive index if it is a function of wavelength
-            n = self.n(2 * np.pi * c / omega) if callable(self.n) else self.n
+        # Get the spectral field in the spatial domain
+        field, omega = grid_in.get_spectral_field()
 
-            # Calculate the phase shift in k-space
-            phase = (distance * n * (kz[None, None, :]** 2 - kx[:, None, None]**2 - ky[None, :, None]**2)** 0.5)
+        omega += self.omega0
+        kz = omega / c
 
-            # compensate group delay to keep pulse centered in grid
-            if np.ndim(n) > 0:
-                dndom = np.gradient(n, omega)
-                dndom = np.interp(self.omega0, omega, dndom)
-                n0 = np.interp(self.omega0, omega, n)
-            else:
-                dndom = 0
-                n0 = n
+        # get field in k-space and spatial frequency axes
+        field_kspace, axes_freq = fft(
+            arr_in=field,
+            which="transverse",
+            axes_in=[grid_in.axes[0], grid_in.axes[1]],
+            from_domain="frequency",
+        )
 
-            v_group = c/(n0+self.omega0*dndom)
-            gd = distance/v_group
+        kx = 2 * np.pi * axes_freq[0]
+        ky = 2 * np.pi * axes_freq[1]
 
-            phase = phase - gd * (omega - self.omega0)[None, None, :]
+        # Calculate the refractive index if it is a function of wavelength
+        n = self.n(2 * np.pi * c / omega) if callable(self.n) else self.n
 
-            # Apply the phase shift to the field in k-space
-            field_kspace *= np.exp(1j * phase)
+        # Calculate the phase shift in k-space
+        phase = (distance * n * (kz[None, None, :]** 2 - kx[:, None, None]**2 - ky[None, :, None]**2)** 0.5)
 
-            # Transform back to the spatial domain
-            field, _ = fft(
-                arr_in=field_kspace,
-                which="transverse",
-                axes_in=(kx / (2 * np.pi), ky / (2 * np.pi)),
-                from_domain="real",
-            )
+        # compensate group delay to keep pulse centered in grid
+        if np.ndim(n) > 0:
+            dndom = np.gradient(n, omega)
+            dndom = np.interp(self.omega0, omega, dndom)
+            n0 = np.interp(self.omega0, omega, n)
+        else:
+            dndom = 0
+            n0 = n
 
-            grid_in.set_spectral_field(field)
-         #   grid_in.distance += distance
+        v_group = c/(n0+self.omega0*dndom)
+        gd = distance/v_group
+
+        phase = phase - gd * (omega - self.omega0)[None, None, :]
+
+        # Apply the phase shift to the field in k-space
+        field_kspace *= np.exp(1j * phase)
+
+        # Transform back to the spatial domain
+        field, _ = fft(
+            arr_in=field_kspace,
+            which="transverse",
+            axes_in=(kx / (2 * np.pi), ky / (2 * np.pi)),
+            from_domain="real",
+        )
+        return field
+    
+    def _propagate_mrt(self, distance, grid_in):
+        print("'rt' geometry not yet supported by AngularSpectrumPropagator, skipping propagation")
+        field = grid_in.field
+        return field
+    
