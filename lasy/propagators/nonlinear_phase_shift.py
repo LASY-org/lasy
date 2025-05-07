@@ -1,4 +1,5 @@
 from copy import deepcopy
+
 import numpy as np
 from scipy.constants import c, epsilon_0
 
@@ -53,4 +54,3 @@ class NonlinearKerrStep:
         grid_out.set_temporal_field(temporal_field * np.exp(1j * phase))
 
         return grid_out
-    
