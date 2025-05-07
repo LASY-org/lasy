@@ -1458,7 +1458,7 @@ def get_dispersion(grid, dim, omega0, order, omega_eval=None, method="sum"):
 
 
 def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None):
-    """Calculates the spectral width of a pulse in a given grid.
+    """Calculate the spectral width of a pulse in a given grid.
 
     By default, the bandwidth is calculated as the rms width of the spatially summed spectrum, in rad/s.
     Optionally, the bandwidth can also be calculated on-axis, at a given intensity level or in meters.

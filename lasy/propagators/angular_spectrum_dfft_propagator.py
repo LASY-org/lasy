@@ -79,8 +79,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
 
     def propagate(self, distance, grid_in, dim=None, omega0=None, grid_out=None):
         r"""
-        Propagates the laser field in z diration by a given distance
-        using the angular spectrum method.
+        Propagates the laser field in z diration by a given distance using the angular spectrum method.
 
         Parameters
         ----------
