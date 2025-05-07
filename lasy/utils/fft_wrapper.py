@@ -8,6 +8,7 @@ def fft(which, arr_in, axes_in, from_domain):
     We use the following conventions:
      - From physical space (x&y or t) to frequency space (kx&ky or omega), the FFT done is data_freq = ifft(ifftshift(data_phys))
      - From frequency space (kx&ky or omega) to physical space (x&y or t), the FFT done is data_phys = fftshift(fft(data_freq))
+
     Parameters
     ----------
     which : string
