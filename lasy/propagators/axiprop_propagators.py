@@ -71,7 +71,7 @@ class AxipropPropagator(Propagator):
             A list of Axiprop containers, with the data of laser to propagate.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional)
@@ -120,7 +120,7 @@ class AxipropPropagator(Propagator):
             An Axiprop container, with the data of laser to propagate.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
             Only supported for rt geometry.
 
@@ -173,7 +173,7 @@ class AxipropPropagator(Propagator):
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
             Only supported for 'rt' geometry.
 
@@ -227,7 +227,7 @@ class AxipropPropagator(Propagator):
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional, default False)
@@ -346,7 +346,7 @@ class AxipropFresnelPropagator(Propagator):
             An Axiprop container (dim='xyt'), or list of containers (dim='rt', 1 element per mode), with the data of laser to propagate.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional)
@@ -378,7 +378,7 @@ class AxipropFresnelPropagator(Propagator):
             A list of Axiprop containers (1 element per mode), with the data of laser to propagate.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional)
@@ -433,7 +433,7 @@ class AxipropFresnelPropagator(Propagator):
             An Axiprop container with the data of laser to propagate.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional)
@@ -492,7 +492,7 @@ class AxipropFresnelPropagator(Propagator):
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional, default False)
@@ -545,7 +545,7 @@ class AxipropFresnelPropagator(Propagator):
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional, default False)
@@ -608,7 +608,7 @@ class AxipropFresnelPropagator(Propagator):
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional, default False)
