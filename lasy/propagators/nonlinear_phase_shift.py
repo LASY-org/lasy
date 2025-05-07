@@ -23,9 +23,8 @@ class NonlinearKerrStep:
         Wave vector at the carrier frequency.
     """
 
-    def __init__(self, n2, n0, k0):
+    def __init__(self, n2, k0):
         self.n2 = n2
-        self.n0 = n0
         self.k0 = k0
 
     def apply(self, grid_in, distance):
@@ -42,6 +41,6 @@ class NonlinearKerrStep:
         temporal_field = grid_in.get_temporal_field()
         intensity = 0.5 * c * epsilon_0 * abs(temporal_field) ** 2
 
-        phase = self.n0 * self.n2 * self.k0 * intensity * distance
+        phase = self.n2 * self.k0 * intensity * distance
 
         grid_in.set_temporal_field(temporal_field * np.exp(1j * phase))
