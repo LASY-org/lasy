@@ -106,5 +106,4 @@ class AngularSpectrumDFFTPropagator(Propagator):
             )
 
             grid_in.set_spectral_field(field)
-            grid_in.distance += distance
-            
+         #   grid_in.distance += distance
