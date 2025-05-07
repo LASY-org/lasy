@@ -1,6 +1,7 @@
+from copy import deepcopy
+
 import numpy as np
 from scipy.constants import c
-from copy import deepcopy
 
 from lasy.utils.fft_wrapper import fft
 
@@ -69,7 +70,6 @@ class AngularSpectrumDFFTPropagator(Propagator):
             laser pulse, or a function of the wavelength (in meters).
             Default value is n=1. to describe propagation in vacuum.
         """
-
         assert isinstance(n, (int, float, np.ndarray)) or callable(n)
         assert dim in ["rt", "xyt"]
 
@@ -79,9 +79,9 @@ class AngularSpectrumDFFTPropagator(Propagator):
 
     def propagate(self, distance, grid_in, dim, omega0, grid_out=None):
         r"""
-        Propagates the laser field in z diration by a given distance 
+        Propagates the laser field in z diration by a given distance
         using the angular spectrum method.
-        
+
         Parameters
         ----------
         distance : scalar
@@ -106,26 +106,25 @@ class AngularSpectrumDFFTPropagator(Propagator):
         Returns
         -------
         Grid object with laser data after propagation.
-        
+
         """
         self.update(omega0=omega0, dim=dim, n=self.n)
-        
+
         if grid_out is None:
             grid_out = deepcopy(grid_in)
-        
+
         if self.dim == "rt":
             field = self._propagate_mrt(distance, grid_in)
-            
+
         elif self.dim == "xyt":
             field = self._propagate_xyt(distance, grid_in)
 
- #       grid_out.position += distance
+        #       grid_out.position += distance
         grid_out.set_spectral_field(field)
 
         return grid_out
 
     def _propagate_xyt(self, distance, grid_in):
-
         # Get the spectral field in the spatial domain
         field, omega = grid_in.get_spectral_field()
 
@@ -147,7 +146,12 @@ class AngularSpectrumDFFTPropagator(Propagator):
         n = self.n(2 * np.pi * c / omega) if callable(self.n) else self.n
 
         # Calculate the phase shift in k-space
-        phase = (distance * n * (kz[None, None, :]** 2 - kx[:, None, None]**2 - ky[None, :, None]**2)** 0.5)
+        phase = (
+            distance
+            * n
+            * (kz[None, None, :] ** 2 - kx[:, None, None] ** 2 - ky[None, :, None] ** 2)
+            ** 0.5
+        )
 
         # compensate group delay to keep pulse centered in grid
         if np.ndim(n) > 0:
@@ -158,8 +162,8 @@ class AngularSpectrumDFFTPropagator(Propagator):
             dndom = 0
             n0 = n
 
-        v_group = c/(n0+self.omega0*dndom)
-        gd = distance/v_group
+        v_group = c / (n0 + self.omega0 * dndom)
+        gd = distance / v_group
 
         phase = phase - gd * (omega - self.omega0)[None, None, :]
 
@@ -174,9 +178,10 @@ class AngularSpectrumDFFTPropagator(Propagator):
             from_domain="real",
         )
         return field
-    
+
     def _propagate_mrt(self, distance, grid_in):
-        print("'rt' geometry not yet supported by AngularSpectrumPropagator, skipping propagation")
+        print(
+            "'rt' geometry not yet supported by AngularSpectrumPropagator, skipping propagation"
+        )
         field = grid_in.field
         return field
-    
