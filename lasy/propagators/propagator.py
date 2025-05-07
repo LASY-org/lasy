@@ -14,7 +14,7 @@ class Propagator(ABC):
 
     @abstractmethod
     def update(self, dim, omega0):
-        """
+        r"""
         Update the propagator.
 
         Typically called at the beginning of the propagate function, to update the propagator itself if required.
