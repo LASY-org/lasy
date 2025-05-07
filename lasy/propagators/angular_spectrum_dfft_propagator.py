@@ -78,30 +78,19 @@ class AngularSpectrumDFFTPropagator(Propagator):
             n = self.n(2 * np.pi * c / omega) if callable(self.n) else self.n
 
             # Calculate the phase shift in k-space
-            phase = (
-                distance
-                * n
-                * (
-                    kz[None, None, :] ** 2
-                    - kx[:, None, None] ** 2
-                    - ky[None, :, None] ** 2
-                )
-                ** 0.5
-            )
+            phase = (distance * n * (kz[None, None, :]** 2 - kx[:, None, None]**2 - ky[None, :, None]**2)** 0.5)
 
             # compensate group delay to keep pulse centered in grid
-            Nx, Ny, _ = phase.shape
-            phase_onaxis = phase[Nx // 2, Ny // 2, :]
+            if np.ndim(n) > 0:
+                dndom = np.gradient(n, omega)
+                dndom = np.interp(self.omega0, omega, dndom)
+                n0 = np.interp(self.omega0, omega, n)
+            else:
+                dndom = 0
+                n0 = n
 
-            order = np.argsort(omega)
-
-            phase_onaxis = phase_onaxis[order]
-            omega_sorted = omega[order]
-
-            phase_onaxis = np.unwrap(phase_onaxis)
-
-            gd = np.gradient(phase_onaxis, omega_sorted)
-            gd = np.interp(self.omega0, omega_sorted, gd)
+            v_group = c/(n0+self.omega0*dndom)
+            gd = distance/v_group
 
             phase = phase - gd * (omega - self.omega0)[None, None, :]
 
@@ -117,3 +106,4 @@ class AngularSpectrumDFFTPropagator(Propagator):
             )
 
             grid_in.set_spectral_field(field)
+            grid_in.distance += distance
