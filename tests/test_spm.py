@@ -33,14 +33,13 @@ def test_nonlinear_step():
     described in 'Nonlinear Fiber Optics, G. Agrawal, 3rd ed., p.104'
     """
     # define refractive index and nonlinear refractive index
-    n0 = 1.0
     n2 = 1e-20
 
     # create laser
     laser = make_laser()
 
     # create propagator
-    NLprop = NonlinearKerrStep(n2=n2, n0=n0, k0=laser.profile.omega0 / c)
+    NLprop = NonlinearKerrStep(n2=n2, k0=laser.profile.omega0 / c)
 
     # create range of distances over which to test the spectral broadening
     z_pos = np.linspace(0, 15e-3, 5)
@@ -50,7 +49,7 @@ def test_nonlinear_step():
     # iterate over z-steps and calculate the on-axis bandwidth
     for z in z_pos:
         laser = make_laser()
-        NLprop.propagate(distance=z, grid_in=laser.grid)
+        NLprop.apply(distance=z, grid_in=laser.grid)
         bandwidth = (
             get_bandwidth(grid=laser.grid, dim=laser.dim, method="on-axis") * 2
         )  # times 2 to convert half-width to full width
