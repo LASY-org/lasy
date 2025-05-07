@@ -77,7 +77,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
         self.omega0 = omega0
         self.dim = dim
 
-    def propagate(self, distance, grid_in, dim, omega0, grid_out=None):
+    def propagate(self, distance, grid_in, dim=None, omega0=None, grid_out=None):
         r"""
         Propagates the laser field in z diration by a given distance
         using the angular spectrum method.
@@ -90,13 +90,13 @@ class AngularSpectrumDFFTPropagator(Propagator):
         grid_in : Grid
             Grid object containing the laser to propagate.
 
-        dim : string
+        dim : string (optional)
             Dimensionality of the array. Options are:
             - ``'xyt'``: Laser pulse represented on a 3D Cartesian grid.
             - ``'rt'`` : Laser pulse represented on a 2D cylindrical grid.
 
-        omega0 : float (in rad.s^-1)
-            The main frequency :math:`\omega_0`, which is defined by the laser
+        omega0 : float (optional)
+            The main frequency :math:`\omega_0` (in rad.s^-1), which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object (optional)
@@ -108,6 +108,8 @@ class AngularSpectrumDFFTPropagator(Propagator):
         Grid object with laser data after propagation.
 
         """
+        dim = dim if dim is not None else self.dim
+        omega0 = omega0 if omega0 is not None else self.omega0
         self.update(omega0=omega0, dim=dim, n=self.n)
 
         if grid_out is None:
@@ -177,6 +179,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
             axes_in=(kx / (2 * np.pi), ky / (2 * np.pi)),
             from_domain="real",
         )
+
         return field
 
     def _propagate_mrt(self, distance, grid_in):

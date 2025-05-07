@@ -1,3 +1,4 @@
+from copy import deepcopy
 import numpy as np
 from scipy.constants import c, epsilon_0
 
@@ -27,7 +28,7 @@ class NonlinearKerrStep:
         self.n2 = n2
         self.k0 = k0
 
-    def apply(self, grid_in, distance):
+    def apply(self, grid_in, distance, grid_out=None):
         """
         Apply intensity dependent phase shift to the field.
 
@@ -37,10 +38,19 @@ class NonlinearKerrStep:
             Input grid to which the phase shift is applie.
         distance : float
             Distance over which the pulse propagates the field.
+        grid_out : Grid, optional
+            Grid object on which the laser pulse after applying the phase
+            is defined. Can be different from laser grid before applying.
         """
+        if grid_out is None:
+            grid_out = deepcopy(grid_in)
+
         temporal_field = grid_in.get_temporal_field()
         intensity = 0.5 * c * epsilon_0 * abs(temporal_field) ** 2
 
         phase = self.n2 * self.k0 * intensity * distance
 
-        grid_in.set_temporal_field(temporal_field * np.exp(1j * phase))
+        grid_out.set_temporal_field(temporal_field * np.exp(1j * phase))
+
+        return grid_out
+    
