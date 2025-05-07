@@ -14,6 +14,8 @@ mJ = 1e-3
 c = 2.998e8
 
 class CollinsSFFTPropagator(SingleFFTPropagator):
+    """Collin's propagator."""
+
     def __init__(self):
         super().__init__()
         self.abcd = np.array([[1, 0],[0, 1]])
