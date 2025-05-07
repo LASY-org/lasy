@@ -40,7 +40,7 @@ class AxipropPropagator(Propagator):
             An Axiprop container (dim='xyt'), or list of containers (dim='rt', 1 element per mode), with the data of laser to propagate.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
             Only supported for rt geometry.
 
