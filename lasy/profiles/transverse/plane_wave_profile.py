@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .transverse_profile import TransverseProfile
 
@@ -35,4 +35,4 @@ class PlaneWaveProfile(TransverseProfile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-        return np.ones_like(x**2 + y**2)
+        return xp.ones_like(x**2 + y**2)

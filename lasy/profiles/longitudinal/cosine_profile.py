@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .longitudinal_profile import LongitudinalProfile
 
@@ -62,10 +62,10 @@ class CosineLongitudinalProfile(LongitudinalProfile):
         tn = (t - self.t_peak) / self.tau_fwhm
 
         envelope = (
-            np.cos(0.5 * np.pi * tn)
+            xp.cos(0.5 * xp.pi * tn)
             * (tn > -1)
             * (tn < 1)
-            * np.exp(+1.0j * (self.cep_phase + self.omega0 * self.t_peak))
+            * xp.exp(+1.0j * (self.cep_phase + self.omega0 * self.t_peak))
         )
 
         return envelope

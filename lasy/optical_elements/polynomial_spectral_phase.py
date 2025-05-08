@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .optical_element import OpticalElement
 
@@ -70,4 +70,4 @@ class PolynomialSpectralPhase(OpticalElement):
             + self.fod / 24 * (omega - self.omega0) ** 4
         )
 
-        return np.exp(1j * spectral_phase)
+        return xp.exp(1j * spectral_phase)

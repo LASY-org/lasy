@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from lasy.utils.zernike import zernike
 
@@ -59,8 +59,8 @@ class ZernikeAberrations(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        rr = np.sqrt(x**2 + y**2)
-        phase = np.zeros_like(rr)
+        rr = xp.sqrt(x**2 + y**2)
+        phase = xp.zeros_like(rr)
 
         for j in list(self.zernike_amplitudes):
             # Create the zernike phase and ensure it has the same number of dimensions as phase
@@ -70,8 +70,8 @@ class ZernikeAberrations(OpticalElement):
 
             # Increase the length of the frequency dimension such that the shape is suitable to be added
             # to the phase array, then add it
-            phase += self.zernike_amplitudes[j] * np.broadcast_to(
+            phase += self.zernike_amplitudes[j] * xp.broadcast_to(
                 zernike_phase, phase.shape
             )
 
-        return np.exp(1j * phase)
+        return xp.exp(1j * phase)
