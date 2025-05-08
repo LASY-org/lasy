@@ -263,7 +263,7 @@ class Laser:
             self.add_propagator(propagator)
 
         grid_out = self.propagator.propagate(
-            distance, self.grid, self.dim, self.profile.omega0, **kwargs
+            self.grid, self.dim, self.profile.omega0, distance=distance, **kwargs
         )
         self.grid = grid_out
 

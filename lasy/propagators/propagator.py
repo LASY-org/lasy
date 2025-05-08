@@ -38,15 +38,12 @@ class Propagator(ABC):
         self.omega0 = omega0
 
     @abstractmethod
-    def propagate(self, distance, grid_in, dim, omega0, grid_out=None):
+    def propagate(self, grid_in, dim, omega0, distance=None, grid_out=None):
         r"""
         Propagate field in the grid along axis z, for a certain distance.
 
         Parameters
         ----------
-        distance : float (in meters)
-            Distance over which the field will be propagated.
-
         grid_in: :class:`lasy.utils.Grid`
             Grid lasy object that contains the input field.
 
@@ -59,6 +56,9 @@ class Propagator(ABC):
         omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
+        distance : float (in meters)
+            Distance over which the field will be propagated.
 
         grid_out: :class:`lasy.utils.Grid` (optional)
             Grid lasy object where the output field will be written.
