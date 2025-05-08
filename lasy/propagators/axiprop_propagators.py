@@ -147,7 +147,14 @@ class AxipropPropagator(Propagator):
             )
 
     def propagate(
-            self, grid_in, dim, omega0, distance=None, grid_out=None, verbose=True, nr_boundary=0
+        self,
+        grid_in,
+        dim,
+        omega0,
+        distance=None,
+        grid_out=None,
+        verbose=True,
+        nr_boundary=0,
     ):
         r"""
         Propagate laser pulse in z direction by a given distance.
@@ -182,6 +189,7 @@ class AxipropPropagator(Propagator):
 
         distance : scalar (optional)
             Distance by which the laser is propagated.
+
         Returns
         -------
         Grid object with laser data after propagation.
