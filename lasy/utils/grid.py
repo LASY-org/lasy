@@ -41,6 +41,9 @@ class Grid:
 
     is_plane_wave : bool (optional)
         Whether the laser pulse transverse profile is a plane wave laer profile or not.
+
+    position : scalar (optional)
+        Longitudinal (z) position in a beamline at which the pulse is defined.
     """
 
     def __init__(
@@ -53,6 +56,7 @@ class Grid:
         is_envelope=True,
         is_cw=False,
         is_plane_wave=False,
+        position=0.0,
     ):
         # Metadata
         ndims = 2 if dim == "rt" else 3
@@ -122,6 +126,7 @@ class Grid:
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
+        self.position = position
 
     def set_is_envelope(self, is_envelope):
         """

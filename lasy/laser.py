@@ -368,21 +368,16 @@ class Laser:
             )
             spectral_field = np.moveaxis(transform_data, 0, -1).copy()
 
-        # Choose the time translation assuming propagation at v=c
-        translate_time = distance / c
-
         # This translation (e.g. delay in time, compared to t=0, associated
         # with the propagation) is not automatically handled by the above
         # propagators, so it needs to be added by hand.
         # Note: subtracting by omega0 is only a global phase convention,
         # that derives from the definition of the envelope in lasy.
-        spectral_field *= np.exp(-1j * spectral_axis * translate_time)
+        spectral_field *= np.exp(-1j * spectral_axis * distance / c)
         self.grid.set_spectral_field(spectral_field)
 
         # Translate the domain
-        self.grid.lo[time_axis_indx] += translate_time
-        self.grid.hi[time_axis_indx] += translate_time
-        self.grid.axes[time_axis_indx] += translate_time
+        self.grid.position += distance
 
     def write_to_file(
         self,
