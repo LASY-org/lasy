@@ -120,7 +120,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
         elif self.dim == "xyt":
             field = self._propagate_xyt(distance, grid_in)
 
-        #       grid_out.position += distance
+        grid_out.position += distance
         grid_out.set_spectral_field(field)
 
         return grid_out

@@ -12,7 +12,7 @@ class NonlinearKerrStep:
 
     .. math::
 
-        E (x,y,t) = E(x,y,t) \times \exp(i\,n_2\,n_0\,k_0\,I(x,y,t))
+        E (x,y,t) = E(x,y,t) \times \exp(i\,n_2\,k_0\,I(x,y,t))
 
     where :math:`I(x,y,t)` is the intensity profile of the pulse.
 
@@ -20,17 +20,29 @@ class NonlinearKerrStep:
     ----------
     n2 : float
         Nonlinear (intensity dependent) refractive index.
-    n0 : float
-        Linear refractive index at the carrier frequency.
     k0 : float
         Wave vector at the carrier frequency.
     """
 
     def __init__(self, n2, k0):
+        self.update(n2=n2, k0=k0)
+
+    def update(self, n2, k0):
+        """
+        Update the nonlinear refractive index and/or the wave vector.
+
+        Parameters
+        ----------
+        n2 : float
+            Nonlinear (intensity dependent) refractive index.
+        k0 : float
+            Wave vector at the carrier frequency.
+        """
         self.n2 = n2
         self.k0 = k0
 
-    def apply(self, grid_in, distance, grid_out=None):
+
+    def apply(self, grid_in, distance, grid_out=None, n2=None, k0=None):
         """
         Apply intensity dependent phase shift to the field.
 
@@ -44,6 +56,10 @@ class NonlinearKerrStep:
             Grid object on which the laser pulse after applying the phase
             is defined. Can be different from laser grid before applying.
         """
+        n2 = n2 if n2 is not None else self.n2
+        k0 = k0 if k0 is not None else self.k0
+        self.update(n2=n2, k0=k0)
+        
         if grid_out is None:
             grid_out = deepcopy(grid_in)
 
