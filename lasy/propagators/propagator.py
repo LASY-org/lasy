@@ -57,8 +57,8 @@ class Propagator(ABC):
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
-        distance : float (in meters)
-            Distance over which the field will be propagated.
+        distance : float (optional)
+            Distance (in meters) over which the field will be propagated.
 
         grid_out: :class:`lasy.utils.Grid` (optional)
             Grid lasy object where the output field will be written.

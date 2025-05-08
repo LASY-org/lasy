@@ -176,6 +176,9 @@ class AxipropPropagator(Propagator):
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
+        distance : scalar (optional)
+            Distance by which the laser is propagated.
+
         grid_out : Grid object (optional)
             Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
@@ -186,9 +189,6 @@ class AxipropPropagator(Propagator):
 
         nr_boundary : int (optional, default 0)
             Number of grid points for absorbing boundary condition.
-
-        distance : scalar (optional)
-            Distance by which the laser is propagated.
 
         Returns
         -------
