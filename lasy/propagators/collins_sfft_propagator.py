@@ -71,7 +71,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         y = fftshift(fftfreq(N_points, r0_step) * lambda0 * f0)
         return [x, y]
 
-    def propagate(self, grid, grid_out=None, distance=None, abcd=None):
+    def propagate(self, grid_in, dim, omega0, grid_out=None, distance=None, abcd=None):
         """
         Function to calculate an output field from
         input field and optical ray matrix of the system
@@ -94,15 +94,16 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             The wavelength of the electric field
 
         """
-        axes = grid.axes
-        omega0 = self.omega0
+        axes = grid_in.axes
+        self.omega0 = omega0
+        self.dim = dim
 
         # Get the spectral field and axes from the input grid
-        spectral_field, spectral_axes = grid.get_spectral_field()
+        spectral_field, spectral_axes = grid_in.get_spectral_field()
 
         if grid_out == None:
             axes_out = self.add_output_grid(
-                grid
+                grid_in
             )  # Call routine to determine output grid
         else:
             axes_out = self.grid_out.axes  # Use user-specified grid
@@ -126,7 +127,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
 
         elif self.dim == "xyt":
             print("Collins SFFT propagator in xyt")
-            axes = grid.axes  # Input axes
+            axes = grid_in.axes  # Input axes
             x0 = axes[0]
             y0 = axes[1]
 
@@ -154,10 +155,10 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
                 / np.abs(OM / (2j * np.pi * c * B))
             )
 
-        grid.lo[0] = x[0]
-        grid.lo[1] = y[0]
-        grid.hi[0] = x[-1]
-        grid.hi[1] = y[-1]
-        grid.axes[0] = x
-        grid.axes[1] = y
-        grid.set_spectral_field(profile_out)
+        grid_in.lo[0] = x[0]
+        grid_in.lo[1] = y[0]
+        grid_in.hi[0] = x[-1]
+        grid_in.hi[1] = y[-1]
+        grid_in.axes[0] = x
+        grid_in.axes[1] = y
+        grid_in.set_spectral_field(profile_out)
