@@ -78,6 +78,7 @@ def write_to_openpmd_file(
         for hi, lo, npoints in zip(grid.hi, grid.lo, grid.npoints)
     ][::-1]
     m.grid_global_offset = grid.lo[::-1]
+    m.grid_global_offset[0] += grid.position / c
     if dim == "xyt":
         m.geometry = io.Geometry.cartesian
         m.axis_labels = ["t", "y", "x"]
