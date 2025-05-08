@@ -4,9 +4,6 @@
 [![PyPI](https://img.shields.io/pypi/v/LASY)](https://pypi.org/project/lasy/)
 [![License](https://img.shields.io/badge/License-view-blue)](https://github.com/LASY-org/lasy/blob/development/license.txt)
 
-
-
-
 ## Overview
 
 `lasy` is a Python library that facilitates the initialization of complex laser pulses, in simulations of laser-plasma interactions.
