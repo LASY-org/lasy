@@ -40,7 +40,7 @@ class AxipropPropagator(Propagator):
             An Axiprop container (dim='xyt'), or list of containers (dim='rt', 1 element per mode), with the data of laser to propagate.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
             Only supported for rt geometry.
 
@@ -71,7 +71,7 @@ class AxipropPropagator(Propagator):
             A list of Axiprop containers, with the data of laser to propagate.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional)
@@ -120,7 +120,7 @@ class AxipropPropagator(Propagator):
             An Axiprop container, with the data of laser to propagate.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
             Only supported for rt geometry.
 
@@ -147,7 +147,14 @@ class AxipropPropagator(Propagator):
             )
 
     def propagate(
-        self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
+        self,
+        grid_in,
+        dim,
+        omega0,
+        distance=None,
+        grid_out=None,
+        verbose=True,
+        nr_boundary=0,
     ):
         r"""
         Propagate laser pulse in z direction by a given distance.
@@ -157,9 +164,6 @@ class AxipropPropagator(Propagator):
 
         Parameters
         ----------
-        distance : scalar
-            Distance by which the laser is propagated.
-
         grid_in : Grid
             Grid object containing the laser to propagate.
 
@@ -172,8 +176,11 @@ class AxipropPropagator(Propagator):
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
+        distance : scalar (optional)
+            Distance by which the laser is propagated.
+
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
             Only supported for 'rt' geometry.
 
@@ -187,6 +194,7 @@ class AxipropPropagator(Propagator):
         -------
         Grid object with laser data after propagation.
         """
+        assert distance is not None
         if dim == "xyt":
             assert grid_out is None, (
                 "grid_out not yet supported for xyt, please use None"
@@ -227,7 +235,7 @@ class AxipropPropagator(Propagator):
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional, default False)
@@ -346,7 +354,7 @@ class AxipropFresnelPropagator(Propagator):
             An Axiprop container (dim='xyt'), or list of containers (dim='rt', 1 element per mode), with the data of laser to propagate.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional)
@@ -378,7 +386,7 @@ class AxipropFresnelPropagator(Propagator):
             A list of Axiprop containers (1 element per mode), with the data of laser to propagate.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional)
@@ -433,7 +441,7 @@ class AxipropFresnelPropagator(Propagator):
             An Axiprop container with the data of laser to propagate.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional)
@@ -492,7 +500,7 @@ class AxipropFresnelPropagator(Propagator):
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object (optional)
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional, default False)
@@ -545,7 +553,7 @@ class AxipropFresnelPropagator(Propagator):
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional, default False)
@@ -608,7 +616,7 @@ class AxipropFresnelPropagator(Propagator):
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
         grid_out : Grid object
-            Grid object for on which the propagated laser pulse is defined.
+            Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
         verbose : boolean (optional, default False)

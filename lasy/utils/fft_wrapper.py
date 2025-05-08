@@ -5,6 +5,10 @@ def fft(which, arr_in, axes_in, from_domain):
     """
     Perform FFT on a 3D array.
 
+    We use the following conventions:
+     - From physical space (x&y or t) to frequency space (kx&ky or omega), the FFT done is data_freq = ifft(ifftshift(data_phys))
+     - From frequency space (kx&ky or omega) to physical space (x&y or t), the FFT done is data_phys = fftshift(fft(data_freq))
+
     Parameters
     ----------
     which : string
@@ -84,7 +88,7 @@ def fft(which, arr_in, axes_in, from_domain):
             axes_out[1] = xfftshift(axes_out[1])
             arr_out = xfftshift(arr_out, axes=(0, 1))
 
-    else:  # "longitudinal"
+    else:  # which == "longitudinal"
         # Exit if only 1 element
         if axes_in.size <= 1:
             print("fft of size 1: do nothing")
