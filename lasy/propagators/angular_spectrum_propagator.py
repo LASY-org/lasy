@@ -74,8 +74,8 @@ class AngularSpectrumPropagator(Propagator):
         assert dim in ["rt", "xyt"]
 
         self.n = n  # refractive index
-        self.omega0 = omega0
-        self.dim = dim
+        self.omega0 = omega0 if omega0 is not None else self.omega0
+        self.dim = dim if dim is not None else self.dim
 
     def propagate(self, distance, grid_in, dim=None, omega0=None, grid_out=None):
         r"""
@@ -106,8 +106,6 @@ class AngularSpectrumPropagator(Propagator):
         -------
         Grid object with laser data after propagation.
         """
-        dim = dim if dim is not None else self.dim
-        omega0 = omega0 if omega0 is not None else self.omega0
         self.update(omega0=omega0, dim=dim, n=self.n)
 
         if grid_out is None:
