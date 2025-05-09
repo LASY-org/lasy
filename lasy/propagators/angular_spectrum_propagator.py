@@ -79,7 +79,7 @@ class AngularSpectrumPropagator(Propagator):
         self.omega0 = omega0 if omega0 is not None else self.omega0
         self.n = n  # refractive index
 
-    def propagate(self,  distance, grid_in, dim=None, omega0=None, grid_out=None):
+    def propagate(self,  grid_in, dim=None, omega0=None, distance=None, grid_out=None):
         r"""
         Propagates the laser field in z direction by a given distance using the angular spectrum method.
 
@@ -108,6 +108,8 @@ class AngularSpectrumPropagator(Propagator):
         -------
         Grid object with laser data after propagation.
         """
+        assert distance is not None, "Distance must be provided for propagation."
+
         self.update(omega0=omega0, dim=dim, n=self.n)
 
         if grid_out is None:
@@ -185,7 +187,7 @@ class AngularSpectrumPropagator(Propagator):
 
         # calculate time difference between propagation in vacuum and in medium
         dt = distance / v_group -  distance / c
-        print(dt, distance / c, distance / v_group)
+
         return field, dt
 
     def _propagate_mrt(self, distance, grid_in):
