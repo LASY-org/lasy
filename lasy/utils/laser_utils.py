@@ -1506,9 +1506,6 @@ def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None
     dV = get_grid_cell_volume(grid, dim)
     field, omega = grid.get_spectral_field()
 
-    # Calculate omega
-    #   omega = np.fft.fftfreq(grid.npoints[-1], grid.dx[-1]) * 2 * np.pi
-
     # Choose axis along which to calculate the bandwidth
     if unit == "m":  # convert omega to wavelength
         assert omega0, "'omega0' must be provided to calculate bandwidth in meters."
