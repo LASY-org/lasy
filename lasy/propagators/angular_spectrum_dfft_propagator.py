@@ -117,7 +117,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
         if self.dim == "rt":
             field = self._propagate_mrt(distance, grid_in)
 
-        else: # self.dim == "xyt"
+        else:  # self.dim == "xyt"
             field = self._propagate_xyt(distance, grid_in)
 
         grid_out.position += distance
