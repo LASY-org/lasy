@@ -8,9 +8,9 @@ from lasy.utils.fft_wrapper import fft
 from .propagator import Propagator
 
 
-class AngularSpectrumDFFTPropagator(Propagator):
+class AngularSpectrumPropagator(Propagator):
     r"""
-    Class that represents a dual FFT propagator using the angular spectrum method spectrum dual FFT propagator.
+    Class that represents a dual FFT propagator using the angular spectrum method.
 
     The propagated field is calculated in the following method:
 

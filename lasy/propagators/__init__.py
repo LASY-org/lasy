@@ -1,4 +1,4 @@
-from .angular_spectrum_dfft_propagator import AngularSpectrumDFFTPropagator
+from .angular_spectrum_propagator import AngularSpectrumPropagator
 from .axiprop_propagators import AxipropFresnelPropagator, AxipropPropagator
 from .collins_sfft_propagator import CollinsSFFTPropagator
 from .fresnel_sfft_propagator import FresnelSFFTPropagator
@@ -12,7 +12,7 @@ __all__ = [
     "FresnelSFFTPropagator",
     "CollinsSFFTPropagator",
     "NonlinearKerrStep",
-    "AngularSpectrumDFFTPropagator",
+    "AngularSpectrumPropagator",
     "AxipropPropagator",
     "AxipropFresnelPropagator",
 ]
