@@ -1510,7 +1510,6 @@ def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None
     if unit == "m":  # convert omega to wavelength
         assert omega0, "'omega0' must be provided to calculate bandwidth in meters."
         width_axis = 2 * np.pi * c / (omega + omega0)
-
     else:  # keep omega as that axis
         width_axis = omega
 
