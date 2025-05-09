@@ -70,7 +70,6 @@ class AngularSpectrumPropagator(Propagator):
             laser pulse, or a function of the wavelength (in meters).
             Default value is n=1. to describe propagation in vacuum.
         """
-
         dim = dim if dim is not None else self.dim
         assert isinstance(n, (int, float, np.ndarray)) or callable(n)
         assert dim in ["rt", "xyt"]
@@ -79,7 +78,7 @@ class AngularSpectrumPropagator(Propagator):
         self.omega0 = omega0 if omega0 is not None else self.omega0
         self.n = n  # refractive index
 
-    def propagate(self,  grid_in, dim=None, omega0=None, distance=None, grid_out=None):
+    def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None):
         r"""
         Propagates the laser field in z direction by a given distance using the angular spectrum method.
 
@@ -126,7 +125,7 @@ class AngularSpectrumPropagator(Propagator):
         grid_out.axes[-1] += dt
         grid_out.lo[-1] += dt
         grid_out.hi[-1] += dt
-        
+
         grid_out.set_spectral_field(field)
 
         return grid_out
@@ -186,7 +185,7 @@ class AngularSpectrumPropagator(Propagator):
         )
 
         # calculate time difference between propagation in vacuum and in medium
-        dt = distance / v_group -  distance / c
+        dt = distance / v_group - distance / c
 
         return field, dt
 
