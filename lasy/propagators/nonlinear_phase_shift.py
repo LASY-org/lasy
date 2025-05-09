@@ -38,9 +38,9 @@ class NonlinearKerrStep:
         k0 : float
             Wave vector at the carrier frequency.
         """
-        self.n2 = n2
-        self.k0 = k0
-
+        self.n2 = n2 if n2 is not None else self.n2
+        self.k0 = k0 if k0 is not None else self.k0
+        
     def apply(self, grid_in, distance, grid_out=None, n2=None, k0=None):
         """
         Apply intensity dependent phase shift to the field.
@@ -55,8 +55,6 @@ class NonlinearKerrStep:
             Grid object on which the laser pulse after applying the phase
             is defined. Can be different from laser grid before applying.
         """
-        n2 = n2 if n2 is not None else self.n2
-        k0 = k0 if k0 is not None else self.k0
         self.update(n2=n2, k0=k0)
 
         if grid_out is None:
