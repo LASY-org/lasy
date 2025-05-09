@@ -172,7 +172,6 @@ class Laser:
         value : scalar
             Value to which to normalize the field property that is defined in ``kind``
         kind : string (optional)
-            Distance by which the laser pulse should be propagated
             Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'``, ``'peak_fluence'``, ``'peak_power'``, (default is ``'energy'``)
         """
         if kind == "energy":
