@@ -474,7 +474,14 @@ class AxipropFresnelPropagator(Propagator):
             )
 
     def propagate(
-        self, distance, grid_in, dim, omega0, grid_out=None, verbose=True, nr_boundary=0
+        self,
+        grid_in,
+        dim,
+        omega0,
+        distance=None,
+        grid_out=None,
+        verbose=True,
+        nr_boundary=0,
     ):
         r"""
         Propagate laser pulse in z direction by a given distance.
