@@ -1520,7 +1520,6 @@ def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None
     # Calculate weights of each grid cell (amplitude of the field).
     if dim == "xyt":
         spectral_intensity = np.abs(field) ** 2 * dV
-
     else:  # dim == "rt":
         spectral_intensity = np.abs(field) ** 2 * dV[np.newaxis, :, np.newaxis]
 
