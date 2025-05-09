@@ -10,7 +10,7 @@ from .propagator import Propagator
 
 class AngularSpectrumPropagator(Propagator):
     r"""
-    Class that represents a dual FFT propagator using the angular spectrum method.
+    Class that represents a double FFT propagator using the angular spectrum method.
 
     The propagated field is calculated in the following method:
 
@@ -21,7 +21,7 @@ class AngularSpectrumPropagator(Propagator):
         \times\exp(i\,n\,\Delta z\,\sqrt{k_z^2-k_x^2-k_y^2}) \right]
 
     where :math:`E_{i} (x,y,\omega)` is the initial/propagated fields complex field envelope
-    and :math:`\mathcal{F}_{x,y}` is the 2D fourier transform in the transverse (x,y) axes.
+    and :math:`\mathcal{F}_{x,y}` is the 2D Fourier transform in the transverse (x,y) axes.
 
     Parameters
     ----------
@@ -70,14 +70,16 @@ class AngularSpectrumPropagator(Propagator):
             laser pulse, or a function of the wavelength (in meters).
             Default value is n=1. to describe propagation in vacuum.
         """
+
+        dim = dim if dim is not None else self.dim
         assert isinstance(n, (int, float, np.ndarray)) or callable(n)
         assert dim in ["rt", "xyt"]
 
-        self.n = n  # refractive index
+        self.dim = dim
         self.omega0 = omega0 if omega0 is not None else self.omega0
-        self.dim = dim if dim is not None else self.dim
+        self.n = n  # refractive index
 
-    def propagate(self, distance, grid_in, dim=None, omega0=None, grid_out=None):
+    def propagate(self,  distance, grid_in, dim=None, omega0=None, grid_out=None):
         r"""
         Propagates the laser field in z direction by a given distance using the angular spectrum method.
 
@@ -112,12 +114,17 @@ class AngularSpectrumPropagator(Propagator):
             grid_out = deepcopy(grid_in)
 
         if self.dim == "rt":
-            field = self._propagate_mrt(distance, grid_in)
+            field, dt = self._propagate_mrt(distance, grid_in)
 
         else:  # self.dim == "xyt"
-            field = self._propagate_xyt(distance, grid_in)
+            field, dt = self._propagate_xyt(distance, grid_in)
 
+        # update the grid
         grid_out.position += distance
+        grid_out.axes[-1] += dt
+        grid_out.lo[-1] += dt
+        grid_out.hi[-1] += dt
+        
         grid_out.set_spectral_field(field)
 
         return grid_out
@@ -176,11 +183,15 @@ class AngularSpectrumPropagator(Propagator):
             from_domain="real",
         )
 
-        return field
+        # calculate time difference between propagation in vacuum and in medium
+        dt = distance / v_group -  distance / c
+        print(dt, distance / c, distance / v_group)
+        return field, dt
 
     def _propagate_mrt(self, distance, grid_in):
         print(
             "'rt' geometry not yet supported by AngularSpectrumPropagator, skipping propagation"
         )
         field = grid_in.field
-        return field
+        dt = 0
+        return field, dt
