@@ -105,7 +105,6 @@ class AngularSpectrumDFFTPropagator(Propagator):
         Returns
         -------
         Grid object with laser data after propagation.
-
         """
         dim = dim if dim is not None else self.dim
         omega0 = omega0 if omega0 is not None else self.omega0
