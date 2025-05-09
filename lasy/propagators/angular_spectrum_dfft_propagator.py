@@ -36,7 +36,7 @@ class AngularSpectrumDFFTPropagator(Propagator):
         - ``'rt'`` : The laser pulse is represented on a 2D grid:
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
-    n : int, float, 1d array or callable, Optional
+    n : int, float, 1d array or callable, optional
         Refractive index of the medium in which to propagate the laser.
         Can be either a single value if dispersive effects are ignored, a 1d array
         describing the refractive index along the frequency/wavelength axis of the
