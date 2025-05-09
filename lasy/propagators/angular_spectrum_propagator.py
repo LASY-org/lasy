@@ -63,7 +63,7 @@ class AngularSpectrumPropagator(Propagator):
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
-        n : int, float, 1d array or callable
+        n : scalar, 1d array or callable
             Refractive index of the medium in which to propagate the laser.
             Can be either a single value if dispersive effects are ignored, a 1d array
             describing the refractive index along the frequency/wavelength axis of the
