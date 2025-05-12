@@ -52,10 +52,10 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
     abcd : 2d array
         The 2D ray matrix of the optical system through which the beam propagates.
         By default, this is initialised to be the unitary matrix:
-        
+
         .. math::
-        
-            O = 
+
+            O =
             \begin{pmatrix}
             A & B \\
             C & D
@@ -66,8 +66,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             \end{pmatrix}.
     """
 
-    
-    def __init__(self, omega0, dim, abcd=np.array([[1,0],[0,1]])):
+    def __init__(self, omega0, dim, abcd=np.array([[1, 0], [0, 1]])):
         super().__init__()
         self.update(dim=dim, omega0=omega0, abcd=abcd)
 
@@ -89,10 +88,10 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         abcd : 2d array
             The 2D ray matrix of the optical system through which the beam propagates.
             By default, this is initialised to be the unitary matrix:
-            
+
             .. math::
-            
-                O = 
+
+                O =
                 \begin{pmatrix}
                 A & B \\
                 C & D
@@ -180,8 +179,6 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             The wavelength of the electric field
 
         """
-        
-
         self.update(omega0=omega0, dim=dim, abcd=self.abcd)
 
         axes = grid_in.axes
@@ -203,7 +200,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             D = abcd[1][1]
         except:
             print("Missing the ray matrix for the optical system.")
-        print("Determinant of optical matrix: ", A*D - B*C)
+        print("Determinant of optical matrix: ", A * D - B * C)
 
         if self.dim == "rt":
             print("Collins SFFT propagator in rt")
