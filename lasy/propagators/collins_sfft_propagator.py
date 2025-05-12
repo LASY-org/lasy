@@ -5,16 +5,6 @@ from lasy.utils.laser_utils import get_w0
 
 from .single_fft_propagator import SingleFFTPropagator
 
-"DEFINE CONSTANTS"
-cm = 1e-2
-mm = 1e-3
-um = 1e-6
-nm = 1e-9
-ps = 1e-12
-fs = 1e-15
-mJ = 1e-3
-c = 2.998e8
-
 
 class CollinsSFFTPropagator(SingleFFTPropagator):
     r"""
@@ -148,7 +138,7 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
         # Spot size and Rayleigh range after lens
         z_Rf0 = 2.0 * f0**2 / (k0 * w0**2)  # Estimated Rayleigh range
         w_0f = 2.0 * f0 / (k0 * w0)  # Estimated focal spot-size
-        print("Waist size [um]: ", w_0f / um, "\nRayleigh [um]: ", z_Rf0 / um)
+        print("Waist size [um]: ", w_0f / 1e-6, "\nRayleigh [um]: ", z_Rf0 / 1e-6)
 
         r0_step = L0_width / N_points  # Note: D gridpoints means D-1 intervals
 
