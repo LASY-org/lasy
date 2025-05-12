@@ -198,9 +198,9 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
             B = abcd[0][1]
             C = abcd[1][0]
             D = abcd[1][1]
+            print("Determinant of optical matrix: ", A * D - B * C)
         except:
             print("Missing the ray matrix for the optical system.")
-        print("Determinant of optical matrix: ", A * D - B * C)
 
         if self.dim == "rt":
             print("Collins SFFT propagator in rt")
@@ -208,7 +208,6 @@ class CollinsSFFTPropagator(SingleFFTPropagator):
 
         elif self.dim == "xyt":
             print("Collins SFFT propagator in xyt")
-            axes = grid_in.axes  # Input axes
             x0 = axes[0]
             y0 = axes[1]
 
