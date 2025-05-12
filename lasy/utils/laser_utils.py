@@ -1455,3 +1455,110 @@ def get_dispersion(grid, dim, omega0, order, omega_eval=None, method="sum"):
     disp0 = interp1d(omega, disp, bounds_error=True)(omega_eval)
 
     return disp, disp0
+
+
+def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None):
+    """Calculate the spectral width of a pulse in a given grid.
+
+    By default, the bandwidth is calculated as the rms width of the spatially summed spectrum, in rad/s.
+    Optionally, the bandwidth can also be calculated on-axis, at a given intensity level or in meters.
+
+    Parameters
+    ----------
+    grid : Grid
+        The grid with the envelope to analyze.
+
+    dim : string
+        Dimensionality of the array. Options are:
+
+        - ``'xyt'``: The laser pulse is represented on a 3D grid:
+                    Cartesian (x,y) transversely, and temporal (t) longitudinally.
+        - ``'rt'`` : The laser pulse is represented on a 2D grid:
+                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
+    method : string, optional
+        Method to calculate the bandwidth. Options are:
+
+        - ``'sum'``: Calculates the width of the spatially summed spectrum.
+        - ``'on-axis'``: Calculates the width of the on-axis spectrum.
+
+    level : float, optional
+        Intensity level at which the bandwidth is calculated. If None, i.e. by default,
+        the bandwidth is calculated as the rms width of the spectral intensity.
+
+    unit : string, optional
+        Unit in which the bandwidth should be returned.
+        Options are:
+
+        - ``'rad/s'``: Radians per second.
+        - ``'m'``: meters.
+
+    omega0 : float, optional
+        Central angular frequency of the pulse.
+        Only required if ``unit='m'``, i.e. the bandwidth should be converted to meters.
+
+    Returns
+    -------
+    float
+        Spectral bandwidth of the pulse in the specified units and calculation method.
+    """
+    # Get the volume of each grid cell and spectral field
+    dV = get_grid_cell_volume(grid, dim)
+    field, omega = grid.get_spectral_field()
+
+    # Choose axis along which to calculate the bandwidth
+    if unit == "m":  # convert omega to wavelength
+        assert omega0, "'omega0' must be provided to calculate bandwidth in meters."
+        width_axis = 2 * np.pi * c / (omega + omega0)
+    else:  # keep omega as that axis
+        width_axis = omega
+
+    # Calculate weights of each grid cell (amplitude of the field).
+    if dim == "xyt":
+        spectral_intensity = np.abs(field) ** 2 * dV
+    else:  # dim == "rt":
+        spectral_intensity = np.abs(field) ** 2 * dV[np.newaxis, :, np.newaxis]
+
+    # Selecte the method to calculate the bandwidth
+    if method == "sum":
+        spectral_intensity = np.sum(spectral_intensity, axis=(0, 1))
+    else:
+        if dim == "xyt":
+            spectral_intensity = spectral_intensity[
+                grid.npoints[0] // 2, grid.npoints[1] // 2, :
+            ]
+        else:  # dim=='rt'
+            spectral_intensity = spectral_intensity[0, 0, :]
+
+    if level:
+        # sort omega/wavelength axis and spectral intensity
+        order = np.argsort(width_axis)
+        width_axis = width_axis[order]
+        spectral_intensity = spectral_intensity[order]
+
+        # find intensity threshold
+        threshold = np.max(spectral_intensity) * level
+
+        # find indices that mark the range in which spectral intensity >= threshold
+        idcs = np.where(spectral_intensity >= threshold)[0]
+        i_min, i_max = idcs[0], idcs[-1]
+
+        # calculate positions of lower and upper bounds
+        lower_bound = np.interp(
+            threshold,
+            spectral_intensity[i_min - 1 : i_min + 1],
+            width_axis[i_min - 1 : i_min + 1],
+        )
+        upper_bound = np.interp(
+            threshold,
+            spectral_intensity[i_max : i_max + 2][::-1],
+            width_axis[i_max : i_max + 2][::-1],
+        )
+
+        # calculate bandwidth
+        bandwidth = upper_bound - lower_bound
+
+    else:  # default case, calculate rms width
+        bandwidth = weighted_std(width_axis, spectral_intensity)
+
+    return bandwidth
