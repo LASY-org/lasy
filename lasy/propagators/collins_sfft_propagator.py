@@ -1,6 +1,6 @@
 import numpy as np
-from scipy.constants import c
 from numpy.fft import fftfreq, fftshift, ifft2, ifftshift
+from scipy.constants import c
 
 from lasy.utils.laser_utils import get_w0
 
