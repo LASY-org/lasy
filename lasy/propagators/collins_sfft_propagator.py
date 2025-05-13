@@ -9,8 +9,10 @@ from lasy.utils.laser_utils import get_w0
 
 from .propagator import Propagator
 
+
 def q(z, z_0, z_R):  # Defines the q-parameter of a Gaussian beam
     return z - z_0 - 1j * z_R
+
 
 class CollinsSFFTPropagator(Propagator):
     r"""
@@ -130,60 +132,63 @@ class CollinsSFFTPropagator(Propagator):
             Dimensionality of the array. Options are:
             - ``'xyt'``: Laser pulse represented on a 3D Cartesian grid.
             - ``'rt'`` : Laser pulse represented on a 2D cylindrical grid.
-        
+
         grid_in : meshgrid (in meter)
             2D meshgrid for the input coordinates
 
         """
-        
         if self.dim == "rt":
             print(
                 "'rt' geometry not yet supported by CollinsSFFTPropagator, skipping grid calculation"
             )
-            grid_out = deepcopy(grid_in) # Make a copy of the input grid
-            
+            grid_out = deepcopy(grid_in)  # Make a copy of the input grid
+
         else:  # self.dim == "xyt"
-            grid_out = deepcopy(grid_in) # Make a copy of the input grid
-            
-            try: # Get the elements of the optical matrix
+            grid_out = deepcopy(grid_in)  # Make a copy of the input grid
+
+            try:  # Get the elements of the optical matrix
                 A = self.abcd[0][0]
                 B = self.abcd[0][1]
                 C = self.abcd[1][0]
                 D = self.abcd[1][1]
-                print("Determinant of optical matrix: ", A * D - B * C) # Check determinant = 1
+                print(
+                    "Determinant of optical matrix: ", A * D - B * C
+                )  # Check determinant = 1
             except:
                 print("Missing the ray matrix for the optical system.")
-            
+
             x = grid_in.axes[0]
             y = grid_in.axes[1]
             L0_width = np.abs(x[-1] - x[0])
             N_points = len(x)
-    
+
             lambda0 = 2.0 * np.pi * c / self.omega0
             k0 = self.omega0 / c
-            
-            w0 = get_w0(grid_in, self.dim) # Calculate input spot size
-            z_R = np.pi * w0**2 / lambda0 # Calculate input Rayleigh range
+
+            w0 = get_w0(grid_in, self.dim)  # Calculate input spot size
+            z_R = np.pi * w0**2 / lambda0  # Calculate input Rayleigh range
 
             q1 = q(0, 0, z_R)
-            z_02 = -np.real((A * q1 + B) / (C * q1 + D)) # Calculate waist position
-            z_R2 = -np.imag((A * q1 + B) / (C * q1 + D)) # Calculate output Rayleigh range
-            f0 = np.sqrt(k0 * w0**2 / 2.0 * z_R2) # Calculate effective focal length
-            assert f0<5, (
-            "CollinsSFFTPropagator is for focusing geometries, please specify a lens."
+            z_02 = -np.real((A * q1 + B) / (C * q1 + D))  # Calculate waist position
+            z_R2 = -np.imag(
+                (A * q1 + B) / (C * q1 + D)
+            )  # Calculate output Rayleigh range
+            f0 = np.sqrt(k0 * w0**2 / 2.0 * z_R2)  # Calculate effective focal length
+            assert f0 < 5, (
+                "CollinsSFFTPropagator is for focusing geometries, please specify a lens."
             )
-        
+
             r0_step = L0_width / N_points  # Note: D gridpoints means D-1 intervals
-    
+
             x = fftshift(fftfreq(N_points, r0_step) * lambda0 * f0)
             y = fftshift(fftfreq(N_points, r0_step) * lambda0 * f0)
-            
+
             grid_out.lo[0] = x[0]
             grid_out.lo[1] = y[0]
             grid_out.hi[0] = x[-1]
             grid_out.hi[1] = y[-1]
             grid_out.axes[0] = x
-            grid_out.axes[1] = y        
+            grid_out.axes[1] = y
         return grid_out
 
     def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None):
@@ -210,11 +215,11 @@ class CollinsSFFTPropagator(Propagator):
 
         """
         self.update(omega0=omega0, dim=dim, abcd=self.abcd)
-        
-        if grid_out == None: # Call routine to determine output grids from focusing geometry
-            grid_out = self.add_output_grid(
-                dim, grid_in
-            )
+
+        if (
+            grid_out == None
+        ):  # Call routine to determine output grids from focusing geometry
+            grid_out = self.add_output_grid(dim, grid_in)
         else:
             grid_out = self.grid_out  # Use user-specified grid
 
@@ -227,12 +232,11 @@ class CollinsSFFTPropagator(Propagator):
         grid_in.set_spectral_field(field)
 
     def _propagate_xyt(self, grid_in, grid_out):
-        
         print("Collins SFFT propagator in xyt")
-        
+
         # Get the spectral field and axes from the input grid
         spectral_field, spectral_axes = grid_in.get_spectral_field()
-        
+
         x0 = grid_in.axes[0]  # Input axes
         y0 = grid_in.axes[1]
 
@@ -243,15 +247,15 @@ class CollinsSFFTPropagator(Propagator):
         X, Y, OM = np.meshgrid(y, x, spectral_axes + self.omega0)
         R0 = np.sqrt(X0**2 + Y0**2)
         R = np.sqrt(X**2 + Y**2)
-        
-        try: # Get the elements of the optical matrix
+
+        try:  # Get the elements of the optical matrix
             A = self.abcd[0][0]
             B = self.abcd[0][1]
             C = self.abcd[1][0]
             D = self.abcd[1][1]
         except:
             print("Missing the ray matrix for the optical system.")
-        
+
         propagator = np.exp(1j * OM / (2 * c) * (A / B) * R0**2)
 
         # Take the convolution to the output plane
@@ -261,14 +265,14 @@ class CollinsSFFTPropagator(Propagator):
             axes_in=(x0, y0),
             from_domain="frequency",
         )
-        
+
         field = (
             field
             * np.exp(1j * OM / (2 * c) * (D / B) * R**2)
             * OM
             / (2j * np.pi * c * B)
             / np.abs(OM / (2j * np.pi * c * B))
-        ) # Return field in spectral domain
+        )  # Return field in spectral domain
         return field
 
     def _propagate_mrt(self, grid_in, grid_out):
