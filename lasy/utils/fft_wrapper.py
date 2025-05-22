@@ -142,11 +142,9 @@ def frequency_axis(which, axes_in, from_domain):
     # - From real to frequency, use ifft & fftshift on input data.
     # - From frequency to real, use fft & fftshift on output data.
     if from_domain == "real":
-        shift_before = True
         shift_after = False
         inverse = True
     else:
-        shift_before = False
         shift_after = True
         inverse = False
 
