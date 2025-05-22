@@ -102,6 +102,7 @@ def fft(which, arr_in, axes_in, from_domain):
     axes_out = frequency_axis(which, axes_in, from_domain)
     return arr_out, axes_out
 
+
 def frequency_axis(which, axes_in, from_domain):
     """
     Perform FFT on a 3D array.
