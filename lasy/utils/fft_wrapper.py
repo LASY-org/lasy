@@ -128,9 +128,6 @@ def frequency_axis(which, axes_in, from_domain):
 
     Returns
     -------
-    arr_out : ndarray
-        3D array after FFT
-
     axes_out : list of 1d arrays
         if which="transverse", 2 1d arrays for the transverse transformed axes
         if which="longitudinal", 1 1d array for the longitudinal transformed axis
