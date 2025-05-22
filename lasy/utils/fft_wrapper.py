@@ -59,8 +59,10 @@ def fft(which, arr_in, axes_in, from_domain):
 
         # Set right FFT functions
         if inverse:
+            xfftshift = np.fft.ifftshift
             xfft = np.fft.ifft2
         else:
+            xfftshift = np.fft.fftshift
             xfft = np.fft.fft2
 
         # Do the FFT
@@ -81,8 +83,10 @@ def fft(which, arr_in, axes_in, from_domain):
 
         # Set right FFT functions
         if inverse:
+            xfftshift = np.fft.ifftshift
             xfft = np.fft.ifft
         else:
+            xfftshift = np.fft.fftshift
             xfft = np.fft.fft
 
         # Do the FFT

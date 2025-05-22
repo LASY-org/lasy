@@ -1,6 +1,6 @@
 import numpy as np
 
-from .fft_wrapper import fft
+from .fft_wrapper import fft, frequency_axis
 
 time_axis_indx = -1
 
@@ -175,6 +175,8 @@ class Grid:
         assert field.shape == self.spectral_field.shape
         assert field.dtype == "complex128"
         self.spectral_field[:, :, :] = field
+        if not hasattr(self, "spectral_axis"):
+            self.spectral_axis = frequency_axis("longitudinal", self.axes[-1], "real")
         self.spectral_field_valid = True
         self.temporal_field_valid = False  # Invalidates the temporal field
 
