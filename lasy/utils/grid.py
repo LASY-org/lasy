@@ -175,8 +175,6 @@ class Grid:
         assert field.shape == self.spectral_field.shape
         assert field.dtype == "complex128"
         self.spectral_field[:, :, :] = field
-        if not hasattr(self, "spectral_axis"):
-            self.spectral_axis = frequency_axis("longitudinal", self.axes[-1], "real")
         self.spectral_field_valid = True
         self.temporal_field_valid = False  # Invalidates the temporal field
 
@@ -222,6 +220,8 @@ class Grid:
         # We return a copy, so that the user cannot modify
         # the original field, unless set_spectral_field is called
         assert self.is_envelope
+        if not hasattr(self, "spectral_axis"):
+            self.spectral_axis = frequency_axis("longitudinal", self.axes[-1], "real")
         if self.spectral_field_valid:
             return self.spectral_field.copy(), self.spectral_axis.copy()
         elif self.temporal_field_valid:

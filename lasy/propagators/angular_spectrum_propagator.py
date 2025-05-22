@@ -121,12 +121,11 @@ class AngularSpectrumPropagator(Propagator):
             field, dt = self._propagate_xyt(distance, grid_in)
 
         # update the grid
+        grid_out.set_spectral_field(field)
         grid_out.position += distance
         grid_out.axes[-1] += dt
         grid_out.lo[-1] += dt
         grid_out.hi[-1] += dt
-
-        grid_out.set_spectral_field(field)
 
         return grid_out
 

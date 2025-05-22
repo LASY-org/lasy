@@ -59,11 +59,11 @@ def fft(which, arr_in, axes_in, from_domain):
 
         # Set right FFT functions
         if inverse:
-            xfftshift = np.fft.ifftshift
             xfft = np.fft.ifft2
+            xfftshift = np.fft.ifftshift
         else:
-            xfftshift = np.fft.fftshift
             xfft = np.fft.fft2
+            xfftshift = np.fft.fftshift
 
         # Do the FFT
         arr = np.copy(arr_in)
@@ -83,11 +83,11 @@ def fft(which, arr_in, axes_in, from_domain):
 
         # Set right FFT functions
         if inverse:
-            xfftshift = np.fft.ifftshift
             xfft = np.fft.ifft
+            xfftshift = np.fft.ifftshift
         else:
-            xfftshift = np.fft.fftshift
             xfft = np.fft.fft
+            xfftshift = np.fft.fftshift
 
         # Do the FFT
         arr = np.copy(arr_in)
@@ -100,6 +100,7 @@ def fft(which, arr_in, axes_in, from_domain):
             arr_out = xfftshift(arr_out, axes=-1)
 
     axes_out = frequency_axis(which, axes_in, from_domain)
+
     return arr_out, axes_out
 
 
@@ -183,6 +184,8 @@ def frequency_axis(which, axes_in, from_domain):
 
         # Build output axes data
         axes_out = np.fft.fftfreq(axes_in.size, d)
+        if from_domain == "real":
+            axes_out *= 2 * np.pi
 
         # Shift after FFT
         if shift_after:
