@@ -147,6 +147,9 @@ def frequency_axis(which, axes_in, from_domain):
         inverse = False
 
     if which == "transverse":
+        # Exit if only 1 element
+        if min(axes_in[0].size, axes_in[1].size) < 2:
+            return axes_in
         dx = axes_in[0][1] - axes_in[0][0]
         dy = axes_in[1][1] - axes_in[1][0]
 
@@ -171,6 +174,9 @@ def frequency_axis(which, axes_in, from_domain):
             axes_out[1] = xfftshift(axes_out[1])
 
     else:  # which == "longitudinal"
+        # Exit if only 1 element
+        if axes_in.size <= 1:
+            return axes_in
         d = axes_in[1] - axes_in[0]
 
         # Set right FFT functions
