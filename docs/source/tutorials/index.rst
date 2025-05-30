@@ -18,3 +18,4 @@ Additionally, a set of static (automatically tested) examples can be found below
    denoised_laser.ipynb
    1d_temporal_laser.ipynb
    2d_spatial_laser.ipynb
+   nonlinear_propagation_split_step.ipynb

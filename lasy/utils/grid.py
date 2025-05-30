@@ -1,5 +1,7 @@
 import numpy as np
 
+from .fft_wrapper import fft, frequency_axis
+
 time_axis_indx = -1
 
 
@@ -41,6 +43,9 @@ class Grid:
 
     is_plane_wave : bool (optional)
         Whether the laser pulse transverse profile is a plane wave laer profile or not.
+
+    position : scalar (optional)
+        Longitudinal (z) position in a beamline at which the pulse is defined.
     """
 
     def __init__(
@@ -53,6 +58,7 @@ class Grid:
         is_envelope=True,
         is_cw=False,
         is_plane_wave=False,
+        position=0.0,
     ):
         # Metadata
         ndims = 2 if dim == "rt" else 3
@@ -122,6 +128,7 @@ class Grid:
         self.temporal_field_valid = False
         self.spectral_field = np.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
+        self.position = position
 
     def set_is_envelope(self, is_envelope):
         """
@@ -213,6 +220,8 @@ class Grid:
         # We return a copy, so that the user cannot modify
         # the original field, unless set_spectral_field is called
         assert self.is_envelope
+        if not hasattr(self, "spectral_axis"):
+            self.spectral_axis = frequency_axis("longitudinal", self.axes[-1], "real")
         if self.spectral_field_valid:
             return self.spectral_field.copy(), self.spectral_axis.copy()
         elif self.temporal_field_valid:
@@ -229,9 +238,10 @@ class Grid:
         """
         assert self.temporal_field_valid
 
-        shifted_temporal = np.fft.fftshift(self.temporal_field, axes=time_axis_indx)
-        self.spectral_field = np.fft.ifft(shifted_temporal, axis=time_axis_indx)
-        self.spectral_axis = 2 * np.pi * np.fft.fftfreq(self.npoints[-1], self.dx[-1])
+        self.spectral_field, self.spectral_axis = fft(
+            "longitudinal", self.temporal_field, self.axes[-1], "real"
+        )
+
         self.spectral_field_valid = True
 
     def spectral2temporal_fft(self):
@@ -242,7 +252,8 @@ class Grid:
         """
         assert self.spectral_field_valid
 
-        shifted_temporal = np.fft.fft(self.spectral_field, axis=time_axis_indx)
-        self.temporal_field = np.fft.fftshift(shifted_temporal, axes=time_axis_indx)
+        self.temporal_field, _ = fft(
+            "longitudinal", self.spectral_field, self.axes[-1], "frequency"
+        )
 
         self.temporal_field_valid = True
