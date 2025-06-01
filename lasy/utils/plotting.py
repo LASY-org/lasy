@@ -179,7 +179,7 @@ def show_laser(
         ax.text(
             0.025,
             vpos,
-            r"Time shift = %.1f fs" % (t_shift / 1e-15),
+            r"Time shift = %.1f fs" % (-t_shift / 1e-15),
             transform=ax.transAxes,
             fontsize="x-small",
             ha="left",
