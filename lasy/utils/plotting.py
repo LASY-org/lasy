@@ -236,6 +236,8 @@ def show_laser(
         field_max_label = r"$|a_{max}|$ = %.3f" % (field_max)
     elif envelope_type == "field":
         field_max_label = r"$|E_{max}|$ = %.2e V/m" % (field_max)
+    else:
+        field_max_label = r"Max = %.2e" % (field_max)
 
     if show_max:
         ax.text(
