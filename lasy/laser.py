@@ -327,7 +327,7 @@ class Laser:
         t_shift : float, default: 0
             Shift the temporal axis by `t_shift` seconds.
             It also can be a string with `"left"`, `"right"` or `"center"`,
-            to shift the temporal axis such that the t=0 lies at the left, 
+            to shift the temporal axis such that the t=0 lies at the left,
             right or center of the x-axis.
 
         show_lineout : bool, default: True
