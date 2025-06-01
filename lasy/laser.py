@@ -306,7 +306,7 @@ class Laser:
 
     def show(
         self,
-        field_type="field",
+        envelope_type="field",
         t_shift=0,
         show_lineout=True,
         show_max=False,
@@ -318,7 +318,7 @@ class Laser:
 
         Parameters
         ----------
-        field_type : string, default: "field"
+        envelope_type : string, default: "field"
             Options are:
             - ``'field'``: Show the envelope of the laser field.
             - ``'intensity'``: Show the intensity of the laser field.
@@ -327,7 +327,8 @@ class Laser:
         t_shift : float, default: 0
             Shift the temporal axis by `t_shift` seconds.
             It also can be a string with `"left"`, `"right"` or `"center"`,
-            to shift the temporal axis to the left, right or center of the time axis.
+            to shift the temporal axis such that the t=0 lies at the left, 
+            right or center of the x-axis.
 
         show_lineout : bool, default: True
             Show the lineout of the laser field.
@@ -345,7 +346,7 @@ class Laser:
         show_laser(
             self.grid,
             self.dim,
-            field_type=field_type,
+            envelope_type=envelope_type,
             t_shift=t_shift,
             show_lineout=show_lineout,
             show_max=show_max,
