@@ -154,7 +154,7 @@ class AngularSpectrumPropagator(Propagator):
         phase = (
             distance
             * n
-            * (kz[None, None, :] ** 2 - kx[:, None, None] ** 2 - ky[None, :, None] ** 2)
+            * (np.max(0,kz[None, None, :] ** 2 - kx[:, None, None] ** 2 - ky[None, :, None] ** 2))
             ** 0.5
         )
 
