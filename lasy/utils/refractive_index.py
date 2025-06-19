@@ -57,30 +57,23 @@ class RefractiveIndexDatabase:
     Refractive index database for various materials.
 
     Class that opens and stores the refractiveindex.info
-    YAML database. The entire database will be downloaded
-    on the first time it is run.
+    YAML database. The entire database will be downloaded if it does not exist and download is requested (typically on the first time it is run).
+
+    Parameters
+    ----------
+    database_path : str or None
+        Is None, defaults to user home directory. If passed,
+        should be the directory containing the database
+        structure.
+
+    auto_download : bool, default is True
+        If True, database will be downloaded. If False and
+        no database found, an error will be thrown.
     """
 
     __database_version = "2025-02-23"
 
     def __init__(self, database_path=None, auto_download=False):
-        """
-        Initialise the refractive index database.
-
-        Data will be downloaded, if it does not exist
-        and download is requested.
-
-        Parameters
-        ----------
-        database_path : str or None
-            Is None, defaults to user home directory. If passed,
-            should be the directory containing the database
-            structure.
-
-        auto_download : bool, default is True
-            If True, database will be downloaded. If False and
-            no database found, an error will be thrown.
-        """
         # Load the json database shipped with lasy
         lasy_db_file = os.path.join(
             os.path.dirname(__file__), "refractive_index_db.json"
@@ -349,37 +342,29 @@ class Material:
     """
     Description of material and its optical properties.
 
-    Class that contains material specific data:
-    its refractive index and extinction coefficient.
+    Class that contains material specific data: its refractive index and extinction coefficient.
+    Input arguments can either be a known name defined in the dict above or a combination of shelf, book and page. The latter follow the definitions on refractiveindex.info website.
+
+    Parameters
+    ----------
+    shelf : str or None
+        refractiveindex.info shelf name.
+
+    book : str or None
+        refractiveindex.info book name.
+
+    page : str or None
+        refractiveindex.info page name.
+
+    name : str or None
+        A known name, defined in the dict above.
+
+    db : RefractiveIndexDatabase instance or None
+        An instance of RefractiveIndexDatabase can be
+        given, which speeds up material initialisation.
     """
 
     def __init__(self, shelf=None, book=None, page=None, name=None, db=None):
-        """
-        Initialise the Material container.
-
-        Initialise the Material. Input arguments can either be a known
-        name defined in the dict above or a combination of shelf, book
-        and page. The latter follow the definitions on
-        refractiveindex.info website.
-
-        Parameters
-        ----------
-        shelf : str or None
-            refractiveindex.info shelf name.
-
-        book : str or None
-            refractiveindex.info book name.
-
-        page : str or None
-            refractiveindex.info page name.
-
-        name : str or None
-            A known name, defined in the dict above.
-
-        db : RefractiveIndexDatabase instance or None
-            An instance of RefractiveIndexDatabase can be
-            given, which speeds up material initialisation.
-        """
         if db is None:
             db = RefractiveIndexDatabase()
 
