@@ -1,15 +1,16 @@
 import numpy as np
-from axiprop.lib import PropagatorFFT2, PropagatorResampling
-from scipy.constants import c
 
-from lasy.utils.grid import Grid, time_axis_indx
+from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
     normalize_average_intensity,
     normalize_energy,
     normalize_peak_field_amplitude,
+    normalize_peak_fluence,
     normalize_peak_intensity,
+    normalize_peak_power,
 )
-from lasy.utils.openpmd_output import write_to_openpmd_file
+from lasy.utils.openpmd_helper import write_to_openpmd_file
+from lasy.utils.plotting import show_laser
 
 
 class Laser:
@@ -106,57 +107,72 @@ class Laser:
     def __init__(
         self, dim, lo, hi, npoints, profile, n_azimuthal_modes=1, n_theta_evals=None
     ):
-        self.grid = Grid(dim, lo, hi, npoints, n_azimuthal_modes)
+        self.grid = Grid(
+            dim,
+            lo,
+            hi,
+            npoints,
+            n_azimuthal_modes,
+            is_cw=profile.is_cw,
+            is_plane_wave=profile.is_plane_wave,
+        )
         self.dim = dim
         self.profile = profile
         self.output_iteration = 0  # Incremented each time write_to_file is called
-
-        # Get the spectral axis
-        dt = self.grid.dx[time_axis_indx]
-        Nt = self.grid.shape[time_axis_indx]
-        self.omega_1d = 2 * np.pi * np.fft.fftfreq(Nt, dt) + profile.omega0
 
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
             x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
             self.grid.set_temporal_field(profile.evaluate(x, y, t))
         elif self.dim == "rt":
-            if n_theta_evals is None:
-                # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
-                # theta, to evaluate the laser
-                n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
-            # Make sure that there are enough points to resolve the azimuthal modes
-            assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
-            theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
-            theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
-            x = r * np.cos(theta)
-            y = r * np.sin(theta)
-            # Evaluate the profile on the generated grid
-            envelope = profile.evaluate(x, y, t)
-            # Perform the azimuthal decomposition
-            azimuthal_modes = np.fft.ifft(envelope, axis=0)
-            field = azimuthal_modes[:n_azimuthal_modes]
-            if n_azimuthal_modes > 1:
-                field = np.concatenate(
-                    (field, azimuthal_modes[-n_azimuthal_modes + 1 :])
+            profile_rt = profile.dim == "rt" if hasattr(profile, "dim") else False
+            if profile_rt:
+                r, t = np.meshgrid(*self.grid.axes, indexing="ij")
+                field = np.zeros(
+                    (2 * self.grid.n_azimuthal_modes - 1, *r.shape), dtype="complex128"
                 )
+                for mode in range(2 * self.grid.n_azimuthal_modes - 1):
+                    field[mode, :, :] = profile.evaluate_mrt(mode, r, t)
+            else:
+                if n_theta_evals is None:
+                    # Generate 2*n_azimuthal_modes - 1 evenly-spaced values of
+                    # theta, to evaluate the laser
+                    n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
+                # Make sure that there are enough points to resolve the azimuthal modes
+                assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
+                theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
+                theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
+                x = r * np.cos(theta)
+                y = r * np.sin(theta)
+                # Evaluate the profile on the generated grid
+                envelope = profile.evaluate(x, y, t)
+                # Perform the azimuthal decomposition
+                azimuthal_modes = np.fft.ifft(envelope, axis=0)
+                field = azimuthal_modes[:n_azimuthal_modes]
+                if n_azimuthal_modes > 1:
+                    field = np.concatenate(
+                        (field, azimuthal_modes[-n_azimuthal_modes + 1 :])
+                    )
             self.grid.set_temporal_field(field)
 
-        # For profiles that define the energy, normalize the amplitude
+        # For profiles that define the energy, peak fluence or peak power, normalize the amplitude
         if hasattr(profile, "laser_energy"):
             self.normalize(profile.laser_energy, kind="energy")
+        elif hasattr(profile, "peak_fluence"):
+            self.normalize(profile.peak_fluence, kind="peak_fluence")
+        elif hasattr(profile, "peak_power"):
+            self.normalize(profile.peak_power, kind="peak_power")
 
     def normalize(self, value, kind="energy"):
         """
-        Normalize the pulse either to the energy, peak field amplitude, peak intensity, or average intensity. The average intensity option operates on the envelope.
+        Normalize the pulse either to the energy, peak field amplitude, peak fluence, peak power, peak intensity, or average intensity. The average intensity option operates on the envelope.
 
         Parameters
         ----------
         value : scalar
             Value to which to normalize the field property that is defined in ``kind``
         kind : string (optional)
-            Distance by which the laser pulse should be propagated
-            Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'`` (default is ``'energy'``)
+            Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'``, ``'peak_fluence'``, ``'peak_power'``, (default is ``'energy'``)
         """
         if kind == "energy":
             normalize_energy(self.dim, value, self.grid)
@@ -166,6 +182,10 @@ class Laser:
             normalize_peak_intensity(value, self.grid)
         elif kind == "average_intensity":
             normalize_average_intensity(value, self.grid)
+        elif kind == "peak_power":
+            normalize_peak_power(self.dim, value, self.grid)
+        elif kind == "peak_fluence":
+            normalize_peak_fluence(value, self.grid)
         else:
             raise ValueError(f'kind "{kind}" not recognized')
 
@@ -180,9 +200,11 @@ class Laser:
             propagates.
         """
         # Apply optical element
-        spectral_field = self.grid.get_spectral_field()
+        spectral_field, spectral_axis = self.grid.get_spectral_field()
         if self.dim == "rt":
-            r, omega = np.meshgrid(self.grid.axes[0], self.omega_1d, indexing="ij")
+            r, omega = np.meshgrid(
+                self.grid.axes[0], spectral_axis + self.profile.omega0, indexing="ij"
+            )
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and an array of 0s as `y`
@@ -198,14 +220,29 @@ class Laser:
                 spectral_field[i_m, :, :] *= multiplier
         else:
             x, y, omega = np.meshgrid(
-                self.grid.axes[0], self.grid.axes[1], self.omega_1d, indexing="ij"
+                self.grid.axes[0],
+                self.grid.axes[1],
+                spectral_axis + self.profile.omega0,
+                indexing="ij",
             )
             spectral_field *= optical_element.amplitude_multiplier(x, y, omega)
         self.grid.set_spectral_field(spectral_field)
 
-    def propagate(
-        self, distance, nr_boundary=None, grid=None, backend="NP", show_progress=True
-    ):
+    def add_propagator(self, propagator):
+        """
+        Apply a propagator object to the laser pulse.
+
+        Parameters
+        ----------
+        propagator: a :class:`.Propagator` object (optional)
+            Represents a propagation method.
+        """
+        self.propagator = propagator
+
+    # I really would like to avoid these kwargs, such that one can change the
+    # propagator without affecting the call to laser.propagate. We'll see if
+    # that's reasonable.
+    def propagate(self, distance, **kwargs):
         """
         Propagate the laser pulse by the distance specified.
 
@@ -214,149 +251,20 @@ class Laser:
         distance : scalar
             Distance by which the laser pulse should be propagated
 
-        nr_boundary : integer (optional)
-            Number of cells at the end of radial axis, where the field
-            will be attenuated (to assert proper Hankel transform).
-            Only used for ``'rt'``.
-
         grid : Grid object (optional)
             Resample the field onto a new grid of different radial size and/or different number
             of radial grid points. Only works for ``'rt'``.
-
-        backend : string (optional)
-            Backend used by axiprop (see axiprop documentation).
-
-        show_progress : bool (optional)
-            Whether to show a progress bar when performing the computation
         """
-        assert self.grid.is_envelope  # The propagator assumes envelope
-        # apply boundary "absorption" if required
-        if nr_boundary is not None:
-            assert type(nr_boundary) is int and nr_boundary > 0
-            absorb_layer_axis = np.linspace(0, np.pi / 2, nr_boundary)
-            absorb_layer_shape = np.cos(absorb_layer_axis) ** 0.5
-            absorb_layer_shape[-1] = 0.0
-            field = self.grid.get_temporal_field()
-            if self.dim == "rt":
-                field[:, -nr_boundary:, :] *= absorb_layer_shape[None, :, None]
-            else:
-                field[-nr_boundary:, :, :] *= absorb_layer_shape[:, None, None]
-                field[:nr_boundary, :, :] *= absorb_layer_shape[::-1][:, None, None]
-                field[:, -nr_boundary:, :] *= absorb_layer_shape[None, :, None]
-                field[:, :nr_boundary, :] *= absorb_layer_shape[::-1][None, :, None]
-            self.grid.set_temporal_field(field)
+        if not hasattr(self, "propagator"):
+            from lasy.propagators import AxipropPropagator
 
-        # Retrieve the spectral field from the current grid
-        spectral_field = self.grid.get_spectral_field()
+            propagator = AxipropPropagator()
+            self.add_propagator(propagator)
 
-        if self.dim == "rt":
-            # Resampling onto new grid
-            if grid is not None:
-                # Overwrite time information from current grid
-                grid.lo[time_axis_indx] = self.grid.lo[time_axis_indx]
-                grid.hi[time_axis_indx] = self.grid.hi[time_axis_indx]
-                grid.axes[time_axis_indx] = self.grid.axes[time_axis_indx]
-                # Get radial axis of current and resampled grid
-                spatial_axes = (self.grid.axes[0],)  # current radial axis
-                spatial_axes_n = (grid.axes[0],)  # resampled axis
-                # Overwrite grid with new grid (for the resampled field)
-                self.grid = grid
-                # Creating an empty array to store the resampled spectral field.
-                # This will be needed in the propagation step below.
-                spectral_field_n = np.zeros(
-                    (len(self.grid.azimuthal_modes), grid.npoints[0], grid.npoints[1]),
-                    dtype="complex128",
-                )
-                self.prop = []  # Delete existing propagator
-                # Construct the propagator and pass resampled axis
-                for m in self.grid.azimuthal_modes:
-                    self.prop.append(
-                        PropagatorResampling(
-                            *spatial_axes,
-                            self.omega_1d / c,
-                            *spatial_axes_n,
-                            mode=m,
-                            backend=backend,
-                            verbose=False,
-                        )
-                    )
-            # No resampling (propagating on existing grid)
-            else:
-                if not hasattr(self, "prop"):
-                    spatial_axes = (self.grid.axes[0],)
-                    self.prop = []
-                    # Construct the propagator
-                    for m in self.grid.azimuthal_modes:
-                        self.prop.append(
-                            PropagatorResampling(
-                                *spatial_axes,
-                                self.omega_1d / c,
-                                mode=m,
-                                backend=backend,
-                                verbose=False,
-                            )
-                        )
-            # Propagate the spectral image in time
-            for i_m in range(self.grid.azimuthal_modes.size):
-                transform_data = np.transpose(spectral_field[i_m]).copy()
-                # Propagation step. The spectral field is explicitely
-                # overwritten with the updated field.
-                transform_data = self.prop[i_m].step(
-                    transform_data,
-                    distance,
-                    overwrite=False,
-                    show_progress=show_progress,
-                )
-                if grid is not None:
-                    # Store the updated and resampled field.
-                    spectral_field_n[i_m, :, :] = np.transpose(transform_data).copy()
-                else:
-                    # Store the updated field.
-                    spectral_field[i_m, :, :] = np.transpose(transform_data).copy()
-
-            if grid is not None:
-                # Define the resampled field as new spectral field
-                spectral_field = spectral_field_n
-                # Delete Propagator if resampling and propagation was done
-                del self.prop
-
-        else:
-            # Construct the propagator (check if exists)
-            if not hasattr(self, "prop"):
-                Nx, Ny, Nt = self.grid.shape
-                Lx = self.grid.hi[0] - self.grid.lo[0]
-                Ly = self.grid.hi[1] - self.grid.lo[1]
-                spatial_axes = ((Lx, Nx), (Ly, Ny))
-                self.prop = PropagatorFFT2(
-                    *spatial_axes,
-                    self.omega_1d / c,
-                    backend=backend,
-                    verbose=False,
-                )
-            # Propagate the spectral image
-            transform_data = np.moveaxis(spectral_field, -1, 0).copy()
-            self.prop.step(
-                transform_data, distance, overwrite=True, show_progress=show_progress
-            )
-            spectral_field = np.moveaxis(transform_data, 0, -1).copy()
-
-        # Choose the time translation assuming propagation at v=c
-        translate_time = distance / c
-
-        # This translation (e.g. delay in time, compared to t=0, associated
-        # with the propagation) is not automatically handled by the above
-        # propagators, so it needs to be added by hand.
-        # Note: subtracting by omega0 is only a global phase convention,
-        # that derives from the definition of the envelope in lasy.
-        spectral_field *= np.exp(
-            -1j * (self.omega_1d[None, None, :] - self.profile.omega0) * translate_time
+        grid_out = self.propagator.propagate(
+            self.grid, self.dim, self.profile.omega0, distance=distance, **kwargs
         )
-        self.grid.set_spectral_field(spectral_field)
-
-        # Translate the domain
-        self.grid.lo[time_axis_indx] += translate_time
-        self.grid.hi[time_axis_indx] += translate_time
-        self.grid.axes[time_axis_indx] += translate_time
+        self.grid = grid_out
 
     def write_to_file(
         self,
@@ -396,46 +304,53 @@ class Laser:
         )
         self.output_iteration += 1
 
-    def show(self, **kw):
-        """
-        Show a 2D image of the laser amplitude.
+    def show(
+        self,
+        envelope_type="field",
+        t_shift=0,
+        show_lineout=True,
+        show_max=False,
+        udict={},
+        **kw,
+    ):
+        r"""
+        Show a 2D image of the laser amplitude or intensity.
 
         Parameters
         ----------
+        envelope_type : string, default: "field"
+            Options are:
+            - ``'field'``: Show the envelope of the laser field.
+            - ``'intensity'``: Show the intensity of the laser field.
+            - ``'vector_potential'``: Show the vector potential of the laser field.
+
+        t_shift : float, default: 0
+            Shift the temporal axis by `t_shift` seconds.
+            It also can be a string with `"left"`, `"right"` or `"center"`,
+            to shift the temporal axis such that the t=0 lies at the left,
+            right or center of the x-axis.
+
+        show_lineout : bool, default: True
+            Show the lineout of the laser field.
+
+        show_max : bool, default: False
+            Print the maximum intensity of the laser field.
+
+        udict : dict, default: {}
+            Dictionary with the information of the unit scales of the axes,
+            e.g. ``{'t': {'value': 1e-15, 'label': 'fs'}, 'x': {'value': 1e-6, 'label': r'\mu m'}}``
+            Override the default unit scales.
+
         **kw : additional arguments to be passed to matplotlib's imshow command
         """
-        temporal_field = self.grid.get_temporal_field()
-        if self.dim == "rt":
-            # Show field in the plane y=0, above and below axis, with proper sign for each mode
-            E = [
-                np.concatenate(
-                    ((-1.0) ** m * temporal_field[m, ::-1], temporal_field[m])
-                )
-                for m in self.grid.azimuthal_modes
-            ]
-            E = sum(E)  # Sum all the modes
-            extent = [
-                self.grid.lo[-1],
-                self.grid.hi[-1],
-                -self.grid.hi[0],
-                self.grid.hi[0],
-            ]
-
-        else:
-            # In 3D show an image in the xt plane
-            i_slice = int(temporal_field.shape[1] // 2)
-            E = temporal_field[:, i_slice, :]
-            extent = [
-                self.grid.lo[-1],
-                self.grid.hi[-1],
-                self.grid.lo[0],
-                self.grid.hi[0],
-            ]
-
-        import matplotlib.pyplot as plt
-
-        plt.imshow(abs(E), extent=extent, aspect="auto", origin="lower", **kw)
-        cb = plt.colorbar()
-        cb.set_label("$|E_{envelope}|$ (V/m)")
-        plt.xlabel("t (s)")
-        plt.ylabel("x (m)")
+        show_laser(
+            self.grid,
+            self.dim,
+            envelope_type=envelope_type,
+            t_shift=t_shift,
+            show_lineout=show_lineout,
+            show_max=show_max,
+            udict=udict,
+            omega0=self.profile.omega0,
+            **kw,
+        )

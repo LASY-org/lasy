@@ -9,3 +9,4 @@ Longitudinal Profiles
    gaussian
    super_gaussian_profile
    longitudinal_profile_from_data
+   continuous_wave

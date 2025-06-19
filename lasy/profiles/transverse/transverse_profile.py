@@ -19,6 +19,7 @@ class TransverseProfile(object):
         # Initialise x and y spatial offsets as placeholders
         self.x_offset = 0
         self.y_offset = 0
+        self.is_plane_wave = False
 
     def _evaluate(self, x, y):
         """
@@ -51,6 +52,10 @@ class TransverseProfile(object):
     def __rmul__(self, factor):
         """Return the scaled transverse profile."""
         return ScaledTransverseProfile(self, factor)
+
+    def __update_is_plane_wave__(self, value):
+        """Update state of is_plane_wave variable."""
+        self.is_plane_wave = value
 
     def evaluate(self, x, y):
         """
