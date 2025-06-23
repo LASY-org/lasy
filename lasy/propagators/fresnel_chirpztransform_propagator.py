@@ -10,14 +10,32 @@ class FresnelChirpZPropagator(Propagator):
 
     The propagated field is calculated via the following method:
 
+    Given a scalar field :math:`E_0(x',y',0,\omega)`, one write the propagated field
+    at a distance :math:`z`, under the Fresnel approximation, as:
+
     .. math::
 
-        E_\mathrm{propagated} (x,y,\omega) =
-        \mathcal{F}_{x,y}\left[\mathcal{F}_{x,y}\left[ E_\mathrm{input}(x,y,\omega) \right]
-        \times\exp(i\,n\,\Delta z\,\sqrt{k_z^2-k_x^2-k_y^2}) \right]
+        E (x,y,z,\omega) =
+        \frac{ \omega \exp{(\frac{i \omega z}{c}) \exp(i\omega\frac{x^2+y^2}{2 c z})}}{i 2 \pi c z} \int \int E_0(x',y',0,\omega) \times \exp{\left [\frac{i\omega}{2 c z}(x'^2 + y'^2) \right ]}\times \exp{\left[ \frac{i \omega}{c z} (xx' +yy')\right]} dx' dy'
 
-    where :math:`E_{i} (x,y,\omega)` is the initial/propagated fields complex field envelope
-    and :math:`\mathcal{F}_{x,y}` is the 2D Fourier transform in the transverse (x,y) axes.
+    which can be rewritten as a 2D Fourier transform :math:`\mathcal{F}`:
+
+    .. math::
+
+        E (x,y,z,\omega) = G \times \mathcal{F}(E_0)   
+
+    where :math:`G` is given by:
+
+    .. math::
+
+        G = \frac{ \omega \exp{(\frac{i \omega z}{c}) \exp(i\omega\frac{x^2+y^2}{2 c z})}}{i 2 \pi c z}
+
+    and where :math:`H` is given by:
+
+     .. math::
+
+        H = \exp{\left [\frac{i\omega}{2 c z}(x'^2 + y'^2) \right ]}
+    
 
     Normally, the Fourier transform is computed using the Fast Fourier Transform (FFT) algorithm.
     However, in this case, the Chirp-Z Transform (or Zoom FFT) is used to compute the Fourier transform.
@@ -55,10 +73,6 @@ class FresnelChirpZPropagator(Propagator):
         omega0 : float (in rad.s^-1)
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
-
-        grid_out : Grid object
-            Grid object on which the propagated laser pulse is defined.
-            Can be different from laser grid before propagation.
         """
         self.dim = dim
         self.omega0 = omega0
@@ -110,9 +124,6 @@ class FresnelChirpZPropagator(Propagator):
 
         Parameters
         ----------
-        distance : scalar
-            Distance by which the laser is propagated.
-
         grid_in : Grid
             Grid object containing the laser to propagate.
 
@@ -121,6 +132,9 @@ class FresnelChirpZPropagator(Propagator):
 
         omega0 : float (in rad/s) (optional)
             The center frequency of the laser field. If not provided, uses the propagator's frequency.
+
+        distance : scalar
+            Distance by which the laser is propagated.
 
         grid_out : Grid object (optional)
             Grid object on which the propagated laser pulse is defined.
