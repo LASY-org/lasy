@@ -21,7 +21,7 @@ class FresnelChirpZPropagator(Propagator):
 
     Normally, the Fourier transform is computed using the Fast Fourier Transform (FFT) algorithm.
     However, in this case, the Chirp-Z Transform (or Zoom FFT) is used to compute the Fourier transform.
-    This allows for more flexibility in chosing both the initial and final sampling of the Fourier transform.
+    This allows for more flexibility in choosing both the initial and final sampling of the Fourier transform.
 
     The algorithm is based upon the work by Hu et al., https://www.nature.com/articles/s41377-020-00362-z
     and the implementation of the Chirp-Z Transform in SciPy, specifically `scipy.signal.zoom_fft`.
@@ -157,8 +157,6 @@ class FresnelChirpZPropagator(Propagator):
             F = self._zoomFourierTransform2D(
                 x, y, field_in[:, :, i] * prefactor, k_x, k_y
             )
-
-            (XF, YF) = np.meshgrid(xF, yF)
 
             postFactor = (
                 np.exp(1j * k * distance)
