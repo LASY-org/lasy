@@ -1,11 +1,13 @@
-from .propagator import Propagator
-from scipy.signal import zoom_fft
 import numpy as np
 from scipy.constants import c
+from scipy.signal import zoom_fft
+
+from .propagator import Propagator
+
 
 class FresnelChirpZPropagator(Propagator):
     r"""Class that represents a Fresnel propagator based upon the Chirp-Z Transform.
-    
+
     The propagated field is calculated via the following method:
 
     .. math::
@@ -54,36 +56,51 @@ class FresnelChirpZPropagator(Propagator):
             The main frequency :math:`\omega_0`, which is defined by the laser
             wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
 
-        grid_out : Grid object 
+        grid_out : Grid object
             Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
         """
         self.dim = dim
         self.omega0 = omega0
 
-        assert dim in ["rt", "xyt"], "Invalid dimension. Choose 'rt' or 'xyt'."        
+        assert dim in ["rt", "xyt"], "Invalid dimension. Choose 'rt' or 'xyt'."
 
-
-    def _zoomFourierTransform2D(self,x,y,f,k_x,k_y):    
+    def _zoomFourierTransform2D(self, x, y, f, k_x, k_y):
         # Here we scale by dt, the discrete spacing in time
-        dx = x[1]-x[0]
-        dy = y[1]-y[0]
-        
+        dx = x[1] - x[0]
+        dy = y[1] - y[0]
+
         # Calculate Frequency Axws. The 2pi is because we're returning the axis like k_x rather than 1/x
         X = x[-1] - x[0]
-        sampleXFreq = len(x)/X
+        sampleXFreq = len(x) / X
 
         # Calculate Desired Frequency Window
-        freq_x = k_x/2/np.pi
-        freq_y = k_y/2/np.pi
-            
+        freq_x = k_x / 2 / np.pi
+        freq_y = k_y / 2 / np.pi
+
         Y = y[-1] - y[0]
-        sampleYFreq = len(y)/Y
+        sampleYFreq = len(y) / Y
 
         # Do the ZoomFFT
-        F = zoom_fft(zoom_fft(f,
-                            [np.min(freq_x),np.max(freq_x)], m=len(freq_x), fs=sampleXFreq, endpoint=True,axis=1),
-                    [np.min(freq_y),np.max(freq_y)], m=len(freq_y), fs=sampleYFreq, endpoint=True,axis=0)*dx*dy
+        F = (
+            zoom_fft(
+                zoom_fft(
+                    f,
+                    [np.min(freq_x), np.max(freq_x)],
+                    m=len(freq_x),
+                    fs=sampleXFreq,
+                    endpoint=True,
+                    axis=1,
+                ),
+                [np.min(freq_y), np.max(freq_y)],
+                m=len(freq_y),
+                fs=sampleYFreq,
+                endpoint=True,
+                axis=0,
+            )
+            * dx
+            * dy
+        )
 
         return F
 
@@ -108,19 +125,17 @@ class FresnelChirpZPropagator(Propagator):
         grid_out : Grid object (optional)
             Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
-        
+
         Returns
         -------
         Grid object with laser data after propagation.
         """
-        
         self.update(dim, omega0)
 
         # Get the spectral field from the grid_out object
-        field_in , omega = grid_in.get_spectral_field()
+        field_in, omega = grid_in.get_spectral_field()
         field_out = grid_out.spectral_field
         omega += omega0
-
 
         x = grid_in.axes[1]
         y = grid_in.axes[0]
@@ -128,31 +143,32 @@ class FresnelChirpZPropagator(Propagator):
         xF = grid_out.axes[1]
         yF = grid_out.axes[0]
 
-        X,Y = np.meshgrid(x,x)
-        XF,YF = np.meshgrid(xF,yF)
+        X, Y = np.meshgrid(x, x)
+        XF, YF = np.meshgrid(xF, yF)
 
-
-        for i,om in enumerate(omega):
-            wavelength = 2*np.pi*c/om
+        for i, om in enumerate(omega):
+            wavelength = 2 * np.pi * c / om
             k = om / c
 
-            prefactor = np.exp(1j * k /2 / distance * (X**2 + Y**2))
-            k_x = 2*np.pi*xF/wavelength/distance
-            k_y = 2*np.pi*yF/wavelength/distance
+            prefactor = np.exp(1j * k / 2 / distance * (X**2 + Y**2))
+            k_x = 2 * np.pi * xF / wavelength / distance
+            k_y = 2 * np.pi * yF / wavelength / distance
 
-            F = self._zoomFourierTransform2D(x,y,field_in[:,:,i]*prefactor,k_x,k_y)
+            F = self._zoomFourierTransform2D(
+                x, y, field_in[:, :, i] * prefactor, k_x, k_y
+            )
 
+            (XF, YF) = np.meshgrid(xF, yF)
 
-            (XF,YF) = np.meshgrid(xF,yF)
-
-            postFactor = np.exp(1j*k*distance) * np.exp( 1j*k/distance * (XF**2 + YF**2) )/(1j*wavelength*distance)
-            field_out[:,:,i] = F*postFactor
+            postFactor = (
+                np.exp(1j * k * distance)
+                * np.exp(1j * k / distance * (XF**2 + YF**2))
+                / (1j * wavelength * distance)
+            )
+            field_out[:, :, i] = F * postFactor
 
         grid_out.set_spectral_field(field_out)
 
         grid_out.position += distance
 
-
         return grid_out
-            
-            
