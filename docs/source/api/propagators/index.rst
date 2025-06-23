@@ -10,3 +10,4 @@ Propagators
    propagator
    angular_spectrum_propagator
    nonlinear_phase_shift
+   fresnel_chirpztransform_propagator
