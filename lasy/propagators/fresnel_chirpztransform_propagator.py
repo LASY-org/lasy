@@ -22,7 +22,7 @@ class FresnelChirpZPropagator(Propagator):
 
     .. math::
 
-        E (x,y,z,\omega) = G \times \mathcal{F}(E_0)
+        E (x,y,z,\omega) = G \times \mathcal{F}(E_0 \times H)
 
     where :math:`G` is given by:
 
@@ -32,7 +32,7 @@ class FresnelChirpZPropagator(Propagator):
 
     and where :math:`H` is given by:
 
-     .. math::
+    .. math::
 
         H = \exp{\left [\frac{i\omega}{2 c z}(x'^2 + y'^2) \right ]}
 
