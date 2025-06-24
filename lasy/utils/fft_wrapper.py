@@ -1,8 +1,7 @@
 import numpy as np
-import pyfftw
+import scipy as scc
 
-
-def fft(which, arr_in, axes_in, from_domain, use_fftw=False):
+def fft(which, arr_in, axes_in, from_domain):
     """
     Perform FFT on a 3D array.
 
@@ -43,12 +42,6 @@ def fft(which, arr_in, axes_in, from_domain, use_fftw=False):
     # Set conventions:
     # - From real to frequency, use ifft & fftshift on input data.
     # - From frequency to real, use fft & fftshift on output data.
-    """
-    Perform FFT on a 3D array with optional FFTW acceleration.
-    """
-    assert which in ["transverse", "longitudinal"]
-    assert from_domain in ["real", "frequency"]
-
     if from_domain == "real":
         shift_before = True
         shift_after = False
@@ -58,51 +51,53 @@ def fft(which, arr_in, axes_in, from_domain, use_fftw=False):
         shift_after = True
         inverse = False
 
-    arr = np.copy(arr_in)
-
     if which == "transverse":
+        # Exit if only 1 element
         if min(axes_in[0].size, axes_in[1].size) < 2:
             print("fft of size 1: do nothing")
             return arr_in, axes_in
 
-        if use_fftw:
-            fft_func = (
-                pyfftw.interfaces.numpy_fft.ifft2
-                if inverse
-                else pyfftw.interfaces.numpy_fft.fft2
-            )
-            fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
+        # Set right FFT functions
+        if inverse:
+            xfft = scc.fft.ifft2
+            xfftshift = scc.fft.ifftshift
         else:
-            fft_func = np.fft.ifft2 if inverse else np.fft.fft2
-            fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
+            xfft = scc.fft.fft2
+            xfftshift = scc.fft.fftshift
 
+        # Do the FFT
+        arr = scc.copy(arr_in)
         if shift_before:
-            arr = np.fft.ifftshift(arr, axes=(0, 1))
-        arr_out = fft_func(arr, axes=(0, 1))
-        if shift_after:
-            arr_out = np.fft.fftshift(arr_out, axes=(0, 1))
+            arr = xfftshift(arr, axes=(0, 1))
+        arr_out = xfft(arr, axes=(0, 1))
 
-    else:  # longitudinal
-        if axes_in[0].size < 2:
+        # Shift after FFT
+        if shift_after:
+            arr_out = xfftshift(arr_out, axes=(0, 1))
+
+    else:  # which == "longitudinal"
+        # Exit if only 1 element
+        if axes_in.size <= 1:
             print("fft of size 1: do nothing")
             return arr_in, axes_in
 
-        if use_fftw:
-            fft_func = (
-                pyfftw.interfaces.numpy_fft.ifft
-                if inverse
-                else pyfftw.interfaces.numpy_fft.fft
-            )
-            fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
+        # Set right FFT functions
+        if inverse:
+            xfft = scc.fft.ifft
+            xfftshift = scc.fft.ifftshift
         else:
-            fft_func = np.fft.ifft if inverse else np.fft.fft
-            fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
+            xfft = scc.fft.fft
+            xfftshift = scc.fft.fftshift
 
+        # Do the FFT
+        arr = scc.copy(arr_in)
         if shift_before:
-            arr = fftshift_func(arr, axes=-1)
-        arr_out = fft_func(arr, axis=-1)
+            arr = xfftshift(arr, axes=-1)
+        arr_out = xfft(arr, axis=-1)
+
+        # Shift after FFT
         if shift_after:
-            arr_out = fftshift_func(arr_out, axes=-1)
+            arr_out = xfftshift(arr_out, axes=-1)
 
     axes_out = frequency_axis(which, axes_in, from_domain)
 
@@ -160,14 +155,14 @@ def frequency_axis(which, axes_in, from_domain):
 
         # Set right FFT functions
         if inverse:
-            xfftshift = np.fft.ifftshift
+            xfftshift = scc.fft.ifftshift
         else:
-            xfftshift = np.fft.fftshift
+            xfftshift = scc.fft.fftshift
 
         # Build output axes data
         axes_out = [
-            np.fft.fftfreq(axes_in[0].size, dx),
-            np.fft.fftfreq(axes_in[1].size, dy),
+            scc.fft.fftfreq(axes_in[0].size, dx),
+            scc.fft.fftfreq(axes_in[1].size, dy),
         ]
         if from_domain == "real":
             axes_out[0] *= 2 * np.pi
@@ -186,14 +181,14 @@ def frequency_axis(which, axes_in, from_domain):
 
         # Set right FFT functions
         if inverse:
-            xfftshift = np.fft.ifftshift
+            xfftshift = scc.fft.ifftshift
         else:
-            xfftshift = np.fft.fftshift
+            xfftshift = scc.fft.fftshift
 
         # Build output axes data
-        axes_out = np.fft.fftfreq(axes_in.size, d)
+        axes_out = scc.fft.fftfreq(axes_in.size, d)
         if from_domain == "real":
-            axes_out *= 2 * np.pi
+            axes_out *= 2 * scc.pi
 
         # Shift after FFT
         if shift_after:

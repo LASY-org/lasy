@@ -85,7 +85,6 @@ class AngularSpectrumPropagator(Propagator):
         omega0=None,
         distance=None,
         grid_out=None,
-        use_fftw=False,
     ):
         r"""
         Propagates the laser field in z direction by a given distance using the angular spectrum method.
@@ -123,11 +122,10 @@ class AngularSpectrumPropagator(Propagator):
             grid_out = deepcopy(grid_in)
 
         if self.dim == "rt":
-            field, dt = self._propagate_mrt(distance, grid_in, use_fftw=use_fftw)
+            field, dt = self._propagate_mrt(distance, grid_in)
 
         else:  # self.dim == "xyt"
-            field, dt = self._propagate_xyt(distance, grid_in, use_fftw=use_fftw)
-
+            field, dt = self._propagate_xyt(distance, grid_in)
         # update the grid
         grid_out.set_spectral_field(field)
         grid_out.position += distance
@@ -137,7 +135,7 @@ class AngularSpectrumPropagator(Propagator):
 
         return grid_out
 
-    def _propagate_xyt(self, distance, grid_in, use_fftw):
+    def _propagate_xyt(self, distance, grid_in):
         # Get the spectral field in the spatial domain
         field, omega = grid_in.get_spectral_field()
 
@@ -150,7 +148,6 @@ class AngularSpectrumPropagator(Propagator):
             which="transverse",
             axes_in=[grid_in.axes[0], grid_in.axes[1]],
             from_domain="frequency",
-            use_fftw=use_fftw,
         )
 
         kx = 2 * np.pi * axes_freq[0]
@@ -197,7 +194,6 @@ class AngularSpectrumPropagator(Propagator):
             which="transverse",
             axes_in=(kx / (2 * np.pi), ky / (2 * np.pi)),
             from_domain="real",
-            use_fftw=use_fftw,
         )
 
         # calculate time difference between propagation in vacuum and in medium
@@ -205,7 +201,7 @@ class AngularSpectrumPropagator(Propagator):
 
         return field, dt
 
-    def _propagate_mrt(self, distance, grid_in, use_fftw=False):
+    def _propagate_mrt(self, distance, grid_in):
         print(
             "'rt' geometry not yet supported by AngularSpectrumPropagator, skipping propagation"
         )

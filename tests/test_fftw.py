@@ -29,8 +29,8 @@ def test_fftw():
     dz = 0.02  # length of the individual propagation steps
     laserp.add_propagator(linear_propagator)
     laser.add_propagator(linear_propagator)
-    laserp.propagate(dz, use_fftw=True)
-    laser.propagate(dz, use_fftw=True)
+    laserp.propagate(dz)
+    laser.propagate(dz)
     Ar = field_to_vector_potential(laser.grid, laser.profile.omega0)
     Arp = field_to_vector_potential(laserp.grid, laserp.profile.omega0)
     assert np.allclose(Ar, Arp, rtol=1e-6, atol=1e-9)
