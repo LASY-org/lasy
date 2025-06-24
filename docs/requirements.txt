@@ -6,8 +6,8 @@ matplotlib
 nbsphinx
 numpydoc
 pydata-sphinx-theme
+pyfftw
 scikit-image
 sphinx-copybutton
 sphinx-design
 sphinx-gallery
-pyfftw
