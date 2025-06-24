@@ -3,4 +3,3 @@ matplotlib
 numpy
 openpmd-api>=0.16.1
 scipy
-pyfftw

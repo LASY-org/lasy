@@ -188,7 +188,7 @@ def frequency_axis(which, axes_in, from_domain):
         # Build output axes data
         axes_out = scc.fft.fftfreq(axes_in.size, d)
         if from_domain == "real":
-            axes_out *= 2 * scc.pi
+            axes_out *= 2 * np.pi
 
         # Shift after FFT
         if shift_after:
