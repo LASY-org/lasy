@@ -1,0 +1,834 @@
+{
+  "nk": {
+    "fused silica": {
+      "REFERENCES": "1) I. H. Malitson.\nInterspecimen comparison of the refractive index of fused silica.\n<a href=\"https://doi.org/10.1364/JOSA.55.001205\"><i>J. Opt. Soc. Am.</i> <b>55</b>, 1205-1208 (1965)</a><br>\n2) C. Z. Tan.\nDetermination of refractive index of silica glass for infrared wavelengths by IR spectroscopy.\n<a href=\"https://doi.org/10.1016/S0022-3093(97)00438-9\"><i>J. Non-Cryst. Solids</i> <b>223</b>, 158-163 (1998)</a><br>\n* Sellmeier formula is reported in Ref. 1 for the 0.21\u20133.71 \u03bcm wavelength range. Ref. 2 verifies the validity of the formula up to 6.7 \u03bcm.\n",
+      "COMMENTS": "Fused silica, 20 \u00b0C\n",
+      "DATA": [
+        {
+          "type": "formula 1",
+          "wavelength_range": "0.21 6.7",
+          "coefficients": "0 0.6961663 0.0684043 0.4079426 0.1162414 0.8974794 9.896161"
+        }
+      ],
+      "CONDITIONS": {
+        "temperature": "293"
+      }
+    },
+    "BK7": {
+      "REFERENCES": "<a href=\"https://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf\">SCHOTT Zemax catalog 2017-01-20b</a>\n(obtained from <a href=\"https://www.schott.com/en-us/products/optical-glass-p1000267/downloads/\">http://www.schott.com</a>)<br>\nSee also <a href=\"https://refractiveindex.info/download/data/2017/schott_2017-01-20.pdf\">SCHOTT glass data sheets</a>\n",
+      "COMMENTS": "step 0.5 available\n",
+      "DATA": [
+        {
+          "type": "formula 2",
+          "wavelength_range": "0.3 2.5",
+          "coefficients": "0 1.03961212 0.00600069867 0.231792344 0.0200179144 1.01046945 103.560653"
+        },
+        {
+          "type": "tabulated k",
+          "data": "0.300 2.8607E-06\n0.310 1.3679E-06\n0.320 6.6608E-07\n0.334 2.6415E-07\n0.350 9.2894E-08\n0.365 3.4191E-08\n0.370 2.7405E-08\n0.380 2.0740E-08\n0.390 1.3731E-08\n0.400 1.0227E-08\n0.405 9.0558E-09\n0.420 9.3912E-09\n0.436 1.1147E-08\n0.460 1.0286E-08\n0.500 9.5781E-09\n0.546 6.9658E-09\n0.580 9.2541E-09\n0.620 1.1877E-08\n0.660 1.2643E-08\n0.700 8.9305E-09\n1.060 1.0137E-08\n1.530 9.8390E-08\n1.970 1.0933E-06\n2.325 4.2911E-06\n2.500 8.1300E-06\n"
+        }
+      ],
+      "CONDITIONS": {
+        "temperature": "293"
+      },
+      "PROPERTIES": {
+        "thermal_dispersion": [
+          {
+            "type": "formula A",
+            "coefficients": "1.86e-06 1.31e-08 -1.37e-11 4.34e-07 6.27e-10 0.17"
+          }
+        ],
+        "nd": "1.5168",
+        "Vd": "64.17",
+        "glass_code": "517642.251",
+        "glass_status": "standard",
+        "density": [
+          {
+            "value": "2510"
+          }
+        ],
+        "thermal_expansion": [
+          {
+            "temperature_range": "243 343",
+            "value": "7.1e-06"
+          },
+          {
+            "temperature_range": "293 573",
+            "value": "8.3e-06"
+          }
+        ],
+        "dPgF": "-0.0009",
+        "resistance": {
+          "climatic": "1.0",
+          "stain": "0.0",
+          "acid": "1.0",
+          "alkali": "2.3",
+          "phosphate": "2.3"
+        }
+      }
+    },
+    "air": {
+      "REFERENCES": "P. E. Ciddor.\nRefractive index of air: new equations for the visible and near infrared.\n<a href=\"https://doi.org/10.1364/AO.35.001566\"><i>Appl. Optics</i> <b>35</b>, 1566-1573 (1996)</a><br>\n[<a href=\"https://github.com/polyanskiy/refractiveindex.info-scripts/blob/master/scripts/Ciddor%201996%20-%20air.py\">Calculation script (Python)</a> - can be used to calculate the refractive index of air for specific values of humidity, temperature, pressure, and CO<sub>2</sub> concentration]\n",
+      "COMMENTS": "Standard air: dry air at 15 \u00b0C, 101.325 kPa and with 450 ppm CO<sub>2</sub> content.\n",
+      "DATA": [
+        {
+          "type": "formula 6",
+          "wavelength_range": "0.23 1.690",
+          "coefficients": "0 0.05792105 238.0185 0.00167917 57.362"
+        }
+      ],
+      "CONDITIONS": {
+        "temperature": "288.15",
+        "pressure": "101325"
+      }
+    },
+    "hydrogen": {
+      "REFERENCES": "E. R. Peck and S. Hung.\nRefractivity and dispersion of hydrogen in the visible and near infrared.\n<a href=\"https://doi.org/10.1364/JOSA.67.001550\"><i>J. Opt. Soc. Am.</i> <b>67</b>, 1550-1554 (1977)</a>\n",
+      "COMMENTS": "Standard conditions. 0 \u00b0C, 760 torr (101.325 kPa).\n",
+      "DATA": [
+        {
+          "type": "formula 6",
+          "wavelength_range": "0.1680 1.6945",
+          "coefficients": "0 0.0148956 180.7 0.0049037 92"
+        }
+      ],
+      "CONDITIONS": {
+        "temperature": "273.15",
+        "pressure": "101325"
+      }
+    },
+    "helium": {
+      "REFERENCES": "C. R. Mansfield and E. R. Peck.\nDispersion of helium.\n<a href=\"https://doi.org/10.1364/JOSA.59.000199\"><i>J. Opt. Soc. Am.</i> <b>59</b>, 199-203 (1969)</a>\n",
+      "COMMENTS": "Standard conditions: 0 \u00b0C, 760 torr (101.325 kPa).\n",
+      "DATA": [
+        {
+          "type": "formula 6",
+          "wavelength_range": "0.4801 2.0586",
+          "coefficients": "0 0.01470091 423.98"
+        }
+      ],
+      "CONDITIONS": {
+        "temperature": "273.15",
+        "pressure": "101325"
+      }
+    },
+    "argon": {
+      "REFERENCES": "E. R. Peck and D. J. Fisher.\nDispersion of argon.\n<a href=\"https://doi.org/10.1364/JOSA.54.001362\"><i>J. Opt. Soc. Am.</i> <b>54</b>, 1362-1364 (1964)</a>\n",
+      "COMMENTS": "15 \u00b0C, 760 torr (101.325 kPa)\n",
+      "DATA": [
+        {
+          "type": "formula 6",
+          "wavelength_range": "0.4679 2.0587",
+          "coefficients": "6.432135E-5 2.8606021E-2 144"
+        }
+      ],
+      "CONDITIONS": {
+        "temperature": "288.15",
+        "pressure": "101325"
+      }
+    },
+    "SF11": {
+      "REFERENCES": "<a href=\"https://refractiveindex.info/download/data/2017/schott_2017-01-20b.agf\">SCHOTT Zemax catalog 2017-01-20b</a> (obtained from <a href=\"https://www.schott.com/en-us/products/optical-glass-p1000267/downloads/\">http://www.schott.com</a>)<br>See also <a href=\"https://refractiveindex.info/download/data/2017/schott_2017-01-20.pdf\">SCHOTT glass data sheets</a>\n",
+      "COMMENTS": "",
+      "DATA": [
+        {
+          "type": "formula 2",
+          "wavelength_range": "0.37 2.5",
+          "coefficients": "0 1.73759695 0.013188707 0.313747346 0.0623068142 1.89878101 155.23629"
+        },
+        {
+          "type": "tabulated k",
+          "data": "0.370 7.3192E-06\n0.380 2.5646E-06\n0.390 1.1689E-06\n0.400 6.5040E-07\n0.405 5.1628E-07\n0.420 2.8171E-07\n0.436 1.9327E-07\n0.460 1.2209E-07\n0.500 7.6618E-08\n0.546 3.8662E-08\n0.580 2.9778E-08\n0.620 3.7858E-08\n0.660 4.0300E-08\n0.700 3.3676E-08\n1.060 6.7549E-09\n1.530 7.3606E-08\n1.970 5.5703E-07\n2.325 2.6396E-06\n2.500 3.8041E-06\n"
+        }
+      ],
+      "CONDITIONS": {
+        "temperature": "293"
+      },
+      "PROPERTIES": {
+        "thermal_dispersion": [
+          {
+            "type": "formula A",
+            "coefficients": "-3.56e-06 9.2e-09 -2.1e-11 9.65e-07 1.44e-09 0.294"
+          }
+        ],
+        "nd": "1.78472",
+        "Vd": "25.68",
+        "glass_code": "785257.322",
+        "glass_status": "standard",
+        "density": [
+          {
+            "value": "3224"
+          }
+        ],
+        "thermal_expansion": [
+          {
+            "temperature_range": "243 343",
+            "value": "8.52e-06"
+          },
+          {
+            "temperature_range": "293 573",
+            "value": "9.85e-06"
+          }
+        ],
+        "dPgF": "0.015",
+        "resistance": {
+          "climatic": "1.0",
+          "stain": "0.0",
+          "acid": "1.0",
+          "alkali": "1.0",
+          "phosphate": "1.0"
+        }
+      }
+    },
+    "soda lime glass": {
+      "REFERENCES": "M. Rubin.\nOptical properties of soda lime silica glasses.\n<a href=\"https://doi.org/10.1016/0165-1633(85)90052-8\"><i>Sol. Energy Mater.</i> <b>12</b>, 275-288 (1985)</a>\n",
+      "COMMENTS": "Clear soda lime silica window glass\n",
+      "DATA": [
+        {
+          "type": "formula 5",
+          "wavelength_range": "0.31 4.6",
+          "coefficients": "1.5130 -0.003169 2 0.003962 -2"
+        },
+        {
+          "type": "tabulated k",
+          "data": "0.31 4.996E-5\n0.32 1.375E-5\n0.33 6.281E-6\n0.34 2.713E-6\n0.35 1.118E-6\n0.36 5.419E-7\n0.37 4.061E-7\n0.38 5.936E-7\n0.39 2.828E-7\n0.40 2.047E-7\n0.41 2.182E-7\n0.42 2.279E-7\n0.43 2.397E-7\n0.44 2.342E-7\n0.45 1.925E-7\n0.46 1.669E-7\n0.47 1.700E-7\n0.48 1.683E-7\n0.49 1.554E-7\n0.50 1.492E-7\n0.51 1.499E-7\n0.52 1.582E-7\n0.53 1.769E-7\n0.54 1.988E-7\n0.55 2.200E-7\n0.56 2.529E-7\n0.57 3.051E-7\n0.58 3.563E-7\n0.59 4.003E-7\n0.60 4.548E-7\n0.61 5.217E-7\n0.62 5.972E-7\n0.63 6.913E-7\n0.64 7.754E-7\n0.65 8.371E-7\n0.66 9.108E-7\n0.67 1.009E-6\n0.68 1.097E-6\n0.69 1.159E-6\n0.70 1.234E-6\n0.71 1.349E-6\n0.72 1.466E-6\n0.73 1.585E-6\n0.74 1.706E-6\n0.75 1.830E-6\n0.76 1.956E-6\n0.77 2.085E-6\n0.78 2.214E-6\n0.79 2.345E-6\n0.80 2.477E-6\n0.81 2.617E-6\n0.82 2.755E-6\n0.83 2.890E-6\n0.84 3.022E-6\n0.85 3.150E-6\n0.86 3.274E-6\n0.87 3.394E-6\n0.88 3.510E-6\n0.89 3.621E-6\n0.90 3.727E-6\n0.91 3.817E-6\n0.92 3.906E-6\n0.93 3.995E-6\n0.94 4.083E-6\n0.95 4.170E-6\n0.96 4.261E-6\n0.97 4.349E-6\n0.98 4.433E-6\n0.99 4.514E-6\n1.00 4.591E-6\n1.10 5.111E-6\n1.20 5.374E-6\n1.30 5.353E-6\n1.40 4.939E-6\n1.50 4.234E-6\n1.60 3.675E-6\n1.70 3.656E-6\n1.80 3.920E-6\n1.90 4.190E-6\n2.00 4.423E-6\n2.10 4.476E-6\n2.20 5.373E-6\n2.30 5.082E-6\n2.40 5.372E-6\n2.50 6.324E-6\n2.60 6.883E-6\n2.70 1.020E-5\n2.80 6.495E-5\n2.90 7.931E-5\n3.00 7.432E-5\n3.10 7.424E-5\n3.20 8.187E-5\n3.30 9.341E-5\n3.40 9.958E-5\n3.50 1.065E-4\n3.60 1.073E-4\n3.70 1.049E-4\n3.80 1.029E-4\n3.90 1.033E-4\n4.00 1.060E-4\n4.10 1.222E-4\n4.20 1.435E-4\n4.30 1.781E-4\n4.40 2.247E-4\n4.50 2.978E-4\n4.60 7.437E-4\n"
+        }
+      ]
+    },
+    "CaF2": {
+      "REFERENCES": "I. H. Malitson.\nA redetermination of some optical properties of calcium fluoride.\n<a href=\"https://doi.org/10.1364/AO.2.001103\"><i>Appl. Opt.</i> <b>2</b>, 1103-1107 (1963)</a>\n",
+      "COMMENTS": "24 \u00b0C\n",
+      "DATA": [
+        {
+          "type": "formula 1",
+          "wavelength_range": "0.23 9.7",
+          "coefficients": "0 0.5675888 0.050263605 0.4710914 0.1003909 3.8484723 34.649040"
+        }
+      ]
+    },
+    "MgF2": {
+      "REFERENCES": "H. H. Li.\nRefractive index of alkaline earth halides and its wavelength and temperature derivatives.\n<a href=\"https://doi.org/10.1063/1.555616\"><i>J. Phys. Chem. Ref. Data</i> <b>9</b>, 161-289 (1980)</a> and references therein.<br>\n* Sellmeier formula is derived by critical analysis of experimental data from several sources.\n",
+      "COMMENTS": "293 K (20 \u00b0C). Ordinary ray (o).\n",
+      "DATA": [
+        {
+          "type": "formula 1",
+          "wavelength_range": "0.14 7.5",
+          "coefficients": "0.27620 0.60967 0.08636 0.0080 18.0 2.14973 25.0"
+        }
+      ]
+    },
+    "Sapphire": {
+      "REFERENCES": "1) I. H. Malitson and M. J. Dodge.\nRefractive index and birefringence of synthetic sapphire.\n<a href=\"http://www.opticsinfobase.org/josa/abstract.cfm?uri=josa-62-11-1336\"><i>J. Opt. Soc. Am.</i> <b>62</b>, 1405 (1972)</a><br>\n2) M. J. Dodge.\n\"Refractive index\"\nin Handbook of Laser Science and Technology, Volume IV, Optical Materials: Part 2, CRC Press, Boca Raton, 1986, p. 30<br>\n* Ref. 1 is a talk abstract in a conference program; Ref. 2 provides a dispersion formula\n",
+      "COMMENTS": "Synthetic sapphire, Ordinary ray (o), 20 \u00b0C\n",
+      "DATA": [
+        {
+          "type": "formula 1",
+          "wavelength_range": "0.20 5.0",
+          "coefficients": "0 1.4313493 0.0726631 0.65054713 0.1193242 5.3414021 18.028251"
+        }
+      ],
+      "CONDITIONS": {
+        "temperature": "293",
+        "direction": "o"
+      }
+    }
+  },
+  "n2": {
+    "fused silica": {
+      "Jansonas": {
+        "REFERENCES": "G. Jansonas, R. Budri\u016bnas, M. Vengris, A. Varanavi\u010dius.\nInterferometric measurements of nonlinear refractive index in the infrared spectral range.\n<a href=\"https://doi.org/10.1364/OE.458850\"><i>Opt. Express</i> <b>30</b>, 30507\u201330524 (2022)</a>\n",
+        "COMMENTS": "Ultraviolet grade fused silica - UVFS (SiO<sub>2</sub>). 230 fs at 1.03 \u03bcm. Fourier Interferometry.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.03 0.253e-19\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "FI",
+          "pulse_duration": "230e-15"
+        }
+      },
+      "Patwardhan": {
+        "REFERENCES": "G. N. Patwardhan, J. S. Ginsberg, C. Y. Chen, M. M. Jadidi, A. L. Gaeta.\nNonlinear refractive index of solids in mid-infrared.\n<a href=\"https://doi.org/10.1364/OL.421469\"><i>Opt. Lett.</i> <b>46</b>, 1824 (2021)</a>\n",
+        "COMMENTS": "Fused silica. 100 fs. Spectrally resolved two-beam coupling.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "2.3 1.94e-20\n3.5 2.00e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SRTBC",
+          "pulse_duration": "100e-15"
+        }
+      },
+      "Kabacinski": {
+        "REFERENCES": "P. Kabaci\u0144ski, T. M. Karda\u015b, Y. Stepanenko, C. Radzewicz.\nNonlinear refractive index measurement by SPM-induced phase regression.\n<a href=\"https://doi.org/10.1364/OE.27.011018\"><i>Opt. Express</i> <b>27</b>, 11018 (2019)</a>\n",
+        "COMMENTS": "210 fs. SPM-induced phase regression.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.030 2.19e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SPMIPR",
+          "pulse_duration": "210e-15"
+        }
+      },
+      "Ensley": {
+        "REFERENCES": "T. R. Ensley and N. K. Bambha.\nUltrafast nonlinear refraction measurements of infrared transmitting materials in the mid-wave infrared.\n<a href=\"https://doi.org/10.1364/OE.380702\"><i>Opt. Express</i> <b>27</b>, 37940 (2019)</a>\n",
+        "COMMENTS": "Fused silica. 100 fs. Z-scan.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.8 2.70e-20\n2.0 2.80e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Z-scan",
+          "pulse_duration": "100e-15"
+        }
+      },
+      "Flom": {
+        "REFERENCES": "S. R. Flom, G. Beadie, S. S. Bayya, B. Shaw, J. M. Auxier.\nUltrafast Z-scan measurements of nonlinear optical constants of window materials at 772, 1030, and 1550 nm.\n<a href=\"https://doi.org/10.1364/AO.54.00F123\"><i>Appl. Opt.</i> <b>54</b>, F123 (2015)</a>\n",
+        "COMMENTS": "Fused silica. 280 fs @ 772 nm, 140 fs @ 1030 nm, 97 fs @ 1550 nm. Z-scan.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.772 2.07e-20\n1.030 2.23e-20\n1.550 2.42e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Z-scan",
+          "pulse_duration": "280e-15 140e-15 97e-15"
+        }
+      },
+      "Milam": {
+        "REFERENCES": "D. Milam.\nReview and assessment of measured values of the nonlinear refractive-index coefficient of fused silica.\n<a href=\"https://doi.org/10.1364/AO.37.000546\"><i>Appl. Opt.</i> <b>37</b>, 546 (1998)</a>\n(Compilation of data from several sources)\n",
+        "COMMENTS": "Fused silica.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.351 3.60e-20\n0.527 3.00e-20\n1.053 2.74e-20\n"
+          }
+        ]
+      },
+      "DeSalvo": {
+        "REFERENCES": "R. DeSalvo, A. A. Said, D. J. Hagan, E. W. Van Stryland, M. Sheik-Bahae.\nInfrared to ultraviolet measurements of two-photon absorption and n<sub>2</sub> in wide bandgap solids.\n<a href=\"https://doi.org/10.1109/3.511545\"><i>IEEE J. Quantum Electron.</i> <b>32</b>, 1324 (1996)</a>\n",
+        "COMMENTS": "Fused silica. 15 ps @ 266 nm, 17 ps @ 355 nm, 22 ps @ 532 nm, 30 ps @ 1064 nm. Z-scan.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.266 7.82e-20\n0.355 2.41e-20\n0.532 2.24e-20\n1.064 2.14e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Z-scan",
+          "pulse_duration": "15e-12 17e-12 22e-12 30e-12"
+        }
+      },
+      "Adair": {
+        "REFERENCES": "R. Adair, L. L. Chase, S. A. Payne.\nNonlinear refractive index of optical crystals.\n<a href=\"https://doi.org/10.1103/PhysRevB.39.3337\"><i>Phys. Rev. B</i> <b>39</b>, 3337 (1989)</a>\n",
+        "COMMENTS": "Fused silica. 3 ns. Three-wave mixing.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 2.46e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TWM",
+          "pulse_duration": "3e-9"
+        }
+      },
+      "White": {
+        "REFERENCES": "W. T. White, W. L. Smith, D. Milam.\nDirect measurement of the nonlinear refractive-index coefficient \u03b3 at 355 nm in fused silica and in BK-10 glass.\n<a href=\"https://doi.org/10.1364/OL.9.000010\"><i>Opt. Lett.</i> <b>9</b>, 10 (1984)</a>\n",
+        "COMMENTS": "Fused silica. Time-resolved interferometry.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.355 2.5e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TRI"
+        }
+      },
+      "Adair-o": {
+        "REFERENCES": "R. Adair, L. L. Chase, S. A. Payne.\nNonlinear refractive index of optical crystals.\n<a href=\"https://doi.org/10.1103/PhysRevB.39.3337\"><i>Phys. Rev. B</i> <b>39</b>, 3337 (1989)</a>\n",
+        "COMMENTS": "Quartz. Ordinary ray (o). 3 ns. Three-wave mixing.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 3.06e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TWM",
+          "pulse_duration": "3e-9"
+        }
+      },
+      "Adair-e": {
+        "REFERENCES": "R. Adair, L. L. Chase, S. A. Payne.\nNonlinear refractive index of optical crystals.\n<a href=\"https://doi.org/10.1103/PhysRevB.39.3337\"><i>Phys. Rev. B</i> <b>39</b>, 3337 (1989)</a>\n",
+        "COMMENTS": "Quartz. Extraordinary ray (e). 3 ns. Three-wave mixing.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 3.15e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TWM",
+          "pulse_duration": "3e-9"
+        }
+      }
+    },
+    "BK7": {
+      "Ensley": {
+        "REFERENCES": "T. R. Ensley and N. K. Bambha.\nUltrafast nonlinear refraction measurements of infrared transmitting materials in the mid-wave infrared.\n<a href=\"https://doi.org/10.1364/OE.380702\"><i>Opt. Express</i> <b>27</b>, 37940 (2019)</a>\n",
+        "COMMENTS": "100 fs. Z-scan.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.8 3.30e-20\n2.0 3.50e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Z-scan",
+          "pulse_duration": "100e-15"
+        }
+      },
+      "Flom": {
+        "REFERENCES": "S. R. Flom, G. Beadie, S. S. Bayya, B. Shaw, J. M. Auxier.\nUltrafast Z-scan measurements of nonlinear optical constants of window materials at 772, 1030, and 1550 nm.\n<a href=\"https://doi.org/10.1364/AO.54.00F123\"><i>Appl. Opt.</i> <b>54</b>, F123 (2015)</a>\n",
+        "COMMENTS": "280 fs @ 772 nm, 140 fs @ 1030 nm, 97 fs @ 1550 nm. Z-scan.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.772 1.47e-20\n1.030 2.42e-20\n1.550 2.24e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Z-scan",
+          "pulse_duration": "280e-15 140e-15 97e-15"
+        }
+      },
+      "Adair": {
+        "REFERENCES": "R. Adair, L. L. Chase, S. A. Payne.\nNonlinear refractive-index measurements of glasses using three-wave frequency mixing.\n<a href=\"https://doi.org/10.1364/JOSAB.4.000875\"><i>J. Opt. Soc. Am. B</i> <b>4</b>, 875 (1987)</a>\n",
+        "COMMENTS": "3 ns. Three-wave mixing.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 3.62e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TWM",
+          "pulse_duration": "3e-9"
+        }
+      }
+    },
+    "air": {
+      "Polyanskiy": {
+        "REFERENCES": "M. N. Polyanskiy, M. Babzien, I. V. Pogorelsky, R. Kupfer, K. L. Vodopyanov, M. A. Palmer.\nSingle-shot measurement of the nonlinear refractive index of air at 9.2 \u00b5m with a picosecond terawatt CO<sub>2</sub> laser.\n<a href=\"https://doi.org/10.1364/OL.423800\"> <i>Opt. Lett.</i> <b>46</b>, 2067-2070 (2021)</a>\n",
+        "COMMENTS": "2 ps at 9.2 \u00b5m. Spatial profile analysis.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "9.2 3.0e-23\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SPA",
+          "pulse_duration": "2e-12"
+        }
+      },
+      "Pigeon": {
+        "REFERENCES": "J. J. Pigeon, S. Ya. Tochitsky, E. C. Welch, C. Joshi.\nMeasurements of the nonlinear refractive index of air, N<sub>2</sub>, and O<sub>2</sub> at 10 \u03bcm using four-wave mixing.\n<a href=\"https://doi.org/10.1364/OL.41.003924\"> <i>Opt. Lett.</i> <b>41</b>,  3924-3927 (2016)</a>\n",
+        "COMMENTS": "200 ps at 10.6 nm. Four-wave mixing. Room temperature.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "10.6 5.0e-23\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "FWM",
+          "pulse_duration": "200e-12"
+        }
+      },
+      "Geints": {
+        "REFERENCES": "Yu. E. Geints, A. M. Kabanov, A. A. Zemlyanov, E. E. Bykova, O. A. Bukin, S. S. Golik.\nKerr-driven nonlinear refractive index of air at 800 and 400 nm measured through femtosecond laser pulse filamentation.\n<a href=\"https://doi.org/10.1063/1.3657774\"> <i>Appl. Phys. Lett.</i> <b>99</b>, 181114 (2011)</a>\n",
+        "COMMENTS": "Analysis of plasma channel formed within the filamentation zone. 40 fs pulse.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.400 5.36e-23\n0.800 3.01e-23\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Filament",
+          "pulse_duration": "40e-15"
+        }
+      },
+      "Nibbering": {
+        "REFERENCES": "E. T. J. Nibbering, G. Grillon, M. A. Franco, B. S. Prade, A. Mysyrowicz.\nDetermination of the inertial contribution to the nonlinear refractive index of air,\nN<sub>2</sub>, and O<sub>2</sub> by use of unfocused high-intensity femtosecond laser pulses.\n<a href=\"https://doi.org/10.1364/JOSAB.14.000650\"> <i>J. Opt. Soc. Am. B</i> <b>14</b>, 650-660 (1997)</a>\n",
+        "COMMENTS": "120 fs at 800 nm. Spectral analysis of self-phase modulation.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.8 4.0e-23\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SSPM",
+          "pulse_duration": "120e-15",
+          "temperature": "293",
+          "pressure": "101325"
+        }
+      },
+      "Vlasov": {
+        "REFERENCES": "D. V. Vlasov, R. A. Garaev, V. V. Korobkin, R. V. Serov. Measurement of nonlinear polarizability of air, <i>Zh. Eksp. Teor. Fi.</i> <b>76</b>, 2039\u20132045 (1997)\n",
+        "COMMENTS": "30 ns at 1.064 \u03bcm. Elliptical polarization rotation.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 1.05e-22\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "EPR",
+          "pulse_duration": "30e-9"
+        }
+      },
+      "Shaw": {
+        "REFERENCES": "M. J. Shaw, C. J. Hooker, D. C. Wilson.\nMeasurement of the nonlinear refractive index of air and other gases at 248 nm.\n<a href=\"https://doi.org/10.1016/0030-4018(93)90657-Q\"> <i>Opt. Commun.</i> <b>103</b>, 153-1960 (1993)</a>\n",
+        "COMMENTS": "10 ps at 248 nm. Spectral analysis of self-phase modulation.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.248 1.2e-22\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SSPM",
+          "pulse_duration": "10e-12",
+          "temperature": "300",
+          "pressure": "101325"
+        }
+      },
+      "Pennington": {
+        "REFERENCES": "D. M. Pennington, M. A. Henesian, R. W. Hellwarth.\nNonlinear index of air at 1.053 \u03bcm.\n<a href=\"https://doi.org/10.1103/PhysRevA.39.3003\"> <i>Phys. Rev. A</i> <b>39</b>, 3003-3009 (1989)</a>\n",
+        "COMMENTS": "1 ns at 1.053 \u03bcm. Elliptical polarization rotation.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.053 4.2e-23\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "EPR",
+          "pulse_duration": "1e-9"
+        }
+      },
+      "Shimoji": {
+        "REFERENCES": "Y. Shimoji, A. T. Fay, R. S. F. Chang, N. Djeu.\nDirect measurement of the nonlinear refractive index of air.\n<a href=\"https://doi.org/10.1364/JOSAB.6.001994\"> <i>J. Opt. Soc. Am.</i> <b>6</b>, 1994-1998 (1989)</a>\n",
+        "COMMENTS": "300 ps at 308 nm. Spatial profile analysis.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.308 1.2e-22\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SPA",
+          "pulse_duration": "300e-12",
+          "temperature": "300 K"
+        }
+      }
+    },
+    "helium": {
+      "Shaw": {
+        "REFERENCES": "M. J. Shaw, C. J. Hooker, D. C. Wilson.\nMeasurement of the nonlinear refractive index of air and other gases at 248 nm.\n<a href=\"https://doi.org/10.1016/0030-4018(93)90657-Q\"> <i>Opt. Commun.</i> <b>103</b>, 153-1960 (1993)</a>\n",
+        "COMMENTS": "10 ps at 248 nm. Spectral analysis of self-phase modulation.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.248 -2.4e-25\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SSPM",
+          "pulse_duration": "10e-12",
+          "temperature": "300",
+          "pressure": "101325"
+        }
+      }
+    },
+    "argon": {
+      "Zahedpour": {
+        "REFERENCES": "S. Zahedpour, J. K. Wahlstrand, H. M. Milchberg.\nMeasurement of the nonlinear refractive index of air constituents at mid-infrared wavelengths.\n<a href=\"https://doi.org/10.1364/OL.40.005794\"> <i>Opt. Lett.</i> <b>40</b>,  5794-5795 (2015)</a>\n",
+        "COMMENTS": "40 fs. Single-shot supercontinuum spectral interferometry. Room temperature, atmospheric pressure.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.40 10.9e-24\n0.80 10.1e-24\n1.25 10.5e-24\n1.65 10.9e-24\n2.20 9.3e-24\n2.40 9.9e-24\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SI",
+          "pulse_duration": "40e-15"
+        }
+      },
+      "Wahlstrand": {
+        "REFERENCES": "J. K. Wahlstrand, Y.-H. Cheng, H. M. Milchberg.\nAbsolute measurement of the transient optical nonlinearity in N<sub>2</sub>, O<sub>2</sub>, N<sub>2</sub>O, and Ar.\n<a href=\"https://doi.org/10.1103/PhysRevA.85.043820\"> <i>Phys. Rev. A</i> <b>85</b>, 043820 (2012)</a>\n",
+        "COMMENTS": "40 fs. Single-shot supercontinuum spectral interferometry. Room temperature, atmospheric pressure.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.80 9.7e-24\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SI",
+          "pulse_duration": "40e-15"
+        }
+      },
+      "Nibbering": {
+        "REFERENCES": "E. T. J. Nibbering, G. Grillon, M. A. Franco, B. S. Prade, A. Mysyrowicz.\nDetermination of the inertial contribution to the nonlinear refractive index of air, N<sub>2</sub>, and O<sub>2</sub> by use of unfocused high-intensity femtosecond laser pulses.\n<a href=\"https://doi.org/10.1364/JOSAB.14.000650\"> <i>J. Opt. Soc. Am. B</i> <b>14</b>, 650-660 (1997)</a>\n",
+        "COMMENTS": "120 fs at 800 nm. Spectral analysis of self-phase modulation.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.8 1.4e-23\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SSPM",
+          "pulse_duration": "120e-15",
+          "temperature": "293",
+          "pressure": "101325"
+        }
+      },
+      "Shaw": {
+        "REFERENCES": "M. J. Shaw, C. J. Hooker, D. C. Wilson.\nMeasurement of the nonlinear refractive index of air and other gases at 248 nm.\n<a href=\"https://doi.org/10.1016/0030-4018(93)90657-Q\"> <i>Opt. Commun.</i> <b>103</b>, 153-1960 (1993)</a>\n",
+        "COMMENTS": "10 ps at 248 nm. Spectral analysis of self-phase modulation.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.248 2.9e-23\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SSPM",
+          "pulse_duration": "10e-12",
+          "temperature": "300",
+          "pressure": "101325"
+        }
+      }
+    },
+    "CaF2": {
+      "Ensley": {
+        "REFERENCES": "T. R. Ensley and N. K. Bambha.\nUltrafast nonlinear refraction measurements of infrared transmitting materials in the mid-wave infrared.\n<a href=\"https://doi.org/10.1364/OE.380702\"><i>Opt. Express</i> <b>27</b>, 37940 (2019)</a>\n",
+        "COMMENTS": "100 fs. Z-scan.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.8 1.80e-20\n2.0 1.70e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Z-scan",
+          "pulse_duration": "100e-15"
+        }
+      },
+      "Kabacinski": {
+        "REFERENCES": "P. Kabaci\u0144ski, T. M. Karda\u015b, Y. Stepanenko, C. Radzewicz.\nNonlinear refractive index measurement by SPM-induced phase regression.\n<a href=\"https://doi.org/10.1364/OE.27.011018\"><i>Opt. Express</i> <b>27</b>, 11018 (2019)</a>\n",
+        "COMMENTS": "210 fs. SPM-induced phase regression.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.030 1.71e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SPMIPR",
+          "pulse_duration": "210e-15"
+        }
+      },
+      "Patwardhan": {
+        "REFERENCES": "G. N. Patwardhan, J. S. Ginsberg, C. Y. Chen, M. M. Jadidi, A. L. Gaeta.\nNonlinear refractive index of solids in mid-infrared.\n<a href=\"https://doi.org/10.1364/OL.421469\"><i>Opt. Lett.</i> <b>46</b>, 1824 (2021)</a>\n",
+        "COMMENTS": "100 fs. Spectrally resolved two-beam coupling.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "2.3 1.09e-20\n3.5 1.19e-20\n4.5 1.12e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SRTBC",
+          "pulse_duration": "100e-15"
+        }
+      },
+      "Adair": {
+        "REFERENCES": "R. Adair, L. L. Chase, S. A. Payne.\nNonlinear refractive index of optical crystals.\n<a href=\"https://doi.org/10.1103/PhysRevB.39.3337\"><i>Phys. Rev. B</i> <b>39</b>, 3337 (1989)</a>\n",
+        "COMMENTS": "CaF2[100]. 3 ns. Three-wave mixing.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 1.26e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TWM",
+          "pulse_duration": "3e-9"
+        }
+      },
+      "Milam": {
+        "REFERENCES": "D. Milam, M. J. Weber, A. J. Glass.\nNonlinear refractive index of fluoride crystals.\n<a href=\"https://doi.org/10.1063/1.89561\"><i>Appl. Phys. Lett.</i> <b>31</b>, 822 (1977)</a>\n",
+        "COMMENTS": "Cubic BaF<sub>2</sub>. 125 ps. Time-resolved interferometry.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 1.90e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TRI",
+          "pulse_duration": "125e-12"
+        }
+      }
+    },
+    "MgF2": {
+      "Ensley": {
+        "REFERENCES": "T. R. Ensley and N. K. Bambha.\nUltrafast nonlinear refraction measurements of infrared transmitting materials in the mid-wave infrared.\n<a href=\"https://doi.org/10.1364/OE.380702\"><i>Opt. Express</i> <b>27</b>, 37940 (2019)</a>\n",
+        "COMMENTS": "100 fs. Z-scan.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.8 1.10e-20\n2.0 1.10e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Z-scan",
+          "pulse_duration": "100e-15"
+        }
+      },
+      "Patwardhan": {
+        "REFERENCES": "G. N. Patwardhan, J. S. Ginsberg, C. Y. Chen, M. M. Jadidi, A. L. Gaeta.\nNonlinear refractive index of solids in mid-infrared.\n<a href=\"https://doi.org/10.1364/OL.421469\"><i>Opt. Lett.</i> <b>46</b>, 1824 (2021)</a>\n",
+        "COMMENTS": "100 fs. Spectrally resolved two-beam coupling.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "2.3 6.60e-21\n3.5 7.40e-21\n4.5 8.20e-21\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SRTBC",
+          "pulse_duration": "100e-15"
+        }
+      },
+      "DeSalvo": {
+        "REFERENCES": "R. DeSalvo, A. A. Said, D. J. Hagan, E. W. Van Stryland, M. Sheik-Bahae.\nInfrared to ultraviolet measurements of two-photon absorption and n<sub>2</sub> in wide bandgap solids.\n<a href=\"https://doi.org/10.1109/3.511545\"><i>IEEE J. Quantum Electron.</i> <b>32</b>, 1324 (1996)</a>\n",
+        "COMMENTS": "Ordinary ray (o). 15 ps @ 266 nm, 17 ps @ 355 nm, 22 ps @ 532 nm, 30 ps @ 1064 nm. Z-scan.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.266 1.50e-20\n0.355 6.65e-21\n0.532 5.77e-21\n1.064 5.80e-21\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Z-scan",
+          "pulse_duration": "15e-12 17e-12 22e-12 30e-12"
+        }
+      },
+      "Adair": {
+        "REFERENCES": "R. Adair, L. L. Chase, S. A. Payne.\nNonlinear refractive index of optical crystals.\n<a href=\"https://doi.org/10.1103/PhysRevB.39.3337\"><i>Phys. Rev. B</i> <b>39</b>, 3337 (1989)</a>\n",
+        "COMMENTS": "Ordinary ray (o). 3 ns. Three-wave mixing.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 7.6e-21\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TWM",
+          "pulse_duration": "3e-9"
+        }
+      },
+      "Milam": {
+        "REFERENCES": "D. Milam, M. J. Weber, A. J. Glass.\nNonlinear refractive index of fluoride crystals.\n<a href=\"https://doi.org/10.1063/1.89561\"><i>Appl. Phys. Lett.</i> <b>31</b>, 822 (1977)</a>\n",
+        "COMMENTS": "Ordinary ray (o). 125 ps. Time-resolved interferometry.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 9.90e-21\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TRI",
+          "pulse_duration": "125e-12"
+        }
+      }
+    },
+    "Sapphire": {
+      "Patwardhan": {
+        "REFERENCES": "G. N. Patwardhan, J. S. Ginsberg, C. Y. Chen, M. M. Jadidi, A. L. Gaeta.\nNonlinear refractive index of solids in mid-infrared.\n<a href=\"https://doi.org/10.1364/OL.421469\"><i>Opt. Lett.</i> <b>46</b>, 1824 (2021)</a>\n",
+        "COMMENTS": "Sapphire. 100 fs. Spectrally resolved two-beam coupling.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "2.3 2.44e-20\n3.5 2.62e-20\n4.5 2.66e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "SRTBC",
+          "pulse_duration": "100e-15"
+        }
+      },
+      "DeSalvo": {
+        "REFERENCES": "R. DeSalvo, A. A. Said, D. J. Hagan, E. W. Van Stryland, M. Sheik-Bahae.\nInfrared to ultraviolet measurements of two-photon absorption and n<sub>2</sub> in wide bandgap solids.\n<a href=\"https://doi.org/10.1109/3.511545\"><i>IEEE J. Quantum Electron.</i> <b>32</b>, 1324 (1996)</a>\n",
+        "COMMENTS": "Extraordinary ray (e). 15 ps @ 266 nm, 17 ps @ 355 nm, 22 ps @ 532 nm, 30 ps @ 1064 nm. Z-scan.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "0.266 5.97e-20\n0.355 3.75e-20\n0.532 3.33e-20\n1.064 3.12e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "Z-scan",
+          "pulse_duration": "15e-12 17e-12 22e-12 30e-12"
+        }
+      },
+      "Adair-o": {
+        "REFERENCES": "R. Adair, L. L. Chase, S. A. Payne.\nNonlinear refractive index of optical crystals.\n<a href=\"https://doi.org/10.1103/PhysRevB.39.3337\"><i>Phys. Rev. B</i> <b>39</b>, 3337 (1989)</a>\n",
+        "COMMENTS": "Ordinary ray (o). 3 ns. Three-wave mixing.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 2.9e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TWM",
+          "pulse_duration": "3e-9"
+        }
+      },
+      "Adair-e": {
+        "REFERENCES": "R. Adair, L. L. Chase, S. A. Payne.\nNonlinear refractive index of optical crystals.\n<a href=\"https://doi.org/10.1103/PhysRevB.39.3337\"><i>Phys. Rev. B</i> <b>39</b>, 3337 (1989)</a>\n",
+        "COMMENTS": "Extraordinary ray (e). 3 ns. Three-wave mixing.\n",
+        "DATA": [
+          {
+            "type": "tabulated n2",
+            "data": "1.064 3.1e-20\n"
+          }
+        ],
+        "CONDITIONS": {
+          "n2_method": "TWM",
+          "pulse_duration": "3e-9"
+        }
+      }
+    }
+  }
+}
