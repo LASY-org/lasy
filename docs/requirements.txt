@@ -10,3 +10,4 @@ scikit-image
 sphinx-copybutton
 sphinx-design
 sphinx-gallery
+pyfftw
