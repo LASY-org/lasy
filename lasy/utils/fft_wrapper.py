@@ -91,7 +91,7 @@ def fft(which, arr_in, axes_in, from_domain):
             xfftshift = scc.fft.fftshift
 
         # Do the FFT
-        arr = scc.copy(arr_in)
+        arr = np.copy(arr_in)
         if shift_before:
             arr = xfftshift(arr, axes=-1)
         arr_out = xfft(arr, axis=-1)
