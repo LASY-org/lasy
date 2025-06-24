@@ -1,7 +1,7 @@
 import numpy as np
 import pyfftw
 
-def fft(which, arr_in, axes_in, from_domain, use_fftw=):
+def fft(which, arr_in, axes_in, from_domain, use_fftw=False):
     """
     Perform FFT on a 3D array.
 
