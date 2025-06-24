@@ -42,7 +42,7 @@ def fft(which, arr_in, axes_in, from_domain, use_fftw=False):
     # Set conventions:
     # - From real to frequency, use ifft & fftshift on input data.
     # - From frequency to real, use fft & fftshift on output data.
- """
+    """
     Perform FFT on a 3D array with optional FFTW acceleration.
     """
     assert which in ["transverse", "longitudinal"]
