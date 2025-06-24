@@ -11,14 +11,13 @@ import numpy as np
 from lasy.laser import Grid, Laser
 from lasy.optical_elements import ParabolicMirror
 from lasy.profiles.combined_profile import CombinedLongitudinalTransverseProfile
-from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.profiles.longitudinal.gaussian_profile import GaussianLongitudinalProfile
 from lasy.profiles.longitudinal.continuous_wave_profile import ContinuousWaveProfile
 from lasy.profiles.transverse.laguerre_gaussian_profile import (
     LaguerreGaussianTransverseProfile,
 )
 from lasy.propagators.fresnel_chirpztransform_propagator import FresnelChirpZPropagator
 from lasy.utils.laser_utils import get_w0
+
 # Laser parameters
 w0 = 5.0e-3  # m, initialized in near field
 pol = (1, 0)
@@ -53,8 +52,8 @@ def resampling_laguerre_CW(m=0, wavelength=800e-9):
         wavelength, pol, LongitProfile, TransvProfile, peak_fluence=1
     )
 
-    lo = (-15e-3, -15e-3 , -1)
-    hi = (15e-3, 15e-3,  1)
+    lo = (-15e-3, -15e-3, -1)
+    hi = (15e-3, 15e-3, 1)
     npoints = (1024, 1024, 1)
 
     laser = Laser(dim, lo, hi, npoints, pulseProfile)
@@ -63,26 +62,27 @@ def resampling_laguerre_CW(m=0, wavelength=800e-9):
     new_r_max = 250e-6
     npoints_new = (1024, 1024, npoints[2])
     new_grid = Grid(
-        dim,
-        (-new_r_max,-new_r_max, lo[2]),
-        (new_r_max, new_r_max, hi[2]),
-        npoints_new)
+        dim, (-new_r_max, -new_r_max, lo[2]), (new_r_max, new_r_max, hi[2]), npoints_new
+    )
     # Check resampling propagator
     check_resampling(laser, new_grid, m, wavelength)
 
 
 def test_gaussian_633nm():
     # Test a gaussian beam at a wavelength of 633nm
-    resampling_laguerre_CW(m=0,wavelength=633e-9)
+    resampling_laguerre_CW(m=0, wavelength=633e-9)
+
 
 def test_gaussian_800nm():
     # Test a gaussian beam at a wavelength of 800 nm
-    resampling_laguerre_CW(m=0,wavelength=800e-9)
+    resampling_laguerre_CW(m=0, wavelength=800e-9)
+
 
 def test_gaussian_m1_633nm():
     # Test a gaussian beam at a wavelength of 633nm
-    resampling_laguerre_CW(m=1,wavelength=633e-9)
+    resampling_laguerre_CW(m=1, wavelength=633e-9)
+
 
 def test_gaussian_m1_800nm():
     # Test a gaussian beam at a wavelength of 800 nm
-    resampling_laguerre_CW(m=1,wavelength=800e-9)
+    resampling_laguerre_CW(m=1, wavelength=800e-9)
