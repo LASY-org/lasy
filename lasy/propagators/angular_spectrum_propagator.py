@@ -120,7 +120,6 @@ class AngularSpectrumPropagator(Propagator):
 
         if grid_out is None:
             grid_out = deepcopy(grid_in)
-
         if self.dim == "rt":
             field, dt = self._propagate_mrt(distance, grid_in)
 
