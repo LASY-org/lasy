@@ -1,6 +1,6 @@
 import numpy as np
 
-from .fft_wrapper import fft
+from .fft_wrapper import fft, frequency_axis
 
 time_axis_indx = -1
 
@@ -220,6 +220,8 @@ class Grid:
         # We return a copy, so that the user cannot modify
         # the original field, unless set_spectral_field is called
         assert self.is_envelope
+        if not hasattr(self, "spectral_axis"):
+            self.spectral_axis = frequency_axis("longitudinal", self.axes[-1], "real")
         if self.spectral_field_valid:
             return self.spectral_field.copy(), self.spectral_axis.copy()
         elif self.temporal_field_valid:

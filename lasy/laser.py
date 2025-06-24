@@ -172,7 +172,6 @@ class Laser:
         value : scalar
             Value to which to normalize the field property that is defined in ``kind``
         kind : string (optional)
-            Distance by which the laser pulse should be propagated
             Options: ``'energy``', ``'field'``, ``'intensity'``, ``'average_intensity'``, ``'peak_fluence'``, ``'peak_power'``, (default is ``'energy'``)
         """
         if kind == "energy":
@@ -305,17 +304,53 @@ class Laser:
         )
         self.output_iteration += 1
 
-    def show(self, show_intensity=False, **kw):
-        """
+    def show(
+        self,
+        envelope_type="field",
+        t_shift=0,
+        show_lineout=True,
+        show_max=False,
+        udict={},
+        **kw,
+    ):
+        r"""
         Show a 2D image of the laser amplitude or intensity.
 
         Parameters
         ----------
-        show_intensity : bool
-            if False the laser amplitude is plotted
-            if True then the intensity of the laser is plotted along with lineouts
-            and a measure of the pulse duration and spot size
+        envelope_type : string, default: "field"
+            Options are:
+            - ``'field'``: Show the envelope of the laser field.
+            - ``'intensity'``: Show the intensity of the laser field.
+            - ``'vector_potential'``: Show the vector potential of the laser field.
+
+        t_shift : float, default: 0
+            Shift the temporal axis by `t_shift` seconds.
+            It also can be a string with `"left"`, `"right"` or `"center"`,
+            to shift the temporal axis such that the t=0 lies at the left,
+            right or center of the x-axis.
+
+        show_lineout : bool, default: True
+            Show the lineout of the laser field.
+
+        show_max : bool, default: False
+            Print the maximum intensity of the laser field.
+
+        udict : dict, default: {}
+            Dictionary with the information of the unit scales of the axes,
+            e.g. ``{'t': {'value': 1e-15, 'label': 'fs'}, 'x': {'value': 1e-6, 'label': r'\mu m'}}``
+            Override the default unit scales.
 
         **kw : additional arguments to be passed to matplotlib's imshow command
         """
-        show_laser(self.grid, self.dim, show_intensity, **kw)
+        show_laser(
+            self.grid,
+            self.dim,
+            envelope_type=envelope_type,
+            t_shift=t_shift,
+            show_lineout=show_lineout,
+            show_max=show_max,
+            udict=udict,
+            omega0=self.profile.omega0,
+            **kw,
+        )
