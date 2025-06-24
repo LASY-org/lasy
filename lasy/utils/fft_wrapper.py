@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as scc
 
+
 def fft(which, arr_in, axes_in, from_domain):
     """
     Perform FFT on a 3D array.
