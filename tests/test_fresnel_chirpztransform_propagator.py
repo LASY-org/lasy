@@ -22,7 +22,8 @@ from lasy.utils.laser_utils import get_w0
 w0 = 5.0e-3  # m, initialized in near field
 pol = (1, 0)
 peak_fluence = 1e4  # W/m^2
-dim = 'xyt'
+dim = "xyt"
+
 
 def check_resampling(laser, new_grid, m=0, wavelength=800e-9):
     # Focus down the laser and propagate
@@ -52,7 +53,6 @@ def resampling_laguerre_CW(m=0, wavelength=800e-9):
         wavelength, pol, LongitProfile, TransvProfile, peak_fluence=1
     )
 
-    
     lo = (-15e-3, -15e-3, -1)
     hi = (15e-3, 15e-3, 1)
     npoints = (1024, 1024, 1)
