@@ -1,7 +1,7 @@
 import numpy as np
+import pyfftw
 
-
-def fft(which, arr_in, axes_in, from_domain):
+def fft(which, arr_in, axes_in, from_domain, use_fftw=):
     """
     Perform FFT on a 3D array.
 
@@ -42,6 +42,12 @@ def fft(which, arr_in, axes_in, from_domain):
     # Set conventions:
     # - From real to frequency, use ifft & fftshift on input data.
     # - From frequency to real, use fft & fftshift on output data.
+ """
+    Perform FFT on a 3D array with optional FFTW acceleration.
+    """
+    assert which in ["transverse", "longitudinal"]
+    assert from_domain in ["real", "frequency"]
+
     if from_domain == "real":
         shift_before = True
         shift_after = False
@@ -51,53 +57,43 @@ def fft(which, arr_in, axes_in, from_domain):
         shift_after = True
         inverse = False
 
+    arr = np.copy(arr_in)
+
     if which == "transverse":
-        # Exit if only 1 element
         if min(axes_in[0].size, axes_in[1].size) < 2:
             print("fft of size 1: do nothing")
             return arr_in, axes_in
 
-        # Set right FFT functions
-        if inverse:
-            xfft = np.fft.ifft2
-            xfftshift = np.fft.ifftshift
+        if use_fftw:
+            fft_func = pyfftw.interfaces.numpy_fft.ifft2 if inverse else pyfftw.interfaces.numpy_fft.fft2
+            fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
         else:
-            xfft = np.fft.fft2
-            xfftshift = np.fft.fftshift
+            fft_func = np.fft.ifft2 if inverse else np.fft.fft2
+            fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
 
-        # Do the FFT
-        arr = np.copy(arr_in)
         if shift_before:
-            arr = xfftshift(arr, axes=(0, 1))
-        arr_out = xfft(arr, axes=(0, 1))
-
-        # Shift after FFT
+            arr = np.fft.ifftshift(arr, axes=(0, 1))
+        arr_out = fft_func(arr, axes=(0, 1))
         if shift_after:
-            arr_out = xfftshift(arr_out, axes=(0, 1))
+            arr_out = np.fft.fftshift(arr_out, axes=(0, 1))
 
-    else:  # which == "longitudinal"
-        # Exit if only 1 element
-        if axes_in.size <= 1:
+    else:  # longitudinal
+        if axes_in[0].size < 2:
             print("fft of size 1: do nothing")
             return arr_in, axes_in
 
-        # Set right FFT functions
-        if inverse:
-            xfft = np.fft.ifft
-            xfftshift = np.fft.ifftshift
+        if use_fftw:
+            fft_func = pyfftw.interfaces.numpy_fft.ifft if inverse else pyfftw.interfaces.numpy_fft.fft
+            fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
         else:
-            xfft = np.fft.fft
-            xfftshift = np.fft.fftshift
+            fft_func = np.fft.ifft if inverse else np.fft.fft
+            fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
 
-        # Do the FFT
-        arr = np.copy(arr_in)
         if shift_before:
-            arr = xfftshift(arr, axes=-1)
-        arr_out = xfft(arr, axis=-1)
-
-        # Shift after FFT
+            arr = fftshift_func(arr, axes=-1)
+        arr_out = fft_func(arr, axis=-1)
         if shift_after:
-            arr_out = xfftshift(arr_out, axes=-1)
+            arr_out = fftshift_func(arr_out, axes=-1)
 
     axes_out = frequency_axis(which, axes_in, from_domain)
 
