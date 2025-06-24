@@ -1,6 +1,7 @@
 import numpy as np
 import pyfftw
 
+
 def fft(which, arr_in, axes_in, from_domain, use_fftw=False):
     """
     Perform FFT on a 3D array.
@@ -65,7 +66,11 @@ def fft(which, arr_in, axes_in, from_domain, use_fftw=False):
             return arr_in, axes_in
 
         if use_fftw:
-            fft_func = pyfftw.interfaces.numpy_fft.ifft2 if inverse else pyfftw.interfaces.numpy_fft.fft2
+            fft_func = (
+                pyfftw.interfaces.numpy_fft.ifft2
+                if inverse
+                else pyfftw.interfaces.numpy_fft.fft2
+            )
             fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
         else:
             fft_func = np.fft.ifft2 if inverse else np.fft.fft2
@@ -83,7 +88,11 @@ def fft(which, arr_in, axes_in, from_domain, use_fftw=False):
             return arr_in, axes_in
 
         if use_fftw:
-            fft_func = pyfftw.interfaces.numpy_fft.ifft if inverse else pyfftw.interfaces.numpy_fft.fft
+            fft_func = (
+                pyfftw.interfaces.numpy_fft.ifft
+                if inverse
+                else pyfftw.interfaces.numpy_fft.fft
+            )
             fftshift_func = np.fft.ifftshift if inverse else np.fft.fftshift
         else:
             fft_func = np.fft.ifft if inverse else np.fft.fft
