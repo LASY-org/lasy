@@ -19,7 +19,6 @@ dependencies:
   - pytest
   - python>=3.7
   - scipy
-  - pyfftw
 
 # just a note for later hackery, we could install pip packages inside the env, too:
 #  - pip:
