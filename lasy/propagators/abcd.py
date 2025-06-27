@@ -1,14 +1,7 @@
-from copy import deepcopy
-
 import numpy as np
-from numpy.fft import fftfreq, fftshift
-from scipy.constants import c
-
-from lasy.utils.fft_wrapper import fft
-from lasy.utils.laser_utils import get_w0
 
 
-class ABCD():
+class ABCD:
     r"""
     Class that represents an ABCD optical matrix.
 

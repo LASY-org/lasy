@@ -190,7 +190,7 @@ class CollinsDFFTPropagator(Propagator):
             grid_out.axes[0] = x
             grid_out.axes[1] = y
         return grid_out
-        
+
     def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None):
         """
         Function to calculate an output field from
@@ -215,7 +215,7 @@ class CollinsDFFTPropagator(Propagator):
 
         """
         self.update(omega0=omega0, dim=dim, abcd=self.abcd)
-        
+
         if (
             grid_out == None
         ):  # Call routine to determine output grids from focusing geometry
@@ -263,7 +263,7 @@ class CollinsDFFTPropagator(Propagator):
             axes_in=(x0, y0),
             from_domain="real",
         )
-        
+
         propagator = np.exp(
             -1j
             * 2
@@ -272,9 +272,9 @@ class CollinsDFFTPropagator(Propagator):
             / OM
             * (B * A)
             * (len(x0) * R / (x0.max() - x0.min())) ** 2
-            / (x0.max() - x0.min())**2
+            / (x0.max() - x0.min()) ** 2
         )
-        
+
         # Take the convolution to the output plane
         field, _ = fft(
             arr_in=field_FT * propagator,
@@ -282,10 +282,10 @@ class CollinsDFFTPropagator(Propagator):
             axes_in=(x0, y0),
             from_domain="frequency",
         )
-        
+
         field = field * np.exp(
             1j * OM / (2 * c) * (C / A) * R**2
-        ) # Return field in spectral domain
+        )  # Return field in spectral domain
         return field
 
     def _propagate_mrt(self, grid_in, grid_out):

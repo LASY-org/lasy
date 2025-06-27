@@ -159,7 +159,9 @@ class CollinsSFFTPropagator(Propagator):
             grid_out.axes[1] = y_out
         return grid_out
 
-    def propagate(self, grid_in, abcd, dim=None, omega0=None, distance=None, grid_out=None):
+    def propagate(
+        self, grid_in, abcd, dim=None, omega0=None, distance=None, grid_out=None
+    ):
         """
         Function to calculate an output field from
         input field and optical ray matrix of the system
