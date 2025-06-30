@@ -18,7 +18,7 @@ class CollinsSFFTPropagator(Propagator):
     r"""
     Class that represents a single FFT propagator using the Collins method.
 
-    The propagated field is calculated in the following method:
+    The propagated field is calculated using the following method:
 
     .. math::
 
@@ -49,7 +49,7 @@ class CollinsSFFTPropagator(Propagator):
 
     abcd : 2d array
         The 2D ray matrix of the optical system through which the beam propagates.
-        By default, this is initialised to be the unitary matrix:
+        This is defined in the ``'ABCD'`` class as:
 
         .. math::
 
@@ -57,14 +57,11 @@ class CollinsSFFTPropagator(Propagator):
             \begin{pmatrix}
             A & B \\
             C & D
-            \end{pmatrix}=
-            \begin{pmatrix}
-            1 & 0 \\
-            0 & 1
             \end{pmatrix}.
+        
     """
 
-    def __init__(self, omega0, dim):
+    def __init__(self, dim, omega0):
         super().__init__()
         self.update(dim=dim, omega0=omega0)
 
@@ -91,8 +88,8 @@ class CollinsSFFTPropagator(Propagator):
 
     def add_output_grid(self, dim, grid_in):
         """
-        Function to calculate the output grids
-        for a focusing / defocusing beam
+        Function to calculate the output grid automatically.
+        Resolution and size are determined based on the focusing geometry calculated from the ABCD optical ray matrix.
 
         Parameters
         ----------
@@ -100,9 +97,14 @@ class CollinsSFFTPropagator(Propagator):
             Dimensionality of the array. Options are:
             - ``'xyt'``: Laser pulse represented on a 3D Cartesian grid.
             - ``'rt'`` : Laser pulse represented on a 2D cylindrical grid.
-
-        grid_in : meshgrid (in meter)
-            2D meshgrid for the input coordinates
+            
+        grid_in : Grid
+            Grid object at the input plane.   
+            
+        Returns
+        -------
+        grid_out : Grid
+            Grid object for the output plane.
 
         """
         if self.dim == "rt":
@@ -160,7 +162,7 @@ class CollinsSFFTPropagator(Propagator):
         return grid_out
 
     def propagate(
-        self, grid_in, abcd, dim=None, omega0=None, distance=None, grid_out=None
+        self, grid_in, abcd, dim=None, omega0=None, grid_out=None
     ):
         """
         Function to calculate an output field from
@@ -168,11 +170,8 @@ class CollinsSFFTPropagator(Propagator):
 
         Parameters
         ----------
-        profile : array
-            The input field profile with arbitrary intensity and phase
-
-        grid_in : meshgrid (in meter)
-            2D meshgrid for the input coordinates
+        grid_in : Grid
+            Grid object containing the laser to propagate.
 
         abcd : 2d array
             The 2D ray matrix of the optical system through which the beam propagates.
@@ -190,11 +189,22 @@ class CollinsSFFTPropagator(Propagator):
                 0 & 1
                 \end{pmatrix}.
 
-        grid_out : meshgrid (in meter)
-            2D meshgrid for the output coordinates
+        dim : string (optional)
+            Dimensionality of the array. Options are:
+            - ``'xyt'``: Laser pulse represented on a 3D Cartesian grid.
+            - ``'rt'`` : Laser pulse represented on a 2D cylindrical grid.
 
-        omega_0 : float (in meter)
-            The wavelength of the electric field
+        omega0 : float (optional)
+            The main frequency :math:`\omega_0` (in rad.s^-1), which is defined by the laser
+            wavelength :math:`\lambda_0`, as :math:`\omega_0 = 2\pi c/\lambda_0`.
+
+        grid_out : Grid object (optional)
+            Grid object on which the propagated laser pulse is defined.
+            Can be different from laser grid before propagation.       
+            
+        Returns
+        -------
+        Grid object with laser data after propagation.
 
         """
         self.update(omega0=omega0, dim=dim)
@@ -217,8 +227,6 @@ class CollinsSFFTPropagator(Propagator):
         grid_in.set_spectral_field(field)
 
     def _propagate_xyt(self, grid_in, grid_out):
-        print("Collins SFFT propagator in xyt")
-
         # Get the spectral field and axes from the input grid
         spectral_field, spectral_axes = grid_in.get_spectral_field()
 
@@ -258,6 +266,14 @@ class CollinsSFFTPropagator(Propagator):
             / (2j * np.pi * c * B)
             / np.abs(OM / (2j * np.pi * c * B))
         )  # Return field in spectral domain
+
+        # Update the grid
+        grid_in.lo[0] = x[0]
+        grid_in.lo[1] = y[0]
+        grid_in.hi[0] = x[-1]
+        grid_in.hi[1] = y[-1]
+        grid_in.axes[0] = x
+        grid_in.axes[1] = y
         return field
 
     def _propagate_mrt(self, grid_in, grid_out):
