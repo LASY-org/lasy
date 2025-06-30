@@ -239,13 +239,11 @@ class CollinsSFFTPropagator(Propagator):
         R0 = np.sqrt(X0**2 + Y0**2)
         R = np.sqrt(X**2 + Y**2)
 
-        try:  # Get the elements of the optical matrix
-            A = self.abcd.abcd[0][0]
-            B = self.abcd.abcd[0][1]
-            C = self.abcd.abcd[1][0]
-            D = self.abcd.abcd[1][1]
-        except:
-            print("Missing the ray matrix for the optical system.")
+        # Get the elements of the optical matrix
+        A = self.abcd.abcd[0][0]
+        B = self.abcd.abcd[0][1]
+        C = self.abcd.abcd[1][0]
+        # D = self.abcd.abcd[1][1]
 
         propagator = np.exp(1j * OM / (2 * c) * (A / B) * R0**2)
 

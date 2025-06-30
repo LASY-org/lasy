@@ -247,13 +247,11 @@ class CollinsDFFTPropagator(Propagator):
         X, Y, OM = np.meshgrid(y, x, spectral_axes + self.omega0)
         R = np.sqrt(X**2 + Y**2)
 
-        try:  # Get the elements of the optical matrix
-            A = self.abcd.abcd[0][0]
-            B = self.abcd.abcd[0][1]
-            C = self.abcd.abcd[1][0]
-            # D = self.abcd.abcd[1][1]
-        except:
-            print("Missing the ray matrix for the optical system.")
+        # Get the elements of the optical matrix
+        A = self.abcd.abcd[0][0]
+        B = self.abcd.abcd[0][1]
+        C = self.abcd.abcd[1][0]
+        # D = self.abcd.abcd[1][1]
 
         # Take the Fourier transform of the input field to the frequency domain
         field_FT, _ = fft(
