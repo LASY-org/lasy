@@ -243,9 +243,7 @@ class CollinsDFFTPropagator(Propagator):
         x = grid_out.axes[0]  # Output axes
         y = grid_out.axes[1]
 
-        X0, Y0, OM = np.meshgrid(y0, x0, spectral_axes + self.omega0)
         X, Y, OM = np.meshgrid(y, x, spectral_axes + self.omega0)
-        R0 = np.sqrt(X0**2 + Y0**2)
         R = np.sqrt(X**2 + Y**2)
 
         try:  # Get the elements of the optical matrix
