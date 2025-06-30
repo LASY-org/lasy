@@ -85,7 +85,7 @@ class FresnelChirpZPropagator(Propagator):
         dy = y[1] - y[0]
 
         # Calculate the sample frequency in each axis
-        x_range = x[-1] - x[0] #
+        x_range = x[-1] - x[0]  #
         y_range = y[-1] - y[0]
         sample_frequency_x = len(x) / x_range
         sample_frequency_y = len(y) / y_range
@@ -94,7 +94,6 @@ class FresnelChirpZPropagator(Propagator):
         freq_x = k_x / 2 / np.pi
         freq_y = k_y / 2 / np.pi
 
-    
         # Perform the 2D Zoom FFT as a set of 2x 1D Zoom FFTs
         F = (
             zoom_fft(
