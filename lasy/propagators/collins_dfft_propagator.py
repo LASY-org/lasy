@@ -10,7 +10,8 @@ from lasy.utils.laser_utils import get_w0
 from .propagator import Propagator
 
 
-def q(z, z_0, z_R):  # Defines the q-parameter of a Gaussian beam
+def _q(z, z_0, z_R):
+    # Defines the q-parameter of a Gaussian beam
     return z - z_0 - 1j * z_R
 
 
@@ -88,6 +89,7 @@ class CollinsDFFTPropagator(Propagator):
     def add_output_grid(self, dim, grid_in):
         """
         Function to calculate the output grid automatically.
+        
         Resolution and size are determined based on the focusing geometry calculated from the ABCD optical ray matrix.
 
         Parameters
@@ -109,7 +111,7 @@ class CollinsDFFTPropagator(Propagator):
         """
         if self.dim == "rt":
             print(
-                "'rt' geometry not yet supported by CollinsDFFTPropagator, skipping grid calculation"
+                "'rt' geometry not yet supported by CollinsDFFTPropagator, skipping grid calculation."
             )
             grid_out = deepcopy(grid_in)  # Make a copy of the input grid
 
@@ -138,7 +140,7 @@ class CollinsDFFTPropagator(Propagator):
             w0 = get_w0(grid_in, self.dim)  # Calculate input spot size
             z_R = np.pi * w0**2 / lambda0  # Calculate input Rayleigh range
 
-            q1 = q(0, 0, z_R)
+            q1 = _q(0, 0, z_R)
             # z_02 = -np.real((A * q1 + B) / (C * q1 + D))  # Calculate waist position
             z_R2 = -np.imag(
                 (A * q1 + B) / (C * q1 + D)
@@ -168,8 +170,7 @@ class CollinsDFFTPropagator(Propagator):
         self, grid_in, abcd, dim=None, omega0=None, distance=None, grid_out=None
     ):
         """
-        Function to calculate an output field from
-        input field and optical ray matrix of the system
+        Function to calculate an output field from input field and optical ray matrix of the system.
 
         Parameters
         ----------
@@ -296,7 +297,7 @@ class CollinsDFFTPropagator(Propagator):
 
     def _propagate_mrt(self, grid_in, grid_out):
         print(
-            "'rt' geometry not yet supported by CollinsSFFTPropagator, skipping propagation"
+            "'rt' geometry not yet supported by CollinsSFFTPropagator, skipping propagation."
         )
         field = grid_in.field
         return field
