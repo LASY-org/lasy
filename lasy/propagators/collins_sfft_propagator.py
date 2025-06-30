@@ -127,7 +127,6 @@ class CollinsSFFTPropagator(Propagator):
                 print("Ray matrix does not conserve energy.")
 
             x = grid_in.axes[0]
-            y = grid_in.axes[1]
             L0_width = np.abs(x[-1] - x[0])
             N_points = len(x)
 
@@ -208,7 +207,7 @@ class CollinsSFFTPropagator(Propagator):
         self.grid_out = grid_out
 
         if (
-            grid_out == None
+            grid_out is None
         ):  # Call routine to determine output grids from focusing geometry
             grid_out = self.add_output_grid(dim, grid_in)
         else:
