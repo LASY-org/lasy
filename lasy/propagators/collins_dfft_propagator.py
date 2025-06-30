@@ -88,7 +88,7 @@ class CollinsDFFTPropagator(Propagator):
 
     def add_output_grid(self, dim, grid_in):
         """
-        Calculates the output grid automatically.
+        Calculate the output grid automatically.
 
         Resolution and size are determined based on the focusing geometry calculated from the ABCD optical ray matrix.
 
@@ -168,7 +168,7 @@ class CollinsDFFTPropagator(Propagator):
         self, grid_in, abcd, dim=None, omega0=None, distance=None, grid_out=None
     ):
         r"""
-        Function to calculate an output field from input field and optical ray matrix of the system.
+        Calculate the output field from the input field and the optical ray matrix of the system.
 
         Parameters
         ----------
