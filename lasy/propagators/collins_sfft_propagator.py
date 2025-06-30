@@ -58,7 +58,7 @@ class CollinsSFFTPropagator(Propagator):
             A & B \\
             C & D
             \end{pmatrix}.
-        
+
     """
 
     def __init__(self, dim, omega0):
@@ -97,10 +97,10 @@ class CollinsSFFTPropagator(Propagator):
             Dimensionality of the array. Options are:
             - ``'xyt'``: Laser pulse represented on a 3D Cartesian grid.
             - ``'rt'`` : Laser pulse represented on a 2D cylindrical grid.
-            
+
         grid_in : Grid
-            Grid object at the input plane.   
-            
+            Grid object at the input plane.
+
         Returns
         -------
         grid_out : Grid
@@ -161,9 +161,7 @@ class CollinsSFFTPropagator(Propagator):
             grid_out.axes[1] = y_out
         return grid_out
 
-    def propagate(
-        self, grid_in, abcd, dim=None, omega0=None, grid_out=None
-    ):
+    def propagate(self, grid_in, abcd, dim=None, omega0=None, grid_out=None):
         """
         Function to calculate an output field from
         input field and optical ray matrix of the system
@@ -200,8 +198,8 @@ class CollinsSFFTPropagator(Propagator):
 
         grid_out : Grid object (optional)
             Grid object on which the propagated laser pulse is defined.
-            Can be different from laser grid before propagation.       
-            
+            Can be different from laser grid before propagation.
+
         Returns
         -------
         Grid object with laser data after propagation.

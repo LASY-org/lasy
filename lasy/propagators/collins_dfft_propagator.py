@@ -59,7 +59,7 @@ class CollinsDFFTPropagator(Propagator):
             C & D
             \end{pmatrix}.
     """
-    
+
     def __init__(self, dim, omega0):
         super().__init__()
         self.update(dim=dim, omega0=omega0)
@@ -96,10 +96,10 @@ class CollinsDFFTPropagator(Propagator):
             Dimensionality of the array. Options are:
             - ``'xyt'``: Laser pulse represented on a 3D Cartesian grid.
             - ``'rt'`` : Laser pulse represented on a 2D cylindrical grid.
-            
+
         grid_in : Grid
-            Grid object at the input plane.   
-            
+            Grid object at the input plane.
+
         Returns
         -------
         grid_out : Grid
@@ -144,10 +144,12 @@ class CollinsDFFTPropagator(Propagator):
                 (A * q1 + B) / (C * q1 + D)
             )  # Calculate output Rayleigh range
             f0 = np.sqrt(k0 * w0**2 / 2.0 * z_R2)  # Calculate effective focal length
-            if f0 < 100: # If no focusing, just set the input and output grids to be the same
+            if (
+                f0 < 100
+            ):  # If no focusing, just set the input and output grids to be the same
                 x_out = x
                 y_out = y
-                
+
             else:
                 r0_step = L0_width / N_points  # Note: D gridpoints means D-1 intervals
 
@@ -201,8 +203,8 @@ class CollinsDFFTPropagator(Propagator):
 
         grid_out : Grid object (optional)
             Grid object on which the propagated laser pulse is defined.
-            Can be different from laser grid before propagation.       
-            
+            Can be different from laser grid before propagation.
+
         Returns
         -------
         Grid object with laser data after propagation.
@@ -235,8 +237,8 @@ class CollinsDFFTPropagator(Propagator):
         y0 = grid_in.axes[1]
 
         assert len(x0) % 2 != 0 and len(y0) % 2 != 0, (
-                "CollinsDFFTPropagator currently requires an odd number of gridpoints in the transverse plane."
-            )
+            "CollinsDFFTPropagator currently requires an odd number of gridpoints in the transverse plane."
+        )
 
         x = grid_out.axes[0]  # Output axes
         y = grid_out.axes[1]
@@ -253,7 +255,7 @@ class CollinsDFFTPropagator(Propagator):
             D = self.abcd.abcd[1][1]
         except:
             print("Missing the ray matrix for the optical system.")
-            
+
         # Take the Fourier transform of the input field to the frequency domain
         field_FT, _ = fft(
             arr_in=spectral_field,

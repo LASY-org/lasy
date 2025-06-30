@@ -42,7 +42,7 @@ class ABCD:
                 A & B \\
                 C & D
                 \end{pmatrix}.
-                
+
         """
         self.abcd = abcd
 
@@ -53,7 +53,7 @@ class ABCD:
         Parameters
         ----------
         distance : float (in meter)
-            The distance in free-space which the beam propagates. 
+            The distance in free-space which the beam propagates.
             The ray matrix for propagation of a distance :math:`z` in vacuum is:
 
             .. math::
@@ -63,7 +63,7 @@ class ABCD:
                 1 & z \\
                 0 & 1
                 \end{pmatrix}.
-                
+
         """
         vacuum = np.array([[1, distance], [0, 1]])
         self.abcd = np.matmul(vacuum, self.abcd)
@@ -75,7 +75,7 @@ class ABCD:
         Parameters
         ----------
         focal_length : float (in meter)
-            The focal length of a thin-lens through which the beam propagates. 
+            The focal length of a thin-lens through which the beam propagates.
             The ray matrix for propagation through a thin lens with focal length :math:`f_0` is:
 
             .. math::
@@ -85,7 +85,7 @@ class ABCD:
                 1 & z \\
                 0 & 1
                 \end{pmatrix}.
-                
+
         """
         lens = np.array([[1, 0], [-1.0 / focal_length, 1]])
         self.abcd = np.matmul(lens, self.abcd)
