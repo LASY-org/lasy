@@ -122,11 +122,9 @@ class CollinsSFFTPropagator(Propagator):
                 B = self.abcd.abcd[0][1]
                 C = self.abcd.abcd[1][0]
                 D = self.abcd.abcd[1][1]
-                print(
-                    "Determinant of optical matrix: ", A * D - B * C
-                )  # Check determinant = 1
-            except:
-                print("Missing the ray matrix for the optical system.")
+                det = A * D - B * C
+            except det != 1:
+                print("Ray matrix does not conserve energy.")
 
             x = grid_in.axes[0]
             y = grid_in.axes[1]
@@ -239,11 +237,14 @@ class CollinsSFFTPropagator(Propagator):
         R0 = np.sqrt(X0**2 + Y0**2)
         R = np.sqrt(X**2 + Y**2)
 
-        # Get the elements of the optical matrix
-        A = self.abcd.abcd[0][0]
-        B = self.abcd.abcd[0][1]
-        C = self.abcd.abcd[1][0]
-        # D = self.abcd.abcd[1][1]
+        try:  # Get the elements of the optical matrix
+            A = self.abcd.abcd[0][0]
+            B = self.abcd.abcd[0][1]
+            C = self.abcd.abcd[1][0]
+            D = self.abcd.abcd[1][1]
+            det = A * D - B * C
+        except det != 1:
+            print("Ray matrix does not conserve energy.")
 
         propagator = np.exp(1j * OM / (2 * c) * (A / B) * R0**2)
 
