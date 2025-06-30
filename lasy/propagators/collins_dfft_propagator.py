@@ -250,7 +250,7 @@ class CollinsDFFTPropagator(Propagator):
             A = self.abcd.abcd[0][0]
             B = self.abcd.abcd[0][1]
             C = self.abcd.abcd[1][0]
-            D = self.abcd.abcd[1][1]
+            # D = self.abcd.abcd[1][1]
         except:
             print("Missing the ray matrix for the optical system.")
 
