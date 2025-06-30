@@ -80,35 +80,35 @@ class FresnelChirpZPropagator(Propagator):
         assert dim in ["rt", "xyt"], "Invalid dimension. Choose 'rt' or 'xyt'."
 
     def _zoomFourierTransform2D(self, x, y, f, k_x, k_y):
-        # Here we scale by dt, the discrete spacing in time
+        # Get initial grid spacing in each axis
         dx = x[1] - x[0]
         dy = y[1] - y[0]
 
-        # Calculate Frequency Axws. The 2pi is because we're returning the axis like k_x rather than 1/x
-        X = x[-1] - x[0]
-        sampleXFreq = len(x) / X
+        # Calculate the sample frequency in each axis
+        x_range = x[-1] - x[0] #
+        y_range = y[-1] - y[0]
+        sample_frequency_x = len(x) / x_range
+        sample_frequency_y = len(y) / y_range
 
-        # Calculate Desired Frequency Window
+        # Convert desired frequency from rad/s to Hz
         freq_x = k_x / 2 / np.pi
         freq_y = k_y / 2 / np.pi
 
-        Y = y[-1] - y[0]
-        sampleYFreq = len(y) / Y
-
-        # Do the ZoomFFT
+    
+        # Perform the 2D Zoom FFT as a set of 2x 1D Zoom FFTs
         F = (
             zoom_fft(
                 zoom_fft(
                     f,
                     [np.min(freq_x), np.max(freq_x)],
                     m=len(freq_x),
-                    fs=sampleXFreq,
+                    fs=sample_frequency_x,
                     endpoint=True,
                     axis=1,
                 ),
                 [np.min(freq_y), np.max(freq_y)],
                 m=len(freq_y),
-                fs=sampleYFreq,
+                fs=sample_frequency_y,
                 endpoint=True,
                 axis=0,
             )
@@ -146,14 +146,14 @@ class FresnelChirpZPropagator(Propagator):
         """
         self.update(dim, omega0)
 
-        # Get the spectral field from the grid_out object
+        # Get the spectral field from the grid objects
         field_in, omega = grid_in.get_spectral_field()
         field_out = grid_out.spectral_field
         omega += omega0
 
+        # Extract the initial and final axes from the grids
         x = grid_in.axes[1]
         y = grid_in.axes[0]
-
         xF = grid_out.axes[1]
         yF = grid_out.axes[0]
 
@@ -165,9 +165,12 @@ class FresnelChirpZPropagator(Propagator):
             k = om / c
 
             prefactor = np.exp(1j * k / 2 / distance * (X**2 + Y**2))
+
+            # Calculate the required fourier frequencies from output grid
             k_x = 2 * np.pi * xF / wavelength / distance
             k_y = 2 * np.pi * yF / wavelength / distance
 
+            # Perform the 2D Zoom FFT
             F = self._zoomFourierTransform2D(
                 x, y, field_in[:, :, i] * prefactor, k_x, k_y
             )
@@ -177,10 +180,12 @@ class FresnelChirpZPropagator(Propagator):
                 * np.exp(1j * k / distance * (XF**2 + YF**2))
                 / (1j * wavelength * distance)
             )
+
+            # Add output field to array
             field_out[:, :, i] = F * postFactor
 
+        # Update output grid parameters
         grid_out.set_spectral_field(field_out)
-
         grid_out.position += distance
 
         return grid_out
