@@ -63,8 +63,8 @@ def test_spatial_propagation_SFFT():
         laser.profile.lambda0 * focal_length / (np.pi * laser.profile.w0)
     )  # Estimated focal spot-size
 
-    z_pos = (
-        np.linspace(-5.0 * zR + focal_length, 5.0 * zR + focal_length, 10)
+    z_pos = np.linspace(
+        -5.0 * zR + focal_length, 5.0 * zR + focal_length, 10
     )  # Absolute position from lens
     waists_propagated = []
 
