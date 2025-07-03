@@ -30,7 +30,7 @@ class CollinsSFFTPropagator(Propagator):
     and :math:`S` is the propagator term
 
     .. math::
-    
+
         S = \bigg\{\frac{1}{2B}\Big[A(x_0^2+y_0^2)+D(x^2+y^2)-2(xx_0+yy_0)\Big]\bigg\},
 
     defined in terms of the elements of the ``'ABCD'`` optical ray matrix.
