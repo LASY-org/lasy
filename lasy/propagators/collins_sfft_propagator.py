@@ -26,10 +26,11 @@ class CollinsSFFTPropagator(Propagator):
         \frac{1}{i\lambda B} e^{ik(z-z_0)}\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}
         E_{i} (x,y,\omega) e^{ikS}dx_0dy_0,
 
-    where :math:`E_{i} (x,y,\omega)` is the initial/propagated fields complex field envelope
+    where :math:`E_{i} (x,y,\omega)` is the complex field envelope of the input field
     and :math:`S` is the propagator term
 
-    :math:
+    .. math::
+    
         S = \bigg\{\frac{1}{2B}\Big[A(x_0^2+y_0^2)+D(x^2+y^2)-2(xx_0+yy_0)\Big]\bigg\},
 
     defined in terms of the elements of the ``'ABCD'`` optical ray matrix.
