@@ -18,7 +18,7 @@ def make_laserFF():
     )
 
     dim = "xyt"
-    hi = ( 20e-3,  20e-3,  50e-15)
+    hi = (20e-3, 20e-3, 50e-15)
     lo = (-20e-3, -20e-3, -50e-15)
     npoints = (499, 499, 1)
 
@@ -38,34 +38,41 @@ def make_laserNF():
     )
 
     dim = "xyt"
-    hi = ( 20e-6,  20e-6,  50e-15)
+    hi = (20e-6, 20e-6, 50e-15)
     lo = (-20e-6, -20e-6, -50e-15)
     npoints = (499, 499, 1)
 
     laser = Laser(dim=dim, hi=hi, lo=lo, npoints=npoints, profile=profile)
 
     return laser
-    
+
 
 def test_spatial_propagation_SFFT():
     """Verify that the waist of Gaussian beam evolves as expected."""
     laser = make_laserFF()
     prop = CollinsSFFTPropagator(
-        dim=laser.dim, omega0=2 * np.pi * c / 800e-9, 
+        dim=laser.dim,
+        omega0=2 * np.pi * c / 800e-9,
     )
-    
+
     focal_length = 100e-3
-    zR = focal_length**2 * laser.profile.lambda0 / (np.pi * laser.profile.w0**2) # Estimated Rayleigh range
-    w0 = laser.profile.lambda0 * focal_length / (np.pi * laser.profile.w0) # Estimated focal spot-size
-    
-    z_pos = np.linspace(-5.0 * zR, 5.0 * zR, 10) + focal_length # Absolute position from lens
+    zR = (
+        focal_length**2 * laser.profile.lambda0 / (np.pi * laser.profile.w0**2)
+    )  # Estimated Rayleigh range
+    w0 = (
+        laser.profile.lambda0 * focal_length / (np.pi * laser.profile.w0)
+    )  # Estimated focal spot-size
+
+    z_pos = (
+        np.linspace(-5.0 * zR, 5.0 * zR, 10) + focal_length
+    )  # Absolute position from lens
     waists_propagated = []
-    
-    i=0
+
+    i = 0
     abcd = ABCD()
     abcd.add_lens(focal_length)
     for z in z_pos:
-        laser = make_laserFF() # Propagate from input plane each time
+        laser = make_laserFF()  # Propagate from input plane each time
         if i == 0:
             abcd.add_vacuum(z)
             prop.propagate(laser.grid, abcd)
@@ -76,16 +83,16 @@ def test_spatial_propagation_SFFT():
 
         waist = get_w0(grid=laser.grid, dim=laser.dim)
         waists_propagated.append(waist)
-        i+=1
+        i += 1
 
-    waists_analytical = w0 * np.sqrt(1 + (np.abs(z_pos-focal_length) / zR) ** 2)
+    waists_analytical = w0 * np.sqrt(1 + (np.abs(z_pos - focal_length) / zR) ** 2)
 
-    debug=False
+    debug = False
     if debug:
-        print('\t'.join(['{:.3e}'.format(x) for x in waists_propagated]))
-        print('\t'.join(['{:.3e}'.format(x) for x in waists_analytical]))
+        print("\t".join(["{:.3e}".format(x) for x in waists_propagated]))
+        print("\t".join(["{:.3e}".format(x) for x in waists_analytical]))
         print(np.isclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6))
-    
+
     assert np.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
 
 
@@ -93,30 +100,29 @@ def test_spatial_propagation_DFFT():
     """Verify that the waist of Gaussian beam evolves as expected."""
     laser = make_laserNF()
     prop = CollinsDFFTPropagator(
-        dim=laser.dim, omega0=2 * np.pi * c / 800e-9, 
+        dim=laser.dim,
+        omega0=2 * np.pi * c / 800e-9,
     )
-    
+
     z_pos = np.linspace(-1e-9, 1e-9, 10)
     waists_propagated = []
 
     for z in z_pos:
         laser = make_laserNF()
-        
+
         abcd = ABCD()
         abcd.add_vacuum(z)
-        prop.propagate(
-            laser.grid, abcd
-        ) 
+        prop.propagate(laser.grid, abcd)
 
         waist = get_w0(grid=laser.grid, dim=laser.dim)
         waists_propagated.append(waist)
 
     zR = np.pi * laser.profile.w0**2 / (laser.profile.lambda0)
     waists_analytical = laser.profile.w0 * np.sqrt(1 + np.abs(z_pos / zR) ** 2)
-    debug=False
+    debug = False
     if debug:
-        print('\t'.join(['{:.3e}'.format(x) for x in waists_propagated]))
-        print('\t'.join(['{:.3e}'.format(x) for x in waists_analytical]))
+        print("\t".join(["{:.3e}".format(x) for x in waists_propagated]))
+        print("\t".join(["{:.3e}".format(x) for x in waists_analytical]))
         print(np.isclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6))
 
     assert np.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
