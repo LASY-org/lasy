@@ -11,7 +11,8 @@ class ABCD:
         The 2D ray matrix of the optical system through which the beam propagates.
         By default, this is initialised to be the unitary matrix:
 
-    .. math::
+
+        .. math::
 
             O =
             \begin{pmatrix}
@@ -82,8 +83,8 @@ class ABCD:
 
                 O =
                 \begin{pmatrix}
-                1 & z \\
-                0 & 1
+                1 & 0 \\
+                -1/f_0 & 1
                 \end{pmatrix}.
 
         """
