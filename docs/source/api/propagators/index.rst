@@ -4,6 +4,7 @@ Propagators
 .. toctree::
    :maxdepth: 1
 
+   propagator
    axiprop_propagators
    abcd
    collins_sfft_propagator
