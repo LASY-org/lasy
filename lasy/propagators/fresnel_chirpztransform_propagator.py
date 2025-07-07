@@ -85,7 +85,7 @@ class FresnelChirpZPropagator(Propagator):
         dy = y[1] - y[0]
 
         # Calculate the sample frequency in each axis
-        x_range = x[-1] - x[0] #
+        x_range = x[-1] - x[0] 
         y_range = y[-1] - y[0]
         sample_frequency_x = len(x) / x_range
         sample_frequency_y = len(y) / y_range
@@ -152,13 +152,13 @@ class FresnelChirpZPropagator(Propagator):
         omega += omega0
 
         # Extract the initial and final axes from the grids
-        x = grid_in.axes[1]
-        y = grid_in.axes[0]
-        xF = grid_out.axes[1]
-        yF = grid_out.axes[0]
+        x = grid_in.axes[0]
+        y = grid_in.axes[1]
+        xF = grid_out.axes[0]
+        yF = grid_out.axes[1]
 
-        X, Y = np.meshgrid(x, x)
-        XF, YF = np.meshgrid(xF, yF)
+        Y, X = np.meshgrid(y, x)
+        YF, XF = np.meshgrid(yF, xF)
 
         for i, om in enumerate(omega):
             wavelength = 2 * np.pi * c / om
@@ -177,7 +177,7 @@ class FresnelChirpZPropagator(Propagator):
 
             postFactor = (
                 np.exp(1j * k * distance)
-                * np.exp(1j * k / distance * (XF**2 + YF**2))
+                * np.exp(1j * k / 2/ distance * (XF**2 + YF**2))
                 / (1j * wavelength * distance)
             )
 
