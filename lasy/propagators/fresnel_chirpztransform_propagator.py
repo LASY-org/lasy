@@ -85,7 +85,7 @@ class FresnelChirpZPropagator(Propagator):
         dy = y[1] - y[0]
 
         # Calculate the sample frequency in each axis
-        x_range = x[-1] - x[0] 
+        x_range = x[-1] - x[0]
         y_range = y[-1] - y[0]
         sample_frequency_x = len(x) / x_range 
         sample_frequency_y = len(y) / y_range 
