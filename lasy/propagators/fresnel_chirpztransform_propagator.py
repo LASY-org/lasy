@@ -85,36 +85,38 @@ class FresnelChirpZPropagator(Propagator):
         dy = y[1] - y[0]
 
         # Calculate the sample frequency in each axis
-        x_range = x[-1] - x[0]  
+        x_range = x[-1] - x[0] 
         y_range = y[-1] - y[0]
-        sample_frequency_x = len(x) / x_range
-        sample_frequency_y = len(y) / y_range
+        sample_frequency_x = len(x) / x_range 
+        sample_frequency_y = len(y) / y_range 
 
         # Convert desired frequency from rad/s to Hz
         freq_x = k_x / 2 / np.pi
         freq_y = k_y / 2 / np.pi
 
+        FreqX, FreqY = np.meshgrid(freq_x, freq_y,)
+    
         # Perform the 2D Zoom FFT as a set of 2x 1D Zoom FFTs
-        F = (
-            zoom_fft(
+        F = zoom_fft(
                 zoom_fft(
                     f,
-                    [np.min(freq_x), np.max(freq_x)],
+                    [freq_x[0], freq_x[-1]],
                     m=len(freq_x),
                     fs=sample_frequency_x,
                     endpoint=True,
                     axis=1,
-                ),
-                [np.min(freq_y), np.max(freq_y)],
+                    )* dx,
+                [freq_y[0], freq_y[-1]],
                 m=len(freq_y),
                 fs=sample_frequency_y,
                 endpoint=True,
                 axis=0,
-            )
-            * dx
-            * dy
-        )
-
+            )* dy 
+        
+        # Apply the phase factor to shift the transform. Similar to a Fourier Transform shift.
+        F *= np.exp(1j * FreqX * np.pi * x_range) * \
+                    np.exp(1j * FreqY * np.pi * y_range)
+        
         return F
 
     def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None):
@@ -149,6 +151,7 @@ class FresnelChirpZPropagator(Propagator):
         field_in, omega = grid_in.get_spectral_field()
         field_out = grid_out.spectral_field
         omega += omega0
+        indxs = np.argsort(omega)
 
         # Extract the initial and final axes from the grids
         x = grid_in.axes[0]
@@ -156,10 +159,17 @@ class FresnelChirpZPropagator(Propagator):
         xF = grid_out.axes[0]
         yF = grid_out.axes[1]
 
-        Y, X = np.meshgrid(y, x)
-        YF, XF = np.meshgrid(yF, xF)
+        assert np.isclose(np.mean(x),0,atol=1e-8 * np.abs((x[-1]-x[0]))), "Input grid x-axis is not centered around zero." 
+        assert np.isclose(np.mean(y),0,atol=1e-8 * np.abs((y[-1]-y[0]))), "Input grid y-axis is not centered around zero."
+        assert np.isclose(np.mean(xF),0,atol=1e-8 * np.abs((xF[-1]-xF[0]))), "Output grid x-axis is not centered around zero." 
+        assert np.isclose(np.mean(yF),0,atol=1e-8 * np.abs((yF[-1]-yF[0]))), "Output grid y-axis is not centered around zero." 
 
-        for i, om in enumerate(omega):
+        X, Y = np.meshgrid(x, y, indexing='ij')
+        XF, YF = np.meshgrid(xF, yF, indexing='ij')
+
+
+        for indx in indxs:
+            om = omega[indx]
             wavelength = 2 * np.pi * c / om
             k = om / c
 
@@ -171,17 +181,17 @@ class FresnelChirpZPropagator(Propagator):
 
             # Perform the 2D Zoom FFT
             F = self._zoomFourierTransform2D(
-                x, y, field_in[:, :, i] * prefactor, k_x, k_y
+                x, y, np.squeeze(field_in[:, :, indx]) * prefactor, k_x, k_y
             )
 
             postFactor = (
                 np.exp(1j * k * distance)
-                * np.exp(1j * k / 2/ distance * (XF**2 + YF**2))
+                * np.exp(1j * k / 2 / distance * (XF**2 + YF**2))
                 / (1j * wavelength * distance)
             )
 
             # Add output field to array
-            field_out[:, :, i] = F * postFactor
+            field_out[:, :, indx] = F * postFactor
 
         # Update output grid parameters
         grid_out.set_spectral_field(field_out)
