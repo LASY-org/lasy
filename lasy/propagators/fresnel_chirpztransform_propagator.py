@@ -57,6 +57,50 @@ class FresnelChirpZPropagator(Propagator):
         - ``'rt'`` : The laser pulse is represented on a 2D grid:
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
+    Examples
+    --------
+    >>> import matplotlib.pyplot as plt
+    >>> from lasy.laser import Laser
+    >>> from lasy.profiles.gaussian_profile import GaussianProfile
+    >>> from lasy.optical_elements import ParabolicMirror
+    >>> from lasy.propagators import FresnelChirpZPropagator
+    >>> from lasy.utils.grid import Grid
+    >>> import numpy as np
+    >>> # Create profile.
+    >>> profile = GaussianProfile(
+    ...     wavelength=0.8e-6,  # m
+    ...     pol=(1, 0),
+    ...     laser_energy=1.0,  # J
+    ...     w0=5e-3,  # m
+    ...     tau=30e-15,  # s
+    ...     t_peak=0.0,  # s
+    ... )
+    >>> # Create laser with given profile in `xyt` geometry.
+    >>> laser = Laser(
+    ...     dim="xyt",
+    ...     lo=(-15e-3,-15e-3, -60e-15),
+    ...     hi=(15e-3, 15e-3, +60e-15),
+    ...     npoints=(200,200, 500),
+    ...     profile=profile,
+    ... )
+    >>> # Add Focusing Phase.
+    >>> focal_length = 1 # m
+    >>> laser.apply_optics(ParabolicMirror(focal_length))
+    >>> # Add Fresnel Chirp-Z propagator.
+    >>> laser.add_propagator(FresnelChirpZPropagator())
+    >>> # Create a new resampled grid for propagation.
+    >>> xLimNew = 150e-6 # m
+    >>> newGrid = Grid(
+    ...     laser.dim,
+    ...     (-xLimNew, -xLimNew, laser.grid.lo[2]),
+    ...     (xLimNew, xLimNew, laser.grid.hi[2]),
+    ...     (100, 100, laser.grid.npoints[2]),
+    ... )
+    >>> # Propagate the laser pulse to the focal plane and visualise.
+    >>> laser.propagate(focal_length,grid_out=newGrid)
+    >>> laser.show(envelope_type="intensity")
+    >>> w0_theor = 0.8e-6 * focal_length / (np.pi * 5e-3)
+    >>> print(f"w0 theoretical: {w0_theor:.2e} m")
     """
 
     def update(self, dim, omega0):
@@ -208,7 +252,7 @@ class FresnelChirpZPropagator(Propagator):
 
          # Shift the pulse back to the center of the time axis
         field_out *= np.exp(-1j * omega[np.newaxis,np.newaxis,:] * distance/c)
-        
+
         # Update output grid parameters
         grid_out.set_spectral_field(field_out)
         grid_out.position += distance
