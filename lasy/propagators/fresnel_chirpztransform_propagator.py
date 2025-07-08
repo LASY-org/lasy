@@ -87,17 +87,21 @@ class FresnelChirpZPropagator(Propagator):
         # Calculate the sample frequency in each axis
         x_range = x[-1] - x[0]
         y_range = y[-1] - y[0]
-        sample_frequency_x = len(x) / x_range 
-        sample_frequency_y = len(y) / y_range 
+        sample_frequency_x = len(x) / x_range
+        sample_frequency_y = len(y) / y_range
 
         # Convert desired frequency from rad/s to Hz
         freq_x = k_x / 2 / np.pi
         freq_y = k_y / 2 / np.pi
 
-        FreqX, FreqY = np.meshgrid(freq_x, freq_y,)
-    
+        FreqX, FreqY = np.meshgrid(
+            freq_x,
+            freq_y,
+        )
+
         # Perform the 2D Zoom FFT as a set of 2x 1D Zoom FFTs
-        F = zoom_fft(
+        F = (
+            zoom_fft(
                 zoom_fft(
                     f,
                     [freq_x[0], freq_x[-1]],
@@ -105,18 +109,20 @@ class FresnelChirpZPropagator(Propagator):
                     fs=sample_frequency_x,
                     endpoint=True,
                     axis=1,
-                    )* dx,
+                )
+                * dx,
                 [freq_y[0], freq_y[-1]],
                 m=len(freq_y),
                 fs=sample_frequency_y,
                 endpoint=True,
                 axis=0,
-            )* dy 
-        
+            )
+            * dy
+        )
+
         # Apply the phase factor to shift the transform. Similar to a Fourier Transform shift.
-        F *= np.exp(1j * FreqX * np.pi * x_range) * \
-                    np.exp(1j * FreqY * np.pi * y_range)
-        
+        F *= np.exp(1j * FreqX * np.pi * x_range) * np.exp(1j * FreqY * np.pi * y_range)
+
         return F
 
     def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None):
@@ -159,14 +165,21 @@ class FresnelChirpZPropagator(Propagator):
         xF = grid_out.axes[0]
         yF = grid_out.axes[1]
 
-        assert np.isclose(np.mean(x),0,atol=1e-8 * np.abs((x[-1]-x[0]))), "Input grid x-axis is not centered around zero." 
-        assert np.isclose(np.mean(y),0,atol=1e-8 * np.abs((y[-1]-y[0]))), "Input grid y-axis is not centered around zero."
-        assert np.isclose(np.mean(xF),0,atol=1e-8 * np.abs((xF[-1]-xF[0]))), "Output grid x-axis is not centered around zero." 
-        assert np.isclose(np.mean(yF),0,atol=1e-8 * np.abs((yF[-1]-yF[0]))), "Output grid y-axis is not centered around zero." 
+        assert np.isclose(np.mean(x), 0, atol=1e-8 * np.abs((x[-1] - x[0]))), (
+            "Input grid x-axis is not centered around zero."
+        )
+        assert np.isclose(np.mean(y), 0, atol=1e-8 * np.abs((y[-1] - y[0]))), (
+            "Input grid y-axis is not centered around zero."
+        )
+        assert np.isclose(np.mean(xF), 0, atol=1e-8 * np.abs((xF[-1] - xF[0]))), (
+            "Output grid x-axis is not centered around zero."
+        )
+        assert np.isclose(np.mean(yF), 0, atol=1e-8 * np.abs((yF[-1] - yF[0]))), (
+            "Output grid y-axis is not centered around zero."
+        )
 
-        X, Y = np.meshgrid(x, y, indexing='ij')
-        XF, YF = np.meshgrid(xF, yF, indexing='ij')
-
+        X, Y = np.meshgrid(x, y, indexing="ij")
+        XF, YF = np.meshgrid(xF, yF, indexing="ij")
 
         for indx in indxs:
             om = omega[indx]
