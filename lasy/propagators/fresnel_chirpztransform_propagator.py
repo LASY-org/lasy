@@ -100,7 +100,7 @@ class FresnelChirpZPropagator(Propagator):
     >>> laser.propagate(focal_length, grid_out=newGrid)
     >>> laser.show(envelope_type="intensity")
     >>> w0theory = 0.8e-6 * focal_length / (np.pi * 5e-3)
-    >>> print(f"w0 theoretical: %.2e m" % (w0theory))
+    >>> print("w0 theoretical: %.2e m" % (w0theory))
     """
 
     def update(self, dim, omega0):
