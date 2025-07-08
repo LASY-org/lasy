@@ -6,11 +6,9 @@ from .gaussian_profile import GaussianProfile
 from .profile import Profile
 from .speckle_profile import SpeckleProfile
 from .flying_focus_profiles import (
-    FlyingFocusGaussianProfile,
-    FlyingFocusHGProfile,
-    FlyingFocusLGProfile,
-    FlyingFocusGaussianProfile2D,
-    FlyingFocusHGProfile2D
+    ParaxialFlyingFocusGaussianProfile,
+    ParaxialFlyingFocusHermiteGaussianProfile,
+    ParaxialFlyingFocusLaguerreGaussianProfile,
 )
 
 __all__ = [
@@ -21,9 +19,7 @@ __all__ = [
     "FromOpenPMDProfile",
     "FromInsightFile",
     "SpeckleProfile",
-    "FlyingFocusGaussianProfile",
-    "FlyingFocusHGProfile",
-    "FlyingFocusLGProfile",
-    "FlyingFocusGaussianProfile2D",
-    "FlyingFocusHGProfile2D",
+    "ParaxialFlyingFocusGaussianProfile",
+    "ParaxialFlyingFocusHermiteGaussianProfile",
+    "ParaxialFlyingFocusLaguerreGaussianProfile",
 ]
