@@ -250,8 +250,13 @@ class FresnelChirpZPropagator(Propagator):
             # Add output field to array
             field_out[:, :, indx] = F * postFactor
 
+<<<<<<< HEAD
          # Shift the pulse back to the center of the time axis
         field_out *= np.exp(-1j * omega[np.newaxis,np.newaxis,:] * distance/c)
+=======
+        # Shift the pulse back to the center of the time axis
+        field_out *= np.exp(-1j * omega[np.newaxis, np.newaxis, :] * distance / c)
+>>>>>>> ad3f1320e9d0fc65c2322d990b56807b08e60f90
 
         # Update output grid parameters
         grid_out.set_spectral_field(field_out)
