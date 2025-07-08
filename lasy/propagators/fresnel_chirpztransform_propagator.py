@@ -78,18 +78,18 @@ class FresnelChirpZPropagator(Propagator):
     >>> # Create laser with given profile in `xyt` geometry.
     >>> laser = Laser(
     ...     dim="xyt",
-    ...     lo=(-15e-3,-15e-3, -60e-15),
+    ...     lo=(-15e-3, -15e-3, -60e-15),
     ...     hi=(15e-3, 15e-3, +60e-15),
-    ...     npoints=(200,200, 500),
+    ...     npoints=(200, 200, 500),
     ...     profile=profile,
     ... )
     >>> # Add Focusing Phase.
-    >>> focal_length = 1 # m
+    >>> focal_length = 1  # m
     >>> laser.apply_optics(ParabolicMirror(focal_length))
     >>> # Add Fresnel Chirp-Z propagator.
     >>> laser.add_propagator(FresnelChirpZPropagator())
     >>> # Create a new resampled grid for propagation.
-    >>> xLimNew = 150e-6 # m
+    >>> xLimNew = 150e-6  # m
     >>> newGrid = Grid(
     ...     laser.dim,
     ...     (-xLimNew, -xLimNew, laser.grid.lo[2]),
@@ -97,7 +97,7 @@ class FresnelChirpZPropagator(Propagator):
     ...     (100, 100, laser.grid.npoints[2]),
     ... )
     >>> # Propagate the laser pulse to the focal plane and visualise.
-    >>> laser.propagate(focal_length,grid_out=newGrid)
+    >>> laser.propagate(focal_length, grid_out=newGrid)
     >>> laser.show(envelope_type="intensity")
     >>> w0_theor = 0.8e-6 * focal_length / (np.pi * 5e-3)
     >>> print(f"w0 theoretical: {w0_theor:.2e} m")
