@@ -1,10 +1,12 @@
-import numpy as np
-from lasy.profiles.profile import Profile
 from math import factorial
-from scipy.special import (hermite, genlaguerre)
+
+import numpy as np
+from scipy.special import genlaguerre, hermite
+
+from lasy.profiles.profile import Profile
+
 
 class ParaxialFlyingFocusGaussianProfile(Profile):
-
     r"""
     Class for the analytic profile of a flying focus Gaussian laser pulse in 2 and 3 dimensions.
 
@@ -12,18 +14,18 @@ class ParaxialFlyingFocusGaussianProfile(Profile):
     corresponds to:
     .. math::
 
-        E_{3D}(x, y, t) = 
+        E_{3D}(x, y, t) =
             \Rea \left(
                 \frac{iz_r}{q}
-                \exp\left(-ik\frac{x^2+y^2}{2q} 
-                - \left(\frac{(t-t_p)^2}{\tau^2}\right)^{n_{order}/2} 
+                \exp\left(-ik\frac{x^2+y^2}{2q}
+                - \left(\frac{(t-t_p)^2}{\tau^2}\right)^{n_{order}/2}
                 + i(\phi_{cep}+\text{omega}_0t_p)\right)
             \right)
-        E_{2D}(x, t) = 
+        E_{2D}(x, t) =
             \Rea \left(
                 \sqrt{\frac{iz_r}{q}}
-                \exp\left(-ik\frac{x^2}{2q} 
-                - \left(\frac{(t-t_p)^2}{\tau^2}\right)^{n_{order}/2} 
+                \exp\left(-ik\frac{x^2}{2q}
+                - \left(\frac{(t-t_p)^2}{\tau^2}\right)^{n_{order}/2}
                 + i(\phi_{cep}+\text{omega}_0t_p)\right)
             \right)
 
@@ -45,13 +47,13 @@ class ParaxialFlyingFocusGaussianProfile(Profile):
         The main laser wavelength :math:`\lambda_0` of the laser.
         Which defines :math:`\omega_0` in the above formula, according to
         :math:`\omega_0 = 2\pi c/\lambda_0`.
-    
+
     pol : list of 2 complex numbers (dimensionless)
         Polarization vector. It corresponds to :math:`p_u` in the above
         formula ; :math:`p_x` is the first element of the list and
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
-    
+
     laser_energy : float (in Joule)
         The total energy of the laser pulse. The amplitude of the laser
         field (:math:`E_0` in the above formula) is automatically
@@ -66,7 +68,7 @@ class ParaxialFlyingFocusGaussianProfile(Profile):
     t_peak : float (in second)
         The time at which the laser envelope reaches its maximum amplitude,
         i.e. :math:`t_{peak}` in the above formula.
-    
+
     vf : float (in meters / second), optional
         The velocity of the point of peak intensity in the pulse
         Default value is 0
@@ -79,12 +81,12 @@ class ParaxialFlyingFocusGaussianProfile(Profile):
     z_init : float (in meter), optional
         Initial position of the focal plane. (The laser pulse is initialized at
         ``z=0``.)
-    
+
     n_order : int, optional
         the exponent for the super gaussian time envelope
         default is two (standard gaussian)
 
-        
+
     Examples
     --------
     >>> import matplotlib.pyplot as plt
@@ -130,24 +132,23 @@ class ParaxialFlyingFocusGaussianProfile(Profile):
     >>> plt.ylabel("r (µm)")
 
     """
-    
-    def __init__(
-            self, 
-            n_dims,
-            w_0, 
-            wavelength, 
-            pol, 
-            laser_energy, 
-            tau, 
-            t_peak, 
-            vf=0, 
-            cep_phase=0,
-            z_init=0,
-            n_order=2
-    ):
 
+    def __init__(
+        self,
+        n_dims,
+        w_0,
+        wavelength,
+        pol,
+        laser_energy,
+        tau,
+        t_peak,
+        vf=0,
+        cep_phase=0,
+        z_init=0,
+        n_order=2,
+    ):
         super().__init__(wavelength, pol)
-        self.n_dims = n_dims # maybe add a check
+        self.n_dims = n_dims  # maybe add a check
         self.w_0 = w_0
         self.wavelength = wavelength
         self.laser_energy = laser_energy
@@ -157,7 +158,7 @@ class ParaxialFlyingFocusGaussianProfile(Profile):
         self.cep_phase = cep_phase
         self.z_init = z_init
         self.n_order = n_order
-    
+
     def evaluate(self, x, y, t):
         """
         Return the transverse and longitudinal envelope.
@@ -176,7 +177,6 @@ class ParaxialFlyingFocusGaussianProfile(Profile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
         """
-
         # Rayleigh Range
         z_r = np.pi * self.w_0**2 / self.wavelength
         # complex beam parameter (z + iz_r)
@@ -197,10 +197,14 @@ class ParaxialFlyingFocusGaussianProfile(Profile):
         exp_argument = -1.0j * k0 * r_sq / 2 / q
         # Get the profile
         envelope = (
-            np.exp(exp_argument) * # transverse envelope
-            np.exp(-np.power(((t - self.t_peak) ** 2) / self.tau**2, self.n_order / 2)) * # longitudal envelope
-            np.exp(1.0j * (self.cep_phase + self.omega0 * self.t_peak)) # phase factor
-            * diffract_factor # normalization
+            np.exp(exp_argument)  # transverse envelope
+            * np.exp(
+                -np.power(((t - self.t_peak) ** 2) / self.tau**2, self.n_order / 2)
+            )  # longitudal envelope
+            * np.exp(
+                1.0j * (self.cep_phase + self.omega0 * self.t_peak)
+            )  # phase factor
+            * diffract_factor  # normalization
         )
 
         return envelope
@@ -268,13 +272,13 @@ class ParaxialFlyingFocusHermiteGaussianProfile(Profile):
         The main laser wavelength :math:`\lambda_0` of the laser.
         Which defines :math:`\omega_0` in the above formula, according to
         :math:`\omega_0 = 2\pi c/\lambda_0`.
-    
+
     pol : list of 2 complex numbers (dimensionless)
         Polarization vector. It corresponds to :math:`p_u` in the above
         formula ; :math:`p_x` is the first element of the list and
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
-    
+
     laser_energy : float (in Joule)
         The total energy of the laser pulse. The amplitude of the laser
         field (:math:`E_0` in the above formula) is automatically
@@ -329,8 +333,8 @@ class ParaxialFlyingFocusHermiteGaussianProfile(Profile):
     ...             m = m, #
     ...             n = n, #
     ...             wavelength = 0.8e-6, # m
-    ...             pol= (1,0) , 
-    ...             laser_energy = 1, # J 
+    ...             pol= (1,0) ,
+    ...             laser_energy = 1, # J
     ...             tau = 30e-12, # s
     ...             t_peak = 0.0, # s
     ...             vf = 0.5*c , # m/s
@@ -370,8 +374,8 @@ class ParaxialFlyingFocusHermiteGaussianProfile(Profile):
     ...     m = 3, #
     ...     n = 2, #
     ...     wavelength = 0.8e-6, # m
-    ...     pol = (1,0) , 
-    ...     laser_energy = 1, # J 
+    ...     pol = (1,0) ,
+    ...     laser_energy = 1, # J
     ...     tau = 30e-12, # s
     ...     t_peak = 0.0, # s
     ...     vf = 0.5*c , # m/s
@@ -405,37 +409,36 @@ class ParaxialFlyingFocusHermiteGaussianProfile(Profile):
     """
 
     def __init__(
-            self, 
-            n_dims,
-            w_0x, 
-            w_0y, 
-            m, 
-            n, 
-            wavelength, 
-            pol, 
-            laser_energy, 
-            tau, 
-            t_peak,
-            vf=0, 
-            cep_phase=0,
-            z_init=0,
-            n_order=2
-        ):
-
+        self,
+        n_dims,
+        w_0x,
+        w_0y,
+        m,
+        n,
+        wavelength,
+        pol,
+        laser_energy,
+        tau,
+        t_peak,
+        vf=0,
+        cep_phase=0,
+        z_init=0,
+        n_order=2,
+    ):
         super().__init__(wavelength, pol)
         self.n_dims = n_dims
         self.w_0x = w_0x
-        self.w_0y = w_0y 
-        self.m = m 
-        self.n = n 
-        self.wavelength = wavelength 
-        self.pol = pol 
-        self.laser_energy = laser_energy 
-        self.tau = tau 
-        self.t_peak = t_peak 
-        self.vf = vf 
-        self.cep_phase = cep_phase 
-        self.z_init = z_init 
+        self.w_0y = w_0y
+        self.m = m
+        self.n = n
+        self.wavelength = wavelength
+        self.pol = pol
+        self.laser_energy = laser_energy
+        self.tau = tau
+        self.t_peak = t_peak
+        self.vf = vf
+        self.cep_phase = cep_phase
+        self.z_init = z_init
         self.n_order = n_order
 
     def evaluate(self, x, y, t):
@@ -455,12 +458,13 @@ class ParaxialFlyingFocusHermiteGaussianProfile(Profile):
         envelope : ndarray of complex numbers
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y, t
-        
-        """
 
+        """
         # Calculation for x terms
-        # z value for flying focus 
-        z_eval = self.z_init - self.vf * (t - self.t_peak)  # this links our observation position to Siegmann's definition
+        # z value for flying focus
+        z_eval = self.z_init - self.vf * (
+            t - self.t_peak
+        )  # this links our observation position to Siegmann's definition
         # wavenumber
         k0 = 2 * np.pi / self.wavelength
         # Calculate Rayleigh Lengths
@@ -468,7 +472,9 @@ class ParaxialFlyingFocusHermiteGaussianProfile(Profile):
         # Calculate Size at Location Z
         wxZ = self.w_0x * np.sqrt(1 + (z_eval / Zx) ** 2)
         # Calculate Multiplicative Factors
-        Anx = 1 / np.sqrt(wxZ * 2 ** (self.m - 1 / 2) * factorial(self.m) * np.sqrt(np.pi))
+        Anx = 1 / np.sqrt(
+            wxZ * 2 ** (self.m - 1 / 2) * factorial(self.m) * np.sqrt(np.pi)
+        )
         # Calculate the Phase contributions from propagation
         phiXz = (self.m + 1 / 2) * np.arctan2(z_eval, Zx)
 
@@ -483,7 +489,9 @@ class ParaxialFlyingFocusHermiteGaussianProfile(Profile):
         if self.n_dims > 2:
             Zy = np.pi * self.w_0y**2 / self.wavelength
             wyZ = self.w_0y * np.sqrt(1 + (z_eval / Zy) ** 2)
-            Any = 1 / np.sqrt(wyZ * 2 ** (self.n - 1 / 2) * factorial(self.n) * np.sqrt(np.pi))
+            Any = 1 / np.sqrt(
+                wyZ * 2 ** (self.n - 1 / 2) * factorial(self.n) * np.sqrt(np.pi)
+            )
             phiYz = (self.n + 1 / 2) * np.arctan2(z_eval, Zy)
 
             HGny = (
@@ -497,14 +505,15 @@ class ParaxialFlyingFocusHermiteGaussianProfile(Profile):
             HGny = 1
             phiYz = 0
 
-
         # Put it altogether
         envelope = (
-            HGnx * # x transverse envelope
-            HGny * # y transverse envelope
-            np.exp(1j * (phiXz + phiYz)) * # guoy terms
-            np.exp(-np.power(((t - self.t_peak) ** 2) / self.tau**2, self.n_order / 2)) * # longitudal envelope
-            np.exp(1.0j * (self.cep_phase + self.omega0 * self.t_peak)) # phase
+            HGnx  # x transverse envelope
+            * HGny  # y transverse envelope
+            * np.exp(1j * (phiXz + phiYz))  # guoy terms
+            * np.exp(
+                -np.power(((t - self.t_peak) ** 2) / self.tau**2, self.n_order / 2)
+            )  # longitudal envelope
+            * np.exp(1.0j * (self.cep_phase + self.omega0 * self.t_peak))  # phase
         )
 
         return envelope
@@ -561,13 +570,13 @@ class ParaxialFlyingFocusLaguerreGaussianProfile(Profile):
         The main laser wavelength :math:`\lambda_0` of the laser.
         Which defines :math:`\omega_0` in the above formula, according to
         :math:`\omega_0 = 2\pi c/\lambda_0`.
-    
+
     pol : list of 2 complex numbers (dimensionless)
         Polarization vector. It corresponds to :math:`p_u` in the above
         formula ; :math:`p_x` is the first element of the list and
         :math:`p_y` is the second element of the list. Using complex
         numbers enables elliptical polarizations.
-    
+
     laser_energy : float (in Joule)
         The total energy of the laser pulse. The amplitude of the laser
         field (:math:`E_0` in the above formula) is automatically
@@ -625,7 +634,7 @@ class ParaxialFlyingFocusLaguerreGaussianProfile(Profile):
     ...             laser_energy = 1, # J
     ...             tau = 30e-12, # s
     ...             t_peak = 0.0, # s
-    ...             vf = 0.5 * c, # m/s 
+    ...             vf = 0.5 * c, # m/s
     ...         )
     ...         intensity = np.abs(ff_lg_profile.evaluate(X,Y,0))**2
     ...         vmax_intensity = np.max(intensity)
@@ -648,7 +657,7 @@ class ParaxialFlyingFocusLaguerreGaussianProfile(Profile):
     >>>             ax[p,m].set_yticks([])
     >>>             ax[p,m+3].set_yticks([])
 
-    
+
     # Longitudal profile
     >>> import matplotlib.pyplot as plt
     >>> from lasy.laser import Laser
@@ -657,15 +666,15 @@ class ParaxialFlyingFocusLaguerreGaussianProfile(Profile):
     >>> from scipy.constants import c
     >>> # Create profile.
     >>> profile = FlyingFocusLGProfile(
-    ...     w_0 = 10e-6, # m
-    ...     p = 3, #
-    ...     m = 2, #
-    ...     wavelength = 0.8e-6, # m
-    ...     pol = (1,0) , 
-    ...     laser_energy = 1, # J 
-    ...     tau = 30e-12, # s
-    ...     t_peak = 0.0, # s
-    ...     vf = 0.5*c , # m/s
+    ...     w_0=10e-6,  # m
+    ...     p=3,  #
+    ...     m=2,  #
+    ...     wavelength=0.8e-6,  # m
+    ...     pol=(1, 0),
+    ...     laser_energy=1,  # J
+    ...     tau=30e-12,  # s
+    ...     t_peak=0.0,  # s
+    ...     vf=0.5 * c,  # m/s
     ... )
     >>> # Create laser with given profile in `rt` geometry.
     >>> laser = Laser(
@@ -696,21 +705,20 @@ class ParaxialFlyingFocusLaguerreGaussianProfile(Profile):
     """
 
     def __init__(
-            self, 
-            w_0, 
-            p, 
-            m, 
-            wavelength, 
-            pol,
-            laser_energy,
-            tau,
-            t_peak,
-            vf=0, 
-            cep_phase=0, 
-            z_init=0,
-            n_order=2
-        ):
-
+        self,
+        w_0,
+        p,
+        m,
+        wavelength,
+        pol,
+        laser_energy,
+        tau,
+        t_peak,
+        vf=0,
+        cep_phase=0,
+        z_init=0,
+        n_order=2,
+    ):
         super().__init__(wavelength, pol)
         self.w_0 = w_0
         self.p = p
@@ -724,7 +732,6 @@ class ParaxialFlyingFocusLaguerreGaussianProfile(Profile):
         self.cep_phase = cep_phase
         self.z_init = z_init
         self.n_order = n_order
-
 
     def evaluate(self, x, y, t):
         """
@@ -745,7 +752,9 @@ class ParaxialFlyingFocusLaguerreGaussianProfile(Profile):
             This array has the same shape as the arrays x, y, t
         """
         # z eval
-        z_eval = self.z_init - self.vf * (t - self.t_peak)  # this links our observation position to Siegmann's definition
+        z_eval = self.z_init - self.vf * (
+            t - self.t_peak
+        )  # this links our observation position to Siegmann's definition
         # wavenumber
         k0 = 2 * np.pi / self.wavelength
         # Calculate Rayleigh Length
@@ -753,7 +762,10 @@ class ParaxialFlyingFocusLaguerreGaussianProfile(Profile):
         # Calculate Size at Location Z
         w0Z = self.w_0 * np.sqrt(1 + (z_eval / z_r) ** 2)
         # Calculate Multiplicative Factors
-        A = np.sqrt(2.0 * factorial(self.p) / (np.pi * factorial(self.m + self.p))) / w0Z
+        A = (
+            np.sqrt(2.0 * factorial(self.p) / (np.pi * factorial(self.m + self.p)))
+            / w0Z
+        )
         # Calculate the Phase contributions from propagation
         phiZ = (2.0 * self.p + self.m + 1) * np.arctan2(z_eval, z_r)
 
@@ -768,12 +780,13 @@ class ParaxialFlyingFocusLaguerreGaussianProfile(Profile):
 
         # Put it altogether
         envelope = (
-            LG * # transverse envelope and laguerre constants
-            np.exp(1j * phiZ) * # guoy phase
-            np.exp(-np.power(((t - self.t_peak) ** 2) / self.tau**2, self.n_order / 2)) * # longitdual envelope
-            np.exp(-1j * self.m * np.arctan2(y, x)) * # orbital angular momentum
-            np.exp(1j * (self.cep_phase + self.omega0 * self.t_peak)) # phase
+            LG  # transverse envelope and laguerre constants
+            * np.exp(1j * phiZ)  # guoy phase
+            * np.exp(
+                -np.power(((t - self.t_peak) ** 2) / self.tau**2, self.n_order / 2)
+            )  # longitdual envelope
+            * np.exp(-1j * self.m * np.arctan2(y, x))  # orbital angular momentum
+            * np.exp(1j * (self.cep_phase + self.omega0 * self.t_peak))  # phase
         )
 
         return envelope
-
