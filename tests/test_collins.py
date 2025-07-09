@@ -87,12 +87,6 @@ def test_spatial_propagation_SFFT():
 
     waists_analytical = w0 * np.sqrt(1 + (np.abs(z_pos - focal_length) / zR) ** 2)
 
-    debug = False
-    if debug:
-        print("\t".join(["{:.3e}".format(x) for x in waists_propagated]))
-        print("\t".join(["{:.3e}".format(x) for x in waists_analytical]))
-        print(np.isclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6))
-
     assert np.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
 
 
@@ -119,10 +113,5 @@ def test_spatial_propagation_DFFT():
 
     zR = np.pi * laser.profile.w0**2 / (laser.profile.lambda0)
     waists_analytical = laser.profile.w0 * np.sqrt(1 + np.abs(z_pos / zR) ** 2)
-    debug = False
-    if debug:
-        print("\t".join(["{:.3e}".format(x) for x in waists_propagated]))
-        print("\t".join(["{:.3e}".format(x) for x in waists_analytical]))
-        print(np.isclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6))
 
     assert np.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
