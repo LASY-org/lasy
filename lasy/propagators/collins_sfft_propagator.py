@@ -263,8 +263,22 @@ class CollinsSFFTPropagator(Propagator):
             / (2j * np.pi * c * B)
             / np.abs(OM / (2j * np.pi * c * B))
         )  # Return field in spectral domain
-        field*=np.sqrt(np.sum(c * epsilon_0 * np.abs(spectral_field) ** 2 * np.abs(x0[1]-x0[0]) * np.abs(y0[1]-y0[0]))/
-                       np.sum(c * epsilon_0 * np.abs(field) ** 2 * np.abs(x[1]-x[0]) * np.abs(y[1]-y[0])))
+        field *= np.sqrt(
+            np.sum(
+                c
+                * epsilon_0
+                * np.abs(spectral_field) ** 2
+                * np.abs(x0[1] - x0[0])
+                * np.abs(y0[1] - y0[0])
+            )
+            / np.sum(
+                c
+                * epsilon_0
+                * np.abs(field) ** 2
+                * np.abs(x[1] - x[0])
+                * np.abs(y[1] - y[0])
+            )
+        )
 
         # Update the grid
         grid_in.lo[0] = x[0]
