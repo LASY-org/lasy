@@ -12,7 +12,7 @@ class FresnelChirpZPropagator(Propagator):
 
     The propagated field is calculated via the following method:
 
-    Given a scalar field :math:`E_0(x',y',0,\omega)`, one write the propagated field
+    Given a scalar field :math:`E_0(x',y',0,\omega)`, one writes the propagated field
     at a distance :math:`z`, under the Fresnel approximation, as:
 
     .. math::
