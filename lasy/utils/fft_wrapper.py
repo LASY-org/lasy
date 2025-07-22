@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def fft(which, arr_in, axes_in, from_domain, verbose):
+def fft(which, arr_in, axes_in, from_domain, verbose=0):
     """
     Perform FFT on a 3D array.
 
@@ -25,6 +25,9 @@ def fft(which, arr_in, axes_in, from_domain, verbose):
     from_domain : string
         "real" of the FFT is done from real domain (x,y) or (t) to frequency domain (kx, ky) or (omega)
         "frequency" for the opposite way
+
+    verbose : integer, optional (default 0)
+        Verbosity level. If >0 print some warning statements.
 
     Returns
     -------
