@@ -138,10 +138,11 @@ class CollinsSFFTPropagator(Propagator):
             z_R = np.pi * w0**2 / lambda0  # Calculate input Rayleigh range
 
             q1 = _q(0, 0, z_R)
-            # z_02 = -np.real((A * q1 + B) / (C * q1 + D))  # Calculate waist position
+
+            # Calculate output Rayleigh range
             z_R2 = -np.imag(
                 (A * q1 + B) / (C * q1 + D)
-            )  # Calculate output Rayleigh range
+            )
             f0 = np.sqrt(k0 * w0**2 / 2.0 * z_R2)  # Calculate effective focal length
             assert f0 < 100, (
                 "CollinsSFFTPropagator is for focusing geometries, please specify a lens."
@@ -256,13 +257,14 @@ class CollinsSFFTPropagator(Propagator):
             from_domain="frequency",
         )
 
+        # Return field in spectral domain
         field = (
             field
             * np.exp(1j * OM / (2 * c) * (D / B) * R**2)
             * OM
             / (2j * np.pi * c * B)
             / np.abs(OM / (2j * np.pi * c * B))
-        )  # Return field in spectral domain
+        )
         field *= np.sqrt(
             np.sum(
                 c
