@@ -24,27 +24,6 @@ class ABCD:
 
     def __init__(self, abcd=np.array([[1, 0], [0, 1]])):
         super().__init__()
-        self.update(abcd=abcd)
-
-    def update(self, abcd):
-        r"""
-        Initialize or update the ABCD matrix if needed.
-
-        Parameters
-        ----------
-        abcd : 2d array
-            The 2D ray matrix of the optical system through which the beam propagates.
-            Generally, this can be any matrix defined as:
-
-            .. math::
-
-                O =
-                \begin{pmatrix}
-                A & B \\
-                C & D
-                \end{pmatrix}.
-
-        """
         self.abcd = abcd
 
     def add_vacuum(self, distance):
