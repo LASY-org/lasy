@@ -1,7 +1,9 @@
+import copy
+
 import numpy as np
 from scipy.constants import c
 from scipy.signal import zoom_fft
-import copy
+
 from .propagator import Propagator
 
 
