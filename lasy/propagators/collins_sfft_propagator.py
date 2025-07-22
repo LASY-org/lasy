@@ -140,9 +140,7 @@ class CollinsSFFTPropagator(Propagator):
             q1 = _q(0, 0, z_R)
 
             # Calculate output Rayleigh range
-            z_R2 = -np.imag(
-                (A * q1 + B) / (C * q1 + D)
-            )
+            z_R2 = -np.imag((A * q1 + B) / (C * q1 + D))
             f0 = np.sqrt(k0 * w0**2 / 2.0 * z_R2)  # Calculate effective focal length
             assert f0 < 100, (
                 "CollinsSFFTPropagator is for focusing geometries, please specify a lens."
