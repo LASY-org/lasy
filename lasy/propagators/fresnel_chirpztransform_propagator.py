@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.constants import c
 from scipy.signal import zoom_fft
-
+import copy
 from .propagator import Propagator
 
 
@@ -199,6 +199,10 @@ class FresnelChirpZPropagator(Propagator):
 
         # Get the spectral field from the grid objects
         field_in, omega = grid_in.get_spectral_field()
+        if grid_out is None:
+            # Create a new grid for the output if not provided
+            grid_out = copy.deepcopy(grid_in)
+            grid_out.set_spectral_field(np.zeros_like(field_in))
         field_out = grid_out.spectral_field
         omega += omega0
         indxs = np.argsort(omega)
