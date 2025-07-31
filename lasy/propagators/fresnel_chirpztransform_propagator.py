@@ -198,6 +198,8 @@ class FresnelChirpZPropagator(Propagator):
         """
         self.update(dim, omega0)
 
+        initial_position = grid_in.position
+
         # Get the spectral field from the grid objects
         field_in, omega = grid_in.get_spectral_field()
         if grid_out is None:
@@ -260,6 +262,6 @@ class FresnelChirpZPropagator(Propagator):
 
         # Update output grid parameters
         grid_out.set_spectral_field(field_out)
-        grid_out.position += distance
+        grid_out.position = initial_position + distance
 
         return grid_out
