@@ -132,8 +132,8 @@ class FresnelChirpZPropagator(Propagator):
         # Calculate the sample frequency in each axis
         x_range = x[-1] - x[0]
         y_range = y[-1] - y[0]
-        sample_frequency_x = (len(x)-1) / x_range
-        sample_frequency_y = (len(y)-1) / y_range
+        sample_frequency_x = (len(x) - 1) / x_range
+        sample_frequency_y = (len(y) - 1) / y_range
 
         # Convert desired frequency from rad/s to Hz
         freq_x = k_x / 2 / np.pi
