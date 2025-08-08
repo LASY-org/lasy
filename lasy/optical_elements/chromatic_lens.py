@@ -4,9 +4,9 @@ from scipy.constants import c
 from .optical_element import OpticalElement
 
 
-class ThickLens(OpticalElement):
+class ChromaticLens(OpticalElement):
     r"""
-    Class for a thick lens, with a varying refractive index depending on the wavelength.
+    Class for a chromatic thin lens, with a varying refractive index depending on the wavelength.
 
     Parameters
     ----------
@@ -15,7 +15,8 @@ class ThickLens(OpticalElement):
     R2 : float
         ROC of the second surface (>0 if concave)
     d : float
-        Thickness of the lens
+        Thickness of the lens used to calculate the total phase shift.
+        Note that this optical element still assumes a thin optics. 
     n_func : function
         Function that returns the refractive index given the wavelength in microns, taken from the website "https://refractiveindex.info".
         e.g. for Fused Silica:

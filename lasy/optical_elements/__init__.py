@@ -2,6 +2,7 @@ from .axicon import Axicon
 from .axiparabola import Axiparabola
 from .intensity_mask import IntensityMask
 from .parabolic_mirror import ParabolicMirror
+from .chromatic_lens import ChromaticLens
 from .polynomial_spectral_phase import PolynomialSpectralPhase
 from .spectral_filter import SpectralFilter
 from .spectral_phase import SpectralPhase
@@ -12,6 +13,7 @@ __all__ = [
     "PolynomialSpectralPhase",
     "Axiparabola",
     "Axicon",
+    "ChromaticLens",
     "IntensityMask",
     "ZernikeAberrations",
     "SpectralFilter",
