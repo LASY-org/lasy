@@ -3,11 +3,11 @@ from lasy.optical_elements.optical_element import OpticalElement
 
 class IntensityMask(OpticalElement):
     """
-    Class for a radially symmetric intensity mask.
+    Class for a round or rectangular intensity mask.
 
     This creates an optical element which acts to mask out the intensity of a laser pulse.
-    The mask is radially symmetric and can either mask intensity beyond a user defined radius, thus acting as
-    an aperture. Alternatively, the optica can mask intensity within a user defined radius, acting in this case as
+    The mask is either round or rectangular and can either mask intensity beyond a user defined radius or width, thus acting as
+    an aperture. Alternatively, the optica can mask intensity within a user defined radius or width, acting in this case as
     an optic with a hole.
 
     Parameters
