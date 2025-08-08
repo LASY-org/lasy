@@ -8,6 +8,14 @@ class ChromaticLens(OpticalElement):
     r"""
     Class for a chromatic thin lens, with a varying refractive index depending on the wavelength.
 
+    Examples
+    --------
+    >>> R1 = 114.5e-3 # 1st ROC 
+    >>> t1 = 3.4e-3 # lens thickness
+    >>> R2 = -114.5e-3 # 2nd ROC
+    >>> nFS = lambda x: (1+0.6961663/(1-(0.0684043/x)**2)+0.4079426/(1-(0.1162414/x)**2)+0.8974794/(1-(9.896161/x)**2))**.5 
+    >>> laser.apply_optics(Lens2(R1 = R1 , R2 = R2, d = t1, n_func=nFS))
+
     Parameters
     ----------
     R1 : float
