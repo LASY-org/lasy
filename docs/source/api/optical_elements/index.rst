@@ -8,6 +8,7 @@ Optical elements
    polynomial_spectral_phase
    axiparabola
    axicon
+   chromatic_lens
    zernike_aberrations
    spectral_filter
    spectral_phase
