@@ -10,11 +10,19 @@ class ChromaticLens(OpticalElement):
 
     Examples
     --------
-    >>> R1 = 114.5e-3 # 1st ROC 
-    >>> t1 = 3.4e-3 # lens thickness
-    >>> R2 = -114.5e-3 # 2nd ROC
-    >>> nFS = lambda x: (1+0.6961663/(1-(0.0684043/x)**2)+0.4079426/(1-(0.1162414/x)**2)+0.8974794/(1-(9.896161/x)**2))**.5 
-    >>> laser.apply_optics(Lens2(R1 = R1 , R2 = R2, d = t1, n_func=nFS))
+    >>> R1 = 114.5e-3  # 1st ROC
+    >>> t1 = 3.4e-3  # lens thickness
+    >>> R2 = -114.5e-3  # 2nd ROC
+    >>> nFS = (
+    ...     lambda x: (
+    ...         1
+    ...         + 0.6961663 / (1 - (0.0684043 / x) ** 2)
+    ...         + 0.4079426 / (1 - (0.1162414 / x) ** 2)
+    ...         + 0.8974794 / (1 - (9.896161 / x) ** 2)
+    ...     )
+    ...     ** 0.5
+    ... )
+    >>> laser.apply_optics(Lens2(R1=R1, R2=R2, d=t1, n_func=nFS))
 
     Parameters
     ----------
@@ -24,7 +32,7 @@ class ChromaticLens(OpticalElement):
         ROC of the second surface (>0 if concave)
     d : float
         Thickness of the lens used to calculate the total phase shift.
-        Note that this optical element still assumes a thin optics. 
+        Note that this optical element still assumes a thin optics.
     n_func : function
         Function that returns the refractive index given the wavelength in microns, taken from the website "https://refractiveindex.info".
         e.g. for Fused Silica:
