@@ -36,8 +36,8 @@ class IntensityMask(OpticalElement):
         self.center = center
         self.mask_type = mask_type
         self.shape = shape
-        if shape==round:
-            assert R.type==float (
+        if self.shape=='round':
+            assert type(self.R)==float (
             "Radius cannot be a tuple'"
         )
         
@@ -57,17 +57,17 @@ class IntensityMask(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        if shape=='round':
+        if self.shape=='round':
             r_squared = (x - self.center[0]) ** 2 + (y - self.center[1]) ** 2
             mask = r_squared <= self.R**2  # True inside, False outside
 
-        if shape=='rectangular':
-            if R.type==float
-                halfwidth=R
-                halfheight=R
-            if R.type==tuple:
-                halfwidth=R[0]
-                halfheight=R[1]
+        if self.shape=='rectangular':
+            if type(self.R)==float
+                halfwidth=self.R
+                halfheight=self.R
+            if type(self.R)==tuple:
+                halfwidth=self.R[0]
+                halfheight=self.R[1]
             mask = ((x-self.center[0]) <= halfwidth) and ((x-self.center[0]) >= -halfwidth) and ((y-self.center[y]) <= halfheight) and ((y-self.center[y]) >= halfheight)) # True inside, False outside
 
         if self.mask_type == "aperture":
