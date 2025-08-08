@@ -14,7 +14,7 @@ class IntensityMask(OpticalElement):
     ----------
     R : float (in meter) or tuple (floats)
         The radius of the mask for round masks or half-width and half-height for rectangular masks as tuple.
-        If the shape is rectangular and only one number is given, a quadratic shape is assumed. 
+        If the shape is rectangular and only one number is given, a quadratic shape is assumed.
     center: tuple (floats)
         Center of the mask. Default is (0,0)
     mask_type: string
@@ -31,7 +31,7 @@ class IntensityMask(OpticalElement):
         assert shape in ["round", "rectangular"], (
             "shape must be 'round' or 'rectangular'"
         )
-        
+
         self.R = R
         self.center = center
         self.mask_type = mask_type
@@ -40,7 +40,7 @@ class IntensityMask(OpticalElement):
             assert type(self.R)==float (
             "Radius cannot be a tuple'"
         )
-        
+
     def amplitude_multiplier(self, x, y, omega):
         """
         Return the amplitude multiplier.
@@ -74,6 +74,3 @@ class IntensityMask(OpticalElement):
             return mask.astype(float)  # 1 inside, 0 outside
         else:  # "hole"
             return (~mask).astype(float)  # 0 inside, 1 outside
-
-            
-
