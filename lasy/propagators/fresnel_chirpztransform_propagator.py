@@ -56,8 +56,7 @@ class FresnelChirpZPropagator(Propagator):
 
         - ``'xyt'``: The laser pulse is represented on a 3D grid:
                     Cartesian (x,y) transversely, and temporal (t) longitudinally.
-        - ``'rt'`` : The laser pulse is represented on a 2D grid:
-                    Cylindrical (r) transversely, and temporal (t) longitudinally.
+
 
     Examples
     --------
@@ -123,7 +122,7 @@ class FresnelChirpZPropagator(Propagator):
         self.dim = dim
         self.omega0 = omega0
 
-        assert dim in ["rt", "xyt"], "Invalid dimension. Choose 'rt' or 'xyt'."
+        assert dim in ["xyt"], "Invalid dimension. Only 'xyt' is currently supported."
 
     def _zoomFourierTransform2D(self, x, y, f, k_x, k_y):
         # Get initial grid spacing in each axis
@@ -133,8 +132,8 @@ class FresnelChirpZPropagator(Propagator):
         # Calculate the sample frequency in each axis
         x_range = x[-1] - x[0]
         y_range = y[-1] - y[0]
-        sample_frequency_x = len(x) / x_range
-        sample_frequency_y = len(y) / y_range
+        sample_frequency_x = (len(x) - 1) / x_range
+        sample_frequency_y = (len(y) - 1) / y_range
 
         # Convert desired frequency from rad/s to Hz
         freq_x = k_x / 2 / np.pi
@@ -199,6 +198,8 @@ class FresnelChirpZPropagator(Propagator):
         """
         self.update(dim, omega0)
 
+        initial_position = grid_in.position
+
         # Get the spectral field from the grid objects
         field_in, omega = grid_in.get_spectral_field()
         if grid_out is None:
@@ -261,6 +262,6 @@ class FresnelChirpZPropagator(Propagator):
 
         # Update output grid parameters
         grid_out.set_spectral_field(field_out)
-        grid_out.position += distance
+        grid_out.position = initial_position + distance
 
         return grid_out
