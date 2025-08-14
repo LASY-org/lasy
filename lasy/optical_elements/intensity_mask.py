@@ -24,7 +24,7 @@ class IntensityMask(OpticalElement):
 
     """
 
-    def __init__(self, R, center=(0, 0), mask_type="aperture",shape="round"):
+    def __init__(self, R, center=(0, 0), mask_type="aperture", shape="round"):
         assert mask_type in ["aperture", "hole"], (
             "mask_type must be 'aperture' or 'hole'"
         )
@@ -36,10 +36,8 @@ class IntensityMask(OpticalElement):
         self.center = center
         self.mask_type = mask_type
         self.shape = shape
-        if self.shape=='round':
-            assert type(self.R)==float (
-            "Radius cannot be a tuple'"
-        )
+        if self.shape == "round":
+            assert type(self.R) == float("Radius cannot be a tuple'")
 
     def amplitude_multiplier(self, x, y, omega):
         """
@@ -57,18 +55,23 @@ class IntensityMask(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        if self.shape=='round':
+        if self.shape == "round":
             r_squared = (x - self.center[0]) ** 2 + (y - self.center[1]) ** 2
             mask = r_squared <= self.R**2  # True inside, False outside
 
-        if self.shape=='rectangular':
-            if type(self.R)==float:
-                halfwidth=self.R
-                halfheight=self.R
-            if type(self.R)==tuple:
-                halfwidth=self.R[0]
-                halfheight=self.R[1]
-            mask = ((x-self.center[0]) <= halfwidth) & ((x-self.center[0]) >= -halfwidth) & ((y-self.center[1]) <= halfheight) & ((y-self.center[1]) >= halfheight) # True inside, False outside
+        if self.shape == "rectangular":
+            if type(self.R) == float:
+                halfwidth = self.R
+                halfheight = self.R
+            if type(self.R) == tuple:
+                halfwidth = self.R[0]
+                halfheight = self.R[1]
+            mask = (
+                ((x - self.center[0]) <= halfwidth)
+                & ((x - self.center[0]) >= -halfwidth)
+                & ((y - self.center[1]) <= halfheight)
+                & ((y - self.center[1]) >= halfheight)
+            )  # True inside, False outside
 
         if self.mask_type == "aperture":
             return mask.astype(float)  # 1 inside, 0 outside
