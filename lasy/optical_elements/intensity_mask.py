@@ -37,7 +37,7 @@ class IntensityMask(OpticalElement):
         self.mask_type = mask_type
         self.shape = shape
         if self.shape == "round":
-            assert type(self.R) == float("Radius cannot be a tuple'")
+            assert type(self.R) != tuple("Radius cannot be a tuple'")
 
     def amplitude_multiplier(self, x, y, omega):
         """
@@ -70,7 +70,7 @@ class IntensityMask(OpticalElement):
                 ((x - self.center[0]) <= halfwidth)
                 & ((x - self.center[0]) >= -halfwidth)
                 & ((y - self.center[1]) <= halfheight)
-                & ((y - self.center[1]) >= halfheight)
+                & ((y - self.center[1]) >= -halfheight)
             )  # True inside, False outside
 
         if self.mask_type == "aperture":
