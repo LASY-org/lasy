@@ -62,13 +62,13 @@ class IntensityMask(OpticalElement):
             mask = r_squared <= self.R**2  # True inside, False outside
 
         if self.shape=='rectangular':
-            if type(self.R)==float
+            if type(self.R)==float:
                 halfwidth=self.R
                 halfheight=self.R
             if type(self.R)==tuple:
                 halfwidth=self.R[0]
                 halfheight=self.R[1]
-            mask = ((x-self.center[0]) <= halfwidth) and ((x-self.center[0]) >= -halfwidth) and ((y-self.center[y]) <= halfheight) and ((y-self.center[y]) >= halfheight)) # True inside, False outside
+            mask = ((x-self.center[0]) <= halfwidth) & ((x-self.center[0]) >= -halfwidth) & ((y-self.center[1]) <= halfheight) & ((y-self.center[1]) >= halfheight) # True inside, False outside
 
         if self.mask_type == "aperture":
             return mask.astype(float)  # 1 inside, 0 outside
