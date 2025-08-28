@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def find_center_of_mass(img):
+def find_center_of_mass(img, cal=None):
     """
     Find the center of mass of an image.
 
@@ -10,11 +10,14 @@ def find_center_of_mass(img):
     img: 2Darray of floats
         The image on which to calculate the COM
 
+    cal: float (m)
+        Pixel calibration in meters
+
     Returns
     -------
     x0 , y0: floats
         The center of mass of the image along the horizontal
-        and the vertical. The units are in pixels.
+        and the vertical. The units are in pixels unless cal is specified
 
     """
     rows, cols = np.shape(img)
@@ -25,6 +28,10 @@ def find_center_of_mass(img):
     img_tot = np.sum(img)
     x0 = np.sum(np.dot(img, x)) / img_tot
     y0 = np.sum(np.dot(img.T, y)) / img_tot
+
+    if cal:
+        x0*=cal
+        y0*=cal
 
     return x0, y0
 
