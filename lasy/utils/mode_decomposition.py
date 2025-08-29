@@ -12,7 +12,7 @@ from lasy.utils.exp_data_utils import find_d4sigma
 def get_hermite_mode(grid_in, w0x, w0y, i, j):
     r"""
     Function to project a laser field onto a Hermite-Gaussian mode to
-    obtain the complex mode coefficient
+    obtain the complex mode coefficient.
 
     Parameters
     ----------
@@ -36,6 +36,7 @@ def get_hermite_mode(grid_in, w0x, w0y, i, j):
     coeff : complex float
         The projected complex modal coefficient for the (i,j) Hermite-Gaussian mode
     """
+    
     X, Y, T = np.meshgrid(
         grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
     )
@@ -56,7 +57,7 @@ def hermite_gauss_decomposition(
     grid_in, w0x, w0y, Mmax, Nmax, skipAsymmetricModes=False
 ):
     r"""
-    Function to decompose a laser field onto a Hermite-Gaussian basis
+    Function to decompose a laser field onto a Hermite-Gaussian basis.
 
     Parameters
     ----------
@@ -83,6 +84,7 @@ def hermite_gauss_decomposition(
     cxy : dict
         A dictionary of complex modal coefficients
     """
+    
     X, Y, T = np.meshgrid(
         grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
     )
@@ -102,7 +104,7 @@ def hermite_gauss_decomposition(
 def hermite_gauss_composition(grid_in, w0x, w0y, cxy, skipAsymmetricModes=False):
     r"""
     Function to compose a laser field from a dictionary of complex
-    modal coefficients for a Hermite-Gaussian basis and update the laser object
+    modal coefficients for a Hermite-Gaussian basis and update the laser object.
 
     Parameters
     ----------
@@ -121,6 +123,7 @@ def hermite_gauss_composition(grid_in, w0x, w0y, cxy, skipAsymmetricModes=False)
     skipAsymmetricModes : Boolean
         Allows the user to only consider symmetric modal coefficients
     """
+    
     X, Y, T = np.meshgrid(
         grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
     )
@@ -141,7 +144,7 @@ def hermite_gauss_composition(grid_in, w0x, w0y, cxy, skipAsymmetricModes=False)
 def get_laguerre_mode(grid_in, w0, i, j):
     r"""
     Function to project a laser field onto a Laguerre-Gaussian mode to
-    obtain the complex mode coefficient
+    obtain the complex mode coefficient.
 
     Parameters
     ----------
@@ -162,6 +165,7 @@ def get_laguerre_mode(grid_in, w0, i, j):
     coeff : complex float
         The projected complex modal coefficient for the (i,j) Laguerre-Gaussian mode
     """
+    
     X, Y, T = np.meshgrid(
         grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
     )
@@ -180,7 +184,7 @@ def get_laguerre_mode(grid_in, w0, i, j):
 
 def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, skipAsymmetricModes=False):
     r"""
-    Function to decompose a laser field onto a Laguerre-Gaussian basis
+    Function to decompose a laser field onto a Laguerre-Gaussian basis.
 
     Parameters
     ----------
@@ -204,6 +208,7 @@ def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, skipAsymmetricModes=Fa
     cxy : dict
         A dictionary of complex modal coefficients
     """
+    
     X, Y, T = np.meshgrid(
         grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
     )
@@ -223,7 +228,7 @@ def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, skipAsymmetricModes=Fa
 def laguerre_gauss_composition(grid_in, w0, cxy, skipAsymmetricModes=False):
     r"""
     Function to compose a laser field from a dictionary of complex
-    modal coefficients for a Laguerre-Gaussian basis and update the laser object
+    modal coefficients for a Laguerre-Gaussian basis and update the laser object.
 
     Parameters
     ----------
@@ -239,6 +244,7 @@ def laguerre_gauss_composition(grid_in, w0, cxy, skipAsymmetricModes=False):
     skipAsymmetricModes : Boolean
         Allows the user to only consider symmetric modal coefficients
     """
+    
     X, Y, T = np.meshgrid(
         grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
     )
@@ -282,6 +288,7 @@ def estimate_best_HG_waist(x, y, field, wavelength):
     w0x, w0y : floats
         The calculated waist in x and y axis.
     """
+    
     dx = x[1] - x[0]
     dy = y[1] - y[0]
     assert np.isclose(dx, dy, rtol=1e-10)
