@@ -6,6 +6,7 @@ Utils
    :hidden:
 
    grid
+   mode_decomposition
    gerchberg_saxton
    refractive_index
    laser_utils
