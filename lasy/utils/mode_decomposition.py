@@ -83,7 +83,6 @@ def hermite_gauss_decomposition(
     cxy : dict
         A dictionary of complex modal coefficients
     """
-
     cxy = {}
     for i in range(Mmax):
         for j in range(Nmax):
@@ -200,7 +199,6 @@ def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, skipAsymmetricModes=Fa
     cxy : dict
         A dictionary of complex modal coefficients
     """
-
     cxy = {}
     for i in range(Mmax):
         for j in range(Nmax):
