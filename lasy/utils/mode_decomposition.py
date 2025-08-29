@@ -52,7 +52,9 @@ def get_hermite_mode(grid_in, w0x, w0y, i, j):
     return coeff
 
 
-def hermite_gauss_decomposition(grid_in, w0x, w0y, Mmax, Nmax, skipAsymmetricModes=False):
+def hermite_gauss_decomposition(
+    grid_in, w0x, w0y, Mmax, Nmax, skipAsymmetricModes=False
+):
     r"""
     Function to decompose a laser field onto a Hermite-Gaussian basis
 

@@ -30,8 +30,8 @@ def find_center_of_mass(img, cal=None):
     y0 = np.sum(np.dot(img.T, y)) / img_tot
 
     if cal:
-        x0*=cal
-        y0*=cal
+        x0 *= cal
+        y0 *= cal
 
     return x0, y0
 
