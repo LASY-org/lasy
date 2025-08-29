@@ -83,10 +83,6 @@ def hermite_gauss_decomposition(
     cxy : dict
         A dictionary of complex modal coefficients
     """
-    X, Y, T = np.meshgrid(
-        grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
-    )
-    field = grid_in.grid.get_temporal_field()
 
     cxy = {}
     for i in range(Mmax):
@@ -204,10 +200,6 @@ def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, skipAsymmetricModes=Fa
     cxy : dict
         A dictionary of complex modal coefficients
     """
-    X, Y, T = np.meshgrid(
-        grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
-    )
-    field = grid_in.grid.get_temporal_field()
 
     cxy = {}
     for i in range(Mmax):
