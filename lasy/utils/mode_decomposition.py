@@ -36,7 +36,6 @@ def get_hermite_mode(grid_in, w0x, w0y, i, j):
     coeff : complex float
         The projected complex modal coefficient for the (i,j) Hermite-Gaussian mode
     """
-    
     X, Y, T = np.meshgrid(
         grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
     )
@@ -84,7 +83,6 @@ def hermite_gauss_decomposition(
     cxy : dict
         A dictionary of complex modal coefficients
     """
-    
     cxy = {}
     for i in range(Mmax):
         for j in range(Nmax):
@@ -118,7 +116,6 @@ def hermite_gauss_composition(grid_in, w0x, w0y, cxy, skipAsymmetricModes=False)
     skipAsymmetricModes : Boolean
         Allows the user to only consider symmetric modal coefficients
     """
-    
     X, Y, T = np.meshgrid(
         grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
     )
@@ -160,7 +157,6 @@ def get_laguerre_mode(grid_in, w0, i, j):
     coeff : complex float
         The projected complex modal coefficient for the (i,j) Laguerre-Gaussian mode
     """
-    
     X, Y, T = np.meshgrid(
         grid_in.grid.axes[0], grid_in.grid.axes[1], grid_in.grid.axes[2], indexing="ij"
     )
