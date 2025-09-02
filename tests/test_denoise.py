@@ -16,7 +16,7 @@ from lasy.profiles.longitudinal import ContinuousWaveProfile
 from lasy.profiles.transverse.super_gaussian_profile import (
     SuperGaussianTransverseProfile,
 )
-from lasy.utils.mode_decomposition import *
+from lasy.utils.mode_decomposition import hermite_gauss_decomposition, hermite_gauss_composition
 
 
 def test_denoise_hg_reconstruction():
