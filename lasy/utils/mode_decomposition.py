@@ -10,8 +10,9 @@ from lasy.utils.exp_data_utils import find_d4sigma
 
 
 def get_hermite_mode(grid_in, w0x, w0y, i, j):
-    r"""
-    Project a laser field onto a Hermite-Gaussian mode to
+    """Calculates the projection of a field onto a particular mode.
+    
+    Projects a laser field onto a Hermite-Gaussian mode to
     obtain the complex mode coefficient.
 
     Parameters
@@ -55,8 +56,11 @@ def get_hermite_mode(grid_in, w0x, w0y, i, j):
 def hermite_gauss_decomposition(
     grid_in, w0x, w0y, Mmax, Nmax, skipAsymmetricModes=False
 ):
-    r"""
-    Decompose a laser field onto a Hermite-Gaussian basis.
+    """Decompose a laser field onto a Hermite-Gaussian basis.
+
+    Loops through the mode coefficients, calculating the mode coefficient
+    for each one via projection. Returns a dictionary of the complex mode 
+    coefficients.
 
     Parameters
     ----------
@@ -95,9 +99,10 @@ def hermite_gauss_decomposition(
 
 
 def hermite_gauss_composition(grid_in, w0x, w0y, cxy, skipAsymmetricModes=False):
-    r"""
-    Compose a laser field from a dictionary of complex
-    modal coefficients for a Hermite-Gaussian basis and update the laser object.
+    """Compose a laser field from the mode coefficients.
+    
+    Uses a dictionary of complex modal coefficients to generate a beam 
+    from a Hermite-Gaussian basis. Updates the laser object.
 
     Parameters
     ----------
@@ -134,8 +139,9 @@ def hermite_gauss_composition(grid_in, w0x, w0y, cxy, skipAsymmetricModes=False)
 
 
 def get_laguerre_mode(grid_in, w0, i, j):
-    r"""
-    Project a laser field onto a Laguerre-Gaussian mode to
+    """Calculates the projection of a field onto a particular mode.
+    
+    Projects a laser field onto a Laguerre-Gaussian mode to
     obtain the complex mode coefficient.
 
     Parameters
@@ -174,8 +180,11 @@ def get_laguerre_mode(grid_in, w0, i, j):
 
 
 def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, skipAsymmetricModes=False):
-    r"""
-    Decompose a laser field onto a Laguerre-Gaussian basis.
+    """Decompose a laser field onto a Laguerre-Gaussian basis.
+
+    Loops through the mode coefficients, calculating the mode coefficient
+    for each one via projection. Returns a dictionary of the complex mode 
+    coefficients.
 
     Parameters
     ----------
@@ -211,9 +220,10 @@ def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, skipAsymmetricModes=Fa
 
 
 def laguerre_gauss_composition(grid_in, w0, cxy, skipAsymmetricModes=False):
-    r"""
-    Compose a laser field from a dictionary of complex
-    modal coefficients for a Laguerre-Gaussian basis and update the laser object.
+    """Compose a laser field from the mode coefficients.
+    
+    Uses a dictionary of complex modal coefficients to generate a beam 
+    from a Laguerre-Gaussian basis. Updates the laser object.
 
     Parameters
     ----------
@@ -247,8 +257,7 @@ def laguerre_gauss_composition(grid_in, w0, cxy, skipAsymmetricModes=False):
 
 
 def estimate_best_HG_waist(x, y, field, wavelength):
-    """
-    Estimate the waist that maximises the weighting of the first mode.
+    """Estimate the waist that maximises the weighting of the first mode.
 
     Calculates a D4Sigma waist as a first estimate and then tests multiple
     gaussians with waists around this value to determine which has the best
