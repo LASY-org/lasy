@@ -11,7 +11,7 @@ from lasy.utils.exp_data_utils import find_d4sigma
 
 def get_hermite_mode(grid_in, w0x, w0y, i, j):
     """Calculates the projection of a field onto a particular mode.
-    
+
     Projects a laser field onto a Hermite-Gaussian mode to
     obtain the complex mode coefficient.
 
@@ -59,7 +59,7 @@ def hermite_gauss_decomposition(
     """Decompose a laser field onto a Hermite-Gaussian basis.
 
     Loops through the mode coefficients, calculating the mode coefficient
-    for each one via projection. Returns a dictionary of the complex mode 
+    for each one via projection. Returns a dictionary of the complex mode
     coefficients.
 
     Parameters
@@ -100,8 +100,8 @@ def hermite_gauss_decomposition(
 
 def hermite_gauss_composition(grid_in, w0x, w0y, cxy, skipAsymmetricModes=False):
     """Compose a laser field from the mode coefficients.
-    
-    Uses a dictionary of complex modal coefficients to generate a beam 
+
+    Uses a dictionary of complex modal coefficients to generate a beam
     from a Hermite-Gaussian basis. Updates the laser object.
 
     Parameters
@@ -140,7 +140,7 @@ def hermite_gauss_composition(grid_in, w0x, w0y, cxy, skipAsymmetricModes=False)
 
 def get_laguerre_mode(grid_in, w0, i, j):
     """Calculates the projection of a field onto a particular mode.
-    
+
     Projects a laser field onto a Laguerre-Gaussian mode to
     obtain the complex mode coefficient.
 
@@ -183,7 +183,7 @@ def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, skipAsymmetricModes=Fa
     """Decompose a laser field onto a Laguerre-Gaussian basis.
 
     Loops through the mode coefficients, calculating the mode coefficient
-    for each one via projection. Returns a dictionary of the complex mode 
+    for each one via projection. Returns a dictionary of the complex mode
     coefficients.
 
     Parameters
@@ -221,8 +221,8 @@ def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, skipAsymmetricModes=Fa
 
 def laguerre_gauss_composition(grid_in, w0, cxy, skipAsymmetricModes=False):
     """Compose a laser field from the mode coefficients.
-    
-    Uses a dictionary of complex modal coefficients to generate a beam 
+
+    Uses a dictionary of complex modal coefficients to generate a beam
     from a Laguerre-Gaussian basis. Updates the laser object.
 
     Parameters
