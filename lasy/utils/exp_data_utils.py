@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def find_center_of_mass(img, cal=None):
+def find_center_of_mass(img):
     """
     Find the center of mass of an image.
 
@@ -28,10 +28,6 @@ def find_center_of_mass(img, cal=None):
     img_tot = np.sum(img)
     x0 = np.sum(np.dot(img, x)) / img_tot
     y0 = np.sum(np.dot(img.T, y)) / img_tot
-
-    if cal:
-        x0 *= cal
-        y0 *= cal
 
     return x0, y0
 
