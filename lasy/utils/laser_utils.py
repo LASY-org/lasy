@@ -605,7 +605,7 @@ def get_frequency(
     return omega, central_omega
 
 
-def get_duration(grid, dim):
+def get_duration(grid, dim, level=None):
     """Get duration of the intensity of the envelope, measured as RMS.
 
     Parameters
@@ -635,7 +635,68 @@ def get_duration(grid, dim):
         weights = np.abs(field) ** 2 * dV[np.newaxis, :, np.newaxis]
     # project weights to longitudinal axes
     weights = np.sum(weights, axis=(0, 1))
-    return weighted_std(grid.axes[-1], weights)
+
+    max_loc = np.argmax(weights)
+    weights = np.roll(weights, weights.size//2-max_loc)
+
+    if level:
+        duration = width_at_level(values=weights, width_axis=grid.axes[-1], level=level)
+    else:
+        duration = weighted_std(grid.axes[-1], weights)
+
+    return duration
+
+
+def width_at_level(values, width_axis, level=0.5):
+    """Calculate the width of the values at a given level.
+
+    Parameters
+    ----------
+    values: array
+        Contains the values to be analyzed
+
+    width_axis: 1d array (optional)
+        Contains the axis along which to calculate the width.
+
+    level: float (optional)
+        Level at which to calculate the width. Default is 0.5.
+
+    Returns
+    -------
+    A float with the value of the width at the specified level.
+    """
+    if width_axis is None:
+        # if no width axis is provided, use the indices of the values
+        width_axis = np.arange(len(values))
+
+    # ensure that the input it sorfted according to the width axis
+    order = np.argsort(width_axis)
+    width_axis = width_axis[order]
+    spectral_intensity = values[order]
+
+    # find intensity threshold
+    threshold = np.max(spectral_intensity) * level
+
+    # find indices that mark the range in which spectral intensity >= threshold
+    idcs = np.where(spectral_intensity >= threshold)[0]
+    i_min, i_max = idcs[0], idcs[-1]
+
+    # calculate positions of lower and upper bounds
+    lower_bound = np.interp(
+        threshold,
+        spectral_intensity[i_min - 1:i_min + 1],
+        width_axis[i_min - 1:i_min + 1],
+    )
+    upper_bound = np.interp(
+        threshold,
+        spectral_intensity[i_max:i_max + 2][::-1],
+        width_axis[i_max:i_max + 2][::-1],
+    )
+
+    # calculate width
+    width = upper_bound - lower_bound
+
+    return width
 
 
 def field_to_vector_potential(grid, omega0):
@@ -1531,34 +1592,10 @@ def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None
             spectral_intensity = spectral_intensity[0, 0, :]
 
     if level:
-        # sort omega/wavelength axis and spectral intensity
-        order = np.argsort(width_axis)
-        width_axis = width_axis[order]
-        spectral_intensity = spectral_intensity[order]
-
-        # find intensity threshold
-        threshold = np.max(spectral_intensity) * level
-
-        # find indices that mark the range in which spectral intensity >= threshold
-        idcs = np.where(spectral_intensity >= threshold)[0]
-        i_min, i_max = idcs[0], idcs[-1]
-
-        # calculate positions of lower and upper bounds
-        lower_bound = np.interp(
-            threshold,
-            spectral_intensity[i_min - 1 : i_min + 1],
-            width_axis[i_min - 1 : i_min + 1],
-        )
-        upper_bound = np.interp(
-            threshold,
-            spectral_intensity[i_max : i_max + 2][::-1],
-            width_axis[i_max : i_max + 2][::-1],
-        )
-
-        # calculate bandwidth
-        bandwidth = upper_bound - lower_bound
+        bandwidth = width_at_level(spectral_intensity, width_axis, level=level)
 
     else:  # default case, calculate rms width
         bandwidth = weighted_std(width_axis, spectral_intensity)
 
     return bandwidth
+
