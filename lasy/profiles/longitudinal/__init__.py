@@ -4,6 +4,7 @@ from .gaussian_profile import GaussianLongitudinalProfile
 from .longitudinal_profile import LongitudinalProfile
 from .longitudinal_profile_from_data import LongitudinalProfileFromData
 from .super_gaussian_profile import SuperGaussianLongitudinalProfile
+from .sech2_profile import Sech2Profile
 
 __all__ = [
     "CosineLongitudinalProfile",
@@ -12,4 +13,5 @@ __all__ = [
     "LongitudinalProfileFromData",
     "LongitudinalProfile",
     "ContinuousWaveProfile",
+    "Sech2Profile"
 ]
