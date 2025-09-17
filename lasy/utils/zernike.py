@@ -56,7 +56,6 @@ def zernike(x, y, pupil_coords, j):
     m, n = get_zernike_nm(j)
 
     # next get the radial part
-    print(rho.shape)
     R = RmnGenerator(n, abs(m), rho)
 
     # Now multiply by the azimuthal part
