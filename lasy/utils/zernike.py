@@ -56,6 +56,7 @@ def zernike(x, y, pupil_coords, j):
     m, n = get_zernike_nm(j)
 
     # next get the radial part
+    print(rho.shape)
     R = RmnGenerator(n, abs(m), rho)
 
     # Now multiply by the azimuthal part
@@ -94,26 +95,13 @@ def RmnGenerator(n, m, rho):
     Rmn : ndarray (rad)
         The radial component of the Zernike mode
     """
+    
     if n == 0:
-        if len(rho.shape) == 1:
-            (r,) = rho.shape
-            Rmn = np.ones(
-                r,
-            )
-        else:
-            r, c = rho.shape
-            Rmn = np.ones((r, c))
+        Rmn = np.ones_like(rho)
     elif (n - m) % 2 == 0:
         # Even, Rmn is not 0
         k = np.linspace(0, int((n - m) / 2), int((n - m) / 2) + 1).astype(int)
-        if len(rho.shape) == 1:
-            (r,) = rho.shape
-            Rmn = np.zeros(
-                r,
-            )
-        else:
-            r, c = rho.shape
-            Rmn = np.zeros((r, c))
+        Rmn = np.zeros_like(rho)
         for i in k:
             Rmn = Rmn + ((-1) ** i * math.factorial(n - i)) / (
                 math.factorial(i)
@@ -122,13 +110,6 @@ def RmnGenerator(n, m, rho):
             ) * rho ** (n - 2 * i)
 
     else:
-        if len(rho.shape) == 1:
-            (r,) = rho.shape
-            Rmn = np.zeros(
-                r,
-            )
-        else:
-            r, c = rho.shape
-            Rmn = np.zeros((r, c))
+        Rmn = np.zeros_like(rho)
 
     return Rmn
