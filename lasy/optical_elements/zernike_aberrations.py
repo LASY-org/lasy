@@ -14,7 +14,7 @@ class ZernikeAberrations(OpticalElement):
 
     .. math::
 
-        T(\boldsymbol{x}_\perp,\omega) = \exp( i \sum_j a_j Z_j(\boldsymbol{x}_\perp))
+        T(\boldsymbol{x}_\perp,\omega) = \exp\left( i \frac{\omega}{c}\sum_j a_j Z_j(\boldsymbol{x}_\perp)\right)
 
     where
     :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
