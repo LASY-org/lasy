@@ -95,7 +95,6 @@ def RmnGenerator(n, m, rho):
     Rmn : ndarray (rad)
         The radial component of the Zernike mode
     """
-    
     if n == 0:
         Rmn = np.ones_like(rho)
     elif (n - m) % 2 == 0:
