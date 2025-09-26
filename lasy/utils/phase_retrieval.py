@@ -29,9 +29,14 @@ class GerchbergSaxton():
         self.m_max = m_max
         self.n_max = n_max
         self.max_iter = max_iter
-        self.intial_phase = self.initial_phase
-        self.verbose = verbose    
+        self.initial_phase = initial_phase
+        self.verbose = verbose   
 
+        self.initialise_lasers()
+        self.initialise_spotsizes()
+        self.initialise_modes()
+
+    
     def initialise_lasers(self):
         
         self.laser1 = copy.deepcopy(self.lasers[0])
@@ -44,8 +49,6 @@ class GerchbergSaxton():
         self.y = self.laser2.grid.axes[1]
 
         self.dz = self.positions[1] - self.positions[0]
-        self.initialise_spotsizes()
-        
         
         
     def initialise_spotsizes(self,spotsizes=None):
@@ -61,10 +64,11 @@ class GerchbergSaxton():
             focus.
             
         """
-        
+
+        # The spotsize is calculated from the fluence, profile is integrated wrt temporal axis
         if spotsizes is None:
             w0x, w0y = estimate_best_HG_waist(
-                x, y, self.amp2, self.laser2.profile.lambda0
+                self.x, self.y, np.sum(self.amp2, axis=-1), self.laser2.profile.lambda0
             ) # Estimate spot size in the focal plane
             spotsizes = (w0x, w0y)
 
@@ -75,20 +79,18 @@ class GerchbergSaxton():
         
 
         # Initialise random phase if no known phase is passed
-        if self.intial_phase is None:
+        if self.initial_phase is None:
             self.phase1 = np.pi * np.random.uniform(-1, 1, np.shape(self.amp1)) # Initial guess of phase
         else:
-            self.phase1 = self.intial_phase
+            self.phase1 = self.initial_phase
 
-        # Construct Initial Guess of Field
+        # Construct initial guess of field
         self.laser1.grid.set_temporal_field(self.amp1*np.exp(1j*self.phase1))
         
         # Find estimate of the decomposition of the initial electric field
-        self.modes = hermite_gauss_decomposition(self.laser1, self.spotsizes[0], self.spotsizes[1], self.m_max, self.n_max)
-
+        self.modes = hermite_gauss_decomposition(self.laser2, self.spotsizes[0], self.spotsizes[1], self.m_max, self.n_max)
     
     def retrieve_phase(self):
-
     
         def breakout(i):
             return i < self.max_iter
@@ -98,22 +100,23 @@ class GerchbergSaxton():
     
         i = 0
         while breakout(cond):
-            laser1.grid.set_temporal_field(amp1 * np.exp(1j * phase1))
+            self.laser1.grid.set_temporal_field(self.amp1 * np.exp(1j * self.phase1))
 
             
             # Calculate the decomposition and waist of the laser pulse
-            modes = hermite_gauss_decomposition(laser_raw, w0x, w0y, m_max, n_max)
-            laser1.apply_optics(ParabolicMirror(dz))
-            laser1.propagate(dz)
+            self.modes = hermite_gauss_decomposition(self.laser1, self.spotsizes[0], self.spotsizes[1], self.m_max, self.n_max)
+
+            self.laser1.apply_optics(ParabolicMirror(dz))
+            self.laser1.propagate(dz)
     
             phase2 = np.angle(laser1.grid.get_temporal_field())
-            laser2.grid.set_temporal_field(amp2 * np.exp(1j * phase2))
-            laser2.propagate(-dz)
-            laser2.apply_optics(ParabolicMirror(-dz))
+            self.self.laser2.grid.set_temporal_field(amp2 * np.exp(1j * phase2))
+            self.laser2.propagate(-dz)
+            self.laser2.apply_optics(ParabolicMirror(-dz))
     
             phase1 = np.angle(laser2.grid.get_temporal_field())
             
-            amp_error_summed = np.sum(np.abs(np.abs(laser2.grid.get_temporal_field())-amp1)) / np.sum(amp1)
+            amp_error_summed = np.sum(np.abs(np.abs(self.laser2.grid.get_temporal_field())-amp1)) / np.sum(amp1)
             
             i += 1
             cond += 1
