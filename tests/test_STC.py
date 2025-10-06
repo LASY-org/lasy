@@ -6,7 +6,6 @@ This test verifies the correct implementation of initialization and diagnostics 
 Additionally, the correctness is validated by comparing the Gaussian profile with a combined Gaussian profile without STC out of focus.
 """
 
-import numpy as np
 import scipy.constants as scc
 
 from lasy.laser import Laser
@@ -26,7 +25,7 @@ beta = 3e-18  # s
 zeta = 2.4e-22  # m * s
 phi2 = 2.4e-27  # s ^ 2
 stc_theta = scc.pi / 2  # rad
-z_r = (np.pi * w0**2) / wavelength
+z_r = (xp.pi * w0**2) / wavelength
 z_foc = 3 * z_r
 
 # Create STC profile.
@@ -90,25 +89,25 @@ laser_2d_gaussian = Laser(
 env_combined = laser_2d_combined.grid.get_temporal_field()
 env_gaussian = laser_2d_gaussian.grid.get_temporal_field()
 
-err_real = np.average(
-    (np.array(env_combined.real) - np.array(env_gaussian.real))
-    / np.array(env_combined.real)
+err_real = xp.average(
+    (xp.array(env_combined.real) - xp.array(env_gaussian.real))
+    / xp.array(env_combined.real)
 )
-err_imag = np.average(
-    (np.array(env_combined.imag) - np.array(env_gaussian.imag))
-    / np.array(env_combined.imag)
+err_imag = xp.average(
+    (xp.array(env_combined.imag) - xp.array(env_gaussian.imag))
+    / xp.array(env_combined.imag)
 )
 
 gdd_3d, gdd0_3d = get_dispersion(
     grid=laser_3d.grid, dim=laser_3d.dim, omega0=laser_3d.profile.omega0, order=2
 )
 [zeta_x, zeta_y], [nu_x, nu_y] = get_zeta(
-    laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6
+    laser_3d.dim, laser_3d.grid, 2.0 * xp.pi / 0.6e-6
 )
-[beta_x, beta_y] = get_beta(laser_3d.dim, laser_3d.grid, 2.0 * np.pi / 0.6e-6)
+[beta_x, beta_y] = get_beta(laser_3d.dim, laser_3d.grid, 2.0 * xp.pi / 0.6e-6)
 
 assert (err_real + err_imag) < 1e-6
 
-np.testing.assert_approx_equal(gdd0_3d, phi2, significant=2)
-np.testing.assert_approx_equal(zeta_y, zeta, significant=2)
-np.testing.assert_approx_equal(beta_y, beta, significant=2)
+xp.testing.assert_approx_equal(gdd0_3d, phi2, significant=2)
+xp.testing.assert_approx_equal(zeta_y, zeta, significant=2)
+xp.testing.assert_approx_equal(beta_y, beta, significant=2)

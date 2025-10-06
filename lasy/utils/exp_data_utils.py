@@ -1,4 +1,6 @@
-import numpy as np
+import cupy as cp
+
+from lasy.backend import xp
 
 
 def find_center_of_mass(img):
@@ -17,14 +19,14 @@ def find_center_of_mass(img):
         and the vertical. The units are in pixels.
 
     """
-    rows, cols = np.shape(img)
-    x = np.linspace(0, cols - 1, cols)
-    y = np.linspace(0, rows - 1, rows)
+    rows, cols = xp.shape(img)
+    x = xp.linspace(0, cols - 1, cols)
+    y = xp.linspace(0, rows - 1, rows)
 
     # find the beam center using COM
-    img_tot = np.sum(img)
-    x0 = np.sum(np.dot(img, x)) / img_tot
-    y0 = np.sum(np.dot(img.T, y)) / img_tot
+    img_tot = xp.sum(img)
+    x0 = xp.sum(xp.dot(img, x)) / img_tot
+    y0 = xp.sum(xp.dot(img.T, y)) / img_tot
 
     return x0, y0
 
@@ -44,14 +46,41 @@ def find_d4sigma(img):
     D4sigX : The D4sigma along the first (x) axis
     D4sigY : The D4sigma along the second (y) axis
     """
-    rows, cols = np.shape(img)
-    x = np.linspace(0, cols - 1, cols)
-    y = np.linspace(0, rows - 1, rows)
+    rows, cols = xp.shape(img)
+    x = xp.linspace(0, cols - 1, cols)
+    y = xp.linspace(0, rows - 1, rows)
 
     x0, y0 = find_center_of_mass(img)
 
-    img_tot = np.sum(img)
-    D4sigX = 4 * np.sqrt(np.sum(np.dot(img, (x - x0) ** 2)) / img_tot)
-    D4sigY = 4 * np.sqrt(np.sum(np.dot(img.T, (y - y0) ** 2)) / img_tot)
+    img_tot = xp.sum(img)
+    D4sigX = 4 * xp.sqrt(xp.sum(xp.dot(img, (x - x0) ** 2)) / img_tot)
+    D4sigY = 4 * xp.sqrt(xp.sum(xp.dot(img.T, (y - y0) ** 2)) / img_tot)
 
     return D4sigX, D4sigY
+
+
+def array_type(x):
+    dummy = xp.get_array_module(x)  # 'xp' is a standard usage in the community
+    print("Using:", dummy.__name__)
+
+
+def cupy_to_numpy(*arrays):
+    """
+    Convert one or more CuPy arrays to NumPy arrays.
+
+    Parameters
+    ----------
+        *arrays: One or more cp.ndarray inputs.
+
+    Returns
+    -------
+        A single NumPy array if one input is given,
+        or a tuple of NumPy arrays if multiple are given.
+    """
+    converted = []
+    for arr in arrays:
+        if not isinstance(arr, cp.ndarray):
+            raise TypeError(f"Expected CuPy array, got {type(arr)}")
+        converted.append(cp.asnumpy(arr))
+
+    return converted[0] if len(converted) == 1 else tuple(converted)

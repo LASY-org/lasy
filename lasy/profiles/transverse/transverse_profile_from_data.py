@@ -1,6 +1,6 @@
-import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
+from lasy.backend import xp
 from lasy.utils.exp_data_utils import find_center_of_mass
 
 from .transverse_profile import TransverseProfile
@@ -48,35 +48,35 @@ class TransverseProfileFromData(TransverseProfile):
 
         intensity_data = intensity_data.astype("float64")
 
-        n_y, n_x = np.shape(intensity_data)
+        n_y, n_x = xp.shape(intensity_data)
 
         dx = (hi[0] - lo[0]) / n_x
         dy = (hi[1] - lo[1]) / n_y
 
         if center_data:
-            x_range = np.abs(hi[0] - lo[0])
-            y_range = np.abs(hi[1] - lo[1])
-            x_data = np.linspace(-x_range / 2, x_range / 2, n_x)
-            y_data = np.linspace(-y_range / 2, y_range / 2, n_y)
+            x_range = xp.abs(hi[0] - lo[0])
+            y_range = xp.abs(hi[1] - lo[1])
+            x_data = xp.linspace(-x_range / 2, x_range / 2, n_x)
+            y_data = xp.linspace(-y_range / 2, y_range / 2, n_y)
 
             n_x0, n_y0 = find_center_of_mass(intensity_data)
-            intensity_data = np.roll(
-                np.roll(intensity_data, -int(n_x0 - n_x / 2), axis=1),
+            intensity_data = xp.roll(
+                xp.roll(intensity_data, -int(n_x0 - n_x / 2), axis=1),
                 -int(n_y0 - n_y / 2),
                 axis=0,
             )
 
         else:
-            x_data = np.linspace(lo[0], hi[0], n_x)
-            y_data = np.linspace(lo[1], hi[1], n_y)
+            x_data = xp.linspace(lo[0], hi[0], n_x)
+            y_data = xp.linspace(lo[1], hi[1], n_y)
 
         # Normalise the profile such that its squared integeral == 1
-        intensity_data /= np.sum(intensity_data) * dx * dy
+        intensity_data /= xp.sum(intensity_data) * dx * dy
 
         # Note here we use the square root of intensity to get the 'field'
         self.field_interp = RegularGridInterpolator(
             (y_data, x_data),
-            np.sqrt(intensity_data),
+            xp.sqrt(intensity_data),
             bounds_error=False,
             fill_value=0.0,
         )

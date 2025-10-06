@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .longitudinal_profile import LongitudinalProfile
 
@@ -55,7 +55,7 @@ class GaussianLongitudinalProfile(LongitudinalProfile):
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
         """
-        envelope = np.exp(
+        envelope = xp.exp(
             -((t - self.t_peak) ** 2) / self.tau**2
             + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)
         )

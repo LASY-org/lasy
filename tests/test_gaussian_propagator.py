@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
 import pytest
 
+from lasy.backend import use_cupy, xp
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
 
@@ -23,22 +23,26 @@ def gaussian():
 
 def get_w0(laser):
     # Calculate the laser waist
-    field = laser.grid.get_temporal_field()
+    field = laser.grid.get_temporal_field(to_cpu=True)
     if laser.dim == "xyt":
         Nx, Ny, Nt = field.shape
-        A2 = (np.abs(field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
+        A2 = (xp.abs(field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
         ax = laser.grid.axes[1]
+        if use_cupy:
+            ax = xp.asnumpy(ax)
     else:
-        A2 = (np.abs(field[0, :, :]) ** 2).sum(-1)
+        A2 = (xp.abs(field[0, :, :]) ** 2).sum(-1)
         ax = laser.grid.axes[0]
+        if use_cupy:
+            ax = xp.asnumpy(ax)
         if ax[0] > 0:
-            A2 = np.r_[A2[::-1], A2]
-            ax = np.r_[-ax[::-1], ax]
+            A2 = xp.r_[A2[::-1], A2]
+            ax = xp.r_[-ax[::-1], ax]
         else:
-            A2 = np.r_[A2[::-1][:-1], A2]
-            ax = np.r_[-ax[::-1][:-1], ax]
+            A2 = xp.r_[A2[::-1][:-1], A2]
+            ax = xp.r_[-ax[::-1][:-1], ax]
 
-    sigma = 2 * np.sqrt(np.average(ax**2, weights=A2))
+    sigma = 2 * xp.sqrt(xp.average(ax**2, weights=A2))
 
     return sigma
 
@@ -48,7 +52,7 @@ def check_gaussian_propagation(
 ):
     # Do the propagation and check evolution of waist with theory
     w0 = laser.profile.w0
-    L_R = np.pi * w0**2 / laser.profile.lambda0
+    L_R = xp.pi * w0**2 / laser.profile.lambda0
 
     propagated_distance = 0.0
     while propagated_distance <= propagation_distance:
@@ -57,8 +61,8 @@ def check_gaussian_propagation(
             propagation_step,
         )
         w0_num = get_w0(laser)
-        w0_theor = w0 * np.sqrt(1 + (propagated_distance / L_R) ** 2)
-        err = 2 * np.abs(w0_theor - w0_num) / (w0_theor + w0_num)
+        w0_theor = w0 * xp.sqrt(1 + (propagated_distance / L_R) ** 2)
+        err = 2 * xp.abs(w0_theor - w0_num) / (w0_theor + w0_num)
         assert err < 1e-3
 
 

@@ -1,9 +1,10 @@
-import numpy as np
 from axiprop.containers import ScalarFieldEnvelope
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
 from scipy.constants import c, e, epsilon_0, m_e
 from scipy.interpolate import interp1d
 from scipy.signal import hilbert
+
+from lasy.backend import use_cupy, xp
 
 from .grid import Grid
 
@@ -107,7 +108,7 @@ def normalize_peak_field_amplitude(amplitude, grid):
     """
     if amplitude is not None:
         field = grid.get_temporal_field()
-        field_max = np.abs(field).max()
+        field_max = xp.abs(field).max()
         if field_max == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
         else:
@@ -131,7 +132,7 @@ def normalize_peak_intensity(peak_intensity, grid):
     """
     if peak_intensity is not None:
         field = grid.get_temporal_field()
-        intensity = np.abs(epsilon_0 * field**2 / 2 * c)
+        intensity = xp.abs(epsilon_0 * field**2 / 2 * c)
         input_peak_intensity = intensity.max()
         if input_peak_intensity == 0.0:
             print("Field is zero everywhere, normalization will be skipped")
@@ -306,13 +307,13 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
     assert laser.grid.is_envelope
 
     if laser.dim == "rt":
-        azimuthal_phase = np.exp(-1j * laser.grid.azimuthal_modes * theta)
+        azimuthal_phase = xp.exp(-1j * laser.grid.azimuthal_modes * theta)
         env_upper = env * azimuthal_phase[:, None, None]
         env_upper = env_upper.sum(0)
-        azimuthal_phase = np.exp(1j * laser.grid.azimuthal_modes * theta)
+        azimuthal_phase = xp.exp(1j * laser.grid.azimuthal_modes * theta)
         env_lower = env * azimuthal_phase[:, None, None]
         env_lower = env_lower.sum(0)
-        env = np.vstack((env_lower[::-1][:-1], env_upper))
+        env = xp.vstack((env_lower[::-1][:-1], env_upper))
     elif slice_axis == "x":
         Nx_middle = env.shape[0] // 2 - 1
         Nx_slice = int((1 + slice) * Nx_middle)
@@ -326,24 +327,24 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
 
     if Nt is not None:
         Nr = env.shape[0]
-        time_axis_new = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], Nt)
-        env_new = np.zeros((Nr, Nt), dtype=env.dtype)
+        time_axis_new = xp.linspace(laser.grid.lo[-1], laser.grid.hi[-1], Nt)
+        env_new = xp.zeros((Nr, Nt), dtype=env.dtype)
 
         for ir in range(Nr):
-            interp_fu_abs = interp1d(time_axis, np.abs(env[ir]))
+            interp_fu_abs = interp1d(time_axis, xp.abs(env[ir]))
             slice_abs = interp_fu_abs(time_axis_new)
-            interp_fu_angl = interp1d(time_axis, np.unwrap(np.angle(env[ir])))
+            interp_fu_angl = interp1d(time_axis, xp.unwrap(xp.angle(env[ir])))
             slice_angl = interp_fu_angl(time_axis_new)
-            env_new[ir] = slice_abs * np.exp(1j * slice_angl)
+            env_new[ir] = slice_abs * xp.exp(1j * slice_angl)
 
         time_axis = time_axis_new
         env = env_new
 
-    env *= np.exp(-1j * omega0 * time_axis[None, :])
-    env = np.real(env)
+    env *= xp.exp(-1j * omega0 * time_axis[None, :])
+    env = xp.real(env)
 
     if laser.dim == "rt":
-        ext = np.array(
+        ext = xp.array(
             [
                 laser.grid.lo[-1],
                 laser.grid.hi[-1],
@@ -352,7 +353,7 @@ def get_full_field(laser, theta=0, slice=0, slice_axis="x", Nt=None):
             ]
         )
     else:
-        ext = np.array(
+        ext = xp.array(
             [
                 laser.grid.lo[-1],
                 laser.grid.hi[-1],
@@ -472,14 +473,14 @@ def get_spectrum(
 
     # Convert to spectral energy density (J/(m^2 rad Hz)).
     if method != "raw":
-        spectrum = np.abs(spectrum) ** 2 * epsilon_0 * c / np.pi
+        spectrum = xp.abs(spectrum) ** 2 * epsilon_0 * c / xp.pi
 
     # Integrate transversely.
     if method == "sum":
         dV = get_grid_cell_volume(grid, dim)
         dz = grid.dx[-1] * c
         if dim == "xyt":
-            spectrum = np.sum(spectrum * dV / dz, axis=(0, 1))
+            spectrum = xp.sum(spectrum * dV / dz, axis=(0, 1))
         else:
             spectrum = np.sum(spectrum[0] * dV[:, np.newaxis] / dz, axis=0)
 
@@ -490,8 +491,8 @@ def get_spectrum(
 
     # If the user specified a frequency range, interpolate into it.
     if method in ["sum", "on_axis"] and range is not None:
-        omega_interp = np.linspace(*range, bins)
-        spectrum = np.interp(omega_interp, omega, spectrum)
+        omega_interp = xp.linspace(*range, bins)
+        spectrum = xp.interp(omega_interp, omega, spectrum)
         omega = omega_interp
 
     return spectrum, omega
@@ -564,9 +565,9 @@ def get_frequency(
     # Assumes t is last dimension!
     if grid.is_envelope:
         assert omega0 is not None
-        phase = np.unwrap(np.angle(field))
-        omega = omega0 + np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
-        central_omega = np.average(omega, weights=np.abs(field))
+        phase = xp.unwrap(xp.angle(field))
+        omega = omega0 + xp.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
+        central_omega = xp.average(omega, weights=xp.abs(field))
     else:
         assert dim in ["xyt", "rt"]
         if dim == "xyt" and phase_unwrap_nd:
@@ -585,22 +586,22 @@ def get_frequency(
                 "scikit-image must be install for nd phase unwrapping.",
                 "Please install scikit-image or use phase_unwrap_nd=False.",
             )
-            phase = unwrap_phase(np.angle(h))
+            phase = unwrap_phase(xp.angle(h))
         else:
-            phase = np.unwrap(np.angle(h))
-        omega = np.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
+            phase = xp.unwrap(xp.angle(h))
+        omega = xp.gradient(-phase, grid.axes[-1], axis=-1, edge_order=2)
 
         if dim == "xyt":
-            weights = np.abs(h)
+            weights = xp.abs(h)
         else:
             r = grid.axes[0].reshape((grid.axes[0].size, 1))
-            weights = r * np.abs(h)
-        central_omega = np.average(omega, weights=weights)
+            weights = r * xp.abs(h)
+        central_omega = xp.average(omega, weights=weights)
 
     # Filter out too small frequencies
-    omega = np.maximum(omega, lower_bound * central_omega)
+    omega = xp.maximum(omega, lower_bound * central_omega)
     # Filter out too large frequencies
-    omega = np.minimum(omega, upper_bound * central_omega)
+    omega = xp.minimum(omega, upper_bound * central_omega)
 
     return omega, central_omega
 
@@ -630,11 +631,11 @@ def get_duration(grid, dim):
     dV = get_grid_cell_volume(grid, dim)
     field = grid.get_temporal_field()
     if dim == "xyt":
-        weights = np.abs(field) ** 2 * dV
+        weights = xp.abs(field) ** 2 * dV
     else:  # dim == "rt":
-        weights = np.abs(field) ** 2 * dV[np.newaxis, :, np.newaxis]
+        weights = xp.abs(field) ** 2 * dV[xp.newaxis, :, xp.newaxis]
     # project weights to longitudinal axes
-    weights = np.sum(weights, axis=(0, 1))
+    weights = xp.sum(weights, axis=(0, 1))
     return weighted_std(grid.axes[-1], weights)
 
 
@@ -690,7 +691,7 @@ def vector_potential_to_field(grid, omega0, direct=True):
     field = grid.get_temporal_field()
     if direct:
         A = (
-            -np.gradient(field, grid.axes[-1], axis=-1, edge_order=2)
+            -xp.gradient(field, grid.axes[-1], axis=-1, edge_order=2)
             + 1j * omega0 * field
         )
         return m_e * c / e * A
@@ -799,7 +800,7 @@ def get_grid_cell_volume(grid, dim):
         r = grid.axes[0]
         dr = grid.dx[0]
         # 1D array that computes the volume of radial cells
-        dV = np.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
+        dV = xp.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
     return dV
 
 
@@ -818,8 +819,8 @@ def weighted_std(values, weights=None):
     -------
     A float with the value of the standard deviation
     """
-    mean_val = np.average(values, weights=weights)
-    std = np.sqrt(np.average((values - mean_val) ** 2, weights=weights))
+    mean_val = xp.average(values, weights=weights)
+    std = xp.sqrt(xp.average((values - mean_val) ** 2, weights=weights))
     return std
 
 
@@ -919,6 +920,9 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
     time_axis_indx = -1
 
     t_axis = grid.axes[time_axis_indx]
+    if use_cupy:
+        t_axis = xp.asnumpy(t_axis)
+
     if z_axis is None:
         z_axis = t_axis * c
 
@@ -940,18 +944,18 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
                 )
             )
 
-        field_z = np.zeros(
+        field_z = xp.zeros(
             (field.shape[0], field.shape[1], z_axis.size),
             dtype=field.dtype,
         )
 
         # Convert the spectral image to the spatial field representation
         for i_m in range(grid.azimuthal_modes.size):
-            FieldAxprp.import_field(np.transpose(field[i_m]).copy())
+            FieldAxprp.import_field(xp.transpose(field[i_m]).copy())
 
             field_z[i_m] = prop[i_m].t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0).T
 
-            field_z[i_m] *= np.exp(-1j * (z_axis / c + t0) * omega0)
+            field_z[i_m] *= xp.exp(-1j * (z_axis / c + t0) * omega0)
     else:
         # Construct the propagator
         Nx, Ny, Nt = field.shape
@@ -965,10 +969,10 @@ def export_to_z(dim, grid, omega0, z_axis=None, z0=0.0, t0=0.0, backend="NP"):
             verbose=False,
         )
         # Convert the spectral image to the spatial field representation
-        FieldAxprp.import_field(np.moveaxis(field, -1, 0).copy())
+        FieldAxprp.import_field(xp.moveaxis(field, -1, 0).copy())
         field_z = prop.t2z(FieldAxprp.Field_ft, z_axis, z0=z0, t0=t0)
-        field_z = np.moveaxis(field_z, 0, -1)
-        field_z *= np.exp(-1j * (z_axis / c + t0) * omega0)
+        field_z = xp.moveaxis(field_z, 0, -1)
+        field_z *= xp.exp(-1j * (z_axis / c + t0) * omega0)
 
     return field_z
 
@@ -1014,10 +1018,10 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
     Nz = z_axis.size
 
     # Transform the field from spatial to wavenumber domain
-    field_fft = np.fft.fft(field_z, axis=z_axis_indx, norm="forward")
+    field_fft = xp.fft.fft(field_z, axis=z_axis_indx, norm="forward")
 
     # Create the axes for wavenumbers, and for corresponding frequency
-    omega = 2 * np.pi * np.fft.fftfreq(Nz, dz / c) + omega0
+    omega = 2 * xp.pi * xp.fft.fftfreq(Nz, dz / c) + omega0
     k_z = omega / c
 
     if dim == "rt":
@@ -1035,12 +1039,12 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
             )
 
         # Convert the spectral image to the spatial field representation
-        field = np.zeros(grid.shape, dtype=np.complex128)
+        field = xp.zeros(grid.shape, dtype=xp.complex128)
         for i_m in range(grid.azimuthal_modes.size):
-            transform_data = np.transpose(field_fft[i_m]).copy()
-            transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None] - omega0 / c))
+            transform_data = xp.transpose(field_fft[i_m]).copy()
+            transform_data *= xp.exp(-1j * z_axis[0] * (k_z[:, None] - omega0 / c))
             field[i_m] = prop[i_m].z2t(transform_data, t_axis, z0=z0, t0=t0).T
-            field[i_m] *= np.exp(1j * (z0 / c + t_axis) * omega0)
+            field[i_m] *= xp.exp(1j * (z0 / c + t_axis) * omega0)
         grid.set_temporal_field(field)
     else:
         # Construct the propagator
@@ -1055,10 +1059,10 @@ def import_from_z(dim, grid, omega0, field_z, z_axis, z0=0.0, t0=0.0, backend="N
             verbose=False,
         )
         # Convert the spectral image to the spatial field representation
-        transform_data = np.moveaxis(field_fft, -1, 0).copy()
-        transform_data *= np.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
-        field = np.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
-        field *= np.exp(1j * (z0 / c + t_axis) * omega0)
+        transform_data = xp.moveaxis(field_fft, -1, 0).copy()
+        transform_data *= xp.exp(-1j * z_axis[0] * (k_z[:, None, None] - omega0 / c))
+        field = xp.moveaxis(prop.z2t(transform_data, t_axis, z0=z0, t0=t0), 0, -1)
+        field *= xp.exp(1j * (z0 / c + t_axis) * omega0)
         grid.set_temporal_field(field)
 
 

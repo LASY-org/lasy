@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .profile import Profile
 
@@ -107,7 +107,7 @@ class GaussianProfile(Profile):
     >>> extent[2:] *= 1e6
     >>> extent[:2] *= 1e15
     >>> tmin, tmax, rmin, rmax = extent
-    >>> vmax = np.abs(E_rt).max()
+    >>> vmax = xp.abs(E_rt).max()
     >>> plt.imshow(
     ...     E_rt,
     ...     origin="lower",
@@ -145,7 +145,7 @@ class GaussianProfile(Profile):
         self.t_peak = t_peak
         self.cep_phase = cep_phase
         self.z_foc = z_foc
-        self.z_foc_over_zr = z_foc * wavelength / (np.pi * w0**2)
+        self.z_foc_over_zr = z_foc * wavelength / (xp.pi * w0**2)
         self.phi2 = phi2
         self.beta = beta
         self.zeta = zeta
@@ -193,9 +193,9 @@ class GaussianProfile(Profile):
                 - self.t_peak
                 - self.beta
                 * self.k0
-                * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
+                * (x * xp.cos(self.stc_theta) + y * xp.sin(self.stc_theta))
                 - 2.0j
-                * (x * np.cos(self.stc_theta) + y * np.sin(self.stc_theta))
+                * (x * xp.cos(self.stc_theta) + y * xp.sin(self.stc_theta))
                 * (-self.zeta - self.beta * self.z_foc)
                 * inv_complex_waist_2
             )
@@ -209,7 +209,7 @@ class GaussianProfile(Profile):
         )
         # Get the profile
         envelope = (
-            np.exp(
+            xp.exp(
                 -stc_exponent
                 + exp_argument
                 + 1.0j * (self.cep_phase + self.omega0 * self.t_peak)

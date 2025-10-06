@@ -1,7 +1,8 @@
 from math import factorial
 
-import numpy as np
 from scipy.special import hermite
+
+from lasy.backend import xp
 
 from .transverse_profile import TransverseProfile
 
@@ -86,8 +87,8 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
     ...     HermiteGaussianTransverseProfile,
     ... )
     >>> # Create evaluation grid
-    >>> xy = np.linspace(-30e-6, 30e-6, 200)
-    >>> X, Y = np.meshgrid(xy, xy)
+    >>> xy = xp.linspace(-30e-6, 30e-6, 200)
+    >>> X, Y = xp.meshgrid(xy, xy)
     >>> # Create an array of plots
     >>> fig, ax = plt.subplots(3, 6, figsize=(10, 5), tight_layout=True)
     >>> extent = (1e6 * xy[0], 1e6 * xy[-1], 1e6 * xy[0], 1e6 * xy[-1])
@@ -100,12 +101,12 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
     ...             n = n, #
     ...             wavelength = 0.8e-6, # m
     ...         )
-    ...         intensity = np.abs(transverse_profile.evaluate(X,Y))**2
-    ...         vmax_intensity = np.max(intensity)
+    ...         intensity = xp.abs(transverse_profile.evaluate(X,Y))**2
+    ...         vmax_intensity = xp.max(intensity)
     >>>         ax[m,n].imshow(intensity,extent=extent,cmap='bone_r',vmin=0,vmax=vmax_intensity)
     >>>         ax[m,n].set_title('Inten: m,n = %i,%i' %(m,n))
-    >>>         phase = np.angle(transverse_profile.evaluate(X,Y))
-    ...         vmax_phase = np.max(np.abs(phase))
+    >>>         phase = xp.angle(transverse_profile.evaluate(X,Y))
+    ...         vmax_phase = xp.max(xp.abs(phase))
     >>>         ax[m,n+3].imshow(phase,extent=extent,cmap='seismic',vmin=-vmax_phase,vmax=vmax_phase)
     >>>         ax[m,n+3].set_title('Phase: m,n = %i,%i' %(m,n))
     >>>         if m==2:
@@ -135,23 +136,23 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         self.z_foc = z_foc
         z_eval = -z_foc  # this links our observation position to Siegmann's definition
 
-        self.k0 = 2 * np.pi / wavelength
+        self.k0 = 2 * xp.pi / wavelength
 
         # Calculate Rayleigh Lengths
-        Zx = np.pi * w_0x**2 / wavelength
-        Zy = np.pi * w_0y**2 / wavelength
+        Zx = xp.pi * w_0x**2 / wavelength
+        Zy = xp.pi * w_0y**2 / wavelength
 
         # Calculate Size at Location Z
-        wxZ = w_0x * np.sqrt(1 + (z_eval / Zx) ** 2)
-        wyZ = w_0y * np.sqrt(1 + (z_eval / Zy) ** 2)
+        wxZ = w_0x * xp.sqrt(1 + (z_eval / Zx) ** 2)
+        wyZ = w_0y * xp.sqrt(1 + (z_eval / Zy) ** 2)
 
         # Calculate Multiplicative Factors
-        Anx = 1 / np.sqrt(wxZ * 2 ** (m - 1 / 2) * factorial(m) * np.sqrt(np.pi))
-        Any = 1 / np.sqrt(wyZ * 2 ** (n - 1 / 2) * factorial(n) * np.sqrt(np.pi))
+        Anx = 1 / xp.sqrt(wxZ * 2 ** (m - 1 / 2) * factorial(m) * xp.sqrt(xp.pi))
+        Any = 1 / xp.sqrt(wyZ * 2 ** (n - 1 / 2) * factorial(n) * xp.sqrt(xp.pi))
 
         # Calculate the Phase contributions from propagation
-        phiXz = (m + 1 / 2) * np.arctan2(z_eval, Zx)
-        phiYz = (n + 1 / 2) * np.arctan2(z_eval, Zy)
+        phiXz = (m + 1 / 2) * xp.arctan2(z_eval, Zx)
+        phiYz = (n + 1 / 2) * xp.arctan2(z_eval, Zy)
 
         self.z_eval = z_eval
         self.Zx = Zx
@@ -195,18 +196,18 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         # Calculate the HG in each plane
         HGnx = (
             Anx
-            * hermite(m)(np.sqrt(2) * (x) / wxZ)
-            * np.exp(-((x) ** 2) / wxZ**2)
-            * np.exp(-1j * k0 * (x) ** 2 / 2 / (z_eval**2 + Zx**2) * z_eval)
+            * hermite(m)(xp.sqrt(2) * (x) / wxZ)
+            * xp.exp(-((x) ** 2) / wxZ**2)
+            * xp.exp(-1j * k0 * (x) ** 2 / 2 / (z_eval**2 + Zx**2) * z_eval)
         )
         HGny = (
             Any
-            * hermite(n)(np.sqrt(2) * (y) / wyZ)
-            * np.exp(-((y) ** 2) / wyZ**2)
-            * np.exp(-1j * k0 * (y) ** 2 / 2 / (z_eval**2 + Zy**2) * z_eval)
+            * hermite(n)(xp.sqrt(2) * (y) / wyZ)
+            * xp.exp(-((y) ** 2) / wyZ**2)
+            * xp.exp(-1j * k0 * (y) ** 2 / 2 / (z_eval**2 + Zy**2) * z_eval)
         )
 
         # Put it altogether
-        envelope = HGnx * HGny * np.exp(1j * (phiXz + phiYz))
+        envelope = HGnx * HGny * xp.exp(1j * (phiXz + phiYz))
 
         return envelope

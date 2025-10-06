@@ -7,16 +7,16 @@ adding spectral phase to it, and checking the corresponding
 temporal shape of the laser pulse against analytical formulas.
 """
 
-import numpy as np
 from scipy.constants import c
 
+from lasy.backend import xp
 from lasy.laser import Laser
 from lasy.optical_elements import PolynomialSpectralPhase
 from lasy.profiles.gaussian_profile import GaussianProfile
 
 # Laser parameters
 wavelength = 0.8e-6
-omega0 = 2 * np.pi * c / wavelength
+omega0 = 2 * xp.pi * c / wavelength
 w0 = 5.0e-6  # m
 pol = (1, 0)
 laser_energy = 1.0  # J
@@ -56,13 +56,13 @@ def test_delay():
     E0 = abs(E_before[50, 50]).max()
 
     # Compute the analtical expression in real space for a Gaussian
-    t = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
+    t = xp.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
 
-    E_analytical = E0 * np.exp(-1.0 * ((t - delay) / tau) ** 2)
+    E_analytical = E0 * xp.exp(-1.0 * ((t - delay) / tau) ** 2)
 
     # Compare the on-axis field with the analytical formula
     tol = 1.2e-3
-    assert np.all(
+    assert xp.all(
         abs(E_after[50, 50, :] - E_analytical) / abs(E_analytical).max() < tol
     )
 
@@ -91,15 +91,15 @@ def test_gdd():
     E0 = abs(E_before[50, 50]).max()
 
     # Compute the analtical expression in real space for a Gaussian
-    t = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
+    t = xp.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
     stretch_factor = 1 - 2j * gdd / tau**2
     E_analytical = (
-        E0 * np.exp(-1.0 / stretch_factor * (t / tau) ** 2) / stretch_factor**0.5
+        E0 * xp.exp(-1.0 / stretch_factor * (t / tau) ** 2) / stretch_factor**0.5
     )
 
     # Compare the on-axis field with the analytical formula
     tol = 1.2e-3
-    assert np.all(
+    assert xp.all(
         abs(E_after[50, 50, :] - E_analytical) / abs(E_analytical).max() < tol
     )
 
@@ -119,7 +119,7 @@ def test_tod():
     hi = (+12e-6, +12e-6, +250e-15)
     npoints = (100, 100, 400)
     laser = Laser(dim, lo, hi, npoints, gaussian_profile)
-    t = np.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
+    t = xp.linspace(laser.grid.lo[-1], laser.grid.hi[-1], laser.grid.npoints[-1])
 
     # Get field before and after dazzler
     E_before = laser.grid.get_temporal_field()
@@ -138,14 +138,14 @@ def test_tod():
         * E0
         * tau
         / (8 * tod * t) ** 0.25
-        * np.exp(-(tau**2) * t / (2 * tod))
-        * np.cos(
+        * xp.exp(-(tau**2) * t / (2 * tod))
+        * xp.cos(
             2 * t / 3 * (2 * t / tod) ** 0.5
             - tau**4 / (8 * tod) * (2 * t / tod) ** 0.5
-            - np.pi / 4
+            - xp.pi / 4
         )
     )
 
     # Compare the on-axis field with the analytical formula
     tol = 2.4e-2
-    assert np.all(abs(E_compare - prediction) / abs(E0) < tol)
+    assert xp.all(abs(E_compare - prediction) / abs(E0) < tol)

@@ -1,7 +1,8 @@
 import math
 
-import numpy as np
 from scipy.special import binom
+
+from lasy.backend import xp
 
 from .transverse_profile import TransverseProfile
 
@@ -105,14 +106,14 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
             # Calculate effective waist of the Laguerre-Gauss modes, at focus
             self.w_foc = w0 * (self.N + 1) ** 0.5
             # Calculate Rayleigh Length
-            self.zr = np.pi * self.w_foc**2 / wavelength
+            self.zr = xp.pi * self.w_foc**2 / wavelength
             # Evaluation distance w.r.t focal position
             self.z_eval = z_foc
             # Calculate the coefficients for the Laguerre-Gaussian modes
-            self.cn = np.empty(self.N + 1)
+            self.cn = xp.empty(self.N + 1)
             for n in range(self.N + 1):
-                m_values = np.arange(n, self.N + 1)
-                self.cn[n] = np.sum((1.0 / 2) ** m_values * binom(m_values, n)) / (
+                m_values = xp.arange(n, self.N + 1)
+                self.cn[n] = xp.sum((1.0 / 2) ** m_values * binom(m_values, n)) / (
                     self.N + 1
                 )
         else:
@@ -137,13 +138,13 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
         if self.field_type == "farfield":
             # Term for wavefront curvature + Gouy phase
             diffract_factor = 1.0 - 1j * self.z_eval / self.zr
-            w = self.w_foc * np.abs(diffract_factor)
-            psi = np.angle(diffract_factor)
+            w = self.w_foc * xp.abs(diffract_factor)
+            psi = xp.angle(diffract_factor)
             # Argument for the Laguerre polynomials
             scaled_radius_squared = 2 * (x**2 + y**2) / w**2
 
             # Sum recursively over the Laguerre polynomials
-            laguerre_sum = np.zeros_like(x, dtype=np.complex128)
+            laguerre_sum = xp.zeros_like(x, dtype=xp.complex128)
             for n in range(0, self.N + 1):
                 # Recursive calculation of the Laguerre polynomial
                 # - `L` represents $L_n$
@@ -159,11 +160,11 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
                     L1 = L
                     L = (((2 * n - 1) - scaled_radius_squared) * L1 - (n - 1) * L2) / n
                 # Add to the sum, including the term for the additional Gouy phase
-                laguerre_sum += self.cn[n] * np.exp(-(2j * n) * psi) * L
+                laguerre_sum += self.cn[n] * xp.exp(-(2j * n) * psi) * L
 
             # Final envelope: multiply by n-independent propagation factors
             exp_argument = -(x**2 + y**2) / (self.w_foc**2 * diffract_factor)
-            envelope = laguerre_sum * np.exp(exp_argument) / diffract_factor
+            envelope = laguerre_sum * xp.exp(exp_argument) / diffract_factor
 
             return envelope
 
@@ -177,6 +178,6 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
                     1 / math.factorial(n) * ((N + 1) * (x**2 + y**2) / w**2) ** n
                 )
 
-            envelope = np.exp(-(N + 1) * (x**2 + y**2) / w**2) * sumseries
+            envelope = xp.exp(-(N + 1) * (x**2 + y**2) / w**2) * sumseries
 
             return envelope

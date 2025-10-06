@@ -1,5 +1,3 @@
-import numpy as np
-
 from .longitudinal_profile import LongitudinalProfile
 
 

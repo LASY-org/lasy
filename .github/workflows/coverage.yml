@@ -1,7 +1,7 @@
 name: Weekly Coverage Update
 on:
   schedule:
-    - cron: "0 0 * * 1"
+    - cron: "30 11 * * 4"
   workflow_dispatch:
 
 jobs:
@@ -99,3 +99,4 @@ jobs:
         branch: update-coverage-badge
         base: development
         delete-branch: true
+        push-to-fork: LASY-org/LASY
