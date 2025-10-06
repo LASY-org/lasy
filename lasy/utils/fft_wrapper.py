@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def fft(which, arr_in, axes_in, from_domain):
+def fft(which, arr_in, axes_in, from_domain, verbose=0):
     """
     Perform FFT on a 3D array.
 
@@ -25,6 +25,9 @@ def fft(which, arr_in, axes_in, from_domain):
     from_domain : string
         "real" of the FFT is done from real domain (x,y) or (t) to frequency domain (kx, ky) or (omega)
         "frequency" for the opposite way
+
+    verbose : integer, optional (default 0)
+        Verbosity level. If >0 print some warning statements.
 
     Returns
     -------
@@ -54,7 +57,8 @@ def fft(which, arr_in, axes_in, from_domain):
     if which == "transverse":
         # Exit if only 1 element
         if min(axes_in[0].size, axes_in[1].size) < 2:
-            print("fft of size 1: do nothing")
+            if verbose > 0:
+                print("fft of size 1: do nothing")
             return arr_in, axes_in
 
         # Set right FFT functions
@@ -78,7 +82,8 @@ def fft(which, arr_in, axes_in, from_domain):
     else:  # which == "longitudinal"
         # Exit if only 1 element
         if axes_in.size <= 1:
-            print("fft of size 1: do nothing")
+            if verbose > 0:
+                print("fft of size 1: do nothing")
             return arr_in, axes_in
 
         # Set right FFT functions
