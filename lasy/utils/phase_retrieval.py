@@ -38,21 +38,28 @@ class GerchbergSaxton():
 
     
     def initialise_lasers(self):
+        """
+        Initialise the laser amplitudes and axes from the laser objects
         
-        self.laser1 = copy.deepcopy(self.lasers[0])
-        self.laser2 = copy.deepcopy(self.lasers[1])
+        Parameters
+        ----------
+            
+        """
         
-        self.amp1 = np.abs(self.laser1.grid.get_temporal_field())
-        self.amp2 = np.abs(self.laser2.grid.get_temporal_field())
+        self.amps = []
+        for laser in self.lasers:
+            self.amps.append(np.abs(laser.grid.get_temporal_field()))
+            print(np.shape(np.abs(laser.grid.get_temporal_field())))
         
-        self.x = self.laser2.grid.axes[0]
-        self.y = self.laser2.grid.axes[1]
+        self.x = self.lasers[0].grid.axes[0]
+        self.y = self.lasers[0].grid.axes[1]
         self.z = self.positions
+        self.z0idx = np.argmin(np.abs(self.z)) # Position of plane closest to the focus
         
         
     def initialise_spotsizes(self,spotsizes=None):
         """
-        Initialise the spot size of the modes at focus in each transverse direction
+        Initialise the spot size of the modes closest to the focus in each transverse direction
         
         Parameters
         ----------
@@ -65,9 +72,10 @@ class GerchbergSaxton():
         """
 
         # The spotsize is calculated from the fluence, profile is integrated wrt temporal axis
+        # Pick the plane closest to the focus
         if spotsizes is None:
             w0x, w0y = estimate_best_HG_waist(
-                self.x, self.y, np.sum(self.amp2, axis=-1), self.laser2.profile.lambda0
+                self.x, self.y, np.sum(self.amps[self.z0idx], axis=-1), self.lasers[self.z0idx].profile.lambda0, self.z[self.z0idx]
             ) # Estimate spot size in the focal plane
             spotsizes = (w0x, w0y)
 
@@ -75,54 +83,102 @@ class GerchbergSaxton():
 
     
     def initialise_modes(self):
+        """
+        Initialise the phase and mode coefficients closest to the focus in each transverse direction
+        
+        Parameters
+        ----------
+            
+        """
         
 
         # Initialise random phase if no known phase is passed
         if self.initial_phase is None:
-            self.phase1 = np.pi * np.random.uniform(-1, 1, np.shape(self.amp1)) # Initial guess of phase
+            self.phase = np.pi * np.random.uniform(-1, 1, np.shape(self.amps[0])) # Initial guess of phase
         else:
-            self.phase1 = self.initial_phase
+            self.phase = self.initial_phase
 
         # Construct initial guess of field
-        self.laser1.grid.set_temporal_field(self.amp1*np.exp(1j*self.phase1))
+        self.lasers[self.z0idx].grid.set_temporal_field(self.amps[self.z0idx]*np.exp(1j*self.phase))
         
         # Find estimate of the decomposition of the initial electric field
-        self.modes = hermite_gauss_decomposition(self.laser2, self.spotsizes[0], self.spotsizes[1], self.m_max, self.n_max)
+        self.modes = hermite_gauss_decomposition(self.lasers[self.z0idx], self.spotsizes[0], self.spotsizes[1], self.m_max, self.n_max, z_foc=self.z[self.z0idx])
+
     
     def retrieve_phase(self):
+        """
+        Perform the phase retrieval over the given planes
+        
+        Parameters
+        ----------
+            
+        """
     
+        # Make an array to alternate from the ends of array, working towards center
+        idx = np.empty(len(self.z), dtype=int)
+        half_ceil = (len(self.z) + 1) // 2  # Ceiling division for the first half
+        idx[::2] = np.arange(half_ceil)
+        half_floor = len(self.z) // 2  # Floor division for the second half
+        idx[1::2] = np.arange(len(z) - 1, half_ceil - 1, -1)
+        
         def breakout(i):
             return i < self.max_iter
         cond = 0
-
-        errors = []
+        
+        mode_power = sum(abs(value) ** 2 for value in self.modes.values())
+        chi2 = np.zeros(self.max_iter)
+        chi2Grad = np.zeros(self.max_iter)
     
         i = 0
         while breakout(cond):
-            self.laser1.grid.set_temporal_field(self.amp1 * np.exp(1j * self.phase1))
+            if self.verbose: print("GSA Iteration: %i" %i)
+            for k in idx:
+                if self.verbose: print("    Image: %i of %i" %(k+1,Nimgs))
 
-            
-            # Calculate the decomposition and waist of the laser pulse
-            self.modes = hermite_gauss_decomposition(self.laser1, self.spotsizes[0], self.spotsizes[1], self.m_max, self.n_max)
+                # Step 2
+                t0 = time.time()
+                
+                Efield = hermite_gauss_composition(self.lasers[k], self.spotsizes[0], self.spotsizes[1], self.modes, z_foc=self.z[k])
+                                                   
+                t1 = time.time()
+                if showProgress: print("        Reconstruction: %.3f s" %(t1-t0))
+                
+                # Step 3
+                phi = np.angle(Efield)
 
-            self.laser1.propagate(self.dz, verbose=False)
-    
-            self.phase2 = np.angle(self.laser1.grid.get_temporal_field())
-            self.laser2.grid.set_temporal_field(self.amp2 * np.exp(1j * self.phase2))
-            self.laser2.propagate(-self.dz, verbose=False)
-    
-            phase1 = np.angle(self.laser2.grid.get_temporal_field())
-            
-            amp_error_summed = np.sum(np.abs(np.abs(self.laser2.grid.get_temporal_field())-self.amp1)) / np.sum(self.amp1)
-            
-            i += 1
-            cond += 1
-            if self.verbose:
-                print(
-                    "Iteration %i : Amplitude Error (summed) = %.2e"
-                    % (i, amp_error_summed)
-                )
+                # Step 4
+                Enew = self.amps[k] * np.exp(1j*phi)
 
-            errors.append(amp_error_summed)
-    
-        return phase1, phase2, np.array(errors)
+                # Step 5
+                delta = (self.amps[k] - np.abs(Efield))/np.max(self.amps[k])
+                Enew *= np.exp(delta)
+
+                # Step 6
+                t0 = time.time()
+                
+                new_modes = hermite_gauss_decomposition(self.lasers[k], self.spotsizes[0], self.spotsizes[1], self.m_max, self.n_max, z_foc=self.z[k])
+                
+                t1 = time.time()
+                if showProgress: print("        Decomposition:  %.3f s" %(t1-t0))
+                
+                
+                for key in new_modes:
+                    new_modes[key] *= np.sqrt(mode_power/sum(abs(value) ** 2 for value in new_modes.values()))
+                    self.modes[key] = (self.modes[key] + new_modes[key])/2.
+
+                for key in self.modes:
+                    self.modes[key] *= np.sqrt(mode_power/sum(abs(value) ** 2 for value in self.modes.values()))
+                    
+                # calculate the fluence error
+                chi2[i] = np.sqrt(np.sum((np.abs(Enew)  - self.amps[k]) **2))/np.sum(self.amps[k])/len(self.z)
+
+                self.lasers[k].grid.set_temporal_field(Enew)
+
+            if i>0:
+                chi2Grad[i] = (chi2[i] -chi2[i-1])/(chi2[i-1]+1e-8) # Add a small amount to prevent inf
+                if i%ittGSEval==0:
+                    if self.verbose:
+                        print("chi2     = %.7e " %(chi2[i]))
+                        print("chi2Grad = %.7f %%" %(chi2Grad[i]*100))
+        
+        return chi2, chi2Grad
