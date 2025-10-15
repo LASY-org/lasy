@@ -1,4 +1,5 @@
 import copy
+import time
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -75,7 +76,7 @@ class GerchbergSaxton():
         # Pick the plane closest to the focus
         if spotsizes is None:
             w0x, w0y = estimate_best_HG_waist(
-                self.x, self.y, np.sum(self.amps[self.z0idx], axis=-1), self.lasers[self.z0idx].profile.lambda0, self.z[self.z0idx]
+                self.x, self.y, np.sum(self.amps[self.z0idx], axis=-1), self.lasers[self.z0idx].profile.lambda0,
             ) # Estimate spot size in the focal plane
             spotsizes = (w0x, w0y)
 
@@ -119,39 +120,37 @@ class GerchbergSaxton():
         half_ceil = (len(self.z) + 1) // 2  # Ceiling division for the first half
         idx[::2] = np.arange(half_ceil)
         half_floor = len(self.z) // 2  # Floor division for the second half
-        idx[1::2] = np.arange(len(z) - 1, half_ceil - 1, -1)
-        
-        def breakout(i):
-            return i < self.max_iter
-        cond = 0
+        idx[1::2] = np.arange(len(self.z) - 1, half_ceil - 1, -1)
         
         mode_power = sum(abs(value) ** 2 for value in self.modes.values())
         chi2 = np.zeros(self.max_iter)
         chi2Grad = np.zeros(self.max_iter)
     
         i = 0
-        while breakout(cond):
+        for i in range(self.max_iter):
             if self.verbose: print("GSA Iteration: %i" %i)
             for k in idx:
-                if self.verbose: print("    Image: %i of %i" %(k+1,Nimgs))
+                if self.verbose: print("    Image: %i of %i" %(k+1,len(self.z)))
 
                 # Step 2
                 t0 = time.time()
                 
-                Efield = hermite_gauss_composition(self.lasers[k], self.spotsizes[0], self.spotsizes[1], self.modes, z_foc=self.z[k])
+                hermite_gauss_composition(self.lasers[k], self.spotsizes[0], self.spotsizes[1], self.modes, z_foc=self.z[k])
                                                    
                 t1 = time.time()
-                if showProgress: print("        Reconstruction: %.3f s" %(t1-t0))
+                if self.verbose: print("        Reconstruction: %.3f s" %(t1-t0))
                 
                 # Step 3
-                phi = np.angle(Efield)
+                phi = np.angle(self.lasers[k].grid.get_temporal_field())
 
                 # Step 4
-                Enew = self.amps[k] * np.exp(1j*phi)
+                laser_new = self.amps[k] * np.exp(1j*phi)
 
                 # Step 5
-                delta = (self.amps[k] - np.abs(Efield))/np.max(self.amps[k])
-                Enew *= np.exp(delta)
+                delta = (self.amps[k] - np.abs(self.lasers[k].grid.get_temporal_field()))/np.max(self.amps[k])
+                laser_new *= np.exp(delta)
+
+                self.lasers[k].grid.set_temporal_field(laser_new)
 
                 # Step 6
                 t0 = time.time()
@@ -159,7 +158,7 @@ class GerchbergSaxton():
                 new_modes = hermite_gauss_decomposition(self.lasers[k], self.spotsizes[0], self.spotsizes[1], self.m_max, self.n_max, z_foc=self.z[k])
                 
                 t1 = time.time()
-                if showProgress: print("        Decomposition:  %.3f s" %(t1-t0))
+                if self.verbose: print("        Decomposition:  %.3f s" %(t1-t0))
                 
                 
                 for key in new_modes:
@@ -170,15 +169,14 @@ class GerchbergSaxton():
                     self.modes[key] *= np.sqrt(mode_power/sum(abs(value) ** 2 for value in self.modes.values()))
                     
                 # calculate the fluence error
-                chi2[i] = np.sqrt(np.sum((np.abs(Enew)  - self.amps[k]) **2))/np.sum(self.amps[k])/len(self.z)
-
-                self.lasers[k].grid.set_temporal_field(Enew)
+                chi2[i] = np.sqrt(np.sum((np.abs(laser_new)  - self.amps[k]) **2))/np.sum(self.amps[k])/len(self.z)
 
             if i>0:
-                chi2Grad[i] = (chi2[i] -chi2[i-1])/(chi2[i-1]+1e-8) # Add a small amount to prevent inf
-                if i%ittGSEval==0:
-                    if self.verbose:
-                        print("chi2     = %.7e " %(chi2[i]))
-                        print("chi2Grad = %.7f %%" %(chi2Grad[i]*100))
+                chi2Grad[i] = np.abs(chi2[i] - chi2[i-1])/(chi2[i-1]+1e-8) # Add a small amount to prevent inf
+                if self.verbose:
+                    print("chi2     = %.7e " %(chi2[i]))
+                    print("chi2Grad = %.7f %%" %(chi2Grad[i]*100))
+
+            i+=1
         
-        return chi2, chi2Grad
+        return self.lasers, chi2, chi2Grad
