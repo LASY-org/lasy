@@ -104,7 +104,9 @@ def hermite_gauss_decomposition(
     return cxy
 
 
-def hermite_gauss_composition(grid_in, w0x, w0y, cxy, z_foc=0, skipAsymmetricModes=False):
+def hermite_gauss_composition(
+    grid_in, w0x, w0y, cxy, z_foc=0, skipAsymmetricModes=False
+):
     """Compose a laser field from the mode coefficients.
 
     Uses a dictionary of complex modal coefficients to generate a beam
@@ -182,16 +184,18 @@ def get_laguerre_mode(grid_in, w0, i, j, z_foc=0):
     dx = np.mean(np.diff(grid_in.grid.axes[0]))
     dy = np.mean(np.diff(grid_in.grid.axes[1]))
 
-    lg = LaguerreGaussianTransverseProfile(w0, i, j, grid_in.profile.lambda0, z_foc=z_foc).evaluate(
-        X, Y
-    )
+    lg = LaguerreGaussianTransverseProfile(
+        w0, i, j, grid_in.profile.lambda0, z_foc=z_foc
+    ).evaluate(X, Y)
 
     coeff = np.sum(grid_in.grid.get_temporal_field() * np.conj(lg)) * dx * dy
 
     return coeff
 
 
-def laguerre_gauss_decomposition(grid_in, w0, Mmax, Nmax, z_foc=0, skipAsymmetricModes=False):
+def laguerre_gauss_decomposition(
+    grid_in, w0, Mmax, Nmax, z_foc=0, skipAsymmetricModes=False
+):
     """Decompose a laser field onto a Laguerre-Gaussian basis.
 
     Loops through the mode coefficients, calculating the mode coefficient
