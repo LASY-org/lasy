@@ -7,7 +7,7 @@ import pytest
 
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
-from lasy.utils.phase_retrieval import gerchberg_saxton_algo
+from lasy.utils.phase_retrieval import GerchbergSaxton
 from lasy.utils.zernike import zernike
 
 w0 = 25.0e-6  # m
@@ -53,20 +53,17 @@ def test_3D_case(gaussian):
     laser.grid.set_temporal_field(np.abs(field) * np.exp(1j * phase3D))
 
     # PROPAGATE THE FIELD FIELD FOWARDS AND BACKWARDS BY 1 MM
+    field = [None] * 2
     propDist = 2e-3
     laserForward = copy.deepcopy(laser)
     laserForward.propagate(propDist)
     laserBackward = copy.deepcopy(laser)
     laserBackward.propagate(-propDist)
 
-    # PERFORM GERCHBERG-SAXTON ALGORTIHM TO RETRIEVE PHASE
-    _, _, amp_error = gerchberg_saxton_algo(
-        laserBackward,
-        laserForward,
-        2 * propDist,
-        condition="max_iterations",
-        max_iterations=100,
-        debug=True,
-    )
+    field = [laserBackward, laserForward]
+    zVals = [-propDist, propDist]
 
+    # PERFORM GERCHBERG-SAXTON ALGORTIHM TO RETRIEVE PHASE
+    gs = GerchbergSaxton(field, zVals, m_max=20, n_max=20, max_iter=50)
+    chi2, chi2Grad = gs.retrieve_phase()
     assert amp_error < 1e-6
