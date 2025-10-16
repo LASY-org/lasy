@@ -12,8 +12,35 @@ from lasy.utils.mode_decomposition import (
 
 class GerchbergSaxton:
     """
-    An implementation of the Gerchberg Saxton Algorithm with Modal Decomposition (GSA-MD)
+    Implement the Gerchberg Saxton Algorithm with Modal Decomposition (GSA-MD)
     as described by I. Moulanier et al., Jour. Opt. Soc. Am. B 40, 9 (2023). DOI 10.1364/JOSAB.489884
+
+    This takes a list of laser objects and the corresponding axial positions relative to the focus and 
+    iteratively enforces the amplitude condition to find the phase
+    
+    Parameters
+    ----------
+    lasers: list
+        List of lasy laser objects for different axial planes
+        The phase of these laser objects is irrelevant and will be updated by the algorithm
+        
+    positions: list
+        List of axial positions at which the above laser objects are defined
+
+    m_max: int
+        The maximum number of x-direction Hermite-Gaussian modes to be included when constructing and 
+        deconstructing the laser objects into summations of modes
+        
+    n_max: int
+        The maximum number of y-direction Hermite-Gaussian modes to be included when constructing and 
+        deconstructing the laser objects into summations of modes
+
+    max_iter: int
+        The maximum number of iterations to be performed by the algorithm
+
+    intial_phase: array
+        This allows the user to pass an initial guess of the phase and should have the same dimensions as the laser field
+        Otherwise, a Gaussian phase is estimated using the displacement between the two planes as the uncertainty
 
     """
 
@@ -27,13 +54,6 @@ class GerchbergSaxton:
         initial_phase=None,
         verbose=False,
     ):
-        """
-        Parameters
-        ----------
-
-
-
-        """
         self.lasers = lasers
         self.positions = positions
         self.m_max = m_max
@@ -48,9 +68,6 @@ class GerchbergSaxton:
     def initialise_lasers(self):
         """
         Initialise the laser amplitudes and axes from the laser objects
-
-        Parameters
-        ----------
 
         """
         self.amps = []
@@ -69,9 +86,9 @@ class GerchbergSaxton:
 
         Parameters
         ----------
-        spotSizes: tuple of floats (meters)
-            The size of the mode along the x and y axes at focus. spotSize[0] corresponds to
-            the y-axis while spotSize[1] corresponds to the x-axis.  If none is provided then
+        spotsizes: tuple of floats (meters)
+            The size of the mode along the x and y axes at focus. spotsizes[0] corresponds to
+            the y-axis while spotsizes[1] corresponds to the x-axis.  If none is provided then
             the spot sizes will be initialised based on a D4sigma fit to the
             focus.
 
@@ -92,10 +109,7 @@ class GerchbergSaxton:
 
     def initialise_modes(self):
         """
-        Initialise the phase and mode coefficients closest to the focus in each transverse direction
-
-        Parameters
-        ----------
+        Initialise the phase and mode coefficients using the plane closest to the focus
 
         """
         # Initialise parabolic phase if no known phase is passed
@@ -156,11 +170,22 @@ class GerchbergSaxton:
 
     def retrieve_phase(self):
         """
-        Perform the phase retrieval over the given planes
+        Perform the phase retrieval over the given planes, planes are alternated between front and back
+        towards the focus
 
-        Parameters
-        ----------
+        Compose the field from the initial guess of the mode coefficients and update field
+        with the new phase and correct (original) amplitude
 
+        Decompose the field to return the new guess of the mode coefficients
+
+        Returns
+        -------
+        chi2: 1D array
+            1D array of the $chi^2$ error between the reconstructed and target field
+
+        chi2Grad: 1D array
+            1D array of the $\nabla chi^2$ gradient error between the reconstructed and target field
+            
         """
         # Make an array to alternate from the ends of array, working towards center
         idx = np.empty(len(self.z), dtype=int)
