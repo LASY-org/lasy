@@ -15,24 +15,24 @@ class GerchbergSaxton:
     Implement the Gerchberg Saxton Algorithm with Modal Decomposition (GSA-MD)
     as described by I. Moulanier et al., Jour. Opt. Soc. Am. B 40, 9 (2023). DOI 10.1364/JOSAB.489884
 
-    This takes a list of laser objects and the corresponding axial positions relative to the focus and 
+    This takes a list of laser objects and the corresponding axial positions relative to the focus and
     iteratively enforces the amplitude condition to find the phase
-    
+
     Parameters
     ----------
     lasers: list
         List of lasy laser objects for different axial planes
         The phase of these laser objects is irrelevant and will be updated by the algorithm
-        
+
     positions: list
         List of axial positions at which the above laser objects are defined
 
     m_max: int
-        The maximum number of x-direction Hermite-Gaussian modes to be included when constructing and 
+        The maximum number of x-direction Hermite-Gaussian modes to be included when constructing and
         deconstructing the laser objects into summations of modes
-        
+
     n_max: int
-        The maximum number of y-direction Hermite-Gaussian modes to be included when constructing and 
+        The maximum number of y-direction Hermite-Gaussian modes to be included when constructing and
         deconstructing the laser objects into summations of modes
 
     max_iter: int
@@ -185,7 +185,7 @@ class GerchbergSaxton:
 
         chi2Grad: 1D array
             1D array of the $\nabla chi^2$ gradient error between the reconstructed and target field
-            
+
         """
         # Make an array to alternate from the ends of array, working towards center
         idx = np.empty(len(self.z), dtype=int)
