@@ -12,11 +12,11 @@ from lasy.utils.mode_decomposition import (
 
 class GerchbergSaxton:
     """
-    Implement the Gerchberg Saxton Algorithm with Modal Decomposition (GSA-MD)
-    as described by I. Moulanier et al., Jour. Opt. Soc. Am. B 40, 9 (2023). DOI 10.1364/JOSAB.489884
+    Implement the Gerchberg Saxton Algorithm with Modal Decomposition (GSA-MD).
 
     This takes a list of laser objects and the corresponding axial positions relative to the focus and
     iteratively enforces the amplitude condition to find the phase
+    as described by I. Moulanier et al., Jour. Opt. Soc. Am. B 40, 9 (2023). DOI 10.1364/JOSAB.489884
 
     Parameters
     ----------
@@ -67,7 +67,7 @@ class GerchbergSaxton:
 
     def initialise_lasers(self):
         """
-        Initialise the laser amplitudes and axes from the laser objects
+        Initialise the laser amplitudes and axes from the laser objects.
 
         """
         self.amps = []
@@ -82,7 +82,7 @@ class GerchbergSaxton:
 
     def initialise_spotsizes(self, spotsizes=None):
         """
-        Initialise the spot size of the modes closest to the focus in each transverse direction
+        Initialise the spot size of the modes closest to the focus in each transverse direction.
 
         Parameters
         ----------
@@ -109,7 +109,7 @@ class GerchbergSaxton:
 
     def initialise_modes(self):
         """
-        Initialise the phase and mode coefficients using the plane closest to the focus
+        Initialise the phase and mode coefficients using the plane closest to the focus.
 
         """
         # Initialise parabolic phase if no known phase is passed
@@ -170,13 +170,11 @@ class GerchbergSaxton:
 
     def retrieve_phase(self):
         """
-        Perform the phase retrieval over the given planes, planes are alternated between front and back
-        towards the focus
+        Perform the phase retrieval for the given lasers over provided axial planes.
 
-        Compose the field from the initial guess of the mode coefficients and update field
-        with the new phase and correct (original) amplitude
-
-        Decompose the field to return the new guess of the mode coefficients
+        1. Compose the field from the initial guess of the mode coefficients
+        2. Update field with the new phase and correct (original) amplitude
+        3. Decompose the field to return the new guess of the mode coefficients
 
         Returns
         -------
