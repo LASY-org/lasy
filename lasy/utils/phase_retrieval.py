@@ -166,7 +166,6 @@ class GerchbergSaxton:
         idx = np.empty(len(self.z), dtype=int)
         half_ceil = (len(self.z) + 1) // 2  # Ceiling division for the first half
         idx[::2] = np.arange(half_ceil)
-        half_floor = len(self.z) // 2  # Floor division for the second half
         idx[1::2] = np.arange(len(self.z) - 1, half_ceil - 1, -1)
 
         mode_power = sum(abs(value) ** 2 for value in self.modes.values())
