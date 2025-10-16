@@ -21,3 +21,4 @@ Additionally, a set of static (automatically tested) examples can be found below
    2d_spatial_laser.ipynb
    nonlinear_propagation_split_step.ipynb
    collins_propagator.ipynb
+   gerchberg_saxton_retrieval.ipynb
