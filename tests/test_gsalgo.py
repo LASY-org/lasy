@@ -65,5 +65,5 @@ def test_3D_case(gaussian):
 
     # PERFORM GERCHBERG-SAXTON ALGORTIHM TO RETRIEVE PHASE
     gs = GerchbergSaxton(field, zVals, m_max=20, n_max=20, max_iter=50)
-    chi2, chi2Grad = gs.retrieve_phase()
-    assert amp_error < 1e-6
+    chi2, _ = gs.retrieve_phase()
+    assert chi2 < 1e-6
