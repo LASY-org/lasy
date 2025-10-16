@@ -67,8 +67,7 @@ class GerchbergSaxton:
 
     def initialise_lasers(self):
         """
-        Initialise the laser amplitudes and axes from the laser objects.
-
+        Initialise the laser amplitudes and axes.
         """
         self.amps = []
         for i, laser in enumerate(self.lasers):
@@ -109,8 +108,7 @@ class GerchbergSaxton:
 
     def initialise_modes(self):
         """
-        Initialise the phase and mode coefficients using the plane closest to the focus.
-
+        Initialise the phase and mode coefficients.
         """
         # Initialise parabolic phase if no known phase is passed
         if self.initial_phase is None:
