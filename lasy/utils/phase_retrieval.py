@@ -66,9 +66,7 @@ class GerchbergSaxton:
         self.initialise_spotsizes()
 
     def initialise_lasers(self):
-        """
-        Initialise the laser amplitudes and axes.
-        """
+        """Initialise the laser amplitudes and axes."""
         self.amps = []
         for i, laser in enumerate(self.lasers):
             self.amps.append(np.abs(laser.grid.get_temporal_field()))
@@ -107,9 +105,7 @@ class GerchbergSaxton:
         self.initialise_modes()  # Reinitialise modes after updating spotsize
 
     def initialise_modes(self):
-        """
-        Initialise the phase and mode coefficients.
-        """
+        """Initialise the phase and mode coefficients."""
         # Initialise parabolic phase if no known phase is passed
         if self.initial_phase is None:
             X, Y, _ = np.meshgrid(self.x, self.y, 1)
