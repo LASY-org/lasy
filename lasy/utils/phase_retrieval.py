@@ -35,7 +35,6 @@ class GerchbergSaxton():
 
         self.initialise_lasers()
         self.initialise_spotsizes()
-        self.initialise_modes()
 
     
     def initialise_lasers(self):
@@ -48,9 +47,9 @@ class GerchbergSaxton():
         """
         
         self.amps = []
-        for laser in self.lasers:
+        for i, laser in enumerate(self.lasers):
             self.amps.append(np.abs(laser.grid.get_temporal_field()))
-            print(np.shape(np.abs(laser.grid.get_temporal_field())))
+            self.lasers[i] = copy.deepcopy(laser)
         
         self.x = self.lasers[0].grid.axes[0]
         self.y = self.lasers[0].grid.axes[1]
@@ -81,6 +80,7 @@ class GerchbergSaxton():
             spotsizes = (w0x, w0y)
 
         self.spotsizes = spotsizes
+        self.initialise_modes() # Reinitialise modes after updating spotsize
 
     
     def initialise_modes(self):
@@ -92,10 +92,12 @@ class GerchbergSaxton():
             
         """
         
-
-        # Initialise random phase if no known phase is passed
+        # Initialise parabolic phase if no known phase is passed
         if self.initial_phase is None:
-            self.phase = np.pi * np.random.uniform(-1, 1, np.shape(self.amps[0])) # Initial guess of phase
+            X, Y, _ = np.meshgrid(self.x,self.y,1)
+            delta_z = np.abs(self.z[self.z0idx+1]-self.z[self.z0idx])
+            z_R = np.pi*np.mean([self.spotsizes[0], self.spotsizes[1]])**2 / self.lasers[self.z0idx].profile.lambda0
+            self.phase = np.pi / self.lasers[self.z0idx].profile.lambda0 * delta_z * (X**2 + Y**2) / (delta_z**2 + z_R**2)
         else:
             self.phase = self.initial_phase
 
@@ -104,6 +106,15 @@ class GerchbergSaxton():
         
         # Find estimate of the decomposition of the initial electric field
         self.modes = hermite_gauss_decomposition(self.lasers[self.z0idx], self.spotsizes[0], self.spotsizes[1], self.m_max, self.n_max, z_foc=self.z[self.z0idx])
+
+        # Print mode contributions
+        if self.verbose:
+            for calcModeKey in self.modes.keys():
+                if calcModeKey[0]<3 and calcModeKey[1]<3:
+                    print('%i,%i :  %.2f  ,  %.2f i' %(calcModeKey[0],calcModeKey[1],np.real(self.modes[calcModeKey]),np.imag(self.modes[calcModeKey])))
+        
+        hermite_gauss_composition(self.lasers[self.z0idx], self.spotsizes[0], self.spotsizes[1], self.modes, z_foc=self.z[self.z0idx])
+
 
     
     def retrieve_phase(self):
@@ -141,10 +152,10 @@ class GerchbergSaxton():
                 if self.verbose: print("        Reconstruction: %.3f s" %(t1-t0))
                 
                 # Step 3
-                phi = np.angle(self.lasers[k].grid.get_temporal_field())
+                phase = np.angle(self.lasers[k].grid.get_temporal_field())
 
                 # Step 4
-                laser_new = self.amps[k] * np.exp(1j*phi)
+                laser_new = self.amps[k] * np.exp(1j*phase) # Enforce amplitude condition
 
                 # Step 5
                 delta = (self.amps[k] - np.abs(self.lasers[k].grid.get_temporal_field()))/np.max(self.amps[k])
@@ -159,7 +170,6 @@ class GerchbergSaxton():
                 
                 t1 = time.time()
                 if self.verbose: print("        Decomposition:  %.3f s" %(t1-t0))
-                
                 
                 for key in new_modes:
                     new_modes[key] *= np.sqrt(mode_power/sum(abs(value) ** 2 for value in new_modes.values()))
@@ -179,4 +189,4 @@ class GerchbergSaxton():
 
             i+=1
         
-        return self.lasers, chi2, chi2Grad
+        return chi2, chi2Grad
