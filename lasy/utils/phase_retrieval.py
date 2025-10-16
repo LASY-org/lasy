@@ -169,7 +169,7 @@ class GerchbergSaxton:
         )
 
     def retrieve_phase(self):
-        """
+        r"""
         Perform the phase retrieval for the given lasers over provided axial planes.
 
         1. Compose the field from the initial guess of the mode coefficients
