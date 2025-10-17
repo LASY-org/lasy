@@ -14,12 +14,13 @@ from lasy.utils.zernike import zernike
 
 spot_size = 10e-6
 
+
 @pytest.fixture(scope="function")
 def gaussian():
     peak_fluence = 1.0  # J/m^2
     wavelength = 800e-9
     pol = (1, 0)
-    
+
     long_prof = ContinuousWaveProfile(wavelength)
     tran_prof = GaussianTransverseProfile(spot_size)
     profile = CombinedLongitudinalTransverseProfile(
@@ -30,9 +31,12 @@ def gaussian():
 
 
 def test_3D_case(gaussian):
-    
     dimensions = "xyt"  # Use Cartesian geometry
-    lo = (-5.0 * spot_size, -5.0 * spot_size, None)  # Lower bounds of the simulation box
+    lo = (
+        -5.0 * spot_size,
+        -5.0 * spot_size,
+        None,
+    )  # Lower bounds of the simulation box
     hi = (5.0 * spot_size, 5.0 * spot_size, None)  # Upper bounds of the simulation box
     num_points = (256, 256, 1)  # Number of points in each dimension
 
