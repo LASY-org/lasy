@@ -12,15 +12,14 @@ from lasy.profiles.transverse import GaussianTransverseProfile
 from lasy.utils.phase_retrieval import GerchbergSaxton
 from lasy.utils.zernike import zernike
 
+spot_size = 10e-6
 
 @pytest.fixture(scope="function")
 def gaussian():
     peak_fluence = 1.0  # J/m^2
-    spot_size = 10e-6
     wavelength = 800e-9
-    omega0 = 2 * np.pi * c / wavelength
     pol = (1, 0)
-
+    
     long_prof = ContinuousWaveProfile(wavelength)
     tran_prof = GaussianTransverseProfile(spot_size)
     profile = CombinedLongitudinalTransverseProfile(
@@ -31,12 +30,9 @@ def gaussian():
 
 
 def test_3D_case(gaussian):
+    
     dimensions = "xyt"  # Use Cartesian geometry
-    lo = (
-        -5.0 * spot_size,
-        -5.0 * spot_size,
-        None,
-    )  # Lower bounds of the simulation box
+    lo = (-5.0 * spot_size, -5.0 * spot_size, None)  # Lower bounds of the simulation box
     hi = (5.0 * spot_size, 5.0 * spot_size, None)  # Upper bounds of the simulation box
     num_points = (256, 256, 1)  # Number of points in each dimension
 
@@ -44,8 +40,8 @@ def test_3D_case(gaussian):
 
     # Add a phase aberration
     # CALCULATE THE REQUIRED PHASE ABERRATION
-    x = np.linspace(lo[0], hi[0], npoints[0])
-    y = np.linspace(lo[1], hi[1], npoints[1])
+    x = np.linspace(lo[0], hi[0], num_points[0])
+    y = np.linspace(lo[1], hi[1], num_points[1])
     X, Y = np.meshgrid(x, y)
     pupilRadius = 20e-6
     phase = -0.2 * zernike(X, Y, (0, 0, pupilRadius), 3)
@@ -55,7 +51,7 @@ def test_3D_case(gaussian):
     phaseMask[R > pupilRadius] = 0
 
     # NOW ADD THE PHASE TO EACH SLICE OF THE FOCUS
-    phase3D = np.repeat(phase[:, :, np.newaxis], npoints[2], axis=2)
+    phase3D = np.repeat(phase[:, :, np.newaxis], num_points[2], axis=2)
     field = laser.grid.get_temporal_field()
     laser.grid.set_temporal_field(np.abs(field) * np.exp(1j * phase3D))
 
