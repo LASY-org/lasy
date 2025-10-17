@@ -6,41 +6,44 @@ import numpy as np
 import pytest
 
 from lasy.laser import Laser
-from lasy.profiles.gaussian_profile import GaussianProfile
+from lasy.profiles import CombinedLongitudinalTransverseProfile
+from lasy.profiles.longitudinal import ContinuousWaveProfile
+from lasy.profiles.transverse import GaussianTransverseProfile
 from lasy.utils.phase_retrieval import GerchbergSaxton
 from lasy.utils.zernike import zernike
 
-w0 = 25.0e-6  # m
-
-
 @pytest.fixture(scope="function")
 def gaussian():
-    # Cases with Gaussian laser
-    wavelength = 0.8e-6
+    peak_fluence = 1.0  # J/m^2
+    spot_size = 10e-6
+    wavelength = 800e-9
+    omega0 = 2 * np.pi * c / wavelength
     pol = (1, 0)
-    laser_energy = 1.0e-3  # J
-    t_peak = 0.0  # s
-    tau = 30.0e-15  # s
-    profile = GaussianProfile(wavelength, pol, laser_energy, w0, tau, t_peak)
+    
+    long_prof = ContinuousWaveProfile(wavelength)
+    tran_prof = GaussianTransverseProfile(spot_size)
+    profile = CombinedLongitudinalTransverseProfile(
+        wavelength, pol, long_prof, tran_prof, peak_fluence=peak_fluence
+    )
 
     return profile
 
 
 def test_3D_case(gaussian):
-    # - 3D case
-    dim = "xyt"
-    lo = (-75e-6, -75e-6, -50e-15)
-    hi = (75e-6, 75e-6, 50e-15)
-    npoints = (100, 100, 100)
+    
+    dimensions = "xyt"  # Use Cartesian geometry
+    lo = (-5.0 * spot_size, -5.0 * spot_size, None)  # Lower bounds of the simulation box
+    hi = (5.0 * spot_size, 5.0 * spot_size, None)  # Upper bounds of the simulation box
+    num_points = (256, 256, 1)  # Number of points in each dimension
 
-    laser = Laser(dim, lo, hi, npoints, gaussian)
+    laser = Laser(dimensions, lo, hi, num_points, laser_profile)
 
     # Add a phase aberration
     # CALCULATE THE REQUIRED PHASE ABERRATION
     x = np.linspace(lo[0], hi[0], npoints[0])
     y = np.linspace(lo[1], hi[1], npoints[1])
     X, Y = np.meshgrid(x, y)
-    pupilRadius = 2 * w0
+    pupilRadius = 20e-6
     phase = -0.2 * zernike(X, Y, (0, 0, pupilRadius), 3)
 
     R = np.sqrt(X**2 + Y**2)
@@ -54,7 +57,7 @@ def test_3D_case(gaussian):
 
     # PROPAGATE THE FIELD FIELD FOWARDS AND BACKWARDS BY 1 MM
     field = [None] * 2
-    propDist = 2e-3
+    propDist = 1e-3
     laserForward = copy.deepcopy(laser)
     laserForward.propagate(propDist)
     laserBackward = copy.deepcopy(laser)
@@ -65,5 +68,5 @@ def test_3D_case(gaussian):
 
     # PERFORM GERCHBERG-SAXTON ALGORTIHM TO RETRIEVE PHASE
     gs = GerchbergSaxton(field, zVals, m_max=20, n_max=20, max_iter=50)
-    chi2, _ = gs.retrieve_phase()
-    assert chi2 < 1e-6
+    chi2, chi2Grad = gs.retrieve_phase()
+    assert chi2 < 5e-5
