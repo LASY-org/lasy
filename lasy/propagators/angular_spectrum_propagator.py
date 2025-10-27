@@ -117,10 +117,10 @@ class AngularSpectrumPropagator(Propagator):
 
         if self.dim == "rt":
             field = self._propagate_mrt(distance, grid_in)
-        
-        elif (grid_in.shape[0]==1) and (grid_in.shape[1]==1):
+
+        elif (grid_in.shape[0] == 1) and (grid_in.shape[1] == 1):
             field = self._propagate_1d(distance, grid_in)
-            
+
         else:  # self.dim == "xyt"
             field = self._propagate_xyt(distance, grid_in)
 
@@ -167,7 +167,7 @@ class AngularSpectrumPropagator(Propagator):
             ** 0.5
         )
 
-        field_kspace *= np.exp(1j*phase)
+        field_kspace *= np.exp(1j * phase)
 
         # Transform back to the spatial domain
         field, _ = fft(
@@ -198,9 +198,9 @@ class AngularSpectrumPropagator(Propagator):
         n = self.n(2 * np.pi * c / omega) if callable(self.n) else self.n
 
         # Calculate the phase shift in k-space
-        phase = (distance * n * kz[None, None, :])
+        phase = distance * n * kz[None, None, :]
 
-        field_propagated = field * np.exp(1j*phase)
+        field_propagated = field * np.exp(1j * phase)
 
         return field_propagated
 
@@ -215,8 +215,10 @@ class AngularSpectrumPropagator(Propagator):
             Angular frequency array on which the propagated pulse is defined.
         """
         if callable(self.n):
-            n_omega = lambda om: self.n(2*np.pi*c/om)
-            dndom = derivative(n_omega, self.omega0, initial_step=self.omega0*0.1)['df']
+            n_omega = lambda om: self.n(2 * np.pi * c / om)
+            dndom = derivative(n_omega, self.omega0, initial_step=self.omega0 * 0.1)[
+                "df"
+            ]
             n0 = n_omega(self.omega0)
 
         elif np.ndim(self.n) > 0:
@@ -231,7 +233,7 @@ class AngularSpectrumPropagator(Propagator):
         self.v_group = c / (n0 + self.omega0 * dndom)
 
     def _compensate_group_delay(self, field, distance, omega):
-        """compensate the group delay of a pulse and calculate group delay relative to vacuum propagation.
+        """Compensate the group delay of a pulse and calculate group delay relative to vacuum propagation.
 
         Parameters
         ----------
@@ -250,7 +252,7 @@ class AngularSpectrumPropagator(Propagator):
             Time difference between propagation in vacuum and in medium.
         """
         # compensate group delay to keep pulse centered in grid
-        if not hasattr(self, 'v_group'):
+        if not hasattr(self, "v_group"):
             self._calc_group_velocity(self.n, omega)
 
         gd = distance / self.v_group

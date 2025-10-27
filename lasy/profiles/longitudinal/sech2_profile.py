@@ -36,7 +36,7 @@ class Sech2Profile(LongitudinalProfile):
 
     def __init__(self, wavelength, tau, t_peak, cep_phase=0):
         super().__init__(wavelength)
-        self.tau = tau 
+        self.tau = tau
         self.t_peak = t_peak
         self.cep_phase = cep_phase
 
@@ -55,7 +55,9 @@ class Sech2Profile(LongitudinalProfile):
             Contains the value of the longitudinal envelope at the
             specified points. This array has the same shape as the array t.
         """
-        envelope = (1 / np.cosh(t / self.tau) 
-                    * np.exp(1.0j * (self.cep_phase 
-                                     + self.omega0 * self.t_peak)))
+        envelope = (
+            1
+            / np.cosh(t / self.tau)
+            * np.exp(1.0j * (self.cep_phase + self.omega0 * self.t_peak))
+        )
         return envelope

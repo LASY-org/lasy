@@ -641,7 +641,7 @@ def get_duration(grid, dim, level=None):
     weights = np.sum(weights, axis=(0, 1))
 
     max_loc = np.argmax(weights)
-    weights = np.roll(weights, weights.size//2-max_loc)
+    weights = np.roll(weights, weights.size // 2 - max_loc)
 
     if level:
         duration = width_at_level(values=weights, width_axis=grid.axes[-1], level=level)
@@ -688,13 +688,13 @@ def width_at_level(values, width_axis, level=0.5):
     # calculate positions of lower and upper bounds
     lower_bound = np.interp(
         threshold,
-        spectral_intensity[i_min - 1:i_min + 1],
-        width_axis[i_min - 1:i_min + 1],
+        spectral_intensity[i_min - 1 : i_min + 1],
+        width_axis[i_min - 1 : i_min + 1],
     )
     upper_bound = np.interp(
         threshold,
-        spectral_intensity[i_max:i_max + 2][::-1],
-        width_axis[i_max:i_max + 2][::-1],
+        spectral_intensity[i_max : i_max + 2][::-1],
+        width_axis[i_max : i_max + 2][::-1],
     )
 
     # calculate width
@@ -1602,4 +1602,3 @@ def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None
         bandwidth = weighted_std(width_axis, spectral_intensity)
 
     return bandwidth
-
