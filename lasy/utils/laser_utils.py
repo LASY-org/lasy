@@ -606,7 +606,7 @@ def get_frequency(
 
 
 def get_duration(grid, dim, level=None):
-    """Get duration of the intensity of the envelope, measured as RMS.
+    """Get duration of the intensity of the envelope, measured as RMS by default.
 
     Parameters
     ----------
@@ -621,10 +621,14 @@ def get_duration(grid, dim, level=None):
         - ``'rt'`` : The laser pulse is represented on a 2D grid:
                     Cylindrical (r) transversely, and temporal (t) longitudinally.
 
+    level : float (Optional)
+        The intensity level at which the duration should be calculated.
+        If no value is given, the RMS duration is calculated.
+
     Returns
     -------
     float
-        RMS duration of the envelope intensity in seconds.
+        Duration of the envelope intensity in seconds.
     """
     # Calculate weights of each grid cell (amplitude of the field).
     dV = get_grid_cell_volume(grid, dim)
