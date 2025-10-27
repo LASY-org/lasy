@@ -215,9 +215,10 @@ class AngularSpectrumPropagator(Propagator):
             Angular frequency array on which the propagated pulse is defined.
         """
         if callable(self.n):
+
             def n_omega(om):
                 return self.n(2 * np.pi * c / om)
-            
+
             dndom = derivative(n_omega, self.omega0, initial_step=self.omega0 * 0.1)[
                 "df"
             ]
