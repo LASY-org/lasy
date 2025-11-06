@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   gpu_unittest:
-    runs-on: desy-gpu-runner-lasy
+    runs-on: desy-runner
     if: github.repository_owner == 'LASY-org'
     container:
       image: nvcr.io/nvidia/cuda:12.6.3-devel-ubuntu22.04
