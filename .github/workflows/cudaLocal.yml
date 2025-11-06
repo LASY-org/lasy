@@ -7,13 +7,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  unittest:
+  gpu_unittest:
     runs-on: desy-gpu-runner-lasy
     if: github.repository_owner == 'LASY-org'
     container:
       image: nvcr.io/nvidia/cuda:12.6.3-devel-ubuntu22.04
-    runs-on: ${{ matrix.os }}
-
     steps:
     - uses: actions/checkout@v4
 
