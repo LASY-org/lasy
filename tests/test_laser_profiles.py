@@ -381,7 +381,7 @@ def test_from_array_profile():
     wx = 3.0e-6
     wy = 5.0e-6
     tau = 5.0e-15
-    E = 1j * e0 * np.exp(-(X**2) / wx**2 - Y**2 / wy**2 - t**2 / tau**2)
+    E = e0 * np.exp(-(X**2) / wx**2 - Y**2 / wy**2 - t**2 / tau**2) * np.exp(0.0j)
     wavelength = 0.8e-6
     pol = (1, 0)
     axes = {"x": x, "y": y, "t": t}
