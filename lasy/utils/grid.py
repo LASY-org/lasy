@@ -267,13 +267,13 @@ class Grid:
         if use_cupy:
             self.get_temporal_field()
 
-            c = copy.copy(self)
+            grid_copy = copy.copy(self)
 
-            c.temporal_field = to_cpu(self.temporal_field)
-            c.axes = to_cpu(self.axes)
+            grid_copy.temporal_field = to_cpu(self.temporal_field)
+            grid_copy.axes = to_cpu(self.axes)
             if hasattr(self, "azimuthal_modes"):
-                c.azimuthal_modes = to_cpu(self.azimuthal_modes)
+                grid_copy.azimuthal_modes = to_cpu(self.azimuthal_modes)
 
-            return c
+            return grid_copy
         else:
             return self
