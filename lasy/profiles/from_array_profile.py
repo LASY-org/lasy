@@ -73,7 +73,6 @@ class FromArrayProfile(Profile):
             if axes["r"][0] != 0.0:
                 # add mirrored point to the axis
                 r = xp.concatenate((-axes["r"][[0]], axes["r"]))
-                #r = xp.concatenate((xp.array([-axes["r"][0]]), axes["r"]))
                 # takes first element of the array in the radial dimension
                 subarray = self.array[:, 0, :]
                 # add it at the beginning to be the value at the mirrored point
