@@ -17,7 +17,7 @@ with open("./tests/requirements.txt") as f:
 setup(
     name="lasy",
     version=lasy.__version__,
-    packages=find_packages("."),    
+    packages=find_packages("."),
     include_package_data=True,
     package_data={
         "lasy": ["**/*.json"],
