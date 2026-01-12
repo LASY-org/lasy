@@ -87,7 +87,7 @@ def write_to_openpmd_file(
         m.axis_labels = ["t", "r"]
 
     # Store metadata needed to reconstruct the field
-    m.set_attribute("angularFrequency", 2 * xp.pi * c / wavelength)
+    m.set_attribute("angularFrequency", to_cpu(2 * xp.pi * c / wavelength))
     m.set_attribute("polarization", to_cpu(pol))
     if save_as_vector_potential:
         m.set_attribute("envelopeField", "normalized_vector_potential")
