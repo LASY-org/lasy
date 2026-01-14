@@ -1,7 +1,7 @@
-import numpy as np
 import openpmd_api as io
 from scipy.constants import c
 
+from lasy.backend import xp
 from lasy.utils.laser_utils import (
     create_grid,
     field_to_envelope,
@@ -39,9 +39,9 @@ class FromOpenPMDProfile(FromArrayProfile):
 
     def __init__(self, file_name, envelope_name=None, iteration=None, verbose=False):
         series = io.Series(file_name, io.Access.read_only)
-        iterations = np.array(series.iterations)
+        iterations = xp.array(series.iterations)
         if iteration is None:
-            iteration = iterations[-1]
+            iteration = int(iterations[-1])
         elif iteration not in iterations:
             raise ValueError(
                 f"Iteration {iteration} not found in openPMD file {file_name}.\n"
@@ -97,7 +97,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             array_list = convert_modes(array_list, geometry, is_envelope, verbose)
             dim = "xyt" if geometry == "cartesian" else "rt"
             # Detect whether Ex (index 0) or Ey (index 1) is strongest (major)
-            if np.max(np.abs(array_list[0])) >= np.max(np.abs(array_list[1])):
+            if xp.max(xp.abs(array_list[0])) >= xp.max(xp.abs(array_list[1])):
                 imajor = 0
             else:
                 imajor = 1
@@ -113,7 +113,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             env_array_list[imajor] = grid_major.get_temporal_field()
             env_array_list[iminor] = grid_minor.get_temporal_field()
             array, pol = isolate_polarization(env_array_list, dim)
-        wavelength = 2 * np.pi * c / omg0
+        wavelength = 2 * xp.pi * c / omg0
 
         super().__init__(
             wavelength=wavelength,

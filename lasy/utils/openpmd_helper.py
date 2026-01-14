@@ -1,10 +1,10 @@
 import os
 
-import numpy as np
 import openpmd_api as io
 from scipy.constants import c
 
 from lasy import __version__ as lasy_version
+from lasy.backend import to_cpu, to_gpu, xp
 
 from .laser_utils import field_to_vector_potential
 
@@ -87,8 +87,8 @@ def write_to_openpmd_file(
         m.axis_labels = ["t", "r"]
 
     # Store metadata needed to reconstruct the field
-    m.set_attribute("angularFrequency", 2 * np.pi * c / wavelength)
-    m.set_attribute("polarization", pol)
+    m.set_attribute("angularFrequency", 2 * xp.pi * c / wavelength)
+    m.set_attribute("polarization", to_cpu(pol))
     if save_as_vector_potential:
         m.set_attribute("envelopeField", "normalized_vector_potential")
         m.unit_dimension = {}
@@ -102,21 +102,21 @@ def write_to_openpmd_file(
         }
 
     if save_as_vector_potential:
-        array = field_to_vector_potential(grid, 2 * np.pi * c / wavelength)
+        array = field_to_vector_potential(grid, 2 * xp.pi * c / wavelength)
 
     # Pick the correct field
     assert dim in ["xyt", "rt"]
     if dim == "xyt":
         # Switch from x,y,t (internal to lasy) to t,y,x (in openPMD file)
         # This is because many PIC codes expect x to be the fastest index
-        data = np.transpose(array).copy()
+        data = xp.transpose(array).copy()
     else:  # dim == "rt"
         # The representation of modes in openPMD
         # (see https://github.com/openPMD/openPMD-standard/blob/latest/STANDARD.md#required-attributes-for-each-mesh-record)
         # is different than the representation of modes internal to lasy.
         # Thus, there is a non-trivial conversion here
         ncomp = 2 * grid.n_azimuthal_modes - 1
-        data = np.zeros((ncomp, grid.npoints[0], grid.npoints[1]), dtype=array.dtype)
+        data = xp.zeros((ncomp, grid.npoints[0], grid.npoints[1]), dtype=array.dtype)
         data[0, :, :] = array[0, :, :]
         for mode in range(1, grid.n_azimuthal_modes):
             # cos(m*theta) part of the mode
@@ -125,14 +125,14 @@ def write_to_openpmd_file(
             data[2 * mode, :, :] = -1.0j * array[mode, :, :] + 1.0j * array[-mode, :, :]
         # Switch from m,r,t (internal to lasy) to m,t,r (in openPMD file)
         # This is because many PIC codes expect r to be the fastest index
-        data = np.transpose(data, axes=[0, 2, 1]).copy()
+        data = xp.transpose(data, axes=[0, 2, 1]).copy()
 
     # Define the dataset
     dataset = io.Dataset(data.dtype, data.shape)
     env = m[io.Mesh_Record_Component.SCALAR]
-    env.position = np.zeros(len(dim), dtype=np.float64)
+    env.position = to_cpu(xp.zeros(len(dim), dtype=xp.float64))
     env.reset_dataset(dataset)
-    env.store_chunk(data)
+    env.store_chunk(to_cpu(data))
 
     series.flush()
     series.close()
@@ -169,10 +169,10 @@ def extract_array(m, series, component=None):
 
     """
     if component is not None:
-        array = m[component].load_chunk()
+        array = to_gpu(m[component].load_chunk())
         position = m[component].get_attribute("position")
     else:
-        array = m[io.Mesh_Record_Component.SCALAR].load_chunk()
+        array = to_gpu(m[io.Mesh_Record_Component.SCALAR].load_chunk())
         position = m.get_attribute("position")
     series.flush()
     # node (0.0) or cell (0.5) centered info for each axis
@@ -198,7 +198,7 @@ def extract_array(m, series, component=None):
     for idx, label in enumerate(axis_labels):
         # Define the axis array
         N = array.shape[idx + idx_offset]
-        axis = np.linspace(
+        axis = xp.linspace(
             grid_offset[idx] + position[idx] * grid_spacing[idx],
             grid_offset[idx] + (N - 1 + position[idx]) * grid_spacing[idx],
             N,
@@ -206,7 +206,7 @@ def extract_array(m, series, component=None):
         # If label is `z`, change it to `t`
         if label == "z":
             axis = (axis - axis[0]) / c
-            array = np.flip(array, axis=idx + idx_offset)
+            array = xp.flip(array, axis=idx + idx_offset)
             label = "t"
 
         # Add axis to the dictionary and label to the list
@@ -216,7 +216,7 @@ def extract_array(m, series, component=None):
     # Set to LASY order here, time is last axis.
     if axes_order[0] == "t":
         axes_order = axes_order[::-1]
-        array = np.swapaxes(array, idx_offset, 2)
+        array = xp.swapaxes(array, idx_offset, 2)
 
     return axes_order, axes, array
 
@@ -260,9 +260,9 @@ def convert_modes(arr_list, geometry, is_env, verbose=False):
         print("nmodes_in:", nmodes_in)
     if is_env:
         assert len(arr_list) == 1
-        assert np.iscomplexobj(arr_list[0])
+        assert xp.iscomplexobj(arr_list[0])
         array_in = arr_list[0]
-        array_out = np.zeros_like(arr_list[0], dtype="complex128")
+        array_out = xp.zeros_like(arr_list[0], dtype="complex128")
         array_out[0, :, :] = array_in[0, :, :]
         # The data is already Ex, we simply to convert from
         # cos(m*theta) and sin(m*theta) to exp(i*m*theta).
@@ -278,15 +278,15 @@ def convert_modes(arr_list, geometry, is_env, verbose=False):
         # arr_list contains 2 elements, Er and Etheta, that need to be
         # combined into Ex. At this point, still operating on full field.
         assert len(arr_list) == 2
-        assert np.isrealobj(arr_list[0]) and np.isrealobj(arr_list[1])
+        assert xp.isrealobj(arr_list[0]) and xp.isrealobj(arr_list[1])
         Er_in = arr_list[0]
         Et_in = arr_list[1]
 
         nmodes_out = nmodes_in - 1
         if verbose:
             print("nmodes_out:", nmodes_in)
-        Ex_out = np.zeros(shape=(2 * nmodes_out - 1, *Er_in.shape[1:]))
-        Ey_out = np.zeros(shape=(2 * nmodes_out - 1, *Er_in.shape[1:]))
+        Ex_out = xp.zeros(shape=(2 * nmodes_out - 1, *Er_in.shape[1:]))
+        Ey_out = xp.zeros(shape=(2 * nmodes_out - 1, *Er_in.shape[1:]))
         # The _in arrays have real and imag parts separated, so we add them
         # together by hand
         for imode in range(nmodes_out):
@@ -343,15 +343,15 @@ def isolate_polarization(arrays, dim):
         )
         Ex = Ex[0]
         Ey = Ey[0]
-    rho2 = np.abs(Ex) ** 2 + np.abs(Ey) ** 2
+    rho2 = xp.abs(Ex) ** 2 + xp.abs(Ey) ** 2
     # Amplitude of polarization vectors
-    rho_x = np.sqrt(np.sum(np.abs(Ex) ** 2) / np.sum(rho2))
-    rho_y = np.sqrt(np.sum(np.abs(Ey) ** 2) / np.sum(rho2))
+    rho_x = xp.sqrt(xp.sum(xp.abs(Ex) ** 2) / xp.sum(rho2))
+    rho_y = xp.sqrt(xp.sum(xp.abs(Ey) ** 2) / xp.sum(rho2))
     # Phase in x is assumed 0. This is a convention.
     phi_x = 0
-    phi_y = np.average(np.angle(Ey) - np.angle(Ex), weights=rho2)
-    px = rho_x * np.exp(1j * phi_x)
-    py = rho_y * np.exp(1j * phi_y)
+    phi_y = xp.average(xp.angle(Ey) - xp.angle(Ex), weights=rho2)
+    px = rho_x * xp.exp(1j * phi_x)
+    py = rho_y * xp.exp(1j * phi_y)
     pol = (px, py)
     print("polarization state detected: (px, py) =", pol)
     array = arrays[0] / px if rho_x >= rho_y else arrays[1] / py

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import numpy as np
 import pytest
 from scipy.constants import c
 
+from lasy.backend import xp
 from lasy.laser import Laser
 from lasy.profiles.gaussian_profile import GaussianProfile
 from lasy.utils.laser_utils import export_to_z, import_from_z
@@ -28,21 +28,21 @@ def get_laser_z_analytic(profile, z_axis, r_axis):
     tau = profile.tau
     omega0 = profile.omega0
     k0 = omega0 / c
-    lambda0 = 2 * np.pi / k0
+    lambda0 = 2 * xp.pi / k0
 
-    L_Ray = np.pi * w0**2 / lambda0
+    L_Ray = xp.pi * w0**2 / lambda0
     z_axis_2d = z_axis[None, :]
     r_axis_2d = r_axis[:, None]
-    w0_z = w0 * np.sqrt(1 + (z_axis_2d / L_Ray) ** 2)
+    w0_z = w0 * xp.sqrt(1 + (z_axis_2d / L_Ray) ** 2)
     R_z_inv = z_axis_2d / (z_axis_2d**2 + L_Ray**2)
-    phi_gouy = np.arctan2(z_axis_2d, L_Ray)
+    phi_gouy = xp.arctan2(z_axis_2d, L_Ray)
 
     Field = (
         w0
         / w0_z
-        * np.exp(-(r_axis_2d**2) / w0_z**2)
-        * np.exp(-(z_axis_2d**2) / (c * tau) ** 2)
-        * np.exp(1j * (k0 * r_axis_2d**2 * R_z_inv / 2 - phi_gouy))
+        * xp.exp(-(r_axis_2d**2) / w0_z**2)
+        * xp.exp(-(z_axis_2d**2) / (c * tau) ** 2)
+        * xp.exp(1j * (k0 * r_axis_2d**2 * R_z_inv / 2 - phi_gouy))
     )
 
     return Field
@@ -61,9 +61,9 @@ def check_correctness(laser_t_in, laser_t_out, laser_z_analytic, z_axis):
     laser_t_out_2d = field[ind0]
     laser_z_2d = laser_z[ind0]
 
-    assert np.allclose(laser_t_in_2d, laser_t_out_2d, atol=2e-7, rtol=0)
+    assert xp.allclose(laser_t_in_2d, laser_t_out_2d, atol=2e-7, rtol=0)
 
-    assert np.allclose(laser_z_2d, laser_z_analytic, atol=1e-3, rtol=0)
+    assert xp.allclose(laser_z_2d, laser_z_analytic, atol=1e-3, rtol=0)
 
 
 def test_RT_case(gaussian):
@@ -103,7 +103,7 @@ def test_3D_case(gaussian):
     laser_t_out.normalize(1.0, "field")
 
     t_axis = laser_t_in.grid.axes[-1]
-    r_axis = np.abs(laser_t_in.grid.axes[1])
+    r_axis = xp.abs(laser_t_in.grid.axes[1])
     z_axis = t_axis * c
 
     laser_z_analytic = get_laser_z_analytic(gaussian, z_axis, r_axis)

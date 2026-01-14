@@ -1,8 +1,6 @@
-import numpy as np
-from scipy.constants import c
-
+from lasy.backend import xp
 from lasy.utils.zernike import zernike
-
+from scipy.constants import c
 from .optical_element import OpticalElement
 
 
@@ -60,8 +58,8 @@ class ZernikeAberrations(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        rr = np.sqrt(x**2 + y**2)
-        phase = np.zeros_like(rr)
+        rr = xp.sqrt(x**2 + y**2)
+        phase = xp.zeros_like(rr)
 
         for j in list(self.zernike_amplitudes):
             phase += self.zernike_amplitudes[j] * zernike(x, y, self.pupil_coords, j)

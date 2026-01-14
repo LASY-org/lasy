@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .optical_element import OpticalElement
 
@@ -44,12 +44,12 @@ class SpectralFilter(OpticalElement):
         """
         # Sort the transmission function and angular frequencies to
         # eliminate problems with interpolation (e.g. due to fftshifted data)
-        order = np.argsort(self.omega_in)
+        order = xp.argsort(self.omega_in)
         self.omega_in = self.omega_in[order]
         self.transmission = self.transmission[order]
 
         # interpolate transmission function to omega axis of the laser
-        transmission = np.interp(omega, self.omega_in, self.transmission)
+        transmission = xp.interp(omega, self.omega_in, self.transmission)
 
         # return the square root of the energy/intensity transmission
-        return np.sqrt(transmission)
+        return xp.sqrt(transmission)
