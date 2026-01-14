@@ -1,6 +1,6 @@
 import math
 
-from lasy.backend import to_cpu, xp
+from lasy.backend import xp
 
 
 def get_zernike_nm(j):

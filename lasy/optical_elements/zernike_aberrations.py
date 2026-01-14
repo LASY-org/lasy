@@ -1,6 +1,8 @@
+from scipy.constants import c
+
 from lasy.backend import xp
 from lasy.utils.zernike import zernike
-from scipy.constants import c
+
 from .optical_element import OpticalElement
 
 
