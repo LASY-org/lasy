@@ -22,7 +22,7 @@ if lasy_backend == "AUTO":
     except Exception:
         lasy_backend = "NP"
 
-print("LASY: using backend", lasy_backend) # py/print-during-import
+print("LASY: using backend", lasy_backend)  # py/print-during-import
 
 if lasy_backend == "CP":
     if not cupy_imported:
