@@ -11,9 +11,6 @@ if "LASY_BACKEND" in os.environ:
 if lasy_backend == "AUTO":
     try:
         import cupy
-        import cupyx.scipy.interpolate
-        import cupyx.scipy.signal
-        import cupyx.scipy.special
 
         # xp.is_available() might cause a CUDARuntimeError
         lasy_backend = "CP" if cupy.is_available() else "NP"
