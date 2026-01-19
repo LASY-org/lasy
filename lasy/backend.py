@@ -18,7 +18,7 @@ if lasy_backend == "AUTO":
         # xp.is_available() might cause a CUDARuntimeError
         lasy_backend = "CP" if xp.is_available() else "NP"
 
-        xp, RegularGridInterpolator, hilbert, zoom_fft, j0 # workaround for pyflakes
+        xp, RegularGridInterpolator, hilbert, zoom_fft, j0  # workaround for pyflakes
     except Exception:
         lasy_backend = "NP"
 
