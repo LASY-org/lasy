@@ -11,10 +11,10 @@ if "LASY_BACKEND" in os.environ:
 cupy_imported = False
 if lasy_backend == "AUTO":
     try:
-        import cupy as xp
-        from cupyx.scipy.interpolate import RegularGridInterpolator
-        from cupyx.scipy.signal import hilbert, zoom_fft
-        from cupyx.scipy.special import j0
+        import cupy as xp  # NOLINT
+        from cupyx.scipy.interpolate import RegularGridInterpolator  # NOLINT
+        from cupyx.scipy.signal import hilbert, zoom_fft  # NOLINT
+        from cupyx.scipy.special import j0  # NOLINT
 
         # xp.is_available() might cause a CUDARuntimeError
         lasy_backend = "CP" if xp.is_available() else "NP"
@@ -22,7 +22,7 @@ if lasy_backend == "AUTO":
     except Exception:
         lasy_backend = "NP"
 
-print("LASY: using backend", lasy_backend)  # py/print-during-import
+print("LASY: using backend", lasy_backend)  # NOLINT
 
 if lasy_backend == "CP":
     if not cupy_imported:
