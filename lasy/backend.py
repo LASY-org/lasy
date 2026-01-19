@@ -2,9 +2,10 @@ import os
 
 lasy_backend = "AUTO"
 if "LASY_BACKEND" in os.environ:
-    assert os.environ["LASY_BACKEND"] in ["NP", "CP", "AUTO"], \
-        "The enviroment variable 'LASY_BACKEND' must be one of " + \
-        "'NP' (NumPy), 'CP' (CuPy) or 'AUTO'!"
+    assert os.environ["LASY_BACKEND"] in ["NP", "CP", "AUTO"], (
+        "The enviroment variable 'LASY_BACKEND' must be one of "
+        + "'NP' (NumPy), 'CP' (CuPy) or 'AUTO'!"
+    )
     lasy_backend = os.environ["LASY_BACKEND"]
 
 if lasy_backend == "AUTO":
@@ -13,6 +14,7 @@ if lasy_backend == "AUTO":
         from cupyx.scipy.interpolate import RegularGridInterpolator
         from cupyx.scipy.signal import hilbert, zoom_fft
         from cupyx.scipy.special import j0
+
         # xp.is_available() might cause a CUDARuntimeError
         lasy_backend = "CP" if xp.is_available() else "NP"
     except Exception:
