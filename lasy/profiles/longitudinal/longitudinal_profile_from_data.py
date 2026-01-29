@@ -1,6 +1,6 @@
 from scipy.constants import c
 
-from lasy.backend import xp
+from lasy.backend import xp, to_gpu
 
 from .longitudinal_profile import LongitudinalProfile
 
@@ -70,12 +70,12 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             if "axis_is_wavelength" in data:
                 axis_is_wavelength = data["axis_is_wavelength"]
             if axis_is_wavelength:
-                wavelength = data["axis"]  # Accept as wavelength
-                spectral_intensity = data["intensity"]
+                wavelength = to_gpu(data["axis"])  # Accept as wavelength
+                spectral_intensity = to_gpu(data["intensity"])
             else:
-                wavelength = 2.0 * xp.pi * c / data["axis"]  # Convert to wavelength
+                wavelength = 2.0 * xp.pi * c / to_gpu(data["axis"])  # Convert to wavelength
                 spectral_intensity = (
-                    data["intensity"] * 2.0 * xp.pi * c / wavelength**2
+                    to_gpu(data["intensity"]) * 2.0 * xp.pi * c / wavelength**2
                 )  # Convert spectral data
             assert xp.all(xp.diff(wavelength) > 0) or xp.all(xp.diff(wavelength) < 0), (
                 'data["axis"] must be in monotonically increasing or decreasing order.'
@@ -83,7 +83,7 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             if data.get("phase") is None:
                 spectral_phase = xp.zeros_like(wavelength)
             else:
-                spectral_phase = data["phase"]
+                spectral_phase = to_gpu(data["phase"])
             if xp.all(xp.diff(wavelength) < 0):  # Flip arrays
                 wavelength = wavelength[::-1]
                 spectral_intensity = spectral_intensity[::-1]
@@ -128,12 +128,12 @@ class LongitudinalProfileFromData(LongitudinalProfile):
             temporal_phase -= temporal_phase[xp.argmin(xp.abs(time))]
 
         elif data["datatype"] == "temporal":
-            time = data["axis"]
-            temporal_intensity = data["intensity"]
+            time = to_gpu(data["axis"])
+            temporal_intensity = to_gpu(data["intensity"])
             if data.get("phase") is None:
                 temporal_phase = xp.zeros_like(time)
             else:
-                temporal_phase = data["phase"]
+                temporal_phase = to_gpu(data["phase"])
             cwl = data["wavelength"]
 
         else:
