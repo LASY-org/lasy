@@ -1,4 +1,4 @@
-from lasy.backend import RegularGridInterpolator, xp
+from lasy.backend import RegularGridInterpolator, xp, to_gpu
 from lasy.utils.exp_data_utils import find_center_of_mass
 
 from .transverse_profile import TransverseProfile
@@ -44,7 +44,7 @@ class TransverseProfileFromData(TransverseProfile):
     def __init__(self, intensity_data, lo, hi, center_data=True):
         super().__init__()
 
-        intensity_data = intensity_data.astype("float64")
+        intensity_data = to_gpu(intensity_data.astype("float64"))
 
         n_y, n_x = xp.shape(intensity_data)
 
