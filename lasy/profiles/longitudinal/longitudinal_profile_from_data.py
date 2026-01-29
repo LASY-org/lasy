@@ -1,6 +1,6 @@
 from scipy.constants import c
 
-from lasy.backend import xp, to_gpu
+from lasy.backend import to_gpu, xp
 
 from .longitudinal_profile import LongitudinalProfile
 
@@ -73,7 +73,9 @@ class LongitudinalProfileFromData(LongitudinalProfile):
                 wavelength = to_gpu(data["axis"])  # Accept as wavelength
                 spectral_intensity = to_gpu(data["intensity"])
             else:
-                wavelength = 2.0 * xp.pi * c / to_gpu(data["axis"])  # Convert to wavelength
+                wavelength = (
+                    2.0 * xp.pi * c / to_gpu(data["axis"])
+                )  # Convert to wavelength
                 spectral_intensity = (
                     to_gpu(data["intensity"]) * 2.0 * xp.pi * c / wavelength**2
                 )  # Convert spectral data
