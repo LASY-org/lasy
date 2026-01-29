@@ -1,4 +1,4 @@
-from lasy.backend import RegularGridInterpolator, xp, to_gpu
+from lasy.backend import RegularGridInterpolator, to_gpu, xp
 from lasy.utils.exp_data_utils import find_center_of_mass
 
 from .transverse_profile import TransverseProfile
