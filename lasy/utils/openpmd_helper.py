@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 
 import openpmd_api as io
 from scipy.constants import c
@@ -65,7 +66,7 @@ def write_to_openpmd_file(
     full_filepath = os.path.join(
         write_dir, "{}_%05T.{}".format(file_prefix, file_format)
     )
-    
+
     os.makedirs(write_dir, exist_ok=True)
     series = io.Series(full_filepath, io.Access.create)
     series.set_software("lasy", lasy_version)
@@ -84,9 +85,11 @@ def write_to_openpmd_file(
         if save_as_vector_potential:
             sys.exit("Cannot convert CW laser field to vector potential.")
         else:
-            m.grid_spacing = [ 
+            m.grid_spacing = [
                 (hi - lo) / (npoints - 1)
-                for hi, lo, npoints in zip(grid.hi[0:2], grid.lo[0:2], grid.npoints[0:2])
+                for hi, lo, npoints in zip(
+                    grid.hi[0:2], grid.lo[0:2], grid.npoints[0:2]
+                )
             ][::-1]
     m.grid_global_offset = grid.lo[::-1]
     m.grid_global_offset[0] += grid.position / c
