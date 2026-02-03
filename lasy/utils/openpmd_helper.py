@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 import openpmd_api as io
 from scipy.constants import c
@@ -65,6 +65,7 @@ def write_to_openpmd_file(
     full_filepath = os.path.join(
         write_dir, "{}_%05T.{}".format(file_prefix, file_format)
     )
+    
     os.makedirs(write_dir, exist_ok=True)
     series = io.Series(full_filepath, io.Access.create)
     series.set_software("lasy", lasy_version)
@@ -73,10 +74,20 @@ def write_to_openpmd_file(
 
     # Define the mesh
     m = i.meshes["laserEnvelope"]
-    m.grid_spacing = [
-        (hi - lo) / (npoints - 1)
-        for hi, lo, npoints in zip(grid.hi, grid.lo, grid.npoints)
-    ][::-1]
+    try:
+        m.grid_spacing = [
+            (hi - lo) / (npoints - 1)
+            for hi, lo, npoints in zip(grid.hi, grid.lo, grid.npoints)
+        ][::-1]
+    except:
+        print("Warning: Exporting CW laser to openPMD.")
+        if save_as_vector_potential:
+            sys.exit("Cannot convert CW laser field to vector potential.")
+        else:
+            m.grid_spacing = [ 
+                (hi - lo) / (npoints - 1)
+                for hi, lo, npoints in zip(grid.hi[0:2], grid.lo[0:2], grid.npoints[0:2])
+            ][::-1]
     m.grid_global_offset = grid.lo[::-1]
     m.grid_global_offset[0] += grid.position / c
     if dim == "xyt":
