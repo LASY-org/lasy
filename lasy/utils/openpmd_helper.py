@@ -80,7 +80,7 @@ def write_to_openpmd_file(
             (hi - lo) / (npoints - 1)
             for hi, lo, npoints in zip(grid.hi, grid.lo, grid.npoints)
         ][::-1]
-    except:
+    except ZeroDivisionError:
         print("Warning: Exporting CW laser to openPMD.")
         if save_as_vector_potential:
             sys.exit("Cannot convert CW laser field to vector potential.")
