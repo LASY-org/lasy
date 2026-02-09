@@ -19,6 +19,8 @@ def write_to_openpmd_file(
     grid,
     wavelength,
     pol,
+    is_cw,
+    is_plane_wave,
     save_as_vector_potential=False,
 ):
     """
@@ -56,6 +58,12 @@ def write_to_openpmd_file(
     pol : list of 2 complex numbers
         Polarization vector that multiplies array to get the Ex and Ey arrays.
 
+    is_cw : bool
+        Whether the laser is a continuous wave.
+
+    is_plane_wave : bool
+        Whether the laser is a plane wave.
+
     save_as_vector_potential : bool (optional)
         Whether the envelope is converted to normalized vector potential
         before writing to file.
@@ -75,12 +83,14 @@ def write_to_openpmd_file(
 
     # Define the mesh
     m = i.meshes["laserEnvelope"]
-    try:
+
+    if not is_cw and not is_plane_wave:
+        # If the laser is not CW and not plane wave, we can export the full field
         m.grid_spacing = [
             (hi - lo) / (npoints - 1)
             for hi, lo, npoints in zip(grid.hi, grid.lo, grid.npoints)
         ][::-1]
-    except ZeroDivisionError:
+    elif is_cw and not is_plane_wave:
         print("Warning: Exporting CW laser to openPMD.")
         if save_as_vector_potential:
             sys.exit("Cannot convert CW laser field to vector potential.")
@@ -91,6 +101,12 @@ def write_to_openpmd_file(
                     grid.hi[0:2], grid.lo[0:2], grid.npoints[0:2]
                 )
             ][::-1]
+    else:  # is_plane_wave
+        print("Warning: Exporting plane wave laser to openPMD.")
+        if save_as_vector_potential:
+            sys.exit("Cannot convert plane wave laser field to vector potential.")
+        else:
+            m.grid_spacing = [(grid.hi[-1] - grid.lo[-1]) / (grid.npoints[-1] - 1)]
     m.grid_global_offset = grid.lo[::-1]
     m.grid_global_offset[0] += grid.position / c
     if dim == "xyt":

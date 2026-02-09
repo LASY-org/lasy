@@ -300,6 +300,8 @@ class Laser:
             self.grid,
             self.profile.lambda0,
             self.profile.pol,
+            self.profile.is_cw,
+            self.profile.is_plane_wave,
             save_as_vector_potential,
         )
         self.output_iteration += 1
