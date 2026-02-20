@@ -72,7 +72,7 @@ class FromArrayProfile(Profile):
             # to make correct interpolation within the first cell
             if axes["r"][0] != 0.0:
                 # add mirrored point to the axis
-                r = xp.concatenate(([-axes["r"][0]], axes["r"]))
+                r = xp.concatenate((-axes["r"][[0]], axes["r"]))
                 # takes first element of the array in the radial dimension
                 subarray = self.array[:, 0, :]
                 # add it at the beginning to be the value at the mirrored point
@@ -94,7 +94,7 @@ class FromArrayProfile(Profile):
                     RegularGridInterpolator(
                         (r, axes["t"]),
                         xp.abs(self.array[imode, :, :])
-                        + 1.0j * xp.unwrap(xp.angle(self.array[imode, :, :]), axis=-1),
+                        + 1.0j * xp.unwrap(xp.angle(self.array[imode, :, :]), axis=0),
                         bounds_error=False,
                         fill_value=0.0,
                     )
