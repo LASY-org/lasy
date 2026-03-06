@@ -101,10 +101,10 @@ def RmnGenerator(n, m, rho):
         k = xp.linspace(0, int((n - m) / 2), int((n - m) / 2) + 1).astype(int)
         Rmn = xp.zeros_like(rho)
         for i in k:
-            Rmn = Rmn + ((-1) ** i * math.factorial(n - i)) / (
-                math.factorial(i)
-                * math.factorial(int((n + m) / 2) - i)
-                * math.factorial(int((n - m) / 2) - i)
+            Rmn = Rmn + ((-1) ** i * math.factorial(int(n - i))) / (
+                math.factorial(int(i))
+                * math.factorial(int((n + m) / 2) - int(i))
+                * math.factorial(int((n - m) / 2) - int(i))
             ) * rho ** (n - 2 * i)
 
     else:
