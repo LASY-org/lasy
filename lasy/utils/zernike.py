@@ -1,6 +1,6 @@
 import math
 
-from lasy.backend import to_cpu, xp
+from lasy.backend import xp
 
 
 def get_zernike_nm(j):
@@ -95,26 +95,12 @@ def RmnGenerator(n, m, rho):
         The radial component of the Zernike mode
     """
     if n == 0:
-        if len(rho.shape) == 1:
-            (r,) = rho.shape
-            Rmn = xp.ones(
-                r,
-            )
-        else:
-            r, c = rho.shape
-            Rmn = xp.ones((r, c))
+        Rmn = xp.ones_like(rho)
     elif (n - m) % 2 == 0:
         # Even, Rmn is not 0
         k = xp.linspace(0, int((n - m) / 2), int((n - m) / 2) + 1).astype(int)
-        if len(rho.shape) == 1:
-            (r,) = rho.shape
-            Rmn = xp.zeros(
-                r,
-            )
-        else:
-            r, c = rho.shape
-            Rmn = xp.zeros((r, c))
-        for i in to_cpu(k):
+        Rmn = xp.zeros_like(rho)
+        for i in k:
             Rmn = Rmn + ((-1) ** i * math.factorial(n - i)) / (
                 math.factorial(i)
                 * math.factorial(int((n + m) / 2) - i)
@@ -122,13 +108,6 @@ def RmnGenerator(n, m, rho):
             ) * rho ** (n - 2 * i)
 
     else:
-        if len(rho.shape) == 1:
-            (r,) = rho.shape
-            Rmn = xp.zeros(
-                r,
-            )
-        else:
-            r, c = rho.shape
-            Rmn = xp.zeros((r, c))
+        Rmn = xp.zeros_like(rho)
 
     return Rmn

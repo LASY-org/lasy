@@ -870,7 +870,7 @@ def create_grid(array, axes, dim, is_envelope=True, position=0.0):
             n_azimuthal_modes=nm,
             is_envelope=is_envelope,
         )
-        assert xp.all(grid.axes[0] == axes["r"])
+        assert xp.allclose(grid.axes[0], axes["r"], rtol=1.0e-14)
         assert xp.allclose(grid.axes[1], axes["t"], rtol=1.0e-14)
         assert array.ndim == 3, (
             "Input array should be of dimension 3 [modes, radius, time]"
