@@ -663,7 +663,7 @@ def field_to_vector_potential(grid, omega0):
     return -1j * e * grid.get_temporal_field() / (m_e * omega * c)
 
 
-def vector_potential_to_field(grid, omega0, direct=True):
+def vector_potential_to_field(grid, omega0, direct=False):
     """
     Convert envelope from electric field (V/m) to normalized vector potential.
 
