@@ -1,5 +1,6 @@
-import numpy as np
-import scipy.special as scispe
+from scipy.special import jv
+
+from lasy.backend import to_cpu, to_gpu, xp
 
 from .transverse_profile import TransverseProfile
 
@@ -42,15 +43,13 @@ class JincTransverseProfile(TransverseProfile):
             Contains the value of the envelope at the specified points
             This array has the same shape as the arrays x, y
         """
-        r_over_w0 = np.sqrt(x**2 + y**2) / self.w0
+        r_over_w0 = xp.sqrt(x**2 + y**2) / self.w0
 
-        envelope = np.ones_like(r_over_w0)
+        envelope = 2.0 * to_gpu(jv(1, to_cpu(r_over_w0)))
+
         # Avoid dividing by zero
-        np.divide(
-            2.0 * scispe.jv(1, r_over_w0),
-            r_over_w0,
-            out=envelope,
-            where=r_over_w0 > 0.0,
-        )
+        unsave_dif = r_over_w0 <= 0.0
+        envelope[unsave_dif] = 1
+        r_over_w0[unsave_dif] = 1
 
-        return envelope
+        return envelope / r_over_w0

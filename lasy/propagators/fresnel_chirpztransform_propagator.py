@@ -1,8 +1,8 @@
 import copy
 
-import numpy as np
 from scipy.constants import c
-from scipy.signal import zoom_fft
+
+from lasy.backend import xp, zoom_fft
 
 from .propagator import Propagator
 
@@ -60,13 +60,12 @@ class FresnelChirpZPropagator(Propagator):
 
     Examples
     --------
-    >>> import matplotlib.pyplot as plt
     >>> from lasy.laser import Laser
     >>> from lasy.profiles.gaussian_profile import GaussianProfile
     >>> from lasy.optical_elements import ParabolicMirror
     >>> from lasy.propagators import FresnelChirpZPropagator
     >>> from lasy.utils.grid import Grid
-    >>> import numpy as np
+    >>> from lasy.backend import xp
     >>> # Create profile.
     >>> profile = GaussianProfile(
     ...     wavelength=0.8e-6,  # m
@@ -100,7 +99,7 @@ class FresnelChirpZPropagator(Propagator):
     >>> # Propagate the laser pulse to the focal plane and visualise.
     >>> laser.propagate(focal_length, grid_out=newGrid)
     >>> laser.show(envelope_type="intensity")
-    >>> w0theory = 0.8e-6 * focal_length / (np.pi * 5e-3)
+    >>> w0theory = 0.8e-6 * focal_length / (xp.pi * 5e-3)
     >>> print("w0 theoretical: %.2e m" % (w0theory))
     """
 
@@ -136,10 +135,10 @@ class FresnelChirpZPropagator(Propagator):
         sample_frequency_y = (len(y) - 1) / y_range
 
         # Convert desired frequency from rad/s to Hz
-        freq_x = k_x / 2 / np.pi
-        freq_y = k_y / 2 / np.pi
+        freq_x = k_x / 2 / xp.pi
+        freq_y = k_y / 2 / xp.pi
 
-        FreqX, FreqY = np.meshgrid(
+        FreqX, FreqY = xp.meshgrid(
             freq_x,
             freq_y,
         )
@@ -166,7 +165,7 @@ class FresnelChirpZPropagator(Propagator):
         )
 
         # Apply the phase factor to shift the transform. Similar to a Fourier Transform shift.
-        F *= np.exp(1j * FreqX * np.pi * x_range) * np.exp(1j * FreqY * np.pi * y_range)
+        F *= xp.exp(1j * FreqX * xp.pi * x_range) * xp.exp(1j * FreqY * xp.pi * y_range)
 
         return F
 
@@ -205,10 +204,10 @@ class FresnelChirpZPropagator(Propagator):
         if grid_out is None:
             # Create a new grid for the output if not provided
             grid_out = copy.deepcopy(grid_in)
-            grid_out.set_spectral_field(np.zeros_like(field_in))
+            grid_out.set_spectral_field(xp.zeros_like(field_in))
         field_out = grid_out.spectral_field
         omega += omega0
-        indxs = np.argsort(omega)
+        indxs = xp.argsort(omega)
 
         # Extract the initial and final axes from the grids
         x = grid_in.axes[0]
@@ -216,41 +215,41 @@ class FresnelChirpZPropagator(Propagator):
         xF = grid_out.axes[0]
         yF = grid_out.axes[1]
 
-        assert np.isclose(np.mean(x), 0, atol=1e-8 * np.abs((x[-1] - x[0]))), (
+        assert xp.isclose(xp.mean(x), 0, atol=1e-8 * xp.abs((x[-1] - x[0]))), (
             "Input grid x-axis is not centered around zero."
         )
-        assert np.isclose(np.mean(y), 0, atol=1e-8 * np.abs((y[-1] - y[0]))), (
+        assert xp.isclose(xp.mean(y), 0, atol=1e-8 * xp.abs((y[-1] - y[0]))), (
             "Input grid y-axis is not centered around zero."
         )
-        assert np.isclose(np.mean(xF), 0, atol=1e-8 * np.abs((xF[-1] - xF[0]))), (
+        assert xp.isclose(xp.mean(xF), 0, atol=1e-8 * xp.abs((xF[-1] - xF[0]))), (
             "Output grid x-axis is not centered around zero."
         )
-        assert np.isclose(np.mean(yF), 0, atol=1e-8 * np.abs((yF[-1] - yF[0]))), (
+        assert xp.isclose(xp.mean(yF), 0, atol=1e-8 * xp.abs((yF[-1] - yF[0]))), (
             "Output grid y-axis is not centered around zero."
         )
 
-        X, Y = np.meshgrid(x, y, indexing="ij")
-        XF, YF = np.meshgrid(xF, yF, indexing="ij")
+        X, Y = xp.meshgrid(x, y, indexing="ij")
+        XF, YF = xp.meshgrid(xF, yF, indexing="ij")
 
         for indx in indxs:
             om = omega[indx]
-            wavelength = 2 * np.pi * c / om
+            wavelength = 2 * xp.pi * c / om
             k = om / c
 
-            prefactor = np.exp(1j * k / 2 / distance * (X**2 + Y**2))
+            prefactor = xp.exp(1j * k / 2 / distance * (X**2 + Y**2))
 
             # Calculate the required fourier frequencies from output grid
-            k_x = 2 * np.pi * xF / wavelength / distance
-            k_y = 2 * np.pi * yF / wavelength / distance
+            k_x = 2 * xp.pi * xF / wavelength / distance
+            k_y = 2 * xp.pi * yF / wavelength / distance
 
             # Perform the 2D Zoom FFT
             F = self._zoomFourierTransform2D(
-                x, y, np.squeeze(field_in[:, :, indx]) * prefactor, k_x, k_y
+                x, y, xp.squeeze(field_in[:, :, indx]) * prefactor, k_x, k_y
             )
 
             postFactor = (
-                np.exp(1j * k * distance)
-                * np.exp(1j * k / 2 / distance * (XF**2 + YF**2))
+                xp.exp(1j * k * distance)
+                * xp.exp(1j * k / 2 / distance * (XF**2 + YF**2))
                 / (1j * wavelength * distance)
             )
 
@@ -258,7 +257,7 @@ class FresnelChirpZPropagator(Propagator):
             field_out[:, :, indx] = F * postFactor
 
         # Shift the pulse back to the center of the time axis
-        field_out *= np.exp(-1j * omega[np.newaxis, np.newaxis, :] * distance / c)
+        field_out *= xp.exp(-1j * omega[xp.newaxis, xp.newaxis, :] * distance / c)
 
         # Update output grid parameters
         grid_out.set_spectral_field(field_out)

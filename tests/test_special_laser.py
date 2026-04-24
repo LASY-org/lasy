@@ -6,9 +6,9 @@ checks the implementation of the peak_fluence and peak_power normalizations
 as well as some measurement functionality from laser utils
 """
 
-import numpy as np
 from scipy.constants import c, epsilon_0
 
+from lasy.backend import xp
 from lasy.laser import Laser
 from lasy.profiles import CombinedLongitudinalTransverseProfile
 from lasy.profiles.longitudinal import (
@@ -45,12 +45,12 @@ def test_continuous_wave_laser():
     laser = Laser(dim, lo, hi, npoints, profile)
 
     field = laser.grid.get_temporal_field()
-    intensity = np.abs(epsilon_0 * field**2 / 2 * c)
-    fluence = np.sum(intensity, axis=-1) * laser.grid.dx[-1]
+    intensity = xp.abs(epsilon_0 * field**2 / 2 * c)
+    fluence = xp.sum(intensity, axis=-1) * laser.grid.dx[-1]
     measured_peak_fluence = fluence.max()
 
-    assert np.abs(measured_peak_fluence - peak_fluence) / peak_fluence < 1e-6
-    assert np.abs(get_w0(laser.grid, laser.dim) - spot_size) / spot_size < 1e-6
+    assert xp.abs(measured_peak_fluence - peak_fluence) / peak_fluence < 1e-6
+    assert xp.abs(get_w0(laser.grid, laser.dim) - spot_size) / spot_size < 1e-6
 
 
 def test_plane_wave_laser():
@@ -78,5 +78,5 @@ def test_plane_wave_laser():
     power = get_laser_power(laser.dim, laser.grid)
     measured_peak_power = power.max()
 
-    assert np.abs(measured_peak_power - peak_power) / peak_power < 1e-6
-    assert np.abs(2 * get_duration(laser.grid, laser.dim) - tau) / tau < 1e-6
+    assert xp.abs(measured_peak_power - peak_power) / peak_power < 1e-6
+    assert xp.abs(2 * get_duration(laser.grid, laser.dim) - tau) / tau < 1e-6

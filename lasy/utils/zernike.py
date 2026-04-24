@@ -2,6 +2,8 @@ import math
 
 import numpy as np
 
+from lasy.backend import xp
+
 
 def get_zernike_nm(j):
     """
@@ -20,7 +22,7 @@ def get_zernike_nm(j):
     n,m : ints
         The standard Zernike Polynomial Indexes
     """
-    n = int(np.ceil((-3 + np.sqrt(9 + 8 * j)) / 2))
+    n = int(xp.ceil((-3 + xp.sqrt(9 + 8 * j)) / 2))
     m = 2 * j - n * (n + 2)
     return int(m), int(n)
 
@@ -50,8 +52,8 @@ def zernike(x, y, pupil_coords, j):
     """
     # Setup
     (cgx, cgy, r) = pupil_coords
-    rho = np.sqrt((x - cgx) ** 2 + (y - cgy) ** 2) / r
-    theta = np.arctan2(y - cgy, x - cgx)
+    rho = xp.sqrt((x - cgx) ** 2 + (y - cgy) ** 2) / r
+    theta = xp.arctan2(y - cgy, x - cgx)
 
     m, n = get_zernike_nm(j)
 
@@ -60,18 +62,18 @@ def zernike(x, y, pupil_coords, j):
 
     # Now multiply by the azimuthal part
     if m < 0:
-        Z = R * np.sin(-m * theta)
+        Z = R * xp.sin(-m * theta)
     else:
-        Z = R * np.cos(m * theta)
+        Z = R * xp.cos(m * theta)
 
     # Normalization
     if n == 0:
         scaling = 1
     else:
         if m == 0:
-            scaling = np.sqrt((n + 1))
+            scaling = xp.sqrt((n + 1))
         else:
-            scaling = np.sqrt(2 * (n + 1))
+            scaling = xp.sqrt(2 * (n + 1))
     Z = Z * scaling
 
     return Z
@@ -95,25 +97,11 @@ def RmnGenerator(n, m, rho):
         The radial component of the Zernike mode
     """
     if n == 0:
-        if len(rho.shape) == 1:
-            (r,) = rho.shape
-            Rmn = np.ones(
-                r,
-            )
-        else:
-            r, c = rho.shape
-            Rmn = np.ones((r, c))
+        Rmn = xp.ones_like(rho)
     elif (n - m) % 2 == 0:
         # Even, Rmn is not 0
         k = np.linspace(0, int((n - m) / 2), int((n - m) / 2) + 1).astype(int)
-        if len(rho.shape) == 1:
-            (r,) = rho.shape
-            Rmn = np.zeros(
-                r,
-            )
-        else:
-            r, c = rho.shape
-            Rmn = np.zeros((r, c))
+        Rmn = xp.zeros_like(rho)
         for i in k:
             Rmn = Rmn + ((-1) ** i * math.factorial(n - i)) / (
                 math.factorial(i)
@@ -122,13 +110,6 @@ def RmnGenerator(n, m, rho):
             ) * rho ** (n - 2 * i)
 
     else:
-        if len(rho.shape) == 1:
-            (r,) = rho.shape
-            Rmn = np.zeros(
-                r,
-            )
-        else:
-            r, c = rho.shape
-            Rmn = np.zeros((r, c))
+        Rmn = xp.zeros_like(rho)
 
     return Rmn

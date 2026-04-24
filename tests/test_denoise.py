@@ -6,8 +6,7 @@ checks that the error remains positive and less than the predefined
 value.
 """
 
-import numpy as np
-
+from lasy.backend import xp
 from lasy.profiles.transverse.super_gaussian_profile import (
     SuperGaussianTransverseProfile,
 )
@@ -32,9 +31,9 @@ def test_denoise_hg_reconstruction():
     )  # Denoised profile
 
     # Calculate the error
-    x = np.linspace(-5 * w0x, 5 * w0x, 500)
-    X, Y = np.meshgrid(x, x)
+    x = xp.linspace(-5 * w0x, 5 * w0x, 500)
+    X, Y = xp.meshgrid(x, x)
     prof1 = transverse_profile.evaluate(X, Y)
     prof2 = transverse_profile_cleaned.evaluate(X, Y)
-    error = np.sum(np.abs(prof2 - prof1) ** 2) / np.sum(np.abs(prof1) ** 2)
+    error = xp.sum(xp.abs(prof2 - prof1) ** 2) / xp.sum(xp.abs(prof1) ** 2)
     assert error < 0.02

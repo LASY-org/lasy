@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .optical_element import OpticalElement
 
@@ -44,11 +44,11 @@ class SpectralPhase(OpticalElement):
         """
         # Sort the transmission function and angular frequencies to
         # eliminate problems with interpolation (e.g. due to fftshifted data)
-        order = np.argsort(self.omega_in)
+        order = xp.argsort(self.omega_in)
         self.omega_in = self.omega_in[order]
         self.phase = self.phase[order]
 
         # interpolate transmission function to omega axis of the laser
-        phase = np.interp(omega, self.omega_in, self.phase)
+        phase = xp.interp(omega, self.omega_in, self.phase)
 
-        return np.exp(1j * phase)
+        return xp.exp(1j * phase)

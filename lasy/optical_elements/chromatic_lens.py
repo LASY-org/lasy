@@ -1,5 +1,6 @@
-import numpy as np
 from scipy.constants import c
+
+from lasy.backend import xp
 
 from .optical_element import OpticalElement
 
@@ -59,7 +60,7 @@ class ChromaticLens(OpticalElement):
         multiplier : ndarray of complex numbers
             Contains the value of the multiplier at the specified points
         """
-        lam = 2 * np.pi * c / omega * 1e6  # Wavelength in microns
+        lam = 2 * xp.pi * c / omega * 1e6  # Wavelength in microns
         n = self.n_func(lam)
 
         f = 1 / (
@@ -67,4 +68,4 @@ class ChromaticLens(OpticalElement):
             * (1 / self.R1 - 1 / self.R2 + (n - 1) * self.d / (n * self.R1 * self.R2))
         )
 
-        return np.exp(-1j * omega * (x**2 + y**2) / (2 * c * f))
+        return xp.exp(-1j * omega * (x**2 + y**2) / (2 * c * f))

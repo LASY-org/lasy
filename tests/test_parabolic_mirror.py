@@ -8,8 +8,7 @@ the focal position ; we then check that the waist as the
 expected value in the far field (i.e. in the focal plane).
 """
 
-import numpy as np
-
+from lasy.backend import xp
 from lasy.laser import Laser
 from lasy.optical_elements import ParabolicMirror
 from lasy.profiles.gaussian_profile import GaussianProfile
@@ -29,20 +28,20 @@ def get_w0(laser):
     # Calculate the laser waist
     field = laser.grid.get_temporal_field()
     if laser.dim == "xyt":
-        Nx = field.shape[0]
-        A2 = (np.abs(field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
+        Nx, Ny, Nt = field.shape
+        A2 = (xp.abs(field[Nx // 2 - 1, :, :]) ** 2).sum(-1)
         ax = laser.grid.axes[1]
     else:
-        A2 = (np.abs(field[0, :, :]) ** 2).sum(-1)
+        A2 = (xp.abs(field[0, :, :]) ** 2).sum(-1)
         ax = laser.grid.axes[0]
         if ax[0] > 0:
-            A2 = np.r_[A2[::-1], A2]
-            ax = np.r_[-ax[::-1], ax]
+            A2 = xp.r_[A2[::-1], A2]
+            ax = xp.r_[-ax[::-1], ax]
         else:
-            A2 = np.r_[A2[::-1][:-1], A2]
-            ax = np.r_[-ax[::-1][:-1], ax]
+            A2 = xp.r_[A2[::-1][:-1], A2]
+            ax = xp.r_[-ax[::-1][:-1], ax]
 
-    sigma = 2 * np.sqrt(np.average(ax**2, weights=A2))
+    sigma = 2 * xp.sqrt(xp.average(ax**2, weights=A2))
 
     return sigma
 
@@ -54,8 +53,8 @@ def check_parabolic_mirror(laser):
     laser.propagate(f0)
     # Check that the value is the expected one in the near field
     w0_num = get_w0(laser)
-    w0_theor = wavelength * f0 / (np.pi * w0)
-    err = 2 * np.abs(w0_theor - w0_num) / (w0_theor + w0_num)
+    w0_theor = wavelength * f0 / (xp.pi * w0)
+    err = 2 * xp.abs(w0_theor - w0_num) / (w0_theor + w0_num)
     assert err < 1e-3
 
 

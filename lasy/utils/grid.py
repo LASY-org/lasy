@@ -1,4 +1,6 @@
-import numpy as np
+import copy
+
+from lasy.backend import to_cpu, to_gpu, use_cupy, xp
 
 from .fft_wrapper import fft, frequency_axis
 
@@ -85,7 +87,7 @@ class Grid:
                 )
             if dim == "rt":
                 lo[0] = 0.0
-                hi[0] = np.sqrt(1 / np.pi)
+                hi[0] = xp.sqrt(1 / xp.pi)
                 npoints[0] = 1
             else:
                 lo[0] = -0.5
@@ -99,7 +101,7 @@ class Grid:
         self.axes = []
         self.dx = []
         for i in range(ndims):
-            self.axes.append(np.linspace(lo[i], hi[i], npoints[i]))
+            self.axes.append(xp.linspace(lo[i], hi[i], npoints[i]))
             if len(self.axes[i]) > 1:
                 self.dx.append(self.axes[i][1] - self.axes[i][0])
             else:
@@ -110,8 +112,8 @@ class Grid:
 
         if dim == "rt":
             self.n_azimuthal_modes = n_azimuthal_modes
-            self.azimuthal_modes = np.r_[
-                np.arange(n_azimuthal_modes), np.arange(-n_azimuthal_modes + 1, 0, 1)
+            self.azimuthal_modes = xp.r_[
+                xp.arange(n_azimuthal_modes), xp.arange(-n_azimuthal_modes + 1, 0, 1)
             ]
 
         # Data
@@ -124,9 +126,9 @@ class Grid:
             self.shape = (ncomp, self.npoints[0], self.npoints[1])
 
         self.set_is_envelope(is_envelope)
-        self.temporal_field = np.zeros(self.shape, dtype=self.dtype)
+        self.temporal_field = xp.zeros(self.shape, dtype=self.dtype)
         self.temporal_field_valid = False
-        self.spectral_field = np.zeros(self.shape, dtype="complex128")
+        self.spectral_field = xp.zeros(self.shape, dtype="complex128")
         self.spectral_field_valid = False
         self.position = position
 
@@ -159,7 +161,7 @@ class Grid:
         """
         assert field.shape == self.temporal_field.shape
         assert field.dtype == self.dtype
-        self.temporal_field[:, :, :] = field
+        self.temporal_field[:, :, :] = to_gpu(field)
         self.temporal_field_valid = True
         self.spectral_field_valid = False  # Invalidates the spectral field
 
@@ -174,7 +176,7 @@ class Grid:
         """
         assert field.shape == self.spectral_field.shape
         assert field.dtype == "complex128"
-        self.spectral_field[:, :, :] = field
+        self.spectral_field[:, :, :] = to_gpu(field)
         self.spectral_field_valid = True
         self.temporal_field_valid = False  # Invalidates the temporal field
 
@@ -191,14 +193,15 @@ class Grid:
             The temporal field.
         """
         # We return a copy, so that the user cannot modify
-        # the original field, unless get_temporal_field is called
+        # the original field, unless set_temporal_field is called
         if self.temporal_field_valid:
-            return self.temporal_field.copy()
+            pass
         elif self.spectral_field_valid:
             self.spectral2temporal_fft()
-            return self.temporal_field.copy()
         else:
             raise ValueError("Both temporal and spectral fields are invalid")
+
+        return self.temporal_field.copy()
 
     def get_spectral_field(self):
         """
@@ -223,12 +226,13 @@ class Grid:
         if not hasattr(self, "spectral_axis"):
             self.spectral_axis = frequency_axis("longitudinal", self.axes[-1], "real")
         if self.spectral_field_valid:
-            return self.spectral_field.copy(), self.spectral_axis.copy()
+            pass
         elif self.temporal_field_valid:
             self.temporal2spectral_fft()
-            return self.spectral_field.copy(), self.spectral_axis.copy()
         else:
             raise ValueError("Both temporal and spectral fields are invalid")
+
+        return self.spectral_field.copy(), self.spectral_axis.copy()
 
     def temporal2spectral_fft(self):
         """
@@ -239,7 +243,7 @@ class Grid:
         assert self.temporal_field_valid
 
         self.spectral_field, self.spectral_axis = fft(
-            "longitudinal", self.temporal_field, self.axes[-1], "real"
+            "longitudinal", to_gpu(self.temporal_field), self.axes[-1], "real"
         )
 
         self.spectral_field_valid = True
@@ -253,7 +257,23 @@ class Grid:
         assert self.spectral_field_valid
 
         self.temporal_field, _ = fft(
-            "longitudinal", self.spectral_field, self.axes[-1], "frequency"
+            "longitudinal", to_gpu(self.spectral_field), self.axes[-1], "frequency"
         )
 
         self.temporal_field_valid = True
+
+    def to_axiprop(self):
+        """Copy the parts that axiprop uses to the CPU."""
+        if use_cupy:
+            self.get_temporal_field()
+
+            grid_copy = copy.copy(self)
+
+            grid_copy.temporal_field = to_cpu(self.temporal_field)
+            grid_copy.axes = to_cpu(self.axes)
+            if hasattr(self, "azimuthal_modes"):
+                grid_copy.azimuthal_modes = to_cpu(self.azimuthal_modes)
+
+            return grid_copy
+        else:
+            return self
