@@ -114,6 +114,7 @@ class FromArrayProfile(Profile):
             combined_field = self.field_interp_real(
                 (x, y, t)
             ) + 1.0j * self.field_interp_imag((x, y, t))
+            return combined_field
         else:
             r = xp.sqrt(x**2 + y**2)
             theta = xp.angle(x + 1j * y)
