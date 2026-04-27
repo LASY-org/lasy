@@ -104,7 +104,7 @@ class FromArrayProfile(Profile):
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
         if self.dim == "xyt":
-            return self.field_interp((x,y,t))
+            return self.field_interp((x, y, t))
         else:
             r = xp.sqrt(x**2 + y**2)
             theta = xp.angle(x + 1j * y)
