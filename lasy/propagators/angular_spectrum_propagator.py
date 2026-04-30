@@ -79,7 +79,15 @@ class AngularSpectrumPropagator(Propagator):
         self.omega0 = omega0 if omega0 is not None else self.omega0
         self.n = n  # refractive index
 
-    def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None, compensate_group_delay=True):
+    def propagate(
+        self,
+        grid_in,
+        dim=None,
+        omega0=None,
+        distance=None,
+        grid_out=None,
+        compensate_group_delay=True,
+    ):
         r"""
         Propagates the laser field in z direction by a given distance using the angular spectrum method.
 
