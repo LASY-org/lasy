@@ -1,8 +1,9 @@
-import numpy as np
 import pytest
 from scipy.constants import c
 
-np.random.seed(0)  # Fix random seed for reproducibility
+from lasy.backend import xp
+
+xp.random.seed(0)  # Fix random seed for reproducibility
 
 from lasy.laser import Laser
 from lasy.profiles.speckle_profile import SpeckleProfile
@@ -59,21 +60,21 @@ def test_intensity_distribution(temporal_smoothing_type):
 
     # get spatial statistics
     # <real env> = 0 = <imag env> = <er * ei>
-    e_r = np.real(F)
-    e_i = np.imag(F)
+    e_r = xp.real(F)
+    e_i = xp.imag(F)
     er_ei = e_r * e_i
-    assert np.max(abs(e_r.mean(axis=(0, 1)) / e_r.std(axis=(0, 1)))) < 1.0e-1
-    assert np.max(abs(e_i.mean(axis=(0, 1)) / e_i.std(axis=(0, 1)))) < 1.0e-1
-    assert np.max(abs(er_ei.mean(axis=(0, 1)) / er_ei.std(axis=(0, 1)))) < 1.0e-1
+    assert xp.max(abs(e_r.mean(axis=(0, 1)) / e_r.std(axis=(0, 1)))) < 1.0e-1
+    assert xp.max(abs(e_i.mean(axis=(0, 1)) / e_i.std(axis=(0, 1)))) < 1.0e-1
+    assert xp.max(abs(er_ei.mean(axis=(0, 1)) / er_ei.std(axis=(0, 1)))) < 1.0e-1
 
     # # compare intensity distribution with expected 1/<I> exp(-I/<I>)
     env_I = abs(F) ** 2
     I_vec = env_I.flatten()
     mean_I = I_vec.mean()
     N_hist = 200
-    counts_np, bins_np = np.histogram(I_vec, bins=N_hist, density=True)
-    I_dist = 1.0 / mean_I * np.exp(-bins_np / mean_I)
-    error_I_dist = np.max(abs(counts_np - I_dist[:-1]))
+    counts_np, bins_np = xp.histogram(I_vec, bins=N_hist, density=True)
+    I_dist = 1.0 / mean_I * xp.exp(-bins_np / mean_I)
+    error_I_dist = xp.max(abs(counts_np - I_dist[:-1]))
     assert error_I_dist < 2.0e-4
 
 
@@ -130,21 +131,21 @@ def test_spatial_correlation(temporal_smoothing_type):
     # compare speckle profile / autocorrelation
     # compute autocorrelation using Wiener-Khinchin Theorem
 
-    fft_abs_all = abs(np.fft.fft2(F, axes=(0, 1))) ** 2
-    ifft_abs = abs(np.fft.ifft2(fft_abs_all, axes=(0, 1))) ** 2
-    acorr2_3d = np.fft.fftshift(ifft_abs, axes=(0, 1))
-    acorr2_3d_norm = acorr2_3d / np.max(acorr2_3d, axis=(0, 1))
+    fft_abs_all = abs(xp.fft.fft2(F, axes=(0, 1))) ** 2
+    ifft_abs = abs(xp.fft.ifft2(fft_abs_all, axes=(0, 1))) ** 2
+    acorr2_3d = xp.fft.fftshift(ifft_abs, axes=(0, 1))
+    acorr2_3d_norm = acorr2_3d / xp.max(acorr2_3d, axis=(0, 1))
 
     # compare with theoretical speckle profile
-    x_list = np.linspace(
+    x_list = xp.linspace(
         -n_beamlets[0] / 2 + 0.5, n_beamlets[0] / 2 - 0.5, num_points[0], endpoint=False
     )
-    y_list = np.linspace(
+    y_list = xp.linspace(
         -n_beamlets[1] / 2 + 0.5, n_beamlets[1] / 2 - 0.5, num_points[1], endpoint=False
     )
-    X, Y = np.meshgrid(x_list, y_list)
-    acorr_theor = np.sinc(X) ** 2 * np.sinc(Y) ** 2
-    error_auto_correlation = np.max(abs(acorr_theor[:, :, np.newaxis] - acorr2_3d_norm))
+    X, Y = xp.meshgrid(x_list, y_list)
+    acorr_theor = xp.sinc(X) ** 2 * xp.sinc(Y) ** 2
+    error_auto_correlation = xp.max(abs(acorr_theor[:, :, xp.newaxis] - acorr2_3d_norm))
 
     assert error_auto_correlation < 5.0e-1
 
@@ -245,7 +246,7 @@ def test_FM_SSD_periodicity():
         ssd_transverse_bandwidth_distribution=ssd_transverse_bandwidth_distribution,
     )
     nu_laser = c / wavelength
-    ssd_frac = np.sqrt(
+    ssd_frac = xp.sqrt(
         ssd_transverse_bandwidth_distribution[0] ** 2
         + ssd_transverse_bandwidth_distribution[1] ** 2
     )

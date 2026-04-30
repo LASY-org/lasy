@@ -1,9 +1,8 @@
 from copy import deepcopy
 
-import numpy as np
-from numpy.fft import fftfreq, fftshift
 from scipy.constants import c, epsilon_0
 
+from lasy.backend import xp
 from lasy.utils.fft_wrapper import fft
 from lasy.utils.laser_utils import get_w0
 
@@ -128,28 +127,28 @@ class CollinsSFFTPropagator(Propagator):
                 print("Ray matrix does not conserve energy.")
 
             x = grid_in.axes[0]
-            L0_width = np.abs(x[-1] - x[0])
+            L0_width = xp.abs(x[-1] - x[0])
             N_points = len(x)
 
-            lambda0 = 2.0 * np.pi * c / self.omega0
+            lambda0 = 2.0 * xp.pi * c / self.omega0
             k0 = self.omega0 / c
 
             w0 = get_w0(grid_in, self.dim)  # Calculate input spot size
-            z_R = np.pi * w0**2 / lambda0  # Calculate input Rayleigh range
+            z_R = xp.pi * w0**2 / lambda0  # Calculate input Rayleigh range
 
             q1 = _q(0, 0, z_R)
 
             # Calculate output Rayleigh range
-            z_R2 = -np.imag((A * q1 + B) / (C * q1 + D))
-            f0 = np.sqrt(k0 * w0**2 / 2.0 * z_R2)  # Calculate effective focal length
+            z_R2 = -xp.imag((A * q1 + B) / (C * q1 + D))
+            f0 = xp.sqrt(k0 * w0**2 / 2.0 * z_R2)  # Calculate effective focal length
             assert f0 < 100, (
                 "CollinsSFFTPropagator is for focusing geometries, please specify a lens."
             )
 
             r0_step = L0_width / N_points  # Note: D gridpoints means D-1 intervals
 
-            x_out = fftshift(fftfreq(N_points, r0_step) * lambda0 * f0)
-            y_out = fftshift(fftfreq(N_points, r0_step) * lambda0 * f0)
+            x_out = xp.fft.fftshift(xp.fft.fftfreq(N_points, r0_step) * lambda0 * f0)
+            y_out = xp.fft.fftshift(xp.fft.fftfreq(N_points, r0_step) * lambda0 * f0)
 
             grid_out.lo[0] = x_out[0]
             grid_out.lo[1] = y_out[0]
@@ -231,10 +230,10 @@ class CollinsSFFTPropagator(Propagator):
         x = grid_out.axes[0]  # Output axes
         y = grid_out.axes[1]
 
-        X0, Y0, OM = np.meshgrid(y0, x0, spectral_axes + self.omega0)
-        X, Y, OM = np.meshgrid(y, x, spectral_axes + self.omega0)
-        R0 = np.sqrt(X0**2 + Y0**2)
-        R = np.sqrt(X**2 + Y**2)
+        X0, Y0, OM = xp.meshgrid(y0, x0, spectral_axes + self.omega0)
+        X, Y, OM = xp.meshgrid(y, x, spectral_axes + self.omega0)
+        R0 = xp.sqrt(X0**2 + Y0**2)
+        R = xp.sqrt(X**2 + Y**2)
 
         try:  # Get the elements of the optical matrix
             A = self.abcd.abcd[0][0]
@@ -245,7 +244,7 @@ class CollinsSFFTPropagator(Propagator):
         except det != 1:
             print("Ray matrix does not conserve energy.")
 
-        propagator = np.exp(1j * OM / (2 * c) * (A / B) * R0**2)
+        propagator = xp.exp(1j * OM / (2 * c) * (A / B) * R0**2)
 
         # Take the convolution to the output plane
         field, _ = fft(
@@ -258,25 +257,25 @@ class CollinsSFFTPropagator(Propagator):
         # Return field in spectral domain
         field = (
             field
-            * np.exp(1j * OM / (2 * c) * (D / B) * R**2)
+            * xp.exp(1j * OM / (2 * c) * (D / B) * R**2)
             * OM
-            / (2j * np.pi * c * B)
-            / np.abs(OM / (2j * np.pi * c * B))
+            / (2j * xp.pi * c * B)
+            / xp.abs(OM / (2j * xp.pi * c * B))
         )
-        field *= np.sqrt(
-            np.sum(
+        field *= xp.sqrt(
+            xp.sum(
                 c
                 * epsilon_0
-                * np.abs(spectral_field) ** 2
-                * np.abs(x0[1] - x0[0])
-                * np.abs(y0[1] - y0[0])
+                * xp.abs(spectral_field) ** 2
+                * xp.abs(x0[1] - x0[0])
+                * xp.abs(y0[1] - y0[0])
             )
-            / np.sum(
+            / xp.sum(
                 c
                 * epsilon_0
-                * np.abs(field) ** 2
-                * np.abs(x[1] - x[0])
-                * np.abs(y[1] - y[0])
+                * xp.abs(field) ** 2
+                * xp.abs(x[1] - x[0])
+                * xp.abs(y[1] - y[0])
             )
         )
 

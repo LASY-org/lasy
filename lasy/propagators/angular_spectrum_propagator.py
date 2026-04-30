@@ -1,10 +1,10 @@
 from copy import deepcopy
 
-import numpy as np
 from scipy.constants import c
 from scipy.differentiate import derivative
 
-from lasy.utils.fft_wrapper import fft, frequency_axis
+from lasy.backend import xp
+from lasy.utils.fft_wrapper import fft
 
 from .propagator import Propagator
 
@@ -72,7 +72,7 @@ class AngularSpectrumPropagator(Propagator):
             Default value is n=1. to describe propagation in vacuum.
         """
         dim = dim if dim is not None else self.dim
-        assert isinstance(n, (int, float, np.ndarray)) or callable(n)
+        assert isinstance(n, (int, float, xp.ndarray)) or callable(n)
         assert dim in ["rt", "xyt"]
 
         self.dim = dim
@@ -160,11 +160,11 @@ class AngularSpectrumPropagator(Propagator):
             from_domain="frequency",
         )
 
-        kx = 2 * np.pi * axes_freq[0]
-        ky = 2 * np.pi * axes_freq[1]
+        kx = 2 * xp.pi * axes_freq[0]
+        ky = 2 * xp.pi * axes_freq[1]
 
         # Calculate the refractive index if it is a function of wavelength
-        n = self.n(2 * np.pi * c / omega) if callable(self.n) else self.n
+        n = self.n(2 * xp.pi * c / omega) if callable(self.n) else self.n
 
         # Calculate the phase shift in k-space
         phase = (
@@ -174,13 +174,28 @@ class AngularSpectrumPropagator(Propagator):
             ** 0.5
         )
 
-        field_kspace *= np.exp(1j * phase)
+        # compensate group delay to keep pulse centered in grid
+        if xp.ndim(n) > 0:
+            dndom = xp.gradient(n, omega)
+            dndom = xp.interp(xp.array([self.omega0]), omega, dndom)
+            n0 = xp.interp(xp.array([self.omega0]), omega, n)
+        else:
+            dndom = 0
+            n0 = n
+
+        v_group = c / (n0 + self.omega0 * dndom)
+        gd = distance / v_group
+
+        phase = phase - gd * (omega - self.omega0)[None, None, :]
+
+        # Apply the phase shift to the field in k-space
+        field_kspace *= xp.exp(1j * phase)
 
         # Transform back to the spatial domain
         field, _ = fft(
             arr_in=field_kspace,
             which="transverse",
-            axes_in=(kx / (2 * np.pi), ky / (2 * np.pi)),
+            axes_in=(kx / (2 * xp.pi), ky / (2 * xp.pi)),
             from_domain="real",
         )
 

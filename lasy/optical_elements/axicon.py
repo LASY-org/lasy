@@ -1,5 +1,6 @@
-import numpy as np
 from scipy.constants import c
+
+from lasy.backend import xp
 
 from .optical_element import OpticalElement
 
@@ -48,6 +49,6 @@ class Axicon(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        return np.exp(
-            -2j * (omega / c) * np.sqrt(x**2 + y**2) * np.tan(0.5 * self.gamma)
+        return xp.exp(
+            -2j * (omega / c) * xp.sqrt(x**2 + y**2) * xp.tan(0.5 * self.gamma)
         )

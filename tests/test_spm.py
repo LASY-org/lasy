@@ -1,6 +1,6 @@
-import numpy as np
 from scipy.constants import c, epsilon_0
 
+from lasy.backend import xp
 from lasy.laser import Laser
 from lasy.profiles import GaussianProfile
 from lasy.propagators.nonlinear_phase_shift import NonlinearKerrStep
@@ -12,7 +12,7 @@ def make_laser():
         wavelength=800e-9,
         pol=(1, 0),
         laser_energy=100e-3,
-        tau=50e-15 / np.sqrt(2 * np.log(2)),
+        tau=50e-15 / xp.sqrt(2 * xp.log(2)),
         w0=10e-3,
         t_peak=0,
     )
@@ -43,7 +43,7 @@ def test_nonlinear_step():
     NLprop = NonlinearKerrStep(n2=n2, k0=laser.profile.omega0 / c)
 
     # create range of distances over which to test the spectral broadening
-    z_pos = np.linspace(0, 15e-3, 5)
+    z_pos = xp.linspace(0, 15e-3, 5)
 
     bandwidths_propagated = []
 
@@ -57,16 +57,16 @@ def test_nonlinear_step():
         bandwidths_propagated.append(bandwidth)
 
     # calculate peak intensity and max phase shift for analytical broadening calculation
-    peak_intensity = np.max(
+    peak_intensity = xp.max(
         0.5 * c * epsilon_0 * abs(laser.grid.get_temporal_field()) ** 2
     )
-    phase_shift = 2 * np.pi / laser.profile.lambda0 * n2 * z_pos * peak_intensity
+    phase_shift = 2 * xp.pi / laser.profile.lambda0 * n2 * z_pos * peak_intensity
 
     initial_bandwidth = bandwidths_propagated[0]
 
     # calculate broadening according to Agrawal book
-    bandwidths_analytical = initial_bandwidth * np.sqrt(
+    bandwidths_analytical = initial_bandwidth * xp.sqrt(
         1 + 4 / (3 * 3**0.5) * (phase_shift) ** 2
     )
 
-    assert np.allclose(bandwidths_propagated, bandwidths_analytical, rtol=1e-3)
+    assert xp.allclose(bandwidths_propagated, bandwidths_analytical, rtol=1e-3)

@@ -1,5 +1,4 @@
-import numpy as np
-from scipy.interpolate import RegularGridInterpolator
+from lasy.backend import RegularGridInterpolator, xp
 
 from .profile import Profile
 
@@ -60,12 +59,13 @@ class FromArrayProfile(Profile):
         if dim == "xyt":
             assert axes_order == ["x", "y", "t"]
 
-            self.combined_field_interp = RegularGridInterpolator(
+            self.field_interp = RegularGridInterpolator(
                 (axes["x"], axes["y"], axes["t"]),
-                np.abs(self.array) + 1.0j * np.unwrap(np.angle(self.array), axis=-1),
+                self.array,
                 bounds_error=False,
-                fill_value=0.0,
+                fill_value=0.0 + 0.0j,
             )
+
         else:  # dim = "rt"
             assert axes_order == ["r", "t"]
 
@@ -73,12 +73,12 @@ class FromArrayProfile(Profile):
             # to make correct interpolation within the first cell
             if axes["r"][0] != 0.0:
                 # add mirrored point to the axis
-                r = np.concatenate(([-axes["r"][0]], axes["r"]))
+                r = xp.concatenate((-axes["r"][[0]], axes["r"]))
                 # takes first element of the array in the radial dimension
                 subarray = self.array[:, 0, :]
                 # add it at the beginning to be the value at the mirrored point
-                self.array = np.concatenate(
-                    (subarray[:, np.newaxis, :], self.array), axis=1
+                self.array = xp.concatenate(
+                    (subarray[:, xp.newaxis, :], self.array), axis=1
                 )
             else:
                 r = axes["r"]
@@ -94,8 +94,8 @@ class FromArrayProfile(Profile):
                 self.field_interp_modes.append(
                     RegularGridInterpolator(
                         (r, axes["t"]),
-                        np.abs(self.array[imode, :, :])
-                        + 1.0j * np.unwrap(np.angle(self.array[imode, :, :]), axis=-1),
+                        xp.abs(self.array[imode, :, :])
+                        + 1.0j * xp.unwrap(xp.angle(self.array[imode, :, :]), axis=0),
                         bounds_error=False,
                         fill_value=0.0,
                     )
@@ -104,21 +104,21 @@ class FromArrayProfile(Profile):
     def evaluate(self, x, y, t):
         """Return the envelope field of the scaled profile."""
         if self.dim == "xyt":
-            combined_field = self.combined_field_interp((x, y, t))
+            return self.field_interp((x, y, t))
         else:
-            r = np.sqrt(x**2 + y**2)
-            theta = np.angle(x + 1j * y)
-            combined_field = np.zeros_like(x, dtype="complex128")
+            r = xp.sqrt(x**2 + y**2)
+            theta = xp.angle(x + 1j * y)
+            combined_field = xp.zeros_like(x, dtype="complex128")
             nmodes = (len(self.field_interp_modes) + 1) // 2
             for imode in range(-nmodes + 1, nmodes):
-                combined_field += self.field_interp_modes[imode]((r, t)) * np.exp(
+                combined_field += self.field_interp_modes[imode]((r, t)) * xp.exp(
                     -1j * imode * theta
                 )
 
-        return np.abs(np.real(combined_field)) * np.exp(1.0j * np.imag(combined_field))
+        return xp.abs(xp.real(combined_field)) * xp.exp(1.0j * xp.imag(combined_field))
 
     def evaluate_mrt(self, mode, r, t):
         """Return the envelope field of the scaled profile."""
         assert self.dim == "rt"
         combined_field = self.field_interp_modes[mode]((r, t))
-        return np.abs(np.real(combined_field)) * np.exp(1.0j * np.imag(combined_field))
+        return xp.abs(xp.real(combined_field)) * xp.exp(1.0j * xp.imag(combined_field))

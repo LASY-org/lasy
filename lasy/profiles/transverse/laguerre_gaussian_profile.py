@@ -1,7 +1,8 @@
 from math import factorial
 
-import numpy as np
 from scipy.special import genlaguerre
+
+from lasy.backend import to_cpu, to_gpu, xp
 
 from .transverse_profile import TransverseProfile
 
@@ -74,13 +75,13 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
     Examples
     --------
     >>> import matplotlib.pyplot as plt
-    >>> import numpy as np
+    >>> from lasy.backend import xp, to_cpu
     >>> from lasy.profiles.transverse.laguerre_gaussian_profile import (
     ...     LaguerreGaussianTransverseProfile,
     ... )
     >>> # Create evaluation grid
-    >>> xy = np.linspace(-30e-6, 30e-6, 200)
-    >>> X, Y = np.meshgrid(xy, xy)
+    >>> xy = xp.linspace(-30e-6, 30e-6, 200)
+    >>> X, Y = xp.meshgrid(xy, xy)
     >>> # Create an array of plots
     >>> fig, ax = plt.subplots(3, 6, figsize=(10, 5), tight_layout=True)
     >>> extent = (1e6 * xy[0], 1e6 * xy[-1], 1e6 * xy[0], 1e6 * xy[-1])
@@ -92,13 +93,13 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
     ...             m = m, #
     ...             wavelength = 0.8e-6, # m
     ...         )
-    ...         intensity = np.abs(transverse_profile.evaluate(X,Y))**2
-    ...         vmax_intensity = np.max(intensity)
-    >>>         ax[p,m].imshow(intensity,extent=extent,cmap='bone_r',vmin=0,vmax=vmax_intensity)
+    ...         intensity = xp.abs(transverse_profile.evaluate(X,Y))**2
+    ...         vmax_intensity = xp.max(intensity)
+    >>>         ax[p,m].imshow(to_cpu(intensity),extent=extent,cmap='bone_r',vmin=0,vmax=vmax_intensity)
     >>>         ax[p,m].set_title('Inten: p,m = %i,%i' %(p,m))
-    >>>         phase = np.angle(transverse_profile.evaluate(X,Y))
-    ...         vmax_phase = np.max(np.abs(phase))
-    >>>         ax[p,m+3].imshow(phase,extent=extent,cmap='seismic',vmin=-vmax_phase,vmax=vmax_phase)
+    >>>         phase = xp.angle(transverse_profile.evaluate(X,Y))
+    ...         vmax_phase = xp.max(xp.abs(phase))
+    >>>         ax[p,m+3].imshow(to_cpu(phase),extent=extent,cmap='seismic',vmin=-vmax_phase,vmax=vmax_phase)
     >>>         ax[p,m+3].set_title('Phase: p,m = %i,%i' %(p,m))
     >>>         if p==2:
     >>>             ax[p,m].set_xlabel("x (µm)")
@@ -126,19 +127,19 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         self.z_foc = z_foc
         z_eval = -z_foc  # this links our observation position to Siegman's definition
 
-        self.k0 = 2 * np.pi / wavelength
+        self.k0 = 2 * xp.pi / wavelength
 
         # Calculate Rayleigh Length
-        Zr = np.pi * w_0**2 / wavelength
+        Zr = xp.pi * w_0**2 / wavelength
 
         # Calculate Size at Location Z
-        w0Z = w_0 * np.sqrt(1 + (z_eval / Zr) ** 2)
+        w0Z = w_0 * xp.sqrt(1 + (z_eval / Zr) ** 2)
 
         # Calculate Multiplicative Factors
-        A = np.sqrt(2.0 * factorial(p) / (np.pi * factorial(m + p))) / w0Z
+        A = xp.sqrt(2.0 * factorial(p) / (xp.pi * factorial(m + p))) / w0Z
 
         # Calculate the Phase contributions from propagation
-        phiZ = (2.0 * p + m + 1) * np.arctan2(z_eval, Zr)
+        phiZ = (2.0 * p + m + 1) * xp.arctan2(z_eval, Zr)
 
         self.z_eval = z_eval
         self.Zr = Zr
@@ -174,13 +175,13 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         # Calculate the LG in each plane
         LG = (
             A
-            * (np.sqrt(2.0) * np.sqrt(x**2 + y**2) / w0Z) ** (m)
-            * genlaguerre(p, m)(2.0 * (x**2 + y**2) / w0Z**2)
-            * np.exp(-(x**2 + y**2) / w0Z**2)
-            * np.exp(-1j * k0 * (x**2 + y**2) / 2 / (z_eval**2 + Zr**2) * z_eval)
+            * (xp.sqrt(2.0) * xp.sqrt(x**2 + y**2) / w0Z) ** (m)
+            * to_gpu(genlaguerre(p, m)(to_cpu(2.0 * (x**2 + y**2) / w0Z**2)))
+            * xp.exp(-(x**2 + y**2) / w0Z**2)
+            * xp.exp(-1j * k0 * (x**2 + y**2) / 2 / (z_eval**2 + Zr**2) * z_eval)
         )
 
         # Put it altogether
-        envelope = LG * np.exp(1j * phiZ) * np.exp(-1j * m * np.arctan2(y, x))
+        envelope = LG * xp.exp(1j * phiZ) * xp.exp(-1j * m * xp.arctan2(y, x))
 
         return envelope

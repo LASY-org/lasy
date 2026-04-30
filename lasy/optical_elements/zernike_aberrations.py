@@ -1,5 +1,6 @@
-import numpy as np
+from scipy.constants import c
 
+from lasy.backend import xp
 from lasy.utils.zernike import zernike
 
 from .optical_element import OpticalElement
@@ -13,7 +14,7 @@ class ZernikeAberrations(OpticalElement):
 
     .. math::
 
-        T(\boldsymbol{x}_\perp,\omega) = \exp( i \sum_j a_j Z_j(\boldsymbol{x}_\perp))
+        T(\boldsymbol{x}_\perp,\omega) = \exp\left( i \frac{\omega}{c}\sum_j a_j Z_j(\boldsymbol{x}_\perp)\right)
 
     where
     :math:`\boldsymbol{x}_\perp` is the transverse coordinate (orthogonal
@@ -59,19 +60,10 @@ class ZernikeAberrations(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        rr = np.sqrt(x**2 + y**2)
-        phase = np.zeros_like(rr)
+        rr = xp.sqrt(x**2 + y**2)
+        phase = xp.zeros_like(rr)
 
         for j in list(self.zernike_amplitudes):
-            # Create the zernike phase and ensure it has the same number of dimensions as phase
-            zernike_phase = zernike(x[..., 0], y[..., 0], self.pupil_coords, j)[
-                ..., None
-            ]  # Expand last axis
+            phase += self.zernike_amplitudes[j] * zernike(x, y, self.pupil_coords, j)
 
-            # Increase the length of the frequency dimension such that the shape is suitable to be added
-            # to the phase array, then add it
-            phase += self.zernike_amplitudes[j] * np.broadcast_to(
-                zernike_phase, phase.shape
-            )
-
-        return np.exp(1j * phase)
+        return xp.exp(1j * omega / c * phase)

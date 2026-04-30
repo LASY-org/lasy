@@ -1,5 +1,4 @@
-import numpy as np
-
+from lasy.backend import xp
 from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
     normalize_average_intensity,
@@ -59,6 +58,7 @@ class Laser:
     Examples
     --------
     >>> import matplotlib.pyplot as plt
+    >>> from lasy.backend import xp, to_cpu
     >>> from lasy.laser import Laser
     >>> from lasy.profiles.gaussian_profile import GaussianProfile
     >>> from lasy.utils.laser_utils import get_full_field
@@ -89,9 +89,9 @@ class Laser:
     >>>     extent[2:] *= 1e6
     >>>     extent[:2] *= 1e12
     >>>     tmin, tmax, rmin, rmax = extent
-    >>>     vmax = np.abs(E_rt).max()
+    >>>     vmax = xp.abs(E_rt).max()
     >>>     axes[step].imshow(
-    ...         E_rt,
+    ...         to_cpu(E_rt),
     ...         origin="lower",
     ...         aspect="auto",
     ...         vmax=vmax,
@@ -122,13 +122,13 @@ class Laser:
 
         # Create the grid on which to evaluate the laser, evaluate it
         if self.dim == "xyt":
-            x, y, t = np.meshgrid(*self.grid.axes, indexing="ij")
+            x, y, t = xp.meshgrid(*self.grid.axes, indexing="ij")
             self.grid.set_temporal_field(profile.evaluate(x, y, t))
         elif self.dim == "rt":
             profile_rt = profile.dim == "rt" if hasattr(profile, "dim") else False
             if profile_rt:
-                r, t = np.meshgrid(*self.grid.axes, indexing="ij")
-                field = np.zeros(
+                r, t = xp.meshgrid(*self.grid.axes, indexing="ij")
+                field = xp.zeros(
                     (2 * self.grid.n_azimuthal_modes - 1, *r.shape), dtype="complex128"
                 )
                 for mode in range(2 * self.grid.n_azimuthal_modes - 1):
@@ -140,17 +140,17 @@ class Laser:
                     n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
                 # Make sure that there are enough points to resolve the azimuthal modes
                 assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
-                theta1d = 2 * np.pi / n_theta_evals * np.arange(n_theta_evals)
-                theta, r, t = np.meshgrid(theta1d, *self.grid.axes, indexing="ij")
-                x = r * np.cos(theta)
-                y = r * np.sin(theta)
+                theta1d = 2 * xp.pi / n_theta_evals * xp.arange(n_theta_evals)
+                theta, r, t = xp.meshgrid(theta1d, *self.grid.axes, indexing="ij")
+                x = r * xp.cos(theta)
+                y = r * xp.sin(theta)
                 # Evaluate the profile on the generated grid
                 envelope = profile.evaluate(x, y, t)
                 # Perform the azimuthal decomposition
-                azimuthal_modes = np.fft.ifft(envelope, axis=0)
+                azimuthal_modes = xp.fft.ifft(envelope, axis=0)
                 field = azimuthal_modes[:n_azimuthal_modes]
                 if n_azimuthal_modes > 1:
-                    field = np.concatenate(
+                    field = xp.concatenate(
                         (field, azimuthal_modes[-n_azimuthal_modes + 1 :])
                     )
             self.grid.set_temporal_field(field)
@@ -202,14 +202,14 @@ class Laser:
         # Apply optical element
         spectral_field, spectral_axis = self.grid.get_spectral_field()
         if self.dim == "rt":
-            r, omega = np.meshgrid(
+            r, omega = xp.meshgrid(
                 self.grid.axes[0], spectral_axis + self.profile.omega0, indexing="ij"
             )
             # The line below assumes that amplitude_multiplier
             # is cylindrically symmetric, hence we pass
             # `r` as `x` and an array of 0s as `y`
             multiplier = optical_element.amplitude_multiplier(
-                r, np.zeros_like(r), omega
+                r, xp.zeros_like(r), omega
             )
             # The azimuthal modes are the components of the Fourier transform
             # along theta (FT_theta). Because the multiplier is assumed to be
@@ -219,7 +219,7 @@ class Laser:
             for i_m in range(self.grid.azimuthal_modes.size):
                 spectral_field[i_m, :, :] *= multiplier
         else:
-            x, y, omega = np.meshgrid(
+            x, y, omega = xp.meshgrid(
                 self.grid.axes[0],
                 self.grid.axes[1],
                 spectral_axis + self.profile.omega0,
@@ -300,6 +300,8 @@ class Laser:
             self.grid,
             self.profile.lambda0,
             self.profile.pol,
+            self.profile.is_cw,
+            self.profile.is_plane_wave,
             save_as_vector_potential,
         )
         self.output_iteration += 1

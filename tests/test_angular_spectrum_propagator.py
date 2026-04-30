@@ -1,6 +1,6 @@
-import numpy as np
 from scipy.constants import c
 
+from lasy.backend import xp
 from lasy.laser import Laser
 from lasy.profiles import GaussianProfile
 from lasy.propagators import AngularSpectrumPropagator
@@ -12,7 +12,7 @@ def make_laser():
         wavelength=800e-9,
         pol=(1, 0),
         laser_energy=1,
-        tau=30e-15 / np.sqrt(2 * np.log(2)),
+        tau=30e-15 / xp.sqrt(2 * xp.log(2)),
         w0=100e-6,
         t_peak=0,
     )
@@ -31,10 +31,10 @@ def test_spatial_propagation():
     """Verify that the waist of Gaussian beam evolves as expected."""
     laser = make_laser()
     prop = AngularSpectrumPropagator(
-        omega0=2 * np.pi * c / 800e-9, n=1.0, dim=laser.dim
+        omega0=2 * xp.pi * c / 800e-9, n=1.0, dim=laser.dim
     )
 
-    z_pos = np.linspace(-5e-3, 50e-3, 5)
+    z_pos = xp.linspace(-5e-3, 50e-3, 5)
     waists_propagated = []
 
     for z in z_pos:
@@ -45,10 +45,10 @@ def test_spatial_propagation():
         waist = get_w0(grid=laser.grid, dim=laser.dim)
         waists_propagated.append(waist)
 
-    zR = np.pi * laser.profile.w0**2 / (laser.profile.lambda0)
-    waists_analytical = laser.profile.w0 * np.sqrt(1 + (z_pos / zR) ** 2)
+    zR = xp.pi * laser.profile.w0**2 / (laser.profile.lambda0)
+    waists_analytical = laser.profile.w0 * xp.sqrt(1 + (z_pos / zR) ** 2)
 
-    assert np.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
+    assert xp.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
 
 
 def n_fusedsilica(wavelength):
@@ -66,10 +66,10 @@ def test_temporal_propagation():
     """Verify that pulse broadenes as expected during propagation in material."""
     laser = make_laser()
     prop = AngularSpectrumPropagator(
-        omega0=2 * np.pi * c / 800e-9, n=n_fusedsilica, dim=laser.dim
+        omega0=2 * xp.pi * c / 800e-9, n=n_fusedsilica, dim=laser.dim
     )
 
-    z_pos = np.linspace(0, 10e-3, 5)
+    z_pos = xp.linspace(0, 10e-3, 5)
     durations_propagated = []
 
     for z in z_pos:
@@ -78,14 +78,14 @@ def test_temporal_propagation():
         laser.propagate(z)
 
         duration = (
-            get_duration(grid=laser.grid, dim=laser.dim) * 2 * np.sqrt(2 * np.log(2))
+            get_duration(grid=laser.grid, dim=laser.dim) * 2 * xp.sqrt(2 * xp.log(2))
         )
         durations_propagated.append(duration)
 
     gdd = z_pos * 36.163e-27
-    tau_initial = laser.profile.tau * np.sqrt(2 * np.log(2))
-    duration_analytical = tau_initial * np.sqrt(
-        1 + (4 * np.log(2) * gdd / tau_initial**2) ** 2
+    tau_initial = laser.profile.tau * xp.sqrt(2 * xp.log(2))
+    duration_analytical = tau_initial * xp.sqrt(
+        1 + (4 * xp.log(2) * gdd / tau_initial**2) ** 2
     )
 
-    assert np.allclose(durations_propagated, duration_analytical, rtol=1e-5, atol=1e-15)
+    assert xp.allclose(durations_propagated, duration_analytical, rtol=1e-5, atol=1e-15)

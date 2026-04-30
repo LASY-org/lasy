@@ -19,4 +19,5 @@ Additionally, a set of static (automatically tested) examples can be found below
    1d_temporal_laser.ipynb
    2d_spatial_laser.ipynb
    nonlinear_propagation_split_step.ipynb
+   user_defined_longitudinal_profile.ipynb
    collins_propagator.ipynb

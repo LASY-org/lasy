@@ -1,5 +1,6 @@
-import numpy as np
 from scipy.constants import c
+
+from lasy.backend import xp
 
 from .optical_element import OpticalElement
 
@@ -61,7 +62,7 @@ class Axiparabola(OpticalElement):
         )
 
         # Calculate phase shift
-        T = np.exp(-2j * (omega / c) * sag)
+        T = xp.exp(-2j * (omega / c) * sag)
         # Remove intensity beyond R
         T[x**2 + y**2 > self.R**2] = 0
 

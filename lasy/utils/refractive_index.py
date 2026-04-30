@@ -14,6 +14,8 @@ import scipy.constants as ct
 import yaml
 from scipy.interpolate import CubicSpline
 
+from lasy.backend import to_cpu, to_gpu, xp
+
 try:
     import numdifftools as nd
 
@@ -404,9 +406,9 @@ class Material:
                 )
                 self.equation_n = globals().get("_" + self.type_n)
             else:
-                self.data_raw = np.fromstring(data.get("data", "0 0\n0 0"), sep=" ")
+                self.data_raw = xp.fromstring(data.get("data", "0 0\n0 0"), sep=" ")
                 n_cols = 3 if "nk" in type else 2
-                self.data_raw = np.reshape(
+                self.data_raw = xp.reshape(
                     self.data_raw, (len(self.data_raw) // n_cols, n_cols)
                 )
                 interp_kw = {}  # dict(bounds_error=False, fill_value=0.)
@@ -420,7 +422,7 @@ class Material:
                     ]
                     self.data_n = self.data_raw[:, 1]
                     self.interp_n = CubicSpline(
-                        self.wavelengths_n, self.data_n, **interp_kw
+                        to_cpu(self.wavelengths_n), to_cpu(self.data_n), **interp_kw
                     )
                 if "k" in type:
                     self.wavelengths_k = self.data_raw[:, 0]
@@ -432,7 +434,7 @@ class Material:
                         self.data_raw[:, 2] if "nk" in type else self.data_raw[:, 1]
                     )
                     self.interp_k = CubicSpline(
-                        self.wavelengths_k, self.data_k, **interp_kw
+                        to_cpu(self.wavelengths_k), to_cpu(self.data_k), **interp_kw
                     )
 
     def _load_data_n2(self, mat_n2s):
@@ -446,8 +448,8 @@ class Material:
             data_list = mat_dict.get("DATA")
             for data in data_list:
                 if data["type"] == "tabulated n2":
-                    data_raw = np.fromstring(data.get("data", "0 0\n0 0"), sep=" ")
-                    data_raw = np.reshape(data_raw, (len(data_raw) // 2, 2))
+                    data_raw = xp.fromstring(data.get("data", "0 0\n0 0"), sep=" ")
+                    data_raw = xp.reshape(data_raw, (len(data_raw) // 2, 2))
                     mat["data"] = data_raw
             self.data_n2[mat_key] = mat
 
@@ -504,7 +506,7 @@ class Material:
 
         Returns
         -------
-        k : float or np.array
+        k : float or xp.array
             Extinction coefficient, same shape as `lambda_mu`. 0 is
             returned for wavelengths outside the applicable range
         """
@@ -515,18 +517,18 @@ class Material:
 
         # Make inputs into a proper array
         if isinstance(lambda_um, (list, set)):
-            lambda_um = np.array(lambda_um)
+            lambda_um = xp.array(lambda_um)
 
         mask = (self.wavelength_range_k[0] < lambda_um) & (
             lambda_um < self.wavelength_range_k[1]
         )
 
-        k = self.interp_k(lambda_um)
+        k = to_gpu(self.interp_k(lambda_um))
 
-        if isinstance(mask, (bool, np.bool_)):
+        if isinstance(mask, (bool, xp.bool_)):
             return k * int(mask)
         else:
-            k[np.logical_not(mask)] = 0.0
+            k[xp.logical_not(mask)] = 0.0
             return k
 
     def calc_spectral_phase_expansion(self, omega0):
@@ -565,10 +567,11 @@ class Material:
         d3phi_dw3 : float
             Third term (TOD), in units s^3/m
         """
-        lam = 2 * np.pi * ct.c / omega0  # Sellmeier and everything uses dn/dlambda!
+        omega0 = float(omega0)
+        lam = 2 * xp.pi * ct.c / omega0  # Sellmeier and everything uses dn/dlambda!
         lam_mu = 1e6 * lam
         dphi = (self.calc_n(lam_mu) - lam * self._dn_dw(lam_mu, 1)) / ct.c
-        ddphi = lam**3 / (2 * np.pi * ct.c**2) * self._dn_dw(lam_mu, 2)
+        ddphi = lam**3 / (2 * xp.pi * ct.c**2) * self._dn_dw(lam_mu, 2)
         dddphi = (
             -1
             / (omega0**2 * ct.c)
@@ -635,7 +638,7 @@ class Material:
                     pages.append(page_name)
             # Otherwise, get interpolated value if in range
             else:
-                n2 = np.interp(lambda_mu, lambdas, n2s, left=0, right=0)
+                n2 = xp.interp(lambda_mu, lambdas, n2s, left=0, right=0)
                 if n2 != 0:
                     n2_data.append(n2)
                     pages.append(page_name)
@@ -644,9 +647,9 @@ class Material:
             return 0, []
 
         if return_mean:
-            return np.mean(np.array(n2_data)), pages
+            return xp.mean(xp.array(n2_data)), pages
         else:
-            return np.array(n2_data), pages
+            return xp.array(n2_data), pages
 
     def print_n2_data(self):
         """Nicely print out all the known data for n2."""

@@ -50,7 +50,8 @@ In cylindrical coordinates, the envelope is decomposed in $N_m$ azimuthal modes 
    E_y (r,\theta,t) = \mathrm{Re}\left( \sum_{-N_m+1}^{N_m-1}\mathcal{E}_m(r,t) e^{-im\theta}e^{-i\omega_0t}p_y\right).\end{aligned}
 ```
 
-For more information, please check our [arXiv preprint](https://doi.org/10.48550/arXiv.2403.12191).
+For more information, please check our [paper](https://iopscience.iop.org/article/10.1088/1742-6596/3124/1/012014). Please also consider citing this reference in publications which have benefitted from use of `lasy`.
+
 
 ## Workflow
 

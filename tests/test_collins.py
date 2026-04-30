@@ -1,6 +1,6 @@
-import numpy as np
 from scipy.constants import c
 
+from lasy.backend import xp
 from lasy.laser import Laser
 from lasy.profiles import GaussianProfile
 from lasy.propagators import ABCD, CollinsSFFTPropagator
@@ -12,7 +12,7 @@ def make_laserFF():
         wavelength=800e-9,
         pol=(1, 0),
         laser_energy=1,
-        tau=30e-15 / np.sqrt(2 * np.log(2)),
+        tau=30e-15 / xp.sqrt(2 * xp.log(2)),
         w0=5e-3,
         t_peak=0,
     )
@@ -32,18 +32,18 @@ def test_spatial_propagation_SFFT():
     laser = make_laserFF()
     prop = CollinsSFFTPropagator(
         dim=laser.dim,
-        omega0=2 * np.pi * c / 800e-9,
+        omega0=2 * xp.pi * c / 800e-9,
     )
 
     focal_length = 100e-3
     zR = (
-        focal_length**2 * laser.profile.lambda0 / (np.pi * laser.profile.w0**2)
+        focal_length**2 * laser.profile.lambda0 / (xp.pi * laser.profile.w0**2)
     )  # Estimated Rayleigh range
     w0 = (
-        laser.profile.lambda0 * focal_length / (np.pi * laser.profile.w0)
+        laser.profile.lambda0 * focal_length / (xp.pi * laser.profile.w0)
     )  # Estimated focal spot-size
 
-    z_grid = np.linspace(
+    z_grid = xp.linspace(
         -5.0 * zR + focal_length, 5.0 * zR + focal_length, 10
     )  # Absolute position from lens
     waists_propagated = []
@@ -63,6 +63,6 @@ def test_spatial_propagation_SFFT():
         waist = get_w0(grid=laser.grid, dim=laser.dim)
         waists_propagated.append(waist)
 
-    waists_analytical = w0 * np.sqrt(1 + (np.abs(z_grid - focal_length) / zR) ** 2)
+    waists_analytical = w0 * xp.sqrt(1 + (xp.abs(z_grid - focal_length) / zR) ** 2)
 
-    assert np.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
+    assert xp.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
