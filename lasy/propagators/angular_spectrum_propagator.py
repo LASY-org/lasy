@@ -4,7 +4,7 @@ from scipy.constants import c
 from scipy.differentiate import derivative
 
 from lasy.backend import xp
-from lasy.utils.fft_wrapper import fft
+from lasy.utils.fft_wrapper import fft, frequency_axis
 
 from .propagator import Propagator
 
@@ -217,12 +217,12 @@ class AngularSpectrumPropagator(Propagator):
         kz = omega / c
 
         # Calculate the refractive index if it is a function of wavelength
-        n = self.n(2 * np.pi * c / omega) if callable(self.n) else self.n
+        n = self.n(2 * xp.pi * c / omega) if callable(self.n) else self.n
 
         # Calculate the phase shift in k-space
         phase = distance * n * kz[None, None, :]
 
-        field_propagated = field * np.exp(1j * phase)
+        field_propagated = field * xp.exp(1j * phase)
 
         return field_propagated
 
@@ -239,17 +239,17 @@ class AngularSpectrumPropagator(Propagator):
         if callable(self.n):
 
             def n_omega(om):
-                return self.n(2 * np.pi * c / om)
+                return self.n(2 * xp.pi * c / om)
 
             dndom = derivative(n_omega, self.omega0, initial_step=self.omega0 * 0.1)[
                 "df"
             ]
             n0 = n_omega(self.omega0)
 
-        elif np.ndim(self.n) > 0:
-            dndom = np.gradient(n, omega)
-            dndom = np.interp(self.omega0, omega, dndom)
-            n0 = np.interp(self.omega0, omega, n)
+        elif xp.ndim(self.n) > 0:
+            dndom = xp.gradient(n, omega)
+            dndom = xp.interp(self.omega0, omega, dndom)
+            n0 = xp.interp(self.omega0, omega, n)
 
         else:
             dndom = 0
@@ -284,7 +284,7 @@ class AngularSpectrumPropagator(Propagator):
         phase = -gd * (omega - self.omega0)[None, None, :]
 
         # Apply the phase shift to the field in k-space
-        field *= np.exp(1j * phase)
+        field *= xp.exp(1j * phase)
 
         # calculate time difference between propagation in vacuum and in medium
         dt = distance / self.v_group - distance / c

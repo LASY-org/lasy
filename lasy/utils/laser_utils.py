@@ -637,10 +637,10 @@ def get_duration(grid, dim, level=None):
     else:  # dim == "rt":
         weights = xp.abs(field) ** 2 * dV[xp.newaxis, :, xp.newaxis]
     # project weights to longitudinal axes
-    weights = np.sum(weights, axis=(0, 1))
+    weights = xp.sum(weights, axis=(0, 1))
 
-    max_loc = np.argmax(weights)
-    weights = np.roll(weights, weights.size // 2 - max_loc)
+    max_loc = xp.argmax(weights)
+    weights = xp.roll(weights, weights.size // 2 - max_loc)
 
     if level:
         duration = width_at_level(values=weights, width_axis=grid.axes[-1], level=level)
@@ -670,27 +670,27 @@ def width_at_level(values, width_axis, level=0.5):
     """
     if width_axis is None:
         # if no width axis is provided, use the indices of the values
-        width_axis = np.arange(len(values))
+        width_axis = xp.arange(len(values))
 
     # ensure that the input it sorfted according to the width axis
-    order = np.argsort(width_axis)
+    order = xp.argsort(width_axis)
     width_axis = width_axis[order]
     spectral_intensity = values[order]
 
     # find intensity threshold
-    threshold = np.max(spectral_intensity) * level
+    threshold = xp.max(spectral_intensity) * level
 
     # find indices that mark the range in which spectral intensity >= threshold
-    idcs = np.where(spectral_intensity >= threshold)[0]
+    idcs = xp.where(spectral_intensity >= threshold)[0]
     i_min, i_max = idcs[0], idcs[-1]
 
     # calculate positions of lower and upper bounds
-    lower_bound = np.interp(
+    lower_bound = xp.interp(
         threshold,
         spectral_intensity[i_min - 1 : i_min + 1],
         width_axis[i_min - 1 : i_min + 1],
     )
-    upper_bound = np.interp(
+    upper_bound = xp.interp(
         threshold,
         spectral_intensity[i_max : i_max + 2][::-1],
         width_axis[i_max : i_max + 2][::-1],
