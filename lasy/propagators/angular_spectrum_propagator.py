@@ -79,7 +79,7 @@ class AngularSpectrumPropagator(Propagator):
         self.omega0 = omega0 if omega0 is not None else self.omega0
         self.n = n  # refractive index
 
-    def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None):
+    def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None, compensate_group_delay=True):
         r"""
         Propagates the laser field in z direction by a given distance using the angular spectrum method.
 
@@ -104,6 +104,10 @@ class AngularSpectrumPropagator(Propagator):
             Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
+        compensate_group_delay : bool (optional)
+            Whether to compensate the group delay between in-medium and vacuum propagation.
+            If True, the pulse will remain centered in the grid after propagation.
+
         Returns
         -------
         Grid object with laser data after propagation.
@@ -126,7 +130,10 @@ class AngularSpectrumPropagator(Propagator):
 
         omega = frequency_axis("longitudinal", grid_in.axes[-1], "real")
 
-        field, dt = self._compensate_group_delay(field, distance, omega)
+        if compensate_group_delay:
+            field, dt = self._compensate_group_delay(field, distance, omega)
+        else:
+            dt = 0
 
         # update the grid
         grid_out.position += distance
