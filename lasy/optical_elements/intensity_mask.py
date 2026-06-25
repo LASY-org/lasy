@@ -3,31 +3,41 @@ from lasy.optical_elements.optical_element import OpticalElement
 
 class IntensityMask(OpticalElement):
     """
-    Class for a radially symmetric intensity mask.
+    Class for a round or rectangular intensity mask.
 
     This creates an optical element which acts to mask out the intensity of a laser pulse.
-    The mask is radially symmetric and can either mask intensity beyond a user defined radius, thus acting as
-    an aperture. Alternatively, the optica can mask intensity within a user defined radius, acting in this case as
+    The mask is either round or rectangular and can either mask intensity beyond a user defined radius or width, thus acting as
+    an aperture. Alternatively, the optica can mask intensity within a user defined radius or width, acting in this case as
     an optic with a hole.
 
     Parameters
     ----------
-    R : float (in meter)
-        The radius of the mask
+    R : float (in meter) or tuple (floats)
+        The radius of the mask for round masks or half-width and half-height for rectangular masks as tuple.
+        If the shape is rectangular and only one number is given, a quadratic shape is assumed.
     center: tuple (floats)
         Center of the mask. Default is (0,0)
     mask_type: string
         Should be 'aperture' (default, allows light inside) or 'hole' (allows light outside).
+    shape: string
+        Should be 'round' (default, for round apertures) or 'rectangular' (for rectangular apertures).
 
     """
 
-    def __init__(self, R, center=(0, 0), mask_type="aperture"):
+    def __init__(self, R, center=(0, 0), mask_type="aperture", shape="round"):
         assert mask_type in ["aperture", "hole"], (
             "mask_type must be 'aperture' or 'hole'"
         )
+        assert shape in ["round", "rectangular"], (
+            "shape must be 'round' or 'rectangular'"
+        )
+
         self.R = R
         self.center = center
         self.mask_type = mask_type
+        self.shape = shape
+        if self.shape == "round":
+            assert type(self.R) != tuple("Radius cannot be a tuple'")
 
     def amplitude_multiplier(self, x, y, omega):
         """
@@ -45,8 +55,23 @@ class IntensityMask(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        r_squared = (x - self.center[0]) ** 2 + (y - self.center[1]) ** 2
-        mask = r_squared <= self.R**2  # True inside, False outside
+        if self.shape == "round":
+            r_squared = (x - self.center[0]) ** 2 + (y - self.center[1]) ** 2
+            mask = r_squared <= self.R**2  # True inside, False outside
+
+        if self.shape == "rectangular":
+            if type(self.R) == float:
+                halfwidth = self.R
+                halfheight = self.R
+            if type(self.R) == tuple:
+                halfwidth = self.R[0]
+                halfheight = self.R[1]
+            mask = (
+                ((x - self.center[0]) <= halfwidth)
+                & ((x - self.center[0]) >= -halfwidth)
+                & ((y - self.center[1]) <= halfheight)
+                & ((y - self.center[1]) >= -halfheight)
+            )  # True inside, False outside
 
         if self.mask_type == "aperture":
             return mask.astype(float)  # 1 inside, 0 outside
