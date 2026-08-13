@@ -45,9 +45,24 @@ class FromArrayProfile(Profile):
         Gives the name and ordering of the axes in the array.
         Currently, only implemented for 3D, and supported values are
         ['x', 'y', 't'] and ['t', 'y', 'x'].
+
+    interp_method : String
+        Interpolation method used to evaluate the array-defined field on the grid.
+        Supported options are "linear", "nearest", "slinear", "cubic",
+        "quintic", and "pchip". The default is "linear", but higher-order
+        methods may improve accuracy for smooth data.
     """
 
-    def __init__(self, wavelength, pol, array, dim, axes, axes_order=["x", "y", "t"]):
+    def __init__(
+        self,
+        wavelength,
+        pol,
+        array,
+        dim,
+        axes,
+        axes_order=["x", "y", "t"],
+        interp_method="linear",
+    ):
         super().__init__(wavelength, pol)
 
         assert dim in ["xyt", "rt"]
@@ -62,6 +77,7 @@ class FromArrayProfile(Profile):
             self.field_interp = RegularGridInterpolator(
                 (axes["x"], axes["y"], axes["t"]),
                 self.array,
+                method=interp_method,
                 bounds_error=False,
                 fill_value=0.0 + 0.0j,
             )
@@ -96,6 +112,7 @@ class FromArrayProfile(Profile):
                         (r, axes["t"]),
                         xp.abs(self.array[imode, :, :])
                         + 1.0j * xp.unwrap(xp.angle(self.array[imode, :, :]), axis=0),
+                        method=interp_method,
                         bounds_error=False,
                         fill_value=0.0,
                     )

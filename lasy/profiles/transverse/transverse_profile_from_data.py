@@ -39,9 +39,17 @@ class TransverseProfileFromData(TransverseProfile):
         center of mass at the center of the image. It will
         also shift the x and y data axes such that (x,y) = (0,0)
         is also located at the center of the image. Default is True
+
+    interp_method : String
+        Interpolation method used to evaluate the array-defined field on the grid.
+        Supported options are "linear", "nearest", "slinear", "cubic",
+        "quintic", and "pchip". The default is "linear", but higher-order
+        methods may improve accuracy for smooth data.
     """
 
-    def __init__(self, intensity_data, lo, hi, center_data=True):
+    def __init__(
+        self, intensity_data, lo, hi, center_data=True, interp_method="linear"
+    ):
         super().__init__()
 
         intensity_data = intensity_data.astype("float64")
@@ -75,6 +83,7 @@ class TransverseProfileFromData(TransverseProfile):
         self.field_interp = RegularGridInterpolator(
             (y_data, x_data),
             xp.sqrt(intensity_data),
+            method=interp_method,
             bounds_error=False,
             fill_value=0.0,
         )
