@@ -12,6 +12,7 @@ from pprint import pprint
 import numpy as np
 import scipy.constants as ct
 import yaml
+from scipy.constants import pi
 from scipy.interpolate import CubicSpline
 
 from lasy.backend import to_cpu, to_gpu, xp
@@ -568,10 +569,10 @@ class Material:
             Third term (TOD), in units s^3/m
         """
         omega0 = float(omega0)
-        lam = 2 * xp.pi * ct.c / omega0  # Sellmeier and everything uses dn/dlambda!
+        lam = 2 * pi * ct.c / omega0  # Sellmeier and everything uses dn/dlambda!
         lam_mu = 1e6 * lam
         dphi = (self.calc_n(lam_mu) - lam * self._dn_dw(lam_mu, 1)) / ct.c
-        ddphi = lam**3 / (2 * xp.pi * ct.c**2) * self._dn_dw(lam_mu, 2)
+        ddphi = lam**3 / (2 * pi * ct.c**2) * self._dn_dw(lam_mu, 2)
         dddphi = (
             -1
             / (omega0**2 * ct.c)

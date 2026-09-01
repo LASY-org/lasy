@@ -1,5 +1,6 @@
 from math import factorial
 
+from scipy.constants import pi
 from scipy.special import hermite
 
 from lasy.backend import to_cpu, to_gpu, xp
@@ -136,19 +137,19 @@ class HermiteGaussianTransverseProfile(TransverseProfile):
         self.z_foc = z_foc
         z_eval = -z_foc  # this links our observation position to Siegmann's definition
 
-        self.k0 = 2 * xp.pi / wavelength
+        self.k0 = 2 * pi / wavelength
 
         # Calculate Rayleigh Lengths
-        Zx = xp.pi * w_0x**2 / wavelength
-        Zy = xp.pi * w_0y**2 / wavelength
+        Zx = pi * w_0x**2 / wavelength
+        Zy = pi * w_0y**2 / wavelength
 
         # Calculate Size at Location Z
         wxZ = w_0x * xp.sqrt(1 + (z_eval / Zx) ** 2)
         wyZ = w_0y * xp.sqrt(1 + (z_eval / Zy) ** 2)
 
         # Calculate Multiplicative Factors
-        Anx = 1 / xp.sqrt(wxZ * 2 ** (m - 1 / 2) * factorial(m) * xp.sqrt(xp.pi))
-        Any = 1 / xp.sqrt(wyZ * 2 ** (n - 1 / 2) * factorial(n) * xp.sqrt(xp.pi))
+        Anx = 1 / xp.sqrt(wxZ * 2 ** (m - 1 / 2) * factorial(m) * xp.sqrt(pi))
+        Any = 1 / xp.sqrt(wyZ * 2 ** (n - 1 / 2) * factorial(n) * xp.sqrt(pi))
 
         # Calculate the Phase contributions from propagation
         phiXz = (m + 1 / 2) * xp.arctan2(z_eval, Zx)

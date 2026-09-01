@@ -1,3 +1,5 @@
+from scipy.constants import pi
+
 from lasy.backend import xp
 
 from .transverse_profile import TransverseProfile
@@ -50,7 +52,7 @@ class GaussianTransverseProfile(TransverseProfile):
             assert wavelength is not None, (
                 "You need to pass the wavelength, when `z_foc` is non-zero."
             )
-            self.z_foc_over_zr = z_foc * wavelength / (xp.pi * w0**2)
+            self.z_foc_over_zr = z_foc * wavelength / (pi * w0**2)
 
     def _evaluate(self, x, y):
         """

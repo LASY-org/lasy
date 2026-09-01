@@ -1,5 +1,5 @@
 import h5py
-from scipy.constants import c
+from scipy.constants import c, pi
 
 from lasy.backend import xp
 
@@ -65,7 +65,7 @@ class FromInsightFile(FromArrayProfile):
         data *= xp.exp(1j * omega0 * t[None, None, :])
 
         # created LASY profile using FromArrayProfile class
-        wavelength = 2 * xp.pi * c / omega0
+        wavelength = 2 * pi * c / omega0
         dim = "xyt"
         axes = {"x": x, "y": y, "t": t}
         super().__init__(

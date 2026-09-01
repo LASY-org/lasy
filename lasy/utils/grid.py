@@ -1,5 +1,7 @@
 import copy
 
+from scipy.constants import pi
+
 from lasy.backend import to_cpu, to_gpu, use_cupy, xp
 
 from .fft_wrapper import fft, frequency_axis
@@ -87,7 +89,7 @@ class Grid:
                 )
             if dim == "rt":
                 lo[0] = 0.0
-                hi[0] = xp.sqrt(1 / xp.pi)
+                hi[0] = xp.sqrt(1 / pi)
                 npoints[0] = 1
             else:
                 lo[0] = -0.5
