@@ -1,4 +1,4 @@
-from scipy.constants import c
+from scipy.constants import c, pi
 
 from lasy.backend import xp
 
@@ -38,8 +38,8 @@ class Profile(object):
         norm_pol = xp.sqrt(xp.abs(pol[0]) ** 2 + xp.abs(pol[1]) ** 2)
         self.pol = xp.array([pol[0] / norm_pol, pol[1] / norm_pol])
         self.lambda0 = wavelength
-        self.omega0 = 2 * xp.pi * c / self.lambda0
-        self.k0 = 2.0 * xp.pi / wavelength
+        self.omega0 = 2 * pi * c / self.lambda0
+        self.k0 = 2.0 * pi / wavelength
         self.is_cw = False
         self.is_plane_wave = False
 

@@ -1,4 +1,4 @@
-from scipy.constants import c
+from scipy.constants import c, pi
 
 from lasy.backend import xp
 
@@ -73,9 +73,9 @@ class LongitudinalProfileFromData(LongitudinalProfile):
                 wavelength = data["axis"]  # Accept as wavelength
                 spectral_intensity = data["intensity"]
             else:
-                wavelength = 2.0 * xp.pi * c / data["axis"]  # Convert to wavelength
+                wavelength = 2.0 * pi * c / data["axis"]  # Convert to wavelength
                 spectral_intensity = (
-                    data["intensity"] * 2.0 * xp.pi * c / wavelength**2
+                    data["intensity"] * 2.0 * pi * c / wavelength**2
                 )  # Convert spectral data
             assert xp.all(xp.diff(wavelength) > 0) or xp.all(xp.diff(wavelength) < 0), (
                 'data["axis"] must be in monotonically increasing or decreasing order.'

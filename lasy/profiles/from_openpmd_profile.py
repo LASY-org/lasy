@@ -1,5 +1,5 @@
 import openpmd_api as io
-from scipy.constants import c
+from scipy.constants import c, pi
 
 from lasy.backend import xp
 from lasy.utils.laser_utils import (
@@ -113,7 +113,7 @@ class FromOpenPMDProfile(FromArrayProfile):
             env_array_list[imajor] = grid_major.get_temporal_field()
             env_array_list[iminor] = grid_minor.get_temporal_field()
             array, pol = isolate_polarization(env_array_list, dim)
-        wavelength = 2 * xp.pi * c / omg0
+        wavelength = 2 * pi * c / omg0
 
         super().__init__(
             wavelength=wavelength,

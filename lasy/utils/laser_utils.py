@@ -1,6 +1,6 @@
 from axiprop.containers import ScalarFieldEnvelope
 from axiprop.lib import PropagatorFFT2, PropagatorResampling
-from scipy.constants import c, e, epsilon_0, m_e
+from scipy.constants import c, e, epsilon_0, m_e, pi
 
 from lasy.backend import hilbert, to_cpu, to_gpu, use_cupy, xp
 
@@ -471,7 +471,7 @@ def get_spectrum(
 
     # Convert to spectral energy density (J/(m^2 rad Hz)).
     if method != "raw":
-        spectrum = xp.abs(spectrum) ** 2 * epsilon_0 * c / xp.pi
+        spectrum = xp.abs(spectrum) ** 2 * epsilon_0 * c / pi
 
     # Integrate transversely.
     if method == "sum":
@@ -798,7 +798,7 @@ def get_grid_cell_volume(grid, dim):
         r = grid.axes[0]
         dr = grid.dx[0]
         # 1D array that computes the volume of radial cells
-        dV = xp.pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
+        dV = pi * ((r + 0.5 * dr) ** 2 - (r - 0.5 * dr) ** 2) * dz
     return dV
 
 
@@ -1030,7 +1030,7 @@ def import_from_z(
     field_fft = xp.fft.fft(field_z, axis=z_axis_indx, norm="forward")
 
     # Create the axes for wavenumbers, and for corresponding frequency
-    omega = 2 * xp.pi * xp.fft.fftfreq(Nz, dz / c) + omega0
+    omega = 2 * pi * xp.fft.fftfreq(Nz, dz / c) + omega0
     k_z = omega / c
 
     if dim == "rt":
@@ -1527,7 +1527,7 @@ def get_bandwidth(grid, dim, method="sum", level=None, unit="rad/s", omega0=None
     # Choose axis along which to calculate the bandwidth
     if unit == "m":  # convert omega to wavelength
         assert omega0, "'omega0' must be provided to calculate bandwidth in meters."
-        width_axis = 2 * xp.pi * c / (omega + omega0)
+        width_axis = 2 * pi * c / (omega + omega0)
     else:  # keep omega as that axis
         width_axis = omega
 

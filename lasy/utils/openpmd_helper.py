@@ -2,7 +2,7 @@ import os
 import sys
 
 import openpmd_api as io
-from scipy.constants import c
+from scipy.constants import c, pi
 
 from lasy import __version__ as lasy_version
 from lasy.backend import to_cpu, to_gpu, xp
@@ -117,7 +117,7 @@ def write_to_openpmd_file(
         m.axis_labels = ["t", "r"]
 
     # Store metadata needed to reconstruct the field
-    m.set_attribute("angularFrequency", to_cpu(2 * xp.pi * c / wavelength))
+    m.set_attribute("angularFrequency", to_cpu(2 * pi * c / wavelength))
     m.set_attribute("polarization", to_cpu(pol))
     if save_as_vector_potential:
         m.set_attribute("envelopeField", "normalized_vector_potential")
@@ -132,7 +132,7 @@ def write_to_openpmd_file(
         }
 
     if save_as_vector_potential:
-        array = field_to_vector_potential(grid, 2 * xp.pi * c / wavelength)
+        array = field_to_vector_potential(grid, 2 * pi * c / wavelength)
 
     # Pick the correct field
     assert dim in ["xyt", "rt"]

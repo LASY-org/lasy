@@ -1,6 +1,6 @@
 import copy
 
-from scipy.constants import c
+from scipy.constants import c, pi
 
 from lasy.backend import xp, zoom_fft
 
@@ -99,7 +99,7 @@ class FresnelChirpZPropagator(Propagator):
     >>> # Propagate the laser pulse to the focal plane and visualise.
     >>> laser.propagate(focal_length, grid_out=newGrid)
     >>> laser.show(envelope_type="intensity")
-    >>> w0theory = 0.8e-6 * focal_length / (xp.pi * 5e-3)
+    >>> w0theory = 0.8e-6 * focal_length / (pi * 5e-3)
     >>> print("w0 theoretical: %.2e m" % (w0theory))
     """
 
@@ -135,8 +135,8 @@ class FresnelChirpZPropagator(Propagator):
         sample_frequency_y = (len(y) - 1) / y_range
 
         # Convert desired frequency from rad/s to Hz
-        freq_x = k_x / 2 / xp.pi
-        freq_y = k_y / 2 / xp.pi
+        freq_x = k_x / 2 / pi
+        freq_y = k_y / 2 / pi
 
         FreqX, FreqY = xp.meshgrid(
             freq_x,
@@ -165,7 +165,7 @@ class FresnelChirpZPropagator(Propagator):
         )
 
         # Apply the phase factor to shift the transform. Similar to a Fourier Transform shift.
-        F *= xp.exp(1j * FreqX * xp.pi * x_range) * xp.exp(1j * FreqY * xp.pi * y_range)
+        F *= xp.exp(1j * FreqX * pi * x_range) * xp.exp(1j * FreqY * pi * y_range)
 
         return F
 
@@ -233,14 +233,14 @@ class FresnelChirpZPropagator(Propagator):
 
         for indx in indxs:
             om = omega[indx]
-            wavelength = 2 * xp.pi * c / om
+            wavelength = 2 * pi * c / om
             k = om / c
 
             prefactor = xp.exp(1j * k / 2 / distance * (X**2 + Y**2))
 
             # Calculate the required fourier frequencies from output grid
-            k_x = 2 * xp.pi * xF / wavelength / distance
-            k_y = 2 * xp.pi * yF / wavelength / distance
+            k_x = 2 * pi * xF / wavelength / distance
+            k_y = 2 * pi * yF / wavelength / distance
 
             # Perform the 2D Zoom FFT
             F = self._zoomFourierTransform2D(
