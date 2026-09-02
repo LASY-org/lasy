@@ -154,6 +154,8 @@ def show_laser(
             grid.hi[0] / units["x"]["value"],
         ]
 
+    extent = [float(e) for e in extent]
+
     fig, ax = plt.subplots()
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="3%", pad=0.075)
