@@ -10,9 +10,7 @@ from .propagator import Propagator
 
 
 class FresnelChirpZPropagatorRT(Propagator):
-    r"""Class that represents a Fresnel propagator for cylindrical (rt) geometry,
-    based on a zoomed quasi-discrete Hankel transform — the cylindrical analogue
-    of the Chirp-Z (zoom FFT) approach used in :class:`FresnelChirpZPropagator`.
+    r"""Class that represents a Fresnel propagator based upon the zoomed quasi-discrete Hankel transform.
 
     For an azimuthally symmetric scalar field :math:`E_0(r',0,\omega)`, the
     propagated field at distance :math:`z` under the Fresnel approximation is:
