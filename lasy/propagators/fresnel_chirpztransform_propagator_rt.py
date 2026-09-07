@@ -134,10 +134,9 @@ class FresnelChirpZPropagatorRT(Propagator):
 
     def _zoomHankelTransform(self, r, f, k_r):
         r"""
-        Zeroth-order Hankel transform evaluated at arbitrary output spatial
-        frequencies, the cylindrical analogue of the zoom (Chirp-Z) FFT.
+        Zeroth-order Hankel transform evaluated at arbitrary output spatial freqs.
 
-        Computes the discrete approximation:
+        Cylindrical analogue of the zoom (Chirp-Z) FFT computes the discrete approximation:
 
         .. math::
 
@@ -193,8 +192,7 @@ class FresnelChirpZPropagatorRT(Propagator):
 
     def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None):
         r"""
-        Propagate the laser field in the z direction by a given distance using
-        the zoomed Hankel transform method.
+        Propagate the laser field in the z direction using zoomed Hankel transform method.
 
         Parameters
         ----------
