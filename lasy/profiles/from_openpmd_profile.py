@@ -40,7 +40,9 @@ class FromOpenPMDProfile(FromArrayProfile):
         Set the central frequency for the envelope construction. Necessary when "angularFrequency" is not detected in the openpmd file.
     """
 
-    def __init__(self, file_name, envelope_name=None, iteration=None, verbose=False, omega0 = None):
+    def __init__(
+        self, file_name, envelope_name=None, iteration=None, verbose=False, omega0=None
+    ):
         series = io.Series(file_name, io.Access.read_only)
         iterations = xp.array(series.iterations)
         if iteration is None:
@@ -61,16 +63,16 @@ class FromOpenPMDProfile(FromArrayProfile):
             dim = "xyt" if geometry == "cartesian" else "rt"
             try:
                 omg0 = float(m.get_attribute("angularFrequency"))
-            
+
             except io.ErrorNoSuchAttribute:
                 if omega0 is None:
                     raise ValueError(
                         "'angularFrequency' is missing from the openPMD file. "
                         "Please provide omega0 manually in rad/s."
                     )
-            
+
                 omg0 = float(omega0)
-            
+
                 if omg0 <= 0:
                     raise ValueError("omega0 must be positive.")
             position = m.grid_global_offset[0] * c
