@@ -2,7 +2,7 @@ import copy
 
 from scipy.constants import c
 
-from lasy.backend import xp, zoom_fft, j0
+from lasy.backend import j0, xp, zoom_fft
 
 from .propagator import Propagator
 
@@ -296,25 +296,29 @@ class FresnelChirpZPropagator(Propagator):
         indxs = xp.argsort(omega)
 
         # --- Geometry-specific propagation ---
-        if self.dim == 'xyt':
-            x, y   = grid_in.axes[0],  grid_in.axes[1]
+        if self.dim == "xyt":
+            x, y = grid_in.axes[0], grid_in.axes[1]
             xF, yF = grid_out.axes[0], grid_out.axes[1]
 
-            assert xp.isclose(xp.mean(x),  0, atol=1e-8 * xp.abs(x[-1]  - x[0])),  \
+            assert xp.isclose(xp.mean(x), 0, atol=1e-8 * xp.abs(x[-1] - x[0])), (
                 "Input grid x-axis is not centered around zero."
-            assert xp.isclose(xp.mean(y),  0, atol=1e-8 * xp.abs(y[-1]  - y[0])),  \
+            )
+            assert xp.isclose(xp.mean(y), 0, atol=1e-8 * xp.abs(y[-1] - y[0])), (
                 "Input grid y-axis is not centered around zero."
-            assert xp.isclose(xp.mean(xF), 0, atol=1e-8 * xp.abs(xF[-1] - xF[0])), \
+            )
+            assert xp.isclose(xp.mean(xF), 0, atol=1e-8 * xp.abs(xF[-1] - xF[0])), (
                 "Output grid x-axis is not centered around zero."
-            assert xp.isclose(xp.mean(yF), 0, atol=1e-8 * xp.abs(yF[-1] - yF[0])), \
+            )
+            assert xp.isclose(xp.mean(yF), 0, atol=1e-8 * xp.abs(yF[-1] - yF[0])), (
                 "Output grid y-axis is not centered around zero."
+            )
 
-            X,  Y  = xp.meshgrid(x,  y,  indexing="ij")
+            X, Y = xp.meshgrid(x, y, indexing="ij")
             XF, YF = xp.meshgrid(xF, yF, indexing="ij")
 
             for indx in indxs:
                 om = omega[indx]
-                k  = om / c
+                k = om / c
                 wavelength = 2 * xp.pi / k
 
                 prefactor = xp.exp(1j * k / (2 * distance) * (X**2 + Y**2))
@@ -333,13 +337,13 @@ class FresnelChirpZPropagator(Propagator):
 
                 field_out[:, :, indx] = F * postFactor
 
-        elif self.dim == 'rt':
-            r  = grid_in.axes[0]
+        elif self.dim == "rt":
+            r = grid_in.axes[0]
             rF = grid_out.axes[0]
 
             for indx in indxs:
                 om = omega[indx]
-                k  = om / c
+                k = om / c
 
                 prefactor = xp.exp(1j * k / (2 * distance) * r**2)
                 k_r = k * rF / distance
