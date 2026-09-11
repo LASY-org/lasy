@@ -28,12 +28,12 @@ class Axicon(OpticalElement):
         T(\boldsymbol{x}_\perp,\omega) = \exp\!\left(-i\,\frac{\omega}{\omega_0}\,
         \phi_0(\boldsymbol{x}_\perp)\right)
 
-    A diffractive axicon is a thin phase element with a fixed physical groove depth. 
-    At the design frequency :math:`\omega_0` (equivalently, a design wavelength), the 
-    groove depth is chosen so that the phase matches the ideal (continuous) axicon 
+    A diffractive axicon is a thin phase element with a fixed physical groove depth.
+    At the design frequency :math:`\omega_0` (equivalently, a design wavelength), the
+    groove depth is chosen so that the phase matches the ideal (continuous) axicon
     phase, wrapped into :math:`(-\pi,\pi]` since only phase modulo :math:`2\pi` can be
     physically imprinted.
-    
+
     The sawtooth (blazed-grating) phase profile of the physical element is:
 
     .. math::
@@ -56,7 +56,7 @@ class Axicon(OpticalElement):
     axicon_type : str (optional, default=``R``)
         The axicon type to use, either ``R`` or ``D``
     lambda0 : float (in m, optional, default=0.8e-6)
-        If using axicon_type=``D``, the design (angular) wavelength for which 
+        If using axicon_type=``D``, the design (angular) wavelength for which
         the diffractive axicon's physical groove profile was fabricated should
         be specified.
     """
@@ -64,7 +64,7 @@ class Axicon(OpticalElement):
     def __init__(self, gamma, axicon_type="R", lambda0=0.8e-6):
         self.gamma = gamma
         self.axicon_type = axicon_type
-        self.omega0 = 2.*xp.pi*c / (lambda0)
+        self.omega0 = 2.0 * xp.pi * c / (lambda0)
         assert self.axicon_type in ("R", "D"), (
             f"axicon type must be 'R' or 'D', got {self.axicon_type!r}"
         )
@@ -85,11 +85,11 @@ class Axicon(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        if self.axicon_type=="R":
+        if self.axicon_type == "R":
             return xp.exp(
                 -2j * (omega / c) * xp.sqrt(x**2 + y**2) * xp.tan(0.5 * self.gamma)
             )
-        elif self.axicon_type=="D":
+        elif self.axicon_type == "D":
             unwrapped = (
                 2 * (self.omega0 / c) * xp.sqrt(x**2 + y**2) * xp.tan(0.5 * self.gamma)
             )
