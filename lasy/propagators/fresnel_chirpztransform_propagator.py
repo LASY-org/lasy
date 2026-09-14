@@ -30,7 +30,7 @@ class FresnelChirpZPropagator(Propagator):
 
     where :math:`G` is given by:
 
-    .. math::
+    .. math::s
 
         G = \frac{ \omega \exp{(\frac{i \omega z}{c}) \exp(i\omega\frac{x^2+y^2}{2 c z})}}{i 2 \pi c z}
 
@@ -166,6 +166,8 @@ class FresnelChirpZPropagator(Propagator):
         self.dim = dim
         self.omega0 = omega0
 
+        assert dim in ['xyt', 'rt'], "Invalid dimension, must be 'xyt' or 'rt'"
+
     def _zoomFourierTransform2D(self, x, y, f, k_x, k_y):
         # Get initial grid spacing in each axis
         dx = x[1] - x[0]
@@ -232,7 +234,7 @@ class FresnelChirpZPropagator(Propagator):
         Parameters
         ----------
         r : array_like, shape (N,)
-            Uniformly-spaced radial coordinates of the input field
+            Uniformly spaced radial coordinates of the input field
             (must start at or very near zero).
 
         f : array_like, shape (N,)
@@ -240,7 +242,7 @@ class FresnelChirpZPropagator(Propagator):
 
         k_r : array_like, shape (M,)
             Radial spatial frequencies (rad m⁻¹) at which to evaluate the
-            transform.  Typically ``k_r = k * r_out / z``.
+            transform. Typically ``k_r = k * r_out / z``.
 
         Returns
         -------
@@ -285,14 +287,17 @@ class FresnelChirpZPropagator(Propagator):
 
         # --- Common setup ---
         initial_position = grid_in.position
+        
+        # Get the spectral field from the grid objects
         field_in, omega = grid_in.get_spectral_field()
 
         if grid_out is None:
+            # Create a new grid for the output if not provided
             grid_out = copy.deepcopy(grid_in)
             grid_out.set_spectral_field(xp.zeros_like(field_in))
         field_out = grid_out.spectral_field
 
-        omega = omega + omega0  # avoid mutating the grid's internal array
+        omega += omega0
         indxs = xp.argsort(omega)
 
         # --- Geometry-specific propagation ---
@@ -317,8 +322,7 @@ class FresnelChirpZPropagator(Propagator):
             XF, YF = xp.meshgrid(xF, yF, indexing="ij")
 
             for indx in indxs:
-                om = omega[indx]
-                k = om / c
+                k = omega[indx] / c
                 wavelength = 2 * xp.pi / k
 
                 prefactor = xp.exp(1j * k / (2 * distance) * (X**2 + Y**2))
@@ -342,8 +346,7 @@ class FresnelChirpZPropagator(Propagator):
             rF = grid_out.axes[0]
 
             for indx in indxs:
-                om = omega[indx]
-                k = om / c
+                k = omega[indx] / c
 
                 prefactor = xp.exp(1j * k / (2 * distance) * r**2)
                 k_r = k * rF / distance
@@ -355,15 +358,14 @@ class FresnelChirpZPropagator(Propagator):
                 )
 
                 postFactor = (
-                    (-1j * k / distance)
+                    -1j * k / distance
                     * xp.exp(1j * k * distance)
                     * xp.exp(1j * k / (2 * distance) * rF**2)
                 )
 
                 field_out[:, :, indx] = F * postFactor
 
-        # --- Common teardown ---
-        # Shift pulse back to centre of time axis; broadcast omega over all spatial axes
+        # Shift the pulse back to the center of the time axis
         omega_bc = omega.reshape((1,) * (field_out.ndim - 1) + (-1,))
         field_out *= xp.exp(-1j * omega_bc * distance / c)
 
