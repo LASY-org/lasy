@@ -53,20 +53,21 @@ class Axicon(OpticalElement):
         The angle that the outcoming rays (coming from the axicon) would make
         with the optical axis, if the incoming rays (impinging on the axicon)
         are parallel to the optical axis.
-    axicon_type : str (optional, default=``R``)
-        The axicon type to use, either ``R`` or ``D``
+    axicon_type : string (optional, default=``'reflective'``)
+        The axicon type to use, ``'reflective'`` or ``'diffractive'``.
+        For a refractive axicon, use ``'reflective'``, the profiles are identical in this implementation.
     lambda0 : float (in m, optional, default=0.8e-6)
-        If using axicon_type=``D``, the design (angular) wavelength for which
+        If using axicon_type=``diffractive``, the design (angular) wavelength for which
         the diffractive axicon's physical groove profile was fabricated should
         be specified.
     """
 
-    def __init__(self, gamma, axicon_type="R", lambda0=0.8e-6):
+    def __init__(self, gamma, axicon_type="reflective", lambda0=0.8e-6):
         self.gamma = gamma
         self.axicon_type = axicon_type
-        self.omega0 = 2.0 * xp.pi * c / (lambda0)
-        assert self.axicon_type in ("R", "D"), (
-            f"axicon type must be 'R' or 'D', got {self.axicon_type!r}"
+        self.omega0 = 2.0 * xp.pi * c / lambda0
+        assert self.axicon_type in ("reflective", "diffractive"), (
+            f"axicon type must be 'reflective' or 'diffractive', got {self.axicon_type!r}"
         )
 
     def amplitude_multiplier(self, x, y, omega):
@@ -85,11 +86,11 @@ class Axicon(OpticalElement):
             Contains the value of the multiplier at the specified points.
             This array has the same shape as the array omega.
         """
-        if self.axicon_type == "R":
+        if self.axicon_type == "reflective":
             return xp.exp(
                 -2j * (omega / c) * xp.sqrt(x**2 + y**2) * xp.tan(0.5 * self.gamma)
             )
-        elif self.axicon_type == "D":
+        elif self.axicon_type == "diffractive":
             unwrapped = (
                 2 * (self.omega0 / c) * xp.sqrt(x**2 + y**2) * xp.tan(0.5 * self.gamma)
             )
