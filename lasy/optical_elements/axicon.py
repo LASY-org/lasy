@@ -53,9 +53,9 @@ class Axicon(OpticalElement):
         The angle that the outcoming rays (coming from the axicon) would make
         with the optical axis, if the incoming rays (impinging on the axicon)
         are parallel to the optical axis.
-    axicon_type : string (optional, default=``'reflective'``)
-        The axicon type to use, ``'reflective'`` or ``'diffractive'``.
-        For a refractive axicon, use ``'reflective'``, the profiles are identical in this implementation.
+    axicon_type : string (optional, default=``reflective``)
+        The axicon type to use, ``reflective`` or ``diffractive``.
+        For a refractive axicon, use ``reflective``, the profiles are identical in this implementation.
     lambda0 : float (in m, optional, default=0.8e-6)
         If using axicon_type=``diffractive``, the design (angular) wavelength for which
         the diffractive axicon's physical groove profile was fabricated should
