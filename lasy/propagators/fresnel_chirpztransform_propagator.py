@@ -166,7 +166,7 @@ class FresnelChirpZPropagator(Propagator):
         self.dim = dim
         self.omega0 = omega0
 
-        assert dim in ['xyt', 'rt'], "Invalid dimension, must be 'xyt' or 'rt'"
+        assert dim in ["xyt", "rt"], "Invalid dimension, must be 'xyt' or 'rt'"
 
     def _zoomFourierTransform2D(self, x, y, f, k_x, k_y):
         # Get initial grid spacing in each axis
@@ -287,7 +287,7 @@ class FresnelChirpZPropagator(Propagator):
 
         # --- Common setup ---
         initial_position = grid_in.position
-        
+
         # Get the spectral field from the grid objects
         field_in, omega = grid_in.get_spectral_field()
 
@@ -358,7 +358,9 @@ class FresnelChirpZPropagator(Propagator):
                 )
 
                 postFactor = (
-                    -1j * k / distance
+                    -1j
+                    * k
+                    / distance
                     * xp.exp(1j * k * distance)
                     * xp.exp(1j * k / (2 * distance) * rF**2)
                 )
