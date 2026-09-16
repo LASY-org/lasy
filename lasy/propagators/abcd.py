@@ -22,7 +22,7 @@ class ABCD:
 
     """
 
-    def __init__(self, abcd=xp.array([[1, 0], [0, 1]])):
+    def __init__(self, abcd=None):
         super().__init__()
         self.abcd = abcd
 
