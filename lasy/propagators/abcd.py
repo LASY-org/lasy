@@ -46,7 +46,7 @@ class ABCD:
 
         """
         vacuum = xp.array([[1, float(distance)], [0, 1]])
-        if self.abcd == None:
+        if self.abcd is None:
             self.abcd = vacuum
         else:
             self.abcd = xp.matmul(vacuum, self.abcd)
@@ -71,7 +71,7 @@ class ABCD:
 
         """
         lens = xp.array([[1, 0], [-1.0 / focal_length, 1]])
-        if self.abcd == None:
+        if self.abcd is None:
             self.abcd = lens
         else:
             self.abcd = xp.matmul(lens, self.abcd)
