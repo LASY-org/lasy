@@ -9,7 +9,7 @@ class ABCD:
     ----------
     abcd : 2d array
         The 2D ray matrix of the optical system through which the beam propagates.
-        By default, this is initialised to be the unitary matrix:
+        By default, this is initialised to none:
 
 
         .. math::
