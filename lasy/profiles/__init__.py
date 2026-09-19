@@ -1,4 +1,9 @@
 from .combined_profile import CombinedLongitudinalTransverseProfile
+from .flying_focus_profiles import (
+    ParaxialFlyingFocusGaussianProfile,
+    ParaxialFlyingFocusHermiteGaussianProfile,
+    ParaxialFlyingFocusLaguerreGaussianProfile,
+)
 from .from_array_profile import FromArrayProfile
 from .from_insight_file import FromInsightFile
 from .from_openpmd_profile import FromOpenPMDProfile
@@ -14,4 +19,7 @@ __all__ = [
     "FromOpenPMDProfile",
     "FromInsightFile",
     "SpeckleProfile",
+    "ParaxialFlyingFocusGaussianProfile",
+    "ParaxialFlyingFocusHermiteGaussianProfile",
+    "ParaxialFlyingFocusLaguerreGaussianProfile",
 ]
