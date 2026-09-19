@@ -251,7 +251,7 @@ class Laser:
         distance : scalar
             Distance by which the laser pulse should be propagated
 
-        grid : Grid object (optional)
+        grid_out : Grid object (optional)
             Resample the field onto a new grid of different radial size and/or different number
             of radial grid points. Only works for ``'rt'``.
         """
