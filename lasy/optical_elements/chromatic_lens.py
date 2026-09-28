@@ -14,8 +14,8 @@ class ChromaticLens(OpticalElement):
     >>> R1 = 114.5e-3  # 1st ROC
     >>> t1 = 3.4e-3  # lens thickness
     >>> R2 = -114.5e-3  # 2nd ROC
-    >>> nFS = (
-    ...     lambda x: (
+    >>> nFS = lambda x: (
+    ...     (
     ...         1
     ...         + 0.6961663 / (1 - (0.0684043 / x) ** 2)
     ...         + 0.4079426 / (1 - (0.1162414 / x) ** 2)
