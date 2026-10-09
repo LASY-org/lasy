@@ -1,9 +1,10 @@
 from copy import deepcopy
 
 from scipy.constants import c
+from scipy.differentiate import derivative
 
 from lasy.backend import xp
-from lasy.utils.fft_wrapper import fft
+from lasy.utils.fft_wrapper import fft, frequency_axis
 
 from .propagator import Propagator
 
@@ -78,7 +79,15 @@ class AngularSpectrumPropagator(Propagator):
         self.omega0 = omega0 if omega0 is not None else self.omega0
         self.n = n  # refractive index
 
-    def propagate(self, grid_in, dim=None, omega0=None, distance=None, grid_out=None):
+    def propagate(
+        self,
+        grid_in,
+        dim=None,
+        omega0=None,
+        distance=None,
+        grid_out=None,
+        compensate_group_delay=True,
+    ):
         r"""
         Propagates the laser field in z direction by a given distance using the angular spectrum method.
 
@@ -103,6 +112,10 @@ class AngularSpectrumPropagator(Propagator):
             Grid object on which the propagated laser pulse is defined.
             Can be different from laser grid before propagation.
 
+        compensate_group_delay : bool (optional)
+            Whether to compensate the group delay between in-medium and vacuum propagation.
+            If True, the pulse will remain centered in the grid after propagation.
+
         Returns
         -------
         Grid object with laser data after propagation.
@@ -115,17 +128,28 @@ class AngularSpectrumPropagator(Propagator):
             grid_out = deepcopy(grid_in)
 
         if self.dim == "rt":
-            field, dt = self._propagate_mrt(distance, grid_in)
+            field = self._propagate_mrt(distance, grid_in)
+
+        elif (grid_in.shape[0] == 1) and (grid_in.shape[1] == 1):
+            field = self._propagate_1d(distance, grid_in)
 
         else:  # self.dim == "xyt"
-            field, dt = self._propagate_xyt(distance, grid_in)
+            field = self._propagate_xyt(distance, grid_in)
+
+        omega = frequency_axis("longitudinal", grid_in.axes[-1], "real")
+
+        if compensate_group_delay:
+            field, dt = self._compensate_group_delay(field, distance, omega)
+        else:
+            dt = 0
 
         # update the grid
-        grid_out.set_spectral_field(field)
         grid_out.position += distance
         grid_out.axes[-1] += dt
         grid_out.lo[-1] += dt
         grid_out.hi[-1] += dt
+
+        grid_out.set_spectral_field(field)
 
         return grid_out
 
@@ -183,10 +207,7 @@ class AngularSpectrumPropagator(Propagator):
             from_domain="real",
         )
 
-        # calculate time difference between propagation in vacuum and in medium
-        dt = distance / v_group - distance / c
-
-        return field, dt
+        return field
 
     def _propagate_mrt(self, distance, grid_in):
         print(
@@ -194,4 +215,85 @@ class AngularSpectrumPropagator(Propagator):
         )
         field = grid_in.field
         dt = 0
+        return field, dt
+
+    def _propagate_1d(self, distance, grid_in):
+        # Get the spectral field in the spatial domain
+        field, omega = grid_in.get_spectral_field()
+
+        omega += self.omega0
+        kz = omega / c
+
+        # Calculate the refractive index if it is a function of wavelength
+        n = self.n(2 * xp.pi * c / omega) if callable(self.n) else self.n
+
+        # Calculate the phase shift in k-space
+        phase = distance * n * kz[None, None, :]
+
+        field_propagated = field * xp.exp(1j * phase)
+
+        return field_propagated
+
+    def _calc_group_velocity(self, n, omega):
+        """Calculate the group velocity of the medium at the center frequency.
+
+        Parameters
+        ----------
+        n : 1d array or callable
+            Refractive index of the medium as a function of wavelength or a constant value.
+        omega : 1d array
+            Angular frequency array on which the propagated pulse is defined.
+        """
+        if callable(self.n):
+
+            def n_omega(om):
+                return self.n(2 * xp.pi * c / om)
+
+            dndom = derivative(n_omega, self.omega0, initial_step=self.omega0 * 0.1)[
+                "df"
+            ]
+            n0 = n_omega(self.omega0)
+
+        elif xp.ndim(self.n) > 0:
+            dndom = xp.gradient(n, omega)
+            dndom = xp.interp(self.omega0, omega, dndom)
+            n0 = xp.interp(self.omega0, omega, n)
+
+        else:
+            dndom = 0
+            n0 = self.n
+
+        self.v_group = c / (n0 + self.omega0 * dndom)
+
+    def _compensate_group_delay(self, field, distance, omega):
+        """Compensate the group delay of a pulse and calculate group delay relative to vacuum propagation.
+
+        Parameters
+        ----------
+        field : 3d array
+            The spectral field to be propagated.
+        distance : float
+            Propagation distance in meters.
+        omega : 1d arrray
+            Angular frequency array along which the field is defined.
+
+        Returns
+        -------
+        field: 3d array
+            Field with compensated group delay.
+        dt : float
+            Time difference between propagation in vacuum and in medium.
+        """
+        # compensate group delay to keep pulse centered in grid
+        if not hasattr(self, "v_group"):
+            self._calc_group_velocity(self.n, omega)
+
+        gd = distance / self.v_group
+        phase = -gd * (omega - self.omega0)[None, None, :]
+
+        # Apply the phase shift to the field in k-space
+        field *= xp.exp(1j * phase)
+
+        # calculate time difference between propagation in vacuum and in medium
+        dt = distance / self.v_group - distance / c
         return field, dt
