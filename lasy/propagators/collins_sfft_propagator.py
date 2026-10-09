@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from scipy.constants import c, epsilon_0
+from scipy.constants import c, epsilon_0, pi
 
 from lasy.backend import xp
 from lasy.utils.fft_wrapper import fft
@@ -130,11 +130,11 @@ class CollinsSFFTPropagator(Propagator):
             L0_width = xp.abs(x[-1] - x[0])
             N_points = len(x)
 
-            lambda0 = 2.0 * xp.pi * c / self.omega0
+            lambda0 = 2.0 * pi * c / self.omega0
             k0 = self.omega0 / c
 
             w0 = get_w0(grid_in, self.dim)  # Calculate input spot size
-            z_R = xp.pi * w0**2 / lambda0  # Calculate input Rayleigh range
+            z_R = pi * w0**2 / lambda0  # Calculate input Rayleigh range
 
             q1 = _q(0, 0, z_R)
 
@@ -259,8 +259,8 @@ class CollinsSFFTPropagator(Propagator):
             field
             * xp.exp(1j * OM / (2 * c) * (D / B) * R**2)
             * OM
-            / (2j * xp.pi * c * B)
-            / xp.abs(OM / (2j * xp.pi * c * B))
+            / (2j * pi * c * B)
+            / xp.abs(OM / (2j * pi * c * B))
         )
         field *= xp.sqrt(
             xp.sum(

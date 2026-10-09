@@ -1,5 +1,6 @@
 import math
 
+from scipy.constants import pi
 from scipy.special import binom
 
 from lasy.backend import to_cpu, to_gpu, xp
@@ -106,7 +107,7 @@ class FlattenedGaussianTransverseProfile(TransverseProfile):
             # Calculate effective waist of the Laguerre-Gauss modes, at focus
             self.w_foc = w0 * (self.N + 1) ** 0.5
             # Calculate Rayleigh Length
-            self.zr = xp.pi * self.w_foc**2 / wavelength
+            self.zr = pi * self.w_foc**2 / wavelength
             # Evaluation distance w.r.t focal position
             self.z_eval = z_foc
             # Calculate the coefficients for the Laguerre-Gaussian modes

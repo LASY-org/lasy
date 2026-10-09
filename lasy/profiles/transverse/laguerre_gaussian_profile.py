@@ -1,5 +1,6 @@
 from math import factorial
 
+from scipy.constants import pi
 from scipy.special import genlaguerre
 
 from lasy.backend import to_cpu, to_gpu, xp
@@ -127,16 +128,16 @@ class LaguerreGaussianTransverseProfile(TransverseProfile):
         self.z_foc = z_foc
         z_eval = -z_foc  # this links our observation position to Siegman's definition
 
-        self.k0 = 2 * xp.pi / wavelength
+        self.k0 = 2 * pi / wavelength
 
         # Calculate Rayleigh Length
-        Zr = xp.pi * w_0**2 / wavelength
+        Zr = pi * w_0**2 / wavelength
 
         # Calculate Size at Location Z
         w0Z = w_0 * xp.sqrt(1 + (z_eval / Zr) ** 2)
 
         # Calculate Multiplicative Factors
-        A = xp.sqrt(2.0 * factorial(p) / (xp.pi * factorial(m + p))) / w0Z
+        A = xp.sqrt(2.0 * factorial(p) / (pi * factorial(m + p))) / w0Z
 
         # Calculate the Phase contributions from propagation
         phiZ = (2.0 * p + m + 1) * xp.arctan2(z_eval, Zr)

@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from scipy.constants import c
+from scipy.constants import c, pi
 
 from lasy.backend import xp
 from lasy.utils.fft_wrapper import fft
@@ -144,11 +144,11 @@ class AngularSpectrumPropagator(Propagator):
             from_domain="frequency",
         )
 
-        kx = 2 * xp.pi * axes_freq[0]
-        ky = 2 * xp.pi * axes_freq[1]
+        kx = 2 * pi * axes_freq[0]
+        ky = 2 * pi * axes_freq[1]
 
         # Calculate the refractive index if it is a function of wavelength
-        n = self.n(2 * xp.pi * c / omega) if callable(self.n) else self.n
+        n = self.n(2 * pi * c / omega) if callable(self.n) else self.n
 
         # Calculate the phase shift in k-space
         phase = (
@@ -179,7 +179,7 @@ class AngularSpectrumPropagator(Propagator):
         field, _ = fft(
             arr_in=field_kspace,
             which="transverse",
-            axes_in=(kx / (2 * xp.pi), ky / (2 * xp.pi)),
+            axes_in=(kx / (2 * pi), ky / (2 * pi)),
             from_domain="real",
         )
 

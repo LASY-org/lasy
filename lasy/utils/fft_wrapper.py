@@ -1,3 +1,5 @@
+from scipy.constants import pi
+
 from lasy.backend import xp
 
 
@@ -170,8 +172,8 @@ def frequency_axis(which, axes_in, from_domain):
             xp.fft.fftfreq(axes_in[1].size, dy),
         ]
         if from_domain == "real":
-            axes_out[0] *= 2 * xp.pi
-            axes_out[1] *= 2 * xp.pi
+            axes_out[0] *= 2 * pi
+            axes_out[1] *= 2 * pi
 
         # Shift after FFT
         if shift_after:
@@ -193,7 +195,7 @@ def frequency_axis(which, axes_in, from_domain):
         # Build output axes data
         axes_out = xp.fft.fftfreq(axes_in.size, d)
         if from_domain == "real":
-            axes_out *= 2 * xp.pi
+            axes_out *= 2 * pi
 
         # Shift after FFT
         if shift_after:

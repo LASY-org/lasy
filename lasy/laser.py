@@ -1,3 +1,5 @@
+from scipy.constants import pi
+
 from lasy.backend import xp
 from lasy.utils.grid import Grid
 from lasy.utils.laser_utils import (
@@ -140,7 +142,7 @@ class Laser:
                     n_theta_evals = 2 * self.grid.n_azimuthal_modes - 1
                 # Make sure that there are enough points to resolve the azimuthal modes
                 assert n_theta_evals >= 2 * self.grid.n_azimuthal_modes - 1
-                theta1d = 2 * xp.pi / n_theta_evals * xp.arange(n_theta_evals)
+                theta1d = 2 * pi / n_theta_evals * xp.arange(n_theta_evals)
                 theta, r, t = xp.meshgrid(theta1d, *self.grid.axes, indexing="ij")
                 x = r * xp.cos(theta)
                 y = r * xp.sin(theta)

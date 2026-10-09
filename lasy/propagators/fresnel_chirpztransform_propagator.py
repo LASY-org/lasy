@@ -1,6 +1,6 @@
 import copy
 
-from scipy.constants import c
+from scipy.constants import c, pi
 
 from lasy.backend import j0, xp, zoom_fft
 
@@ -144,7 +144,7 @@ class FresnelChirpZPropagator(Propagator):
     >>> # Propagate the laser pulse to the focal plane and visualise.
     >>> laser.propagate(focal_length, grid_out=newGrid)
     >>> laser.show(envelope_type="intensity")
-    >>> w0theory = 0.8e-6 * focal_length / (xp.pi * 5e-3)
+    >>> w0theory = 0.8e-6 * focal_length / (pi * 5e-3)
     >>> print("w0 theoretical: %.2e m" % (w0theory))
     """
 
@@ -180,8 +180,8 @@ class FresnelChirpZPropagator(Propagator):
         sample_frequency_y = (len(y) - 1) / y_range
 
         # Convert desired frequency from rad/m to cycles/m
-        freq_x = k_x / (2 * xp.pi)
-        freq_y = k_y / (2 * xp.pi)
+        freq_x = k_x / (2 * pi)
+        freq_y = k_y / (2 * pi)
 
         FreqX, FreqY = xp.meshgrid(freq_x, freq_y)
 
@@ -207,7 +207,7 @@ class FresnelChirpZPropagator(Propagator):
         )
 
         # Apply phase shift to account for non-zero grid origin (analogous to FFT shift)
-        F *= xp.exp(1j * FreqX * xp.pi * x_range) * xp.exp(1j * FreqY * xp.pi * y_range)
+        F *= xp.exp(1j * FreqX * pi * x_range) * xp.exp(1j * FreqY * pi * y_range)
 
         return F
 
@@ -323,7 +323,7 @@ class FresnelChirpZPropagator(Propagator):
 
             for indx in indxs:
                 k = omega[indx] / c
-                wavelength = 2 * xp.pi / k
+                wavelength = 2 * pi / k
 
                 prefactor = xp.exp(1j * k / (2 * distance) * (X**2 + Y**2))
                 k_x = k * xF / distance

@@ -1,4 +1,4 @@
-from scipy.constants import c
+from scipy.constants import c, pi
 
 from lasy.backend import xp
 
@@ -28,7 +28,7 @@ def gen_gaussian_time_series(t_num, dt, fwhm, rms_mean):
         temporal_amplitude = xp.zeros(t_num, dtype=xp.complex128)
     else:
         omega = xp.fft.fftshift(xp.fft.fftfreq(t_num, d=dt))
-        psd = xp.exp(-xp.log(2) * 0.5 * xp.square(omega / fwhm * 2 * xp.pi))
+        psd = xp.exp(-xp.log(2) * 0.5 * xp.square(omega / fwhm * 2 * pi))
         spectral_amplitude = xp.array(psd) * (
             xp.random.normal(size=t_num) + 1j * xp.random.normal(size=t_num)
         )
@@ -317,13 +317,13 @@ class SpeckleProfile(Profile):
             pm_phase0 = gen_gaussian_time_series(
                 series_time.size + int(ssd_time_delay_sum / self.dt_update) + 2,
                 self.dt_update,
-                2 * xp.pi * self.ssd_phase_modulation_frequency[0],
+                2 * pi * self.ssd_phase_modulation_frequency[0],
                 self.ssd_phase_modulation_amplitude[0],
             )
             pm_phase1 = gen_gaussian_time_series(
                 series_time.size + int(ssd_time_delay_sum / self.dt_update) + 2,
                 self.dt_update,
-                2 * xp.pi * self.ssd_phase_modulation_frequency[1],
+                2 * pi * self.ssd_phase_modulation_frequency[1],
                 self.ssd_phase_modulation_amplitude[1],
             )
             time_interp = xp.arange(
@@ -395,7 +395,7 @@ class SpeckleProfile(Profile):
             phase_t = self.ssd_phase_modulation_amplitude[0] * xp.sin(
                 self.ssd_x_y_dephasing[0]
                 + 2
-                * xp.pi
+                * pi
                 * self.ssd_phase_modulation_frequency[0]
                 * (
                     t_now
@@ -404,7 +404,7 @@ class SpeckleProfile(Profile):
             ) + self.ssd_phase_modulation_amplitude[1] * xp.sin(
                 self.ssd_x_y_dephasing[1]
                 + 2
-                * xp.pi
+                * pi
                 * self.ssd_phase_modulation_frequency[1]
                 * (
                     t_now
@@ -474,7 +474,7 @@ class SpeckleProfile(Profile):
         y_focus_list = Y_focus_matrix[0, :]
         x_phase_focus_matrix = xp.exp(
             -2
-            * xp.pi
+            * pi
             * 1j
             / self.n_beamlets[0]
             * self.x_lens_list[:, xp.newaxis]
@@ -482,7 +482,7 @@ class SpeckleProfile(Profile):
         )
         y_phase_focus_matrix = xp.exp(
             -2
-            * xp.pi
+            * pi
             * 1j
             / self.n_beamlets[1]
             * self.y_lens_list[:, xp.newaxis]
@@ -530,13 +530,13 @@ class SpeckleProfile(Profile):
 
         # Calculate auxiliary parameters
         if "RPP" == self.temporal_smoothing_type.upper():
-            phase_plate = xp.random.choice([0, xp.pi], self.n_beamlets)
+            phase_plate = xp.random.choice([0, pi], self.n_beamlets)
         elif any(
             cpp_smoothing_type in self.temporal_smoothing_type.upper()
             for cpp_smoothing_type in ["CPP", "SSD"]
         ):
             phase_plate = xp.random.uniform(
-                -xp.pi, xp.pi, size=self.n_beamlets[0] * self.n_beamlets[1]
+                -pi, pi, size=self.n_beamlets[0] * self.n_beamlets[1]
             ).reshape(self.n_beamlets)
         elif "ISI" in self.temporal_smoothing_type.upper():
             phase_plate = xp.zeros(self.n_beamlets)  # ISI does not require phase plates
@@ -544,7 +544,7 @@ class SpeckleProfile(Profile):
             raise NotImplementedError
         exp_phase_plate = xp.exp(1j * phase_plate)
         if self.temporal_smoothing_type.upper() == "FM SSD":
-            self.ssd_x_y_dephasing = xp.random.standard_normal(2) * xp.pi
+            self.ssd_x_y_dephasing = xp.random.standard_normal(2) * pi
 
         series_time = xp.arange(0, t_max + self.dt_update, self.dt_update)
 

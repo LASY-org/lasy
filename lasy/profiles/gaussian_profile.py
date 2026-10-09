@@ -1,3 +1,5 @@
+from scipy.constants import pi
+
 from lasy.backend import xp
 
 from .profile import Profile
@@ -146,7 +148,7 @@ class GaussianProfile(Profile):
         self.t_peak = t_peak
         self.cep_phase = cep_phase
         self.z_foc = z_foc
-        self.z_foc_over_zr = z_foc * wavelength / (xp.pi * w0**2)
+        self.z_foc_over_zr = z_foc * wavelength / (pi * w0**2)
         self.phi2 = phi2
         self.beta = beta
         self.zeta = zeta
