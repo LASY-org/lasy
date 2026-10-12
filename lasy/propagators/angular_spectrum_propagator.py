@@ -161,8 +161,8 @@ class AngularSpectrumPropagator(Propagator):
         # compensate group delay to keep pulse centered in grid
         if xp.ndim(n) > 0:
             dndom = xp.gradient(n, omega)
-            dndom = xp.interp(xp.array([self.omega0]), omega, dndom)
-            n0 = xp.interp(xp.array([self.omega0]), omega, n)
+            dndom = xp.interp(xp.array([self.omega0]), omega, dndom)[0]
+            n0 = xp.interp(xp.array([self.omega0]), omega, n)[0]
         else:
             dndom = 0
             n0 = n
@@ -184,7 +184,7 @@ class AngularSpectrumPropagator(Propagator):
         )
 
         # calculate time difference between propagation in vacuum and in medium
-        dt = distance / v_group - distance / c
+        dt = float(distance / v_group - distance / c)
 
         return field, dt
 
