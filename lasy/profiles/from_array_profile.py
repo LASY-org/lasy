@@ -94,8 +94,7 @@ class FromArrayProfile(Profile):
                 self.field_interp_modes.append(
                     RegularGridInterpolator(
                         (r, axes["t"]),
-                        xp.abs(self.array[imode, :, :])
-                        + 1.0j * xp.unwrap(xp.angle(self.array[imode, :, :]), axis=0),
+                        self.array[imode, :, :],
                         bounds_error=False,
                         fill_value=0.0,
                     )
@@ -114,11 +113,9 @@ class FromArrayProfile(Profile):
                 combined_field += self.field_interp_modes[imode]((r, t)) * xp.exp(
                     -1j * imode * theta
                 )
-
-        return xp.abs(xp.real(combined_field)) * xp.exp(1.0j * xp.imag(combined_field))
+            return combined_field
 
     def evaluate_mrt(self, mode, r, t):
         """Return the envelope field of the scaled profile."""
         assert self.dim == "rt"
-        combined_field = self.field_interp_modes[mode]((r, t))
-        return xp.abs(xp.real(combined_field)) * xp.exp(1.0j * xp.imag(combined_field))
+        return self.field_interp_modes[mode]((r, t))

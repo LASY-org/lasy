@@ -199,12 +199,13 @@ def extract_array(m, series, component=None):
 
     """
     if component is not None:
-        array = to_gpu(m[component].load_chunk())
+        array_cpu = m[component].load_chunk()
         position = m[component].get_attribute("position")
     else:
-        array = to_gpu(m[io.Mesh_Record_Component.SCALAR].load_chunk())
+        array_cpu = m[io.Mesh_Record_Component.SCALAR].load_chunk()
         position = m.get_attribute("position")
     series.flush()
+    array = to_gpu(array_cpu)
     # node (0.0) or cell (0.5) centered info for each axis
     axis_labels = m.get_attribute("axisLabels")
     grid_offset = m.get_attribute("gridGlobalOffset")
