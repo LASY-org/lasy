@@ -1,4 +1,4 @@
-import numpy as np
+from lasy.backend import xp
 
 from .longitudinal_profile import LongitudinalProfile
 
@@ -57,7 +57,7 @@ class Sech2Profile(LongitudinalProfile):
         """
         envelope = (
             1
-            / np.cosh(t / self.tau)
-            * np.exp(1.0j * (self.cep_phase + self.omega0 * self.t_peak))
+            / xp.cosh(t / self.tau)
+            * xp.exp(1.0j * (self.cep_phase + self.omega0 * self.t_peak))
         )
         return envelope
