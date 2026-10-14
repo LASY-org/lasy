@@ -1,6 +1,6 @@
 import os
 
-lasy_backend = "AUTO"
+lasy_backend = "NP"
 if "LASY_BACKEND" in os.environ:
     assert os.environ["LASY_BACKEND"] in ["NP", "CP", "AUTO"], (
         "The enviroment variable 'LASY_BACKEND' must be one of "
