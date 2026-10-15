@@ -47,10 +47,10 @@ class FromArrayProfile(Profile):
         ['x', 'y', 't'] and ['t', 'y', 'x'].
 
     interp_method : String
-        Interpolation method used to evaluate the array-defined field on the grid.
-        Supported options are "linear", "nearest", "slinear", "cubic",
+        Interpolation method for creating a function from the data, passed to RegularGridInterpolator.
+        Supported options are those of Scipy's `RegularGridInterpolator`: "linear", "nearest", "slinear", "cubic",
         "quintic", and "pchip". The default is "linear", but higher-order
-        methods may improve accuracy for smooth data.
+        methods is sometimes preferable to have smoother data.
     """
 
     def __init__(
