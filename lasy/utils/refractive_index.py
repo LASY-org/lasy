@@ -750,7 +750,7 @@ def _formula9(lam, c1, c2, c3, c4, c5, c6):
 
 def _clean_yaml_file(filename):
     # Clean the nk and n2 file of the 'DIVIDER' items
-    clean_text = []    
+    clean_text = []
     with open(filename, encoding="utf-8") as f:
         for line in f:
             if "DIVIDER" not in line:
