@@ -31,7 +31,6 @@ class DHT(object):
         use_cuda: bool, optional
         Whether to use the GPU for the Hankel transform
         """
-        # Register values of the arguments
         self.m = m
         self.Nr = Nr
         self.rmax = rmax
@@ -112,7 +111,6 @@ class DHT(object):
         G: 2darray of complex values
         Array where the result will be stored
         """
-        # Perform the matrix product with M
         xp.matmul(self.M, F, out=G)
 
     def inverse_transform(self, G, F):
@@ -123,5 +121,4 @@ class DHT(object):
         F: 2darray of real or complex values
         Array where the result will be stored.
         """
-        # Perform the matrix product with invM
         xp.matmul(self.invM, G, out=F)
