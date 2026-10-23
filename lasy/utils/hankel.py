@@ -9,7 +9,6 @@ from lasy.backend import to_gpu, xp
 
 
 class DHT(object):
-
     def __init__(self, m, Nr, Nz, rmax):
         """
         Calculate the r (position) and kr (frequency) grid
@@ -32,7 +31,6 @@ class DHT(object):
         use_cuda: bool, optional
         Whether to use the GPU for the Hankel transform
         """
-
         # Register values of the arguments
         self.m = m
         self.Nr = Nr
@@ -89,7 +87,6 @@ class DHT(object):
         -------
         A real 1darray containing the values of the positions
         """
-
         return self.r
 
     def get_kr(self):
@@ -100,7 +97,6 @@ class DHT(object):
         -------
         A real 1darray containing the values of the frequencies
         """
-
         return self.kr
 
     def transform(self, F, G):
@@ -116,7 +112,6 @@ class DHT(object):
         G: 2darray of complex values
         Array where the result will be stored
         """
-
         # Perform the matrix product with M
         xp.matmul(self.M, F, out=G)
 
@@ -128,6 +123,5 @@ class DHT(object):
         F: 2darray of real or complex values
         Array where the result will be stored.
         """
-
         # Perform the matrix product with invM
         xp.matmul(self.invM, G, out=F)
