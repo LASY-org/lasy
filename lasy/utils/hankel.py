@@ -9,10 +9,11 @@ Definition of the Hankel forward and backward transform of order p:
 g(\nu) = 2 \pi \int_0^\infty f(r) J_p( 2 \pi \nu r) r dr
 f( r ) = 2 \pi \int_0^\infty g(\nu) J_p( 2 \pi \nu r) \nu d\nu d
 """
+
 import numpy as np
 from scipy.special import jn, jn_zeros
 
-from lasy.backend import xp, to_gpu
+from lasy.backend import to_gpu, xp
 
 
 class DHT(object):
@@ -20,15 +21,15 @@ class DHT(object):
     Class that allows to perform the Discrete Hankel Transform.
     """
 
-    def __init__(self, m, Nr, Nz, rmax ):
+    def __init__(self, m, Nr, Nz, rmax):
         """
         Calculate the r (position) and kr (frequency) grid
         on which the transform will operate.
 
         Also store auxiliary data needed for the transform.
 
-        Parameters:
-        ------------
+        Parameters
+        ----------
         m: int
         The azimuthal mode for which the Hankel transform is calculated
 
@@ -42,7 +43,6 @@ class DHT(object):
         use_cuda: bool, optional
         Whether to use the GPU for the Hankel transform
         """
-
         # Register values of the arguments
         self.m = m
         self.Nr = Nr
@@ -53,15 +53,15 @@ class DHT(object):
         if m != 0:
             # In this case, 0 is a zero of the Bessel function of order m.
             # It turns out that it is needed to reconstruct the signal for p=0.
-            alphas = np.hstack( (np.array([0.]), jn_zeros(m, Nr-1)) )
+            alphas = np.hstack((np.array([0.0]), jn_zeros(m, Nr - 1)))
         else:
             alphas = jn_zeros(m, Nr)
 
         # Calculate the spectral grid
-        self.kr = 1./(rmax) * alphas
+        self.kr = 1.0 / (rmax) * alphas
 
         # Calculate the spatial grid (Uniform grid with an half-cell offset)
-        self.r = (rmax/Nr) * np.arange(Nr)
+        self.r = (rmax / Nr) * np.arange(Nr)
 
         # Calculate and store the inverse matrix invM
         # (imposed by the constraints on the DHT of Bessel modes)
@@ -69,22 +69,22 @@ class DHT(object):
         # are calculated in transposed form. This is done so as to use the
         # `dot` and `gemm` functions, in the `transform` method.
         self.invM = np.empty((Nr, Nr))
-        denom = np.pi * rmax**2 * jn( m+1, alphas)**2
-        num = jn( m, self.r[:,np.newaxis]*self.kr[np.newaxis,:] )
+        denom = np.pi * rmax**2 * jn(m + 1, alphas) ** 2
+        num = jn(m, self.r[:, np.newaxis] * self.kr[np.newaxis, :])
         # Get the inverse matrix
         if m != 0:
             self.invM[:, 1:] = num[:, 1:] / denom[np.newaxis, 1:]
-            self.invM[:, 0] = 0.
-        else :
+            self.invM[:, 0] = 0.0
+        else:
             self.invM[:, :] = num[:, :] / denom[np.newaxis, :]
 
         # Calculate the matrix M by inverting invM
         self.M = np.empty((Nr, Nr))
         if m != 0:
-            self.M[1:, :] = np.linalg.pinv( self.invM[:,1:] )
-            self.M[0, :] = 0.
+            self.M[1:, :] = np.linalg.pinv(self.invM[:, 1:])
+            self.M[0, :] = 0.0
         else:
-            self.M = np.linalg.inv( self.invM )
+            self.M = np.linalg.inv(self.invM)
 
         self.M = to_gpu(self.M)
         self.invM = to_gpu(self.invM)
@@ -95,30 +95,28 @@ class DHT(object):
         """
         Return the r grid
 
-        Returns:
-        ---------
+        Returns
+        -------
         A real 1darray containing the values of the positions
         """
-        return( self.r )
-
+        return self.r
 
     def get_kr(self):
         """
         Return the natural, non-uniform kr grid
 
-        Returns:
-        ---------
+        Returns
+        -------
         A real 1darray containing the values of the frequencies
         """
-        return( self.kr )
+        return self.kr
 
-
-    def transform( self, F, G ):
+    def transform(self, F, G):
         """
         Perform the Hankel transform of F.
 
-        Parameters:
-        ------------
+        Parameters
+        ----------
         F: 2darray of complex values
         Array containing the discrete values of the function for which
         the discrete Hankel transform is to be calculated.
@@ -129,8 +127,7 @@ class DHT(object):
         # Perform the matrix product with M
         xp.matmul(self.M, F, out=G)
 
-
-    def inverse_transform( self, G, F ):
+    def inverse_transform(self, G, F):
         """
         G: 2darray of real or complex values
         Array containing the values from which to compute the DHT

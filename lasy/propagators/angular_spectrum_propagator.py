@@ -221,12 +221,14 @@ class AngularSpectrumPropagator(Propagator):
 
         Nr = len(grid_in.axes[0])
         Nz = len(grid_in.axes[-1])
-        rmax = grid_in.axes[0][-1] * Nr / (Nr-1)
+        rmax = grid_in.axes[0][-1] * Nr / (Nr - 1)
 
         key = (Nr, Nz, rmax, grid_in.n_azimuthal_modes)
         if self.dht_key != key:
             self.dht_key = key
-            self.dht_cache = [DHT(mode, Nr, Nz, rmax) for mode in grid_in.azimuthal_modes]
+            self.dht_cache = [
+                DHT(mode, Nr, Nz, rmax) for mode in grid_in.azimuthal_modes
+            ]
 
         dht_m = self.dht_cache
 
@@ -241,12 +243,7 @@ class AngularSpectrumPropagator(Propagator):
         n = self.n(2 * xp.pi * c / omega) if callable(self.n) else self.n
 
         # Calculate the phase shift in k-space
-        phase = (
-            distance
-            * n
-            * (kz[None, :] ** 2 - kr[:, None] ** 2)
-            ** 0.5
-        )
+        phase = distance * n * (kz[None, :] ** 2 - kr[:, None] ** 2) ** 0.5
 
         # compensate group delay to keep pulse centered in grid
         if xp.ndim(n) > 0:
