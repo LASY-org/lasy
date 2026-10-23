@@ -1,14 +1,6 @@
 # Copyright 2016, FBPIC contributors
 # Authors: Remi Lehe, Manuel Kirchen
 # License: 3-Clause-BSD-LBNL
-r"""
-This file is part of FBPIC (Fourier-Bessel Particle-In-Cell code).
-It defines the class that performs the Hankel transform.
-
-Definition of the Hankel forward and backward transform of order p:
-g(\nu) = 2 \pi \int_0^\infty f(r) J_p( 2 \pi \nu r) r dr
-f( r ) = 2 \pi \int_0^\infty g(\nu) J_p( 2 \pi \nu r) \nu d\nu d
-"""
 
 import numpy as np
 from scipy.special import jn, jn_zeros
@@ -17,9 +9,6 @@ from lasy.backend import to_gpu, xp
 
 
 class DHT(object):
-    """
-    Class that allows to perform the Discrete Hankel Transform.
-    """
 
     def __init__(self, m, Nr, Nz, rmax):
         """
@@ -43,6 +32,7 @@ class DHT(object):
         use_cuda: bool, optional
         Whether to use the GPU for the Hankel transform
         """
+
         # Register values of the arguments
         self.m = m
         self.Nr = Nr
@@ -93,22 +83,24 @@ class DHT(object):
 
     def get_r(self):
         """
-        Return the r grid
+        Return the r grid.
 
         Returns
         -------
         A real 1darray containing the values of the positions
         """
+
         return self.r
 
     def get_kr(self):
         """
-        Return the natural, non-uniform kr grid
+        Return the natural, non-uniform kr grid.
 
         Returns
         -------
         A real 1darray containing the values of the frequencies
         """
+
         return self.kr
 
     def transform(self, F, G):
@@ -124,16 +116,18 @@ class DHT(object):
         G: 2darray of complex values
         Array where the result will be stored
         """
+
         # Perform the matrix product with M
         xp.matmul(self.M, F, out=G)
 
     def inverse_transform(self, G, F):
         """
         G: 2darray of real or complex values
-        Array containing the values from which to compute the DHT
+        Array containing the values from which to compute the DHT.
 
         F: 2darray of real or complex values
-        Array where the result will be stored
+        Array where the result will be stored.
         """
+
         # Perform the matrix product with invM
         xp.matmul(self.invM, G, out=F)
