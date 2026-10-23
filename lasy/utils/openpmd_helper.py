@@ -69,13 +69,17 @@ def convert_xyt_to_rt(
     --------
     >>> from lasy.profiles.gaussian_profile import GaussianProfile
     >>> profile = GaussianProfile(
-    ...     wavelength=0.8e-6, pol=(1, 0), laser_energy=1.0,
-    ...     w0=25e-6, tau=30e-15, t_peak=0.0,
+    ...     wavelength=0.8e-6,
+    ...     pol=(1, 0),
+    ...     laser_energy=1.0,
+    ...     w0=25e-6,
+    ...     tau=30e-15,
+    ...     t_peak=0.0,
     ... )
     >>> laser_xyt = Laser(
     ...     dim="xyt",
     ...     lo=(-50e-6, -50e-6, -90e-15),
-    ...     hi=( 50e-6,  50e-6,  90e-15),
+    ...     hi=(50e-6, 50e-6, 90e-15),
     ...     npoints=(64, 64, 200),
     ...     profile=profile,
     ... )
@@ -83,9 +87,7 @@ def convert_xyt_to_rt(
     >>> laser_rt.write_to_file(file_prefix="converted", write_dir="diags")
     """
     if laser_xyt.dim != "xyt":
-        raise ValueError(
-            f"Expected a Laser with dim='xyt', got dim='{laser_xyt.dim}'."
-        )
+        raise ValueError(f"Expected a Laser with dim='xyt', got dim='{laser_xyt.dim}'.")
 
     grid_xyt = laser_xyt.grid
     x_axis, y_axis, t_axis = grid_xyt.axes
@@ -119,7 +121,7 @@ def convert_xyt_to_rt(
     if n_theta_evals < 2 * n_azimuthal_modes - 1:
         raise ValueError(
             f"n_theta_evals ({n_theta_evals}) must be >= "
-            f"2*n_azimuthal_modes - 1 = {2*n_azimuthal_modes - 1}."
+            f"2*n_azimuthal_modes - 1 = {2 * n_azimuthal_modes - 1}."
         )
 
     field_xyt = grid_xyt.get_temporal_field()
@@ -159,9 +161,7 @@ def convert_xyt_to_rt(
         y_pts = r_np[:, None] * xp.sin(theta) * xp.ones((1, nt))
         t_pts = xp.ones((nr, 1)) * t_np[None, :]
 
-        pts = xp.stack(
-            [x_pts.ravel(), y_pts.ravel(), t_pts.ravel()], axis=-1
-        )
+        pts = xp.stack([x_pts.ravel(), y_pts.ravel(), t_pts.ravel()], axis=-1)
 
         envelope_polar[i_theta] = (
             interpolator_re(pts) + 1j * interpolator_im(pts)
@@ -187,7 +187,7 @@ def convert_xyt_to_rt(
 
     return laser_rt
 
-    
+
 def write_to_openpmd_file(
     dim,
     write_dir,
