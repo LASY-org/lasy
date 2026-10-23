@@ -9,12 +9,13 @@ from lasy.backend import to_gpu, xp
 
 
 class DHT(object):
+    """
+    Class to compute the discrete Hankel transform.
+    """
+
     def __init__(self, m, Nr, Nz, rmax):
         """
-        Calculate the r (position) and kr (frequency) grid
-        on which the transform will operate.
-
-        Also store auxiliary data needed for the transform.
+        Initialize the Hankel transform.
 
         Parameters
         ----------
@@ -31,6 +32,7 @@ class DHT(object):
         use_cuda: bool, optional
         Whether to use the GPU for the Hankel transform
         """
+        # Register values of the arguments
         self.m = m
         self.Nr = Nr
         self.rmax = rmax
@@ -111,14 +113,20 @@ class DHT(object):
         G: 2darray of complex values
         Array where the result will be stored
         """
+        # Perform the matrix product with M
         xp.matmul(self.M, F, out=G)
 
     def inverse_transform(self, G, F):
         """
+        Perform the inverse Hankel transform of G.
+
+        Parameters
+        ----------
         G: 2darray of real or complex values
         Array containing the values from which to compute the DHT.
 
         F: 2darray of real or complex values
         Array where the result will be stored.
         """
+        # Perform the matrix product with invM
         xp.matmul(self.invM, G, out=F)
