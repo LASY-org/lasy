@@ -9,9 +9,7 @@ from lasy.backend import to_gpu, xp
 
 
 class DHT(object):
-    """
-    Class to compute the discrete Hankel transform.
-    """
+    """Class to compute the discrete Hankel transform."""
 
     def __init__(self, m, Nr, Nz, rmax):
         """
