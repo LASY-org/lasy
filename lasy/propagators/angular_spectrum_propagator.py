@@ -243,7 +243,9 @@ class AngularSpectrumPropagator(Propagator):
         n = self.n(2 * xp.pi * c / omega) if callable(self.n) else self.n
 
         # Calculate the phase shift in k-space
-        phase = distance * n * xp.sqrt(xp.maximum(0, kz[None, :] ** 2 - kr[:, None] ** 2))
+        phase = (
+            distance * n * xp.sqrt(xp.maximum(0, kz[None, :] ** 2 - kr[:, None] ** 2))
+        )
 
         # compensate group delay to keep pulse centered in grid
         if xp.ndim(n) > 0:
