@@ -27,8 +27,6 @@ class DHT(object):
         Edge of the box in which the Hankel transform is taken
         (The function is assumed to be zero at that point.)
 
-        use_cuda: bool, optional
-        Whether to use the GPU for the Hankel transform
         """
         # Register values of the arguments
         self.m = m
