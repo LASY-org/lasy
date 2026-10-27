@@ -26,6 +26,7 @@ def make_laser_xyt():
 
     return laser
 
+
 def make_laser_rt():
     profile = GaussianProfile(
         wavelength=800e-9,
@@ -44,6 +45,7 @@ def make_laser_rt():
     laser = Laser(dim=dim, hi=hi, lo=lo, npoints=npoints, profile=profile)
 
     return laser
+
 
 def test_spatial_propagation_xyt():
     """Verify that the waist of Gaussian beam evolves as expected."""
@@ -68,6 +70,7 @@ def test_spatial_propagation_xyt():
 
     assert xp.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
 
+
 def test_spatial_propagation_rt():
     """Verify that the waist of Gaussian beam evolves as expected."""
     laser = make_laser_rt()
@@ -90,6 +93,7 @@ def test_spatial_propagation_rt():
     waists_analytical = laser.profile.w0 * xp.sqrt(1 + (z_pos / zR) ** 2)
 
     assert xp.allclose(waists_propagated, waists_analytical, rtol=1e-5, atol=1e-6)
+
 
 def n_fusedsilica(wavelength):
     """Sellmeier equation for fused silica."""
@@ -129,6 +133,7 @@ def test_temporal_propagation_xyt():
     )
 
     assert xp.allclose(durations_propagated, duration_analytical, rtol=1e-5, atol=1e-15)
+
 
 def test_temporal_propagation_rt():
     """Verify that pulse broadenes as expected during propagation in material."""
