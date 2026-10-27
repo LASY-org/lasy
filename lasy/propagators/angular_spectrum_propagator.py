@@ -221,13 +221,13 @@ class AngularSpectrumPropagator(Propagator):
 
         Nr = len(grid_in.axes[0])
         Nz = len(grid_in.axes[-1])
-        rmax = grid_in.axes[0][-1] * Nr / (Nr - 1)
+        rmax = float(grid_in.axes[0][-1]) * Nr / (Nr - 1)
 
         key = (Nr, Nz, rmax, grid_in.n_azimuthal_modes)
         if self.dht_key != key:
             self.dht_key = key
             self.dht_cache = [
-                DHT(mode, Nr, Nz, rmax) for mode in grid_in.azimuthal_modes
+                DHT(int(mode), Nr, Nz, rmax) for mode in grid_in.azimuthal_modes
             ]
 
         dht_m = self.dht_cache
