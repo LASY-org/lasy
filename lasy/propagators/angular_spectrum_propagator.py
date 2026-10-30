@@ -5,6 +5,7 @@ from scipy.differentiate import derivative
 
 from lasy.backend import xp
 from lasy.utils.fft_wrapper import fft, frequency_axis
+from lasy.utils.hankel import DHT
 
 from .propagator import Propagator
 
@@ -48,6 +49,7 @@ class AngularSpectrumPropagator(Propagator):
     def __init__(self, omega0, dim, n=1.0):
         super().__init__()
         self.update(dim=dim, omega0=omega0, n=n)
+        self.dht_key = None
 
     def update(self, dim, omega0, n):
         r"""
@@ -210,12 +212,62 @@ class AngularSpectrumPropagator(Propagator):
         return field
 
     def _propagate_mrt(self, distance, grid_in):
-        print(
-            "'rt' geometry not yet supported by AngularSpectrumPropagator, skipping propagation"
+
+        # Get the spectral field in the spatial domain
+        field, omega = grid_in.get_spectral_field()
+
+        omega += self.omega0
+        kz = omega / c
+
+        Nr = len(grid_in.axes[0])
+        Nz = len(grid_in.axes[-1])
+        rmax = float(grid_in.axes[0][-1]) * Nr / (Nr - 1)
+
+        key = (Nr, Nz, rmax, grid_in.n_azimuthal_modes)
+        if self.dht_key != key:
+            self.dht_key = key
+            self.dht_cache = [
+                DHT(int(mode), Nr, Nz, rmax) for mode in grid_in.azimuthal_modes
+            ]
+
+        dht_m = self.dht_cache
+
+        kr = dht_m[0].get_kr()
+
+        field_kspace = xp.empty_like(field)
+
+        for im in range(len(dht_m)):
+            dht_m[im].transform(field[im], field_kspace[im])
+
+        # Calculate the refractive index if it is a function of wavelength
+        n = self.n(2 * xp.pi * c / omega) if callable(self.n) else self.n
+
+        # Calculate the phase shift in k-space
+        phase = (
+            distance * n * xp.sqrt(xp.maximum(0, kz[None, :] ** 2 - kr[:, None] ** 2))
         )
-        field = grid_in.field
-        dt = 0
-        return field, dt
+
+        # compensate group delay to keep pulse centered in grid
+        if xp.ndim(n) > 0:
+            dndom = xp.gradient(n, omega)
+            dndom = xp.interp(xp.array([self.omega0]), omega, dndom)[0]
+            n0 = xp.interp(xp.array([self.omega0]), omega, n)[0]
+        else:
+            dndom = 0
+            n0 = n
+
+        v_group = c / (n0 + self.omega0 * dndom)
+        gd = distance / v_group
+
+        phase = phase - gd * (omega - self.omega0)[None, :]
+
+        # Apply the phase shift to the field in k-space
+        field_kspace *= xp.exp(1j * phase)
+
+        for im in range(len(dht_m)):
+            dht_m[im].inverse_transform(field_kspace[im], field[im])
+
+        return field
 
     def _propagate_1d(self, distance, grid_in):
         # Get the spectral field in the spatial domain
