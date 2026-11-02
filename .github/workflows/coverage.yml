@@ -20,6 +20,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pytest coverage
+        pip install h5py
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Extract coverage percentage
       id: get_coverage
