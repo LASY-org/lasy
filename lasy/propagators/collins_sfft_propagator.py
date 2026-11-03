@@ -1,5 +1,5 @@
-from copy import deepcopy
 import warnings
+from copy import deepcopy
 
 from scipy.constants import c, epsilon_0
 
@@ -36,7 +36,7 @@ class CollinsSFFTPropagator(Propagator):
 
     The integral is evaluated with a single centred 2D FFT. The output
     coordinates follow the exact Collins mapping :math:`x = \lambda_0 B f_x`,
-    where :math:`f_x` is the FFT spatial frequency. 
+    where :math:`f_x` is the FFT spatial frequency.
     Note that this is currently monochromatic.
 
     Parameters
@@ -240,10 +240,7 @@ class CollinsSFFTPropagator(Propagator):
         # Output quadratic phase and phase of the Collins prefactor 1/(i*lambda*B)
         prefac = OM / (2j * xp.pi * c * B)
         field = (
-            field
-            * xp.exp(1j * OM / (2 * c) * (D / B) * R**2)
-            * prefac
-            / xp.abs(prefac)
+            field * xp.exp(1j * OM / (2 * c) * (D / B) * R**2) * prefac / xp.abs(prefac)
         )
 
         # Energy normalisation
