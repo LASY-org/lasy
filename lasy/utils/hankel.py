@@ -5,7 +5,7 @@
 import numpy as np
 from scipy.special import jn, jn_zeros
 
-from lasy.backend import to_cpu, to_gpu, xp, j0
+from lasy.backend import j0, to_cpu, to_gpu, xp
 
 
 class DHT(object):
@@ -55,8 +55,10 @@ class DHT(object):
         # `dot` and `gemm` functions, in the `transform` method.
         self.invM = np.empty((Nr, Nr))
         denom = np.pi * rmax**2 * jn(m + 1, alphas) ** 2
-        if m==0:
-            num = to_cpu(j0(to_gpu(self.r[:, np.newaxis]) * to_gpu(self.kr[np.newaxis, :])))
+        if m == 0:
+            num = to_cpu(
+                j0(to_gpu(self.r[:, np.newaxis]) * to_gpu(self.kr[np.newaxis, :]))
+            )
         else:
             num = jn(m, self.r[:, np.newaxis] * self.kr[np.newaxis, :])
 
