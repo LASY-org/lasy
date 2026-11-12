@@ -216,7 +216,7 @@ def extract_array(m, series, component=None):
         assert axis_labels in [["r", "z"], ["z", "r"], ["r", "t"], ["t", "r"]]
     else:  # len(axis_labels) == 3
         if len(grid_spacing) == 2:
-            grid_spacing = [0.0] + grid_spacing # For CW beam
+            grid_spacing = [0.0] + grid_spacing  # For CW beam
         idx_offset = 0
         assert axis_labels in [
             ["x", "y", "z"],
