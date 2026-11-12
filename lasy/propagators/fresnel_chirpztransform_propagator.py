@@ -30,7 +30,7 @@ class FresnelChirpZPropagator(Propagator):
 
     where :math:`G` is given by:
 
-    .. math::s
+    .. math::
 
         G = \frac{ \omega \exp{(\frac{i \omega z}{c}) \exp(i\omega\frac{x^2+y^2}{2 c z})}}{i 2 \pi c z}
 
