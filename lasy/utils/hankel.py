@@ -5,7 +5,7 @@
 import numpy as np
 from scipy.special import jn, jn_zeros
 
-from lasy.backend import to_gpu, xp
+from lasy.backend import j0, to_cpu, to_gpu, xp
 
 
 class DHT(object):
@@ -55,7 +55,13 @@ class DHT(object):
         # `dot` and `gemm` functions, in the `transform` method.
         self.invM = np.empty((Nr, Nr))
         denom = np.pi * rmax**2 * jn(m + 1, alphas) ** 2
-        num = jn(m, self.r[:, np.newaxis] * self.kr[np.newaxis, :])
+        if m == 0:
+            num = to_cpu(
+                j0(to_gpu(self.r[:, np.newaxis]) * to_gpu(self.kr[np.newaxis, :]))
+            )
+        else:
+            num = jn(m, self.r[:, np.newaxis] * self.kr[np.newaxis, :])
+
         # Get the inverse matrix
         if m != 0:
             self.invM[:, 1:] = num[:, 1:] / denom[np.newaxis, 1:]
@@ -66,10 +72,10 @@ class DHT(object):
         # Calculate the matrix M by inverting invM
         self.M = np.empty((Nr, Nr))
         if m != 0:
-            self.M[1:, :] = np.linalg.pinv(self.invM[:, 1:])
+            self.M[1:, :] = to_cpu(xp.linalg.pinv(to_gpu(self.invM[:, 1:])))
             self.M[0, :] = 0.0
         else:
-            self.M = np.linalg.inv(self.invM)
+            self.M = to_cpu(xp.linalg.inv(to_gpu(self.invM)))
 
         self.M = to_gpu(self.M)
         self.invM = to_gpu(self.invM)
