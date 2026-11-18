@@ -21,9 +21,9 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
 
         New to ``lasy``? Check this out for installation instructions and a first example.
 
-        +++
+        .. card-footer::
 
-        .. button-ref:: user_guide/index
+            .. button-ref:: user_guide/index
                 :expand:
                 :color: primary
                 :click-parent:
@@ -35,9 +35,9 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
 
         An overview of the key concepts and functionality of the code.
 
-        +++
+        .. card-footer::
 
-        .. button-ref:: code_overview/index
+            .. button-ref:: code_overview/index
                 :expand:
                 :color: primary
                 :click-parent:
@@ -49,9 +49,9 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
 
         Get into the nuts and bolts of the ``lasy`` API with the documentation here.
 
-        +++
+        .. card-footer::
 
-        .. button-ref:: api/index
+            .. button-ref:: api/index
                 :expand:
                 :color: primary
                 :click-parent:
@@ -63,9 +63,9 @@ The code is open-source and hosted on `github <https://github.com/LASY-org/lasy>
 
         Some step-by-step guides to using the code and some common examples which you might find useful.
 
-        +++
+        .. card-footer::
 
-        .. button-ref:: tutorials/index
+            .. button-ref:: tutorials/index
                 :expand:
                 :color: primary
                 :click-parent:
