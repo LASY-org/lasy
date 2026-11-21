@@ -9,7 +9,7 @@ class ABCD:
     ----------
     abcd : 2d array
         The 2D ray matrix of the optical system through which the beam propagates.
-        By default, this is initialised to be the unitary matrix:
+        By default, this is initialised to none:
 
 
         .. math::
@@ -22,7 +22,7 @@ class ABCD:
 
     """
 
-    def __init__(self, abcd=xp.array([[1, 0], [0, 1]])):
+    def __init__(self, abcd=None):
         super().__init__()
         self.abcd = abcd
 
@@ -46,7 +46,10 @@ class ABCD:
 
         """
         vacuum = xp.array([[1, float(distance)], [0, 1]])
-        self.abcd = xp.matmul(vacuum, self.abcd)
+        if self.abcd is None:
+            self.abcd = vacuum
+        else:
+            self.abcd = xp.matmul(vacuum, self.abcd)
 
     def add_lens(self, focal_length):
         r"""
@@ -68,4 +71,7 @@ class ABCD:
 
         """
         lens = xp.array([[1, 0], [-1.0 / focal_length, 1]])
-        self.abcd = xp.matmul(lens, self.abcd)
+        if self.abcd is None:
+            self.abcd = lens
+        else:
+            self.abcd = xp.matmul(lens, self.abcd)
